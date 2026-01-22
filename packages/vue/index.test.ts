@@ -1,7 +1,7 @@
 // Тесты для Vue адаптера
 import { atom, createStore } from '@nexus-state/core';
 import { useAtom } from './index';
-import { watch } from 'vue';
+import * as vue from 'vue';
 
 // Мокаем vue для тестирования хука
 jest.mock('vue', () => ({
@@ -21,10 +21,10 @@ describe('useAtom', () => {
     const testAtom = atom(42);
     
     // Мокаем ref для контроля возвращаемого значения
-    const refMock = jest.spyOn(require('vue'), 'ref');
+    const refMock = jest.spyOn(vue, 'ref');
     refMock.mockImplementation((val) => ({ value: val }));
     
-    const watchEffectMock = jest.spyOn(require('vue'), 'watchEffect');
+    const watchEffectMock = jest.spyOn(vue, 'watchEffect');
     watchEffectMock.mockImplementation((fn) => fn());
     
     const result = useAtom(testAtom, store);
@@ -37,11 +37,10 @@ describe('useAtom', () => {
     const testAtom = atom(0);
     
     // Мокаем ref для контроля возвращаемого значения
-    let refValue = store.get(testAtom);
-    const refMock = jest.spyOn(require('vue'), 'ref');
+    const refMock = jest.spyOn(vue, 'ref');
     refMock.mockImplementation((val) => ({ value: val }));
     
-    const watchEffectMock = jest.spyOn(require('vue'), 'watchEffect');
+    const watchEffectMock = jest.spyOn(vue, 'watchEffect');
     watchEffectMock.mockImplementation((fn) => fn());
     
     const result = useAtom(testAtom, store);
