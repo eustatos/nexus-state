@@ -1,0 +1,24 @@
+# CI/CD configuration for nexus-state
+
+# Workflow for publishing packages to npm
+on:
+  push:
+    - workflows: [publish]
+      filter:
+        tags: ["v*"]
+
+workflows:
+  publish:
+    tasks:
+      - name: publish-packages
+        cubes:
+          - name: publish-to-npm
+            image: docker.io/library/node:18
+            script:
+              - npm ci
+              - npm run build
+              - |
+                echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+                npm publish --workspaces --if-present
+            secrets:
+              - NPM_TOKEN
