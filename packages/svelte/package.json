@@ -15,7 +15,7 @@
     "typescript": "^5.0.0",\r
     "vitest": "^0.34.0",\r
     "eslint": "^8.40.0",\r
-    "@sveltejs/store": "^3.0.0"\r
+    "svelte": "^3.0.0"\r
   },\r
   "peerDependencies": {\r
     "svelte": "^3.0.0"\r
