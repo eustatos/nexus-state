@@ -1,7 +1,6 @@
 <script>
   import { atom } from '@nexus-state/core';
   import { useAtom } from '@nexus-state/svelte';
-  import { writable } from 'svelte/store';
 
   const countAtom = atom(0);
   const count = useAtom(countAtom);
