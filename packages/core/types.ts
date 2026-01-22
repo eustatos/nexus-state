@@ -9,6 +9,8 @@ export type Setter = <Value>(
 
 export type Subscriber<Value> = (value: Value) => void;
 
+export type Plugin = (store: Store) => void;
+
 export interface Store {
   get: <Value>(atom: Atom<Value>) => Value;
   set: <Value>(
@@ -19,6 +21,7 @@ export interface Store {
     atom: Atom<Value>,
     subscriber: Subscriber<Value>
   ) => () => void;
+  getState: () => Record<string, any>;
 }
 
 export interface Atom<Value> {

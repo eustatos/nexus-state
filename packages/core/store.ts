@@ -8,7 +8,9 @@ type AtomState<Value> = {
   dependents: Set<Atom<any>>;
 };
 
-export function createStore(): Store {
+type Plugin = (store: Store) => void;
+
+export function createStore(plugins: Plugin[] = []): Store {
   const atomStates = new Map<Atom<any>, AtomState<any>>();
 
   const get: Getter = <Value>(atom: Atom<Value>): Value => {
@@ -89,9 +91,26 @@ export function createStore(): Store {
     };
   };
 
-  return {
+  // Добавляем метод для получения состояния всех атомов (для devtools)
+  const getState = (): Record<string, any> => {
+    const state: Record<string, any> = {};
+    atomStates.forEach((atomState, atom) => {
+      // Здесь мы используем внутренний ID атома или другую идентификацию
+      // Поскольку у нас нет прямого доступа к имени атома, используем его индекс или хэш
+      state[atom.toString()] = atomState.value;
+    });
+    return state;
+  };
+
+  const store: Store = {
     get,
     set,
     subscribe,
+    getState,
   };
+
+  // Применяем плагины
+  plugins.forEach(plugin => plugin(store));
+
+  return store;
 }
