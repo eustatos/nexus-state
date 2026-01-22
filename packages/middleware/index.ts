@@ -39,34 +39,34 @@ export function middleware<T>(atom: Atom<T>, config: MiddlewareConfig<T>): (stor
     const originalSet = store.set.bind(store);
     
     // Override the set method to add middleware functionality
-    store.set = (a: Atom<unknown>, update: unknown) => {
-      if (a.id === atom.id) {
+    store.set = <Value>(a: Atom<Value>, update: Value | ((prev: Value) => Value)) => {
+      if (a.id === (atom as unknown as Atom<Value>).id) {
         // Handle updates for the target atom
-        let processedValue: T;
+        let processedValue: Value;
         
         if (typeof update === 'function') {
           // Handle function updates
-          const currentValue = store.get(atom);
-          processedValue = (update as (prev: T) => T)(currentValue);
+          const currentValue = store.get(a);
+          processedValue = (update as (prev: Value) => Value)(currentValue);
         } else {
           // Handle direct value updates
-          processedValue = update as T;
+          processedValue = update;
         }
         
         // Apply beforeSet middleware
         if (beforeSet) {
-          const result = beforeSet(atom, processedValue);
+          const result = beforeSet(atom, processedValue as unknown as T);
           if (result !== undefined) {
-            processedValue = result;
+            processedValue = result as unknown as Value;
           }
         }
         
         // Set the value using the original set method
-        originalSet(atom, processedValue);
+        originalSet(a, processedValue);
         
         // Apply afterSet middleware
         if (afterSet) {
-          afterSet(atom, processedValue);
+          afterSet(atom, processedValue as unknown as T);
         }
       } else {
         // For other atoms, use the original implementation
