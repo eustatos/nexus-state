@@ -1,6 +1,5 @@
-// React adapter for nexus-state
-import { Atom, Store, createStore } from '@nexus-state/core';
-import { useEffect, useMemo, useState } from 'react';
+import { Atom, Store, createStore } from "@nexus-state/core";
+import { useEffect, useMemo, useState } from "react";
 
 /**
  * Hook to use an atom in a React component.
@@ -11,7 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
  * @example
  * function Counter() {
  *   const [count, setCount] = useAtom(countAtom);
- *   
+ *
  *   return (
  *     <div>
  *       <p>Count: {count}</p>
@@ -20,19 +19,22 @@ import { useEffect, useMemo, useState } from 'react';
  *   );
  * }
  */
-export function useAtom<T>(atom: Atom<T>, store: Store = useMemo(() => createStore(), [])): T {
-  const [value, setValue] = useState(() => store.get(atom));
+export function useAtom<T>(atom: Atom<T>, store?: Store): T {
+  // Если store не передан, создаем новый store с помощью useMemo
+  const resolvedStore = useMemo(() => store || createStore(), [store]);
+
+  const [value, setValue] = useState(() => resolvedStore.get(atom));
 
   useEffect(() => {
-    const unsubscribe = store.subscribe(atom, () => {
-      setValue(store.get(atom));
+    const unsubscribe = resolvedStore.subscribe(atom, () => {
+      setValue(resolvedStore.get(atom));
     });
 
     // Check if the value has changed immediately after subscription
-    setValue(store.get(atom));
+    setValue(resolvedStore.get(atom));
 
     return unsubscribe;
-  }, [atom, store]);
+  }, [atom, resolvedStore]);
 
   return value;
 }

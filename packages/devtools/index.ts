@@ -1,5 +1,17 @@
 // DevTools plugin for nexus-state
-import { Store } from '@nexus-state/core';
+import { Store } from "@nexus-state/core";
+
+// Declare global types for Redux DevTools
+declare global {
+  interface Window {
+    __REDUX_DEVTOOLS_EXTENSION__?: {
+      connect: (options: { name: string }) => {
+        send: (action: string, state: any) => void;
+        subscribe: (listener: (message: any) => void) => void;
+      };
+    };
+  }
+}
 
 /**
  * Configuration options for the devTools plugin.
@@ -22,29 +34,64 @@ type DevToolsConfig = {
 export function devTools(config: DevToolsConfig = {}): (store: Store) => void {
   return (store: Store) => {
     // Check if Redux DevTools are available
-    if (typeof window === 'undefined' || !window.__REDUX_DEVTOOLS_EXTENSION__) {
-      console.warn('Redux DevTools are not available');
+    if (typeof window === "undefined" || !window.__REDUX_DEVTOOLS_EXTENSION__) {
+      console.warn("Redux DevTools are not available");
       return;
     }
 
-    const { name = 'nexus-state' } = config;
-    
+    const { name = "nexus-state" } = config;
+
     // Create a connection to DevTools
     const devTools = window.__REDUX_DEVTOOLS_EXTENSION__.connect({ name });
-    
-    // Subscribe to store changes
-    store.subscribe(() => {
-      const state = store.getState();
-      devTools.send('STATE_CHANGE', state);
-    });
+
+    // Create a dummy atom for subscription
+    // This is a workaround since we can't subscribe to the entire store
+    let lastState: any = null;
+
+    // We need to find a way to track state changes
+    // Since we can't directly subscribe to all atoms, we'll use a polling approach
+    const interval = setInterval(() => {
+      try {
+        const currentState = store.getState();
+        if (JSON.stringify(currentState) !== JSON.stringify(lastState)) {
+          lastState = currentState;
+          devTools.send("STATE_UPDATE", currentState);
+        }
+      } catch (error) {
+        console.warn("Failed to send state update to DevTools:", error);
+      }
+    }, 100);
+
+    // Clean up interval when window is unloaded
+    if (typeof window !== "undefined") {
+      window.addEventListener("beforeunload", () => {
+        clearInterval(interval);
+      });
+    }
+
+    // Send initial state
+    setTimeout(() => {
+      try {
+        const state = store.getState();
+        lastState = state;
+        devTools.send("INITIAL_STATE", state);
+      } catch (error) {
+        console.warn("Failed to send initial state to DevTools:", error);
+      }
+    }, 0);
 
     // Handle actions from DevTools (e.g., time travel)
     devTools.subscribe((message: any) => {
-      if (message.type === 'DISPATCH' && message.payload?.type === 'JUMP_TO_ACTION') {
+      if (
+        message.type === "DISPATCH" &&
+        message.payload?.type === "JUMP_TO_ACTION"
+      ) {
         // Logic for state restoration should be implemented here
         // Since we don't have direct access to the internal state of atoms,
         // we cannot fully implement time travel without core modifications
-        console.warn('Time travel is not fully supported without core modifications');
+        console.warn(
+          "Time travel is not fully supported without core modifications",
+        );
       }
     });
   };
