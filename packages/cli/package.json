@@ -6,8 +6,8 @@
     "nexus": "./bin/nexus.js"
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w"
+    "build": "echo 'No build required'",
+    "dev": "echo 'No development build required'"
   },
   "dependencies": {
     "commander": "^11.0.0",
