@@ -28,7 +28,7 @@ describe("useAtom", () => {
 
     // Мокаем useState и useMemo для контроля возвращаемых значений
     const useStateMock = jest.spyOn(React, "useState");
-    useStateMock.mockImplementation(<T>(init: T) => [init, jest.fn()]);
+    useStateMock.mockImplementation((initialState: unknown) => [initialState, jest.fn()]);
 
     const useMemoMock = jest.spyOn(React, "useMemo");
     useMemoMock.mockImplementation(() => store);
@@ -48,7 +48,7 @@ describe("useAtom", () => {
     // Мокаем useState и useMemo для контроля возвращаемых значений
     const setState = jest.fn();
     const useStateMock = jest.spyOn(React, "useState");
-    useStateMock.mockImplementation(<T>(init: T) => [init, setState]);
+    useStateMock.mockImplementation((initialState: unknown) => [initialState, setState]);
 
     const useMemoMock = jest.spyOn(React, "useMemo");
     useMemoMock.mockImplementation(() => store);
