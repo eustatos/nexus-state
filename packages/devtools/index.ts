@@ -6,8 +6,8 @@ declare global {
   interface Window {
     __REDUX_DEVTOOLS_EXTENSION__?: {
       connect: (options: { name: string }) => {
-        send: (action: string, state: any) => void;
-        subscribe: (listener: (message: any) => void) => void;
+        send: (action: string, state: unknown) => void;
+        subscribe: (listener: (message: unknown) => void) => void;
       };
     };
   }
@@ -46,7 +46,7 @@ export function devTools(config: DevToolsConfig = {}): (store: Store) => void {
 
     // Create a dummy atom for subscription
     // This is a workaround since we can't subscribe to the entire store
-    let lastState: any = null;
+    let lastState: unknown = null;
 
     // We need to find a way to track state changes
     // Since we can't directly subscribe to all atoms, we'll use a polling approach
@@ -81,10 +81,12 @@ export function devTools(config: DevToolsConfig = {}): (store: Store) => void {
     }, 0);
 
     // Handle actions from DevTools (e.g., time travel)
-    devTools.subscribe((message: any) => {
+    devTools.subscribe((message: unknown) => {
       if (
-        message.type === "DISPATCH" &&
-        message.payload?.type === "JUMP_TO_ACTION"
+        typeof message === "object" &&
+        message !== null &&
+        (message as { type?: string }).type === "DISPATCH" &&
+        (message as { payload?: { type?: string } }).payload?.type === "JUMP_TO_ACTION"
       ) {
         // Logic for state restoration should be implemented here
         // Since we don't have direct access to the internal state of atoms,
