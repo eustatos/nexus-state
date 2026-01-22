@@ -27,7 +27,7 @@ export function workerAtom<T>(options: WorkerAtomOptions<T>): Atom<T> {
   
   // Listen for messages from the worker
   worker.onmessage = (event) => {
-    const { type, payload } = event.data;
+    const { type } = event.data;
     
     switch (type) {
       case 'UPDATE':
