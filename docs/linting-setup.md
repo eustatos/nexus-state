@@ -34,6 +34,35 @@ npm install
 - `packages/react/.eslintrc.js`
 - `packages/vue/.eslintrc.js`
 - `packages/svelte/.eslintrc.js`
+- `packages/immer/.eslintrc.js`
+- `packages/persist/.eslintrc.js`
+
+## Необходимый файл tsconfig.json
+
+Для корректной работы ESLint с TypeScript необходимо создать файл `tsconfig.json` в корне проекта. Пример содержимого файла:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": ["ES2020"],
+    "allowJs": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "composite": true
+  },
+  "exclude": ["node_modules", "dist"]
+}
+```
 
 ## Запуск linting
 

@@ -59,6 +59,8 @@ const unsubscribe = store.subscribe(countAtom, (value) => {
 - [@nexus-state/persist](packages/persist) - Persistence plugin
 - [@nexus-state/devtools](packages/devtools) - DevTools plugin
 - [@nexus-state/middleware](packages/middleware) - Middleware plugin
+- [@nexus-state/immer](packages/immer) - Immer integration
+- [@nexus-state/web-worker](packages/web-worker) - Web Worker integration
 
 ## Documentation
 
