@@ -1,16 +1,23 @@
-// Тесты для Vue адаптера
+// Tests for Vue adapter
 import { atom, createStore } from '@nexus-state/core';
 import { useAtom } from './index';
 import * as vue from 'vue';
 
-// Типы для моков
+// Types for mocks
 interface MockRef<T> {
   value: T;
 }
 
-type OnCleanup = (cleanupFn: () => void) => void;
+interface WatchHandle {
+  pause: () => void;
+  resume: () => void;
+  stop: () => void;
+}
 
-// Мокаем vue для тестирования хука
+type OnCleanup = (cleanupFn: () => void) => void;
+type WatchEffect = (onCleanup: OnCleanup) => void;
+
+// Mock vue for testing the hook
 jest.mock('vue', () => ({
   ...jest.requireActual('vue'),
   ref: jest.fn(),
@@ -19,7 +26,7 @@ jest.mock('vue', () => ({
 
 describe('useAtom', () => {
   beforeEach(() => {
-    // Сброс моков перед каждым тестом
+    // Reset mocks before each test
     jest.clearAllMocks();
   });
 
@@ -27,14 +34,22 @@ describe('useAtom', () => {
     const store = createStore();
     const testAtom = atom(42);
     
-    // Мокаем ref для контроля возвращаемого значения
-    const refMock = jest.spyOn(vue, 'ref');
+    // Mock ref to control the return value
+    const refMock = jest.spyOn(vue, 'ref') as jest.MockedFunction<
+      <T>(value: T) => MockRef<T>
+    >;
     refMock.mockImplementation(<T>(val: T): MockRef<T> => ({ value: val }));
     
-    const watchEffectMock = jest.spyOn(vue, 'watchEffect');
-    watchEffectMock.mockImplementation((fn) => {
+    const watchEffectMock = jest.spyOn(vue, 'watchEffect') as jest.MockedFunction<
+      (effect: WatchEffect) => WatchHandle
+    >;
+    watchEffectMock.mockImplementation((fn): WatchHandle => {
       fn(jest.fn()); // onCleanup function
-      return jest.fn(); // stop handler
+      return {
+        pause: jest.fn(),
+        resume: jest.fn(),
+        stop: jest.fn()
+      };
     });
     
     const result = useAtom(testAtom, store);
@@ -46,32 +61,40 @@ describe('useAtom', () => {
     const store = createStore();
     const testAtom = atom(0);
     
-    // Мокаем ref для контроля возвращаемого значения
+    // Mock ref to control the return value
     let refValue: { value: number } = { value: 0 };
-    const refMock = jest.spyOn(vue, 'ref');
+    const refMock = jest.spyOn(vue, 'ref') as jest.MockedFunction<
+      <T>(value: T) => MockRef<T>
+    >;
     refMock.mockImplementation(<T>(val: T): MockRef<T> => {
       refValue = { value: val as unknown as number };
       return refValue as unknown as MockRef<T>;
     });
     
-    const watchEffectMock = jest.spyOn(vue, 'watchEffect');
-    watchEffectMock.mockImplementation((fn) => {
+    const watchEffectMock = jest.spyOn(vue, 'watchEffect') as jest.MockedFunction<
+      (effect: WatchEffect) => WatchHandle
+    >;
+    watchEffectMock.mockImplementation((fn): WatchHandle => {
       fn(jest.fn()); // onCleanup function
-      return jest.fn(); // stop handler
+      return {
+        pause: jest.fn(),
+        resume: jest.fn(),
+        stop: jest.fn()
+      };
     });
     
     const result = useAtom(testAtom, store);
     
     expect(result.value).toBe(0);
     
-    // Изменяем значение атома
+    // Change the atom value
     store.set(testAtom, 1);
     
-    // Вызываем watchEffect вручную, так как мы замокали его
+    // Call watchEffect manually since we mocked it
     const onCleanup = jest.fn();
-    (watchEffectMock.mock.calls[0][0] as (onCleanup: OnCleanup) => void)(onCleanup);
+    (watchEffectMock.mock.calls[0][0] as WatchEffect)(onCleanup);
     
-    // Проверяем, что значение обновилось
+    // Check that the value was updated
     expect(result.value).toBe(1);
   });
 });
