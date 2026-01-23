@@ -35,14 +35,10 @@ describe('useAtom', () => {
     const testAtom = atom(42);
     
     // Mock ref to control the return value
-    const refMock = jest.spyOn(vue, 'ref') as jest.MockedFunction<
-      <T>(value: T) => MockRef<T>
-    >;
+    const refMock = jest.spyOn(vue, 'ref');
     refMock.mockImplementation(<T>(val: T): MockRef<T> => ({ value: val }));
     
-    const watchEffectMock = jest.spyOn(vue, 'watchEffect') as jest.MockedFunction<
-      (effect: WatchEffect) => WatchHandle
-    >;
+    const watchEffectMock = jest.spyOn(vue, 'watchEffect');
     watchEffectMock.mockImplementation((fn): WatchHandle => {
       fn(jest.fn()); // onCleanup function
       return {
@@ -63,17 +59,13 @@ describe('useAtom', () => {
     
     // Mock ref to control the return value
     let refValue: { value: number } = { value: 0 };
-    const refMock = jest.spyOn(vue, 'ref') as jest.MockedFunction<
-      <T>(value: T) => MockRef<T>
-    >;
+    const refMock = jest.spyOn(vue, 'ref');
     refMock.mockImplementation(<T>(val: T): MockRef<T> => {
       refValue = { value: val as unknown as number };
       return refValue as unknown as MockRef<T>;
     });
     
-    const watchEffectMock = jest.spyOn(vue, 'watchEffect') as jest.MockedFunction<
-      (effect: WatchEffect) => WatchHandle
-    >;
+    const watchEffectMock = jest.spyOn(vue, 'watchEffect');
     watchEffectMock.mockImplementation((fn): WatchHandle => {
       fn(jest.fn()); // onCleanup function
       return {
