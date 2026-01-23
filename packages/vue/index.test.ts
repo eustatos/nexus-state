@@ -8,15 +8,6 @@ interface MockRef<T> {
   value: T;
 }
 
-interface WatchHandle {
-  pause: () => void;
-  resume: () => void;
-  stop: () => void;
-}
-
-type OnCleanup = (cleanupFn: () => void) => void;
-type WatchEffect = (onCleanup: OnCleanup) => void;
-
 // Mock vue for testing the hook
 jest.mock('vue', () => ({
   ...jest.requireActual('vue'),
@@ -36,16 +27,18 @@ describe('useAtom', () => {
     
     // Mock ref to control the return value
     const refMock = jest.spyOn(vue, 'ref');
-    refMock.mockImplementation(<T>(val: T): MockRef<T> => ({ value: val }));
+    refMock.mockImplementation((val: unknown) => ({ value: val }));
     
     const watchEffectMock = jest.spyOn(vue, 'watchEffect');
-    watchEffectMock.mockImplementation((fn): WatchHandle => {
-      fn(jest.fn()); // onCleanup function
+    watchEffectMock.mockImplementation((fn, options) => {
+      // Call the effect function with a mock cleanup function
+      const cleanup = fn(() => {});
+      // Return a mock WatchHandle
       return {
-        pause: jest.fn(),
-        resume: jest.fn(),
-        stop: jest.fn()
-      };
+        stop: () => {},
+        pause: () => {},
+        resume: () => {}
+      } as unknown as ReturnType<typeof vue.watchEffect>;
     });
     
     const result = useAtom(testAtom, store);
@@ -60,19 +53,21 @@ describe('useAtom', () => {
     // Mock ref to control the return value
     let refValue: { value: number } = { value: 0 };
     const refMock = jest.spyOn(vue, 'ref');
-    refMock.mockImplementation(<T>(val: T): MockRef<T> => {
-      refValue = { value: val as unknown as number };
-      return refValue as unknown as MockRef<T>;
+    refMock.mockImplementation((val: unknown) => {
+      refValue = { value: val as number };
+      return refValue;
     });
     
     const watchEffectMock = jest.spyOn(vue, 'watchEffect');
-    watchEffectMock.mockImplementation((fn): WatchHandle => {
-      fn(jest.fn()); // onCleanup function
+    watchEffectMock.mockImplementation((fn, options) => {
+      // Call the effect function with a mock cleanup function
+      const cleanup = fn(() => {});
+      // Return a mock WatchHandle
       return {
-        pause: jest.fn(),
-        resume: jest.fn(),
-        stop: jest.fn()
-      };
+        stop: () => {},
+        pause: () => {},
+        resume: () => {}
+      } as unknown as ReturnType<typeof vue.watchEffect>;
     });
     
     const result = useAtom(testAtom, store);
@@ -84,7 +79,7 @@ describe('useAtom', () => {
     
     // Call watchEffect manually since we mocked it
     const onCleanup = jest.fn();
-    (watchEffectMock.mock.calls[0][0] as WatchEffect)(onCleanup);
+    (watchEffectMock.mock.calls[0][0] as (onCleanup: (fn: () => void) => void) => void)(onCleanup);
     
     // Check that the value was updated
     expect(result.value).toBe(1);
