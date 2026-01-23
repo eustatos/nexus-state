@@ -1,24 +1,24 @@
 # @nexus-state/family
 
-Утилиты для работы с "семьями" состояний в Nexus State
+Utilities for working with state "families" in Nexus State
 
-## Описание
+## Description
 
-Пакет `@nexus-state/family` предоставляет инструменты для управления группами связанных состояний в приложении.
+The `@nexus-state/family` package provides tools for managing groups of related states in an application.
 
-## Установка
+## Installation
 
 ```bash
 npm install @nexus-state/family
 ```
 
-## Основные функции
+## Key Features
 
-- Создание и управление "семьями" состояний
-- Синхронизация связанных состояний
-- Поддержка иерархической структуры
+- Creating and managing state "families"
+- Synchronization of related states
+- Support for hierarchical structure
 
-## Пример использования
+## Usage Example
 
 ```javascript
 import { createFamily } from '@nexus-state/family';
@@ -33,7 +33,7 @@ const family = createFamily({
   }
 });
 
-// Работа с состоянием
+// Working with state
 family.setState({
   user: {
     name: 'John',
@@ -42,6 +42,6 @@ family.setState({
 });
 ```
 
-## Лицензия
+## License
 
 MIT

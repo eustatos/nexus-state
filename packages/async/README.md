@@ -1,36 +1,36 @@
 # @nexus-state/async
 
-Асинхронные утилиты для работы с состоянием Nexus
+Asynchronous utilities for Nexus State
 
-## Описание
+## Description
 
-Пакет `@nexus-state/async` предоставляет инструменты для работы с асинхронными операциями в контексте управления состоянием приложения.
+The `@nexus-state/async` package provides tools for working with asynchronous operations in the context of application state management.
 
-## Установка
+## Installation
 
 ```bash
 npm install @nexus-state/async
 ```
 
-## Основные функции
+## Key Features
 
-- Управление асинхронными операциями
-- Интеграция с основным ядром Nexus State
-- Поддержка отмены операций
+- Asynchronous operation management
+- Integration with the core Nexus State
+- Operation cancellation support
 
-## Пример использования
+## Usage Example
 
 ```javascript
 import { createAsyncOperation } from '@nexus-state/async';
 
 const asyncOp = createAsyncOperation(async () => {
-  // Ваш асинхронный код здесь
+  // Your asynchronous code here
   return await fetchData();
 });
 
-// Использование в вашем приложении
+// Usage in your application
 ```
 
-## Лицензия
+## License
 
 MIT

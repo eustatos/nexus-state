@@ -1,24 +1,24 @@
 # @nexus-state/web-worker
 
-Интеграция Nexus State с Web Workers
+Nexus State integration with Web Workers
 
-## Описание
+## Description
 
-Пакет `@nexus-state/web-worker` предоставляет инструменты для работы с Nexus State в Web Workers.
+The `@nexus-state/web-worker` package provides tools for working with Nexus State in Web Workers.
 
-## Установка
+## Installation
 
 ```bash
 npm install @nexus-state/web-worker
 ```
 
-## Основные функции
+## Key Features
 
-- Перенос логики состояния в Web Workers
-- Асинхронная обработка тяжелых операций
-- Коммуникация между основным потоком и Web Worker
+- Moving state logic to Web Workers
+- Asynchronous processing of heavy operations
+- Communication between main thread and Web Worker
 
-## Пример использования
+## Usage Example
 
 ```javascript
 import { createWorkerStore } from '@nexus-state/web-worker';
@@ -27,18 +27,18 @@ const workerStore = createWorkerStore({
   calculations: []
 });
 
-// Выполнение тяжелых вычислений в Web Worker
+// Performing heavy computations in Web Worker
 workerStore.dispatch({
   type: 'CALCULATE',
   payload: largeDataSet
 });
 
-// Подписка на результаты
+// Subscribing to results
 workerStore.subscribe((state) => {
-  console.log('Результаты вычислений:', state.calculations);
+  console.log('Calculation results:', state.calculations);
 });
 ```
 
-## Лицензия
+## License
 
 MIT

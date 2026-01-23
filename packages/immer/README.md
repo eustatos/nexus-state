@@ -1,24 +1,24 @@
 # @nexus-state/immer
 
-Интеграция Immer с Nexus State
+Immer integration with Nexus State
 
-## Описание
+## Description
 
-Пакет `@nexus-state/immer` предоставляет интеграцию библиотеки Immer с Nexus State для упрощения работы с неизменяемыми структурами данных.
+The `@nexus-state/immer` package provides integration of the Immer library with Nexus State to simplify working with immutable data structures.
 
-## Установка
+## Installation
 
 ```bash
 npm install @nexus-state/immer
 ```
 
-## Основные функции
+## Key Features
 
-- Интеграция Immer с хранилищем Nexus State
-- Упрощенная работа с неизменяемыми структурами
-- Поддержка черновиков (drafts) для изменения состояния
+- Immer integration with Nexus State store
+- Simplified work with immutable structures
+- Draft support for state modification
 
-## Пример использования
+## Usage Example
 
 ```javascript
 import { createImmerStore } from '@nexus-state/immer';
@@ -27,12 +27,12 @@ const store = createImmerStore({
   users: []
 });
 
-// Использование черновика для изменения состояния
+// Using a draft to modify state
 store.setState((draft) => {
   draft.users.push({ id: 1, name: 'John' });
 });
 ```
 
-## Лицензия
+## License
 
 MIT

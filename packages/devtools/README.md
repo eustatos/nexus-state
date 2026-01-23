@@ -1,34 +1,34 @@
 # @nexus-state/devtools
 
-Инструменты разработчика для Nexus State
+Developer tools for Nexus State
 
-## Описание
+## Description
 
-Пакет `@nexus-state/devtools` предоставляет инструменты для отладки и разработки приложений на основе Nexus State.
+The `@nexus-state/devtools` package provides tools for debugging and developing applications based on Nexus State.
 
-## Установка
+## Installation
 
 ```bash
 npm install @nexus-state/devtools
 ```
 
-## Основные функции
+## Key Features
 
-- Интроспекция состояния
-- Логирование изменений
-- Интеграция с браузерными инструментами разработчика
+- State introspection
+- Change logging
+- Integration with browser developer tools
 
-## Пример использования
+## Usage Example
 
 ```javascript
 import { createDevtools } from '@nexus-state/devtools';
 
 const devtools = createDevtools();
 
-// Подключение к вашему хранилищу
+// Connecting to your store
 store.use(devtools);
 ```
 
-## Лицензия
+## License
 
 MIT

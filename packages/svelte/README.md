@@ -1,24 +1,24 @@
 # @nexus-state/svelte
 
-Интеграция Nexus State с Svelte
+Nexus State integration with Svelte
 
-## Описание
+## Description
 
-Пакет `@nexus-state/svelte` предоставляет инструменты для интеграции Nexus State с Svelte-приложениями.
+The `@nexus-state/svelte` package provides tools for integrating Nexus State with Svelte applications.
 
-## Установка
+## Installation
 
 ```bash
 npm install @nexus-state/svelte
 ```
 
-## Основные функции
+## Key Features
 
-- Хранилища, совместимые с Svelte
-- Реактивные привязки к состоянию
-- Поддержка Svelte-специфичных паттернов
+- Stores compatible with Svelte
+- Reactive bindings to state
+- Support for Svelte-specific patterns
 
-## Пример использования
+## Usage Example
 
 ```javascript
 import { createStore } from '@nexus-state/svelte';
@@ -27,7 +27,7 @@ const store = createStore({
   count: 0
 });
 
-// Использование в Svelte-компонентах
+// Usage in Svelte components
 $: count = store.state.count;
 
 function increment() {
@@ -35,6 +35,6 @@ function increment() {
 }
 ```
 
-## Лицензия
+## License
 
 MIT

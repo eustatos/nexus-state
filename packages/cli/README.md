@@ -1,24 +1,24 @@
 # @nexus-state/cli
 
-Интерфейс командной строки для Nexus State
+Command-line interface for Nexus State
 
-## Описание
+## Description
 
-Пакет `@nexus-state/cli` предоставляет инструменты командной строки для работы с Nexus State, включая генерацию кода, управление состоянием и другие полезные функции.
+The `@nexus-state/cli` package provides command-line tools for working with Nexus State, including code generation, state management, and other useful features.
 
-## Установка
+## Installation
 
 ```bash
 npm install -g @nexus-state/cli
 ```
 
-## Основные команды
+## Main Commands
 
-- `nexus init` - инициализация нового проекта
-- `nexus generate` - генерация кода на основе схемы
-- `nexus dev` - запуск режима разработки
+- `nexus init` - initialize a new project
+- `nexus generate` - generate code based on schema
+- `nexus dev` - start development mode
 
-## Пример использования
+## Usage Example
 
 ```bash
 nexus init my-app
@@ -26,6 +26,6 @@ cd my-app
 nexus dev
 ```
 
-## Лицензия
+## License
 
 MIT

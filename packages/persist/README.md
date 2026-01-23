@@ -1,24 +1,24 @@
 # @nexus-state/persist
 
-Персистентность для Nexus State
+Persistence for Nexus State
 
-## Описание
+## Description
 
-Пакет `@nexus-state/persist` предоставляет инструменты для сохранения состояния приложения между сессиями.
+The `@nexus-state/persist` package provides tools for saving application state between sessions.
 
-## Установка
+## Installation
 
 ```bash
 npm install @nexus-state/persist
 ```
 
-## Основные функции
+## Key Features
 
-- Сохранение состояния в localStorage/sessionStorage
-- Поддержка различных стратегий сохранения
-- Возможность выборочного сохранения частей состояния
+- State persistence in localStorage/sessionStorage
+- Support for different persistence strategies
+- Ability to selectively persist parts of the state
 
-## Пример использования
+## Usage Example
 
 ```javascript
 import { createPersist } from '@nexus-state/persist';
@@ -28,10 +28,10 @@ const persist = createPersist({
   storage: localStorage
 });
 
-// Подключение к хранилищу
+// Connecting to the store
 store.use(persist);
 ```
 
-## Лицензия
+## License
 
 MIT

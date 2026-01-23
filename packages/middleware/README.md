@@ -1,24 +1,24 @@
 # @nexus-state/middleware
 
-Middleware для Nexus State
+Middleware for Nexus State
 
-## Описание
+## Description
 
-Пакет `@nexus-state/middleware` предоставляет инструменты для создания и использования middleware в Nexus State.
+The `@nexus-state/middleware` package provides tools for creating and using middleware in Nexus State.
 
-## Установка
+## Installation
 
 ```bash
 npm install @nexus-state/middleware
 ```
 
-## Основные функции
+## Key Features
 
-- Создание middleware для перехвата и модификации действий
-- Поддержка асинхронных middleware
-- Интеграция с основным ядром Nexus State
+- Creating middleware to intercept and modify actions
+- Support for asynchronous middleware
+- Integration with the core Nexus State
 
-## Пример использования
+## Usage Example
 
 ```javascript
 import { createMiddleware } from '@nexus-state/middleware';
@@ -28,10 +28,10 @@ const loggerMiddleware = createMiddleware((action, next) => {
   return next(action);
 });
 
-// Подключение к хранилищу
+// Connecting to the store
 store.use(loggerMiddleware);
 ```
 
-## Лицензия
+## License
 
 MIT

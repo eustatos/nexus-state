@@ -1,24 +1,24 @@
 # @nexus-state/vue
 
-Интеграция Nexus State с Vue
+Nexus State integration with Vue
 
-## Описание
+## Description
 
-Пакет `@nexus-state/vue` предоставляет инструменты для интеграции Nexus State с Vue-приложениями.
+The `@nexus-state/vue` package provides tools for integrating Nexus State with Vue applications.
 
-## Установка
+## Installation
 
 ```bash
 npm install @nexus-state/vue
 ```
 
-## Основные функции
+## Key Features
 
-- Плагины для интеграции с Vue
-- Реактивные привязки к состоянию
-- Поддержка Composition API и Options API
+- Plugins for Vue integration
+- Reactive bindings to state
+- Support for Composition API and Options API
 
-## Пример использования
+## Usage Example
 
 ```javascript
 import { createStore } from '@nexus-state/vue';
@@ -27,7 +27,7 @@ const store = createStore({
   count: 0
 });
 
-// В Vue-компонентах
+// In Vue components
 export default {
   data() {
     return {
@@ -42,6 +42,6 @@ export default {
 };
 ```
 
-## Лицензия
+## License
 
 MIT

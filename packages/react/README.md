@@ -1,24 +1,24 @@
 # @nexus-state/react
 
-Интеграция Nexus State с React
+Nexus State integration with React
 
-## Описание
+## Description
 
-Пакет `@nexus-state/react` предоставляет инструменты для интеграции Nexus State с React-приложениями.
+The `@nexus-state/react` package provides tools for integrating Nexus State with React applications.
 
-## Установка
+## Installation
 
 ```bash
 npm install @nexus-state/react
 ```
 
-## Основные функции
+## Key Features
 
-- Хуки для работы с состоянием в React-компонентах
-- Компоненты высшего порядка (HOC)
-- Поддержка контекста React
+- Hooks for working with state in React components
+- Higher-order components (HOC)
+- React context support
 
-## Пример использования
+## Usage Example
 
 ```javascript
 import { useStore } from '@nexus-state/react';
@@ -37,6 +37,6 @@ function MyComponent() {
 }
 ```
 
-## Лицензия
+## License
 
 MIT
