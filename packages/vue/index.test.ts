@@ -3,24 +3,15 @@ import { atom, createStore } from '@nexus-state/core';
 import { useAtom } from './index';
 import * as vue from 'vue';
 
-// Types for mocks
-interface MockRef<T> {
-  value: T;
-}
-
-// Store references to the original functions
-const originalRef = vue.ref;
-const originalWatchEffect = vue.watchEffect;
-
 // Mock vue for testing the hook
 jest.mock('vue', () => {
   const actualVue = jest.requireActual('vue');
   return {
     ...actualVue,
     ref: jest.fn((val: unknown) => ({ value: val })),
-    watchEffect: jest.fn((fn: any, options?: any) => {
+    watchEffect: jest.fn((fn: (onCleanup: (fn: () => void) => void) => void, _options?: unknown) => {
       // Call the effect function with a mock cleanup function
-      const cleanup = fn(() => {});
+      fn(() => {});
       // Return a mock WatchHandle
       return {
         stop: () => {},
@@ -43,9 +34,9 @@ describe('useAtom', () => {
     
     // Setup the mocks
     (vue.ref as jest.Mock).mockImplementation((val: unknown) => ({ value: val }));
-    (vue.watchEffect as jest.Mock).mockImplementation((fn: any, options?: any) => {
+    (vue.watchEffect as jest.Mock).mockImplementation((fn: (onCleanup: (fn: () => void) => void) => void, _options?: unknown) => {
       // Call the effect function with a mock cleanup function
-      const cleanup = fn(() => {});
+      fn(() => {});
       // Return a mock WatchHandle
       return {
         stop: () => {},
@@ -70,9 +61,9 @@ describe('useAtom', () => {
       return refValue;
     });
     
-    (vue.watchEffect as jest.Mock).mockImplementation((fn: any, options?: any) => {
+    (vue.watchEffect as jest.Mock).mockImplementation((fn: (onCleanup: (fn: () => void) => void) => void, _options?: unknown) => {
       // Call the effect function with a mock cleanup function
-      const cleanup = fn(() => {});
+      fn(() => {});
       // Return a mock WatchHandle
       return {
         stop: () => {},
