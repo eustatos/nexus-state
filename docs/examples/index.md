@@ -9,5 +9,5 @@ These examples demonstrate how to use Nexus State in various scenarios.
 
 ## Advanced Examples
 
-- [Forms](/examples/forms) - Form handling with validation
+- [Forms](/examples/form) - Form handling with validation
 - [Async Data](/examples/async-data) - Handling asynchronous data

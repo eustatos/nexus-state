@@ -50,6 +50,7 @@ export default {
             { text: 'Forms', link: '/recipes/forms' },
             { text: 'Caching', link: '/recipes/caching' },
             { text: 'API Integration', link: '/recipes/api-integration' },
+            { text: 'Package-Specific Examples', link: '/recipes/package-examples' },
           ],
         },
       ],
