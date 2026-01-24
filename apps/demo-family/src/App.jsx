@@ -19,7 +19,14 @@ const todoIdsAtom = atom([]);
 // Create selector for getting all todos
 const allTodosSelector = atom((get) => {
   const ids = get(todoIdsAtom);
-  return ids.map(id => get(todosFamily(id)));
+  console.log('allTodosSelector: ids =', ids);
+  const todos = ids.map(id => {
+    const todo = get(todosFamily(id));
+    console.log(`allTodosSelector: todo ${id} =`, todo);
+    return todo;
+  });
+  console.log('allTodosSelector: todos =', todos);
+  return todos;
 });
 
 let nextId = 1;
@@ -30,58 +37,88 @@ export const App = () => {
 
   // Subscribe to changes in the allTodosSelector
   React.useEffect(() => {
+    console.log('Initializing subscription to allTodosSelector');
     // Get initial todos
-    setTodos(store.get(allTodosSelector));
+    const initialTodos = store.get(allTodosSelector);
+    console.log('Initial todos:', initialTodos);
+    setTodos(initialTodos);
     
     // Subscribe to changes
     const unsubscribe = store.subscribe(allTodosSelector, (newTodos) => {
+      console.log('allTodosSelector updated:', newTodos);
       setTodos(newTodos);
     });
     
     // Cleanup subscription
     return () => {
+      console.log('Cleaning up subscription');
       unsubscribe();
     };
   }, []);
 
   const addTodo = () => {
     if (newTodoText.trim()) {
+      console.log('Adding todo:', newTodoText);
       const id = nextId++;
-      // First, get the current todo IDs to initialize the atom
-      const currentIds = store.get(todoIdsAtom);
-      // Add new ID to the list
-      store.set(todoIdsAtom, [...currentIds, id]);
+      console.log('New todo ID:', id);
       
       // Initialize the todo atom by getting it first
       const todoAtom = todosFamily(id);
+      console.log('Created todo atom for ID:', id);
+      
       // Get the atom to initialize it in the store
-      store.get(todoAtom);
+      const initialTodoValue = store.get(todoAtom);
+      console.log('Initial todo value:', initialTodoValue);
+      
       // Set data for the new todo
-      store.set(todoAtom, {
+      const newTodoData = {
         id,
         text: newTodoText,
         completed: false,
         createdAt: new Date()
-      });
+      };
+      console.log('Setting todo data:', newTodoData);
+      store.set(todoAtom, newTodoData);
+      
+      // Verify the value was set
+      const updatedTodoValue = store.get(todoAtom);
+      console.log('Updated todo value:', updatedTodoValue);
+      
+      // Now add new ID to the list
+      const currentIds = store.get(todoIdsAtom);
+      console.log('Current todo IDs:', currentIds);
+      const newIds = [...currentIds, id];
+      console.log('New todo IDs:', newIds);
+      store.set(todoIdsAtom, newIds);
+      
       setNewTodoText('');
+      console.log('Todo added successfully');
     }
   };
 
   const toggleTodo = (id) => {
+    console.log('Toggling todo:', id);
     const todoAtom = todosFamily(id);
     // Initialize the atom if it's not already initialized
     store.get(todoAtom);
     const currentTodo = store.get(todoAtom);
-    store.set(todoAtom, {
+    console.log('Current todo:', currentTodo);
+    const newTodo = {
       ...currentTodo,
       completed: !currentTodo.completed
-    });
+    };
+    console.log('New todo:', newTodo);
+    store.set(todoAtom, newTodo);
   };
 
   const deleteTodo = (id) => {
+    console.log('Deleting todo:', id);
     // Remove ID from the list
     const currentIds = store.get(todoIdsAtom);
-    store.set(todoIdsAtom, currentIds.filter(todoId => todoId !== id));
+    console.log('Current todo IDs:', currentIds);
+    const newIds = currentIds.filter(todoId => todoId !== id);
+    console.log('New todo IDs:', newIds);
+    store.set(todoIdsAtom, newIds);
     // Note: We don't delete the atom itself, just remove it from the list
   };
 
