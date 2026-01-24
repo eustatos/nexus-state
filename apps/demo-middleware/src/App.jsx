@@ -4,14 +4,14 @@ import { middleware } from '@nexus-state/middleware';
 
 // Создаем логгирующий middleware
 const loggingMiddleware = () => (next) => (atom, newValue) => {
-  console.log(`[LOG] Атом ${atom.key} изменен с`, atom.get(), 'на', newValue);
+  console.log(`[LOG] Атом изменен с`, atom.get(), 'на', newValue);
   return next(atom, newValue);
 };
 
 // Создаем middleware для валидации
 const validationMiddleware = () => (next) => (atom, newValue) => {
-  if (atom.key === 'userAge' && (newValue < 0 || newValue > 150)) {
-    console.warn(`[VALIDATION] Недопустимый возраст: ${newValue}. Значение должно быть от 0 до 150.`);
+  if (newValue < 0 || newValue > 150) {
+    console.warn(`[VALIDATION] Недопустимое значение: ${newValue}. Значение должно быть от 0 до 150.`);
     return next(atom, atom.get()); // Отменяем изменение
   }
   return next(atom, newValue);
@@ -19,12 +19,10 @@ const validationMiddleware = () => (next) => (atom, newValue) => {
 
 // Создаем middleware для сохранения в localStorage
 const localStorageMiddleware = () => (next) => (atom, newValue) => {
-  if (atom.key === 'userName' || atom.key === 'userAge') {
-    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-    userData[atom.key] = newValue;
-    localStorage.setItem('userData', JSON.stringify(userData));
-    console.log(`[STORAGE] Сохранено в localStorage:`, userData);
-  }
+  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+  userData[atom.toString()] = newValue;
+  localStorage.setItem('userData', JSON.stringify(userData));
+  console.log(`[STORAGE] Сохранено в localStorage:`, userData);
   return next(atom, newValue);
 };
 
@@ -36,9 +34,9 @@ const store = createStore([
 ]);
 
 // Создаем атомы
-const userNameAtom = atom('', { key: 'userName' });
-const userAgeAtom = atom(0, { key: 'userAge' });
-const clickCountAtom = atom(0, { key: 'clickCount' });
+const userNameAtom = atom('');
+const userAgeAtom = atom(0);
+const clickCountAtom = atom(0);
 
 export const App = () => {
   const [name, setName] = React.useState(store.get(userNameAtom));
