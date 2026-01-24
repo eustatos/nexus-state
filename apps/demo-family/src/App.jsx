@@ -54,7 +54,7 @@ export const App = () => {
       console.log('Cleaning up subscription');
       unsubscribe();
     };
-  }, []);
+  }, []); // Пустой массив зависимостей означает, что эффект выполняется только один раз
 
   const addTodo = () => {
     if (newTodoText.trim()) {
