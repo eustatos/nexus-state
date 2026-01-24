@@ -13,6 +13,9 @@ type Plugin = (store: Store) => void;
 export function createStore(plugins: Plugin[] = []): Store {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const atomStates = new Map<Atom<any>, AtomState<any>>();
+  
+  // Track the current atom being evaluated for dependency tracking
+  let currentAtom: Atom<any> | null = null;
 
   const get: Getter = <Value>(atom: Atom<Value>): Value => {
     // Get or create atom state
@@ -24,6 +27,12 @@ export function createStore(plugins: Plugin[] = []): Store {
         dependents: new Set(),
       };
       atomStates.set(atom, atomState as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    }
+    
+    // Track dependency if we're currently evaluating another atom
+    if (currentAtom && currentAtom !== atom) {
+      // Add currentAtom as a dependent of atom
+      atomState.dependents.add(currentAtom);
     }
 
     return atomState.value as Value;
@@ -58,13 +67,20 @@ export function createStore(plugins: Plugin[] = []): Store {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dependentState = atomStates.get(dependent) as AtomState<any> | undefined;
       if (dependentState) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const newValue = dependent.read(get as any);
-        if (dependentState.value !== newValue) {
-          dependentState.value = newValue;
-          dependentState.subscribers.forEach((subscriber) => {
-            subscriber(newValue);
-          });
+        // Track which atom is being evaluated
+        const previousAtom = currentAtom;
+        currentAtom = dependent;
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const newValue = dependent.read(get as any);
+          if (dependentState.value !== newValue) {
+            dependentState.value = newValue;
+            dependentState.subscribers.forEach((subscriber) => {
+              subscriber(newValue);
+            });
+          }
+        } finally {
+          currentAtom = previousAtom;
         }
       }
     });
