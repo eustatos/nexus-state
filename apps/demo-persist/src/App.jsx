@@ -2,7 +2,7 @@ import React from 'react';
 import { atom, createStore } from '@nexus-state/core';
 import { persist, localStorageStorage } from '@nexus-state/persist';
 
-// Create atoms
+// Create atoms for different parts of the application state
 const userNameAtom = atom('Guest');
 const userPreferencesAtom = atom({
   theme: 'light',
@@ -38,6 +38,7 @@ export const App = () => {
   const [todos, setTodos] = React.useState(store.get(todoListAtom));
   const [counter, setCounter] = React.useState(store.get(counterAtom));
   const [newTodo, setNewTodo] = React.useState('');
+  const [showSavedMessage, setShowSavedMessage] = React.useState(false);
   const [showClearedMessage, setShowClearedMessage] = React.useState(false);
 
   // Synchronize state with atoms
@@ -96,6 +97,8 @@ export const App = () => {
         }
       ]);
       setNewTodo('');
+      setShowSavedMessage(true);
+      setTimeout(() => setShowSavedMessage(false), 2000);
     }
   };
 
@@ -146,7 +149,7 @@ export const App = () => {
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
         <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '5px' }}>
-          <h2>User</h2>
+          <h2>User Information</h2>
           <div style={{ marginBottom: '10px' }}>
             <label>Name: </label>
             <input 
@@ -160,7 +163,7 @@ export const App = () => {
         </div>
         
         <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '5px' }}>
-          <h2>Settings</h2>
+          <h2>User Preferences</h2>
           <div style={{ marginBottom: '10px' }}>
             <button onClick={toggleTheme} style={{ marginRight: '10px' }}>
               Theme: {preferences.theme}
@@ -179,16 +182,16 @@ export const App = () => {
             type="text" 
             value={newTodo} 
             onChange={(e) => setNewTodo(e.target.value)}
-            placeholder="New task"
+            placeholder="Enter new task"
             style={{ flex: 1, padding: '8px', marginRight: '10px' }}
           />
           <button onClick={addTodo} style={{ padding: '8px 16px' }}>
-            Add
+            Add Task
           </button>
         </div>
         
         {todos.length === 0 ? (
-          <p>No tasks. Add your first task!</p>
+          <p>No tasks in your list. Add your first task!</p>
         ) : (
           <ul style={{ listStyle: 'none', padding: 0 }}>
             {todos.map(todo => (
@@ -237,7 +240,7 @@ export const App = () => {
       
       <div style={{ marginTop: '20px', border: '1px solid #ddd', padding: '15px', borderRadius: '5px' }}>
         <h2>Counter</h2>
-        <p>Value: {counter}</p>
+        <p>Current Value: {counter}</p>
         <div>
           <button onClick={incrementCounter} style={{ marginRight: '10px' }}>
             Increment
@@ -252,26 +255,33 @@ export const App = () => {
       </div>
       
       <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#ffebee', borderRadius: '4px' }}>
-        <h3>Clear Data</h3>
+        <h3>Manage Data</h3>
+        <div style={{ marginBottom: '15px' }}>
+          <p><strong>Test Persistence:</strong> Modify any data on this form, then refresh the page to see that your changes are automatically saved and restored.</p>
+          {showSavedMessage && (
+            <p style={{ color: 'green', marginTop: '10px' }}>
+              Task added! Refresh the page to see persistence in action.
+            </p>
+          )}
+        </div>
         <button onClick={clearAllData} style={{ backgroundColor: '#ff4444', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '4px', cursor: 'pointer' }}>
           Clear All Saved Data
         </button>
         {showClearedMessage && (
           <p style={{ color: 'green', marginTop: '10px' }}>
-            Data cleared from localStorage! Refresh the page to see the effect.
+            All data cleared from localStorage! Refresh the page to see default values.
           </p>
         )}
-        <p>After clearing, change some data on the form and refresh the page to see that the data persists.</p>
       </div>
       
       <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e8f4fd', borderRadius: '4px' }}>
-        <h3>How it works:</h3>
+        <h3>How Persistence Works:</h3>
         <ul>
-          <li><strong>persist</strong> - plugin that automatically saves atom states to localStorage</li>
-          <li>Data is automatically restored when the page is refreshed</li>
-          <li>Each atom is saved with the specified key</li>
-          <li>Supports any data types that can be serialized to JSON</li>
-          <li>Try changing data on the form, then refresh the page to see persistence in action</li>
+          <li><strong>Persist Plugin</strong> - Automatically saves atom states to localStorage</li>
+          <li><strong>Automatic Restore</strong> - Data is automatically restored when the page loads</li>
+          <li><strong>Key-based Storage</strong> - Each atom is saved with its specified key</li>
+          <li><strong>JSON Serialization</strong> - Supports any data types that can be serialized to JSON</li>
+          <li><strong>Try It Out</strong> - Change any data on this form, then refresh the page to see persistence in action</li>
         </ul>
       </div>
     </div>
