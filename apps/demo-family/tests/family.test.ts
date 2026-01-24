@@ -1,36 +1,18 @@
 // Tests for demo-family application
 import { atom, createStore } from '@nexus-state/core';
 import { atomFamily } from '@nexus-state/family';
-
-// Создаем хранилище для тестов
-const store = createStore();
-
-// Создаем атом-семью для управления задачами
-const todosFamily = atomFamily((id) => atom({
-  id,
-  text: '',
-  completed: false,
-  createdAt: new Date()
-}));
-
-// Создаем атом для хранения списка ID задач
-const todoIdsAtom = atom([]);
-
-// Создаем селектор для получения всех задач
-const allTodosSelector = atom((get) => {
-  const ids = get(todoIdsAtom);
-  return ids.map(id => get(todosFamily(id)));
-});
+import { describe, it, expect, beforeEach } from '@jest/globals';
 
 describe('demo-family functionality', () => {
-  beforeEach(() => {
-    // Очищаем состояние перед каждым тестом
-    // Поскольку мы не можем напрямую очистить хранилище,
-    // мы будем использовать новое хранилище для каждого теста
-  });
-
   it('should create and retrieve a todo atom', () => {
     const store = createStore();
+    const todosFamily = atomFamily((id) => atom({
+      id,
+      text: '',
+      completed: false,
+      createdAt: new Date()
+    }));
+    
     const todoAtom = todosFamily(1);
     
     // Инициализируем атом в хранилище
