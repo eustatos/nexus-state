@@ -1,44 +1,37 @@
-// Immer integration for nexus-state
-import { produce } from 'immer';
-import { atom, Atom, Store } from '@nexus-state/core';
+// immer.ts
+import { atom, Atom, Store } from "@nexus-state/core";
+import { produce } from "immer";
 
-type DraftFunction<T> = (draft: T) => void | T;
+// Store a mapping between each atom and its associated store instance
+const atomStores = new WeakMap<object, Store>();
 
 /**
- * Creates an atom with immer integration for immutable updates.
- * @template T - The type of the atom's value
- * @param {T} initialValue - The initial value of the atom
- * @returns {Atom<T>} An atom with immer integration
- * @example
- * const todosAtom = atom.immer([
- *   { id: 1, text: 'Learn nexus-state', completed: false }
- * ]);
- * 
- * // Update using immer's draft
- * store.set(todosAtom, (draft) => {
- *   draft.push({ id: 2, text: 'Learn immer', completed: false });
- * });
+ * Creates an atom that integrates with Immer for immutable updates.
+ * This atom must be used with a specific store instance.
+ *
+ * @param initialValue - Initial state value for the atom
+ * @param store - The store instance to bind this atom to
+ * @returns An atom that can be updated via setImmer
  */
-export function immerAtom<T>(initialValue: T): Atom<T> {
-  return atom(initialValue);
+export function immerAtom<T>(initialValue: T, store: Store): Atom<T> {
+  const baseAtom = atom(initialValue);
+  atomStores.set(baseAtom, store);
+  return baseAtom;
 }
 
-// Extend the atom function to support immer
-export const atomWithImmer = Object.assign(atom, {
-  immer: immerAtom,
-});
-
 /**
- * Helper function to update an atom's value using immer's produce.
- * @template T - The type of the atom's value
- * @param {Store} store - The store to use
- * @param {Atom<T>} atom - The atom to update
- * @param {DraftFunction<T>} updater - The updater function that modifies the draft
+ * Updates an atom's value using an Immer-style draft function.
+ *
+ * @param atom - The atom to update
+ * @param updater - A function that receives a draft of the current value and mutates it
  */
-export function setImmer<T>(
-  store: Store,
-  atom: Atom<T>,
-  updater: DraftFunction<T>
-): void {
+export function setImmer<T>(atom: Atom<T>, updater: (draft: T) => void): void {
+  const store = atomStores.get(atom);
+  if (!store) {
+    throw new Error(
+      "Store not found for atom. Did you create this atom with immerAtom?",
+    );
+  }
+
   store.set(atom, produce(store.get(atom), updater));
 }
