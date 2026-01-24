@@ -30,10 +30,17 @@ export const App = () => {
   const addTodo = () => {
     if (newTodoText.trim()) {
       const id = nextId++;
+      // First, get the current todo IDs to initialize the atom
+      const currentIds = store.get(todoIdsAtom);
       // Add new ID to the list
-      store.set(todoIdsAtom, [...store.get(todoIdsAtom), id]);
+      store.set(todoIdsAtom, [...currentIds, id]);
+      
+      // Initialize the todo atom by getting it first
+      const todoAtom = todosFamily(id);
+      // Get the atom to initialize it in the store
+      store.get(todoAtom);
       // Set data for the new todo
-      store.set(todosFamily(id), {
+      store.set(todoAtom, {
         id,
         text: newTodoText,
         completed: false,
@@ -44,8 +51,11 @@ export const App = () => {
   };
 
   const toggleTodo = (id) => {
-    const currentTodo = store.get(todosFamily(id));
-    store.set(todosFamily(id), {
+    const todoAtom = todosFamily(id);
+    // Initialize the atom if it's not already initialized
+    store.get(todoAtom);
+    const currentTodo = store.get(todoAtom);
+    store.set(todoAtom, {
       ...currentTodo,
       completed: !currentTodo.completed
     });
@@ -53,10 +63,12 @@ export const App = () => {
 
   const deleteTodo = (id) => {
     // Remove ID from the list
-    store.set(todoIdsAtom, store.get(todoIdsAtom).filter(todoId => todoId !== id));
-    // Remove todo atom (optional)
+    const currentIds = store.get(todoIdsAtom);
+    store.set(todoIdsAtom, currentIds.filter(todoId => todoId !== id));
+    // Note: We don't delete the atom itself, just remove it from the list
   };
 
+  // Get todos using the selector
   const todos = store.get(allTodosSelector);
 
   return (
