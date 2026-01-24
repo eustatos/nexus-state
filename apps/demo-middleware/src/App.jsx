@@ -2,49 +2,49 @@ import React from 'react';
 import { atom, createStore } from '@nexus-state/core';
 import { middleware } from '@nexus-state/middleware';
 
-// Создаем атомы
+// Create atoms
 const userNameAtom = atom('');
 const userAgeAtom = atom(0);
 const clickCountAtom = atom(0);
 
-// Создаем логгирующий middleware
+// Create logging middleware
 const loggingMiddleware = middleware(userNameAtom, {
   afterSet: (atom, newValue) => {
-    console.log(`[LOG] Атом userName изменен на`, newValue);
+    console.log(`[LOG] Atom userName changed to`, newValue);
   }
 });
 
 const loggingMiddlewareAge = middleware(userAgeAtom, {
   afterSet: (atom, newValue) => {
-    console.log(`[LOG] Атом userAge изменен на`, newValue);
+    console.log(`[LOG] Atom userAge changed to`, newValue);
   }
 });
 
 const loggingMiddlewareClick = middleware(clickCountAtom, {
   afterSet: (atom, newValue) => {
-    console.log(`[LOG] Атом clickCount изменен на`, newValue);
+    console.log(`[LOG] Atom clickCount changed to`, newValue);
   }
 });
 
-// Создаем middleware для валидации
+// Create validation middleware
 const validationMiddleware = middleware(userAgeAtom, {
   beforeSet: (atom, newValue) => {
     if (newValue < 0 || newValue > 150) {
-      console.warn(`[VALIDATION] Недопустимое значение: ${newValue}. Значение должно быть от 0 до 150.`);
-      // Возвращаем текущее значение, чтобы отменить изменение
+      console.warn(`[VALIDATION] Invalid value: ${newValue}. Value must be between 0 and 150.`);
+      // Return current value to cancel the change
       return atom.get();
     }
     return newValue;
   }
 });
 
-// Создаем middleware для сохранения в localStorage
+// Create localStorage middleware
 const localStorageMiddlewareUserName = middleware(userNameAtom, {
   afterSet: (atom, newValue) => {
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     userData.userName = newValue;
     localStorage.setItem('userData', JSON.stringify(userData));
-    console.log(`[STORAGE] Сохранено в localStorage:`, userData);
+    console.log(`[STORAGE] Saved to localStorage:`, userData);
   }
 });
 
@@ -53,11 +53,11 @@ const localStorageMiddlewareUserAge = middleware(userAgeAtom, {
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     userData.userAge = newValue;
     localStorage.setItem('userData', JSON.stringify(userData));
-    console.log(`[STORAGE] Сохранено в localStorage:`, userData);
+    console.log(`[STORAGE] Saved to localStorage:`, userData);
   }
 });
 
-// Создаем хранилище с middleware
+// Create store with middleware
 const store = createStore([
   loggingMiddleware,
   loggingMiddlewareAge,
@@ -72,7 +72,7 @@ export const App = () => {
   const [age, setAge] = React.useState(store.get(userAgeAtom));
   const clickCount = store.get(clickCountAtom);
 
-  // Синхронизируем состояние с атомами
+  // Synchronize state with atoms
   React.useEffect(() => {
     const unsubscribeName = store.subscribe(userNameAtom, (newValue) => {
       setName(newValue);
@@ -83,7 +83,7 @@ export const App = () => {
     });
     
     const unsubscribeClick = store.subscribe(clickCountAtom, (newValue) => {
-      // Обновляем состояние счетчика кликов
+      // Update click counter state
     });
     
     return () => {
@@ -120,12 +120,12 @@ export const App = () => {
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '600px', margin: '0 auto' }}>
       <h1>Nexus State Middleware Demo</h1>
-      <p>Демонстрация работы с middleware для атомов</p>
+      <p>Demonstration of working with middleware for atoms</p>
       
       <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '5px' }}>
-        <h2>Управление пользователем</h2>
+        <h2>User Management</h2>
         <div style={{ marginBottom: '10px' }}>
-          <label>Имя: </label>
+          <label>Name: </label>
           <input 
             type="text" 
             value={name} 
@@ -134,7 +134,7 @@ export const App = () => {
           />
         </div>
         <div>
-          <label>Возраст: </label>
+          <label>Age: </label>
           <input 
             type="number" 
             value={age} 
@@ -147,28 +147,28 @@ export const App = () => {
       </div>
       
       <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '5px' }}>
-        <h2>Счетчик кликов</h2>
-        <p>Значение: {clickCount}</p>
+        <h2>Click Counter</h2>
+        <p>Value: {clickCount}</p>
         <button onClick={handleIncrementClick} style={{ marginRight: '10px' }}>
-          Увеличить
+          Increment
         </button>
         <button onClick={handleDecrementClick} style={{ marginRight: '10px' }}>
-          Уменьшить
+          Decrement
         </button>
         <button onClick={handleResetClick}>
-          Сбросить
+          Reset
         </button>
       </div>
       
       <div style={{ padding: '15px', backgroundColor: '#e8f4fd', borderRadius: '4px' }}>
-        <h3>Middleware в действии:</h3>
+        <h3>Middleware in action:</h3>
         <ul>
-          <li><strong>Logging Middleware</strong> - логирует все изменения атомов в консоль</li>
-          <li><strong>Validation Middleware</strong> - проверяет допустимость возраста (0-150)</li>
-          <li><strong>LocalStorage Middleware</strong> - сохраняет имя и возраст в localStorage</li>
+          <li><strong>Logging Middleware</strong> - logs all atom changes to the console</li>
+          <li><strong>Validation Middleware</strong> - validates age (0-150)</li>
+          <li><strong>LocalStorage Middleware</strong> - saves name and age to localStorage</li>
         </ul>
-        <p>Откройте консоль разработчика, чтобы увидеть работу middleware.</p>
-        <p>Попробуйте ввести недопустимый возраст (меньше 0 или больше 150), чтобы увидеть валидацию в действии.</p>
+        <p>Open the developer console to see the middleware in action.</p>
+        <p>Try entering an invalid age (less than 0 or greater than 150) to see validation in action.</p>
       </div>
     </div>
   );
