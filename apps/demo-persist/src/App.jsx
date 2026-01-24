@@ -2,17 +2,17 @@ import React from 'react';
 import { atom, createStore } from '@nexus-state/core';
 import { persist, localStorageStorage } from '@nexus-state/persist';
 
-// Создаем атомы
-const userNameAtom = atom('Гость');
+// Create atoms
+const userNameAtom = atom('Guest');
 const userPreferencesAtom = atom({
   theme: 'light',
-  language: 'ru',
+  language: 'en',
   notifications: true
 });
 const todoListAtom = atom([]);
 const counterAtom = atom(0);
 
-// Создаем хранилище с плагинами персистентности
+// Create store with persistence plugins
 const store = createStore([
   persist(userNameAtom, {
     key: 'userName',
@@ -38,8 +38,9 @@ export const App = () => {
   const [todos, setTodos] = React.useState(store.get(todoListAtom));
   const [counter, setCounter] = React.useState(store.get(counterAtom));
   const [newTodo, setNewTodo] = React.useState('');
+  const [showClearedMessage, setShowClearedMessage] = React.useState(false);
 
-  // Синхронизируем состояние с атомами
+  // Synchronize state with atoms
   React.useEffect(() => {
     const unsubscribeName = store.subscribe(userNameAtom, (newValue) => {
       setUserName(newValue);
@@ -125,19 +126,29 @@ export const App = () => {
     localStorage.removeItem('userPreferences');
     localStorage.removeItem('todoList');
     localStorage.removeItem('counter');
-    window.location.reload();
+    setShowClearedMessage(true);
+    // Reset local state to show cleared data
+    setUserName('Guest');
+    setPreferences({
+      theme: 'light',
+      language: 'en',
+      notifications: true
+    });
+    setTodos([]);
+    setCounter(0);
+    setTimeout(() => setShowClearedMessage(false), 3000);
   };
 
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto' }}>
       <h1>Nexus State Persist Demo</h1>
-      <p>Демонстрация персистентности состояния с помощью localStorage</p>
+      <p>Demonstration of state persistence using localStorage</p>
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
         <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '5px' }}>
-          <h2>Пользователь</h2>
+          <h2>User</h2>
           <div style={{ marginBottom: '10px' }}>
-            <label>Имя: </label>
+            <label>Name: </label>
             <input 
               type="text" 
               value={userName} 
@@ -145,39 +156,39 @@ export const App = () => {
               style={{ marginLeft: '10px', padding: '5px', width: '200px' }}
             />
           </div>
-          <p>Привет, {userName}!</p>
+          <p>Hello, {userName}!</p>
         </div>
         
         <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '5px' }}>
-          <h2>Настройки</h2>
+          <h2>Settings</h2>
           <div style={{ marginBottom: '10px' }}>
             <button onClick={toggleTheme} style={{ marginRight: '10px' }}>
-              Тема: {preferences.theme}
+              Theme: {preferences.theme}
             </button>
             <button onClick={toggleNotifications}>
-              Уведомления: {preferences.notifications ? 'Вкл' : 'Выкл'}
+              Notifications: {preferences.notifications ? 'On' : 'Off'}
             </button>
           </div>
         </div>
       </div>
       
       <div style={{ marginTop: '20px', border: '1px solid #ddd', padding: '15px', borderRadius: '5px' }}>
-        <h2>Список задач</h2>
+        <h2>Todo List</h2>
         <div style={{ display: 'flex', marginBottom: '10px' }}>
           <input 
             type="text" 
             value={newTodo} 
             onChange={(e) => setNewTodo(e.target.value)}
-            placeholder="Новая задача"
+            placeholder="New task"
             style={{ flex: 1, padding: '8px', marginRight: '10px' }}
           />
           <button onClick={addTodo} style={{ padding: '8px 16px' }}>
-            Добавить
+            Add
           </button>
         </div>
         
         {todos.length === 0 ? (
-          <p>Нет задач. Добавьте первую задачу!</p>
+          <p>No tasks. Add your first task!</p>
         ) : (
           <ul style={{ listStyle: 'none', padding: 0 }}>
             {todos.map(todo => (
@@ -216,7 +227,7 @@ export const App = () => {
                     cursor: 'pointer'
                   }}
                 >
-                  Удалить
+                  Delete
                 </button>
               </li>
             ))}
@@ -225,36 +236,42 @@ export const App = () => {
       </div>
       
       <div style={{ marginTop: '20px', border: '1px solid #ddd', padding: '15px', borderRadius: '5px' }}>
-        <h2>Счетчик</h2>
-        <p>Значение: {counter}</p>
+        <h2>Counter</h2>
+        <p>Value: {counter}</p>
         <div>
           <button onClick={incrementCounter} style={{ marginRight: '10px' }}>
-            Увеличить
+            Increment
           </button>
           <button onClick={decrementCounter} style={{ marginRight: '10px' }}>
-            Уменьшить
+            Decrement
           </button>
           <button onClick={resetCounter}>
-            Сбросить
+            Reset
           </button>
         </div>
       </div>
       
       <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#ffebee', borderRadius: '4px' }}>
-        <h3>Очистка данных</h3>
+        <h3>Clear Data</h3>
         <button onClick={clearAllData} style={{ backgroundColor: '#ff4444', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '4px', cursor: 'pointer' }}>
-          Очистить все сохраненные данные
+          Clear All Saved Data
         </button>
-        <p>После очистки обновите страницу, чтобы увидеть эффект.</p>
+        {showClearedMessage && (
+          <p style={{ color: 'green', marginTop: '10px' }}>
+            Data cleared from localStorage! Refresh the page to see the effect.
+          </p>
+        )}
+        <p>After clearing, change some data on the form and refresh the page to see that the data persists.</p>
       </div>
       
       <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e8f4fd', borderRadius: '4px' }}>
-        <h3>Как это работает:</h3>
+        <h3>How it works:</h3>
         <ul>
-          <li><strong>persist</strong> - плагин, который автоматически сохраняет состояние атомов в localStorage</li>
-          <li>При перезагрузке страницы данные автоматически восстанавливаются</li>
-          <li>Каждый атом сохраняется с указанным ключом</li>
-          <li>Поддерживаются любые типы данных, которые могут быть сериализованы в JSON</li>
+          <li><strong>persist</strong> - plugin that automatically saves atom states to localStorage</li>
+          <li>Data is automatically restored when the page is refreshed</li>
+          <li>Each atom is saved with the specified key</li>
+          <li>Supports any data types that can be serialized to JSON</li>
+          <li>Try changing data on the form, then refresh the page to see persistence in action</li>
         </ul>
       </div>
     </div>
