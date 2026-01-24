@@ -26,6 +26,23 @@ let nextId = 1;
 
 export const App = () => {
   const [newTodoText, setNewTodoText] = React.useState('');
+  const [todos, setTodos] = React.useState([]);
+
+  // Subscribe to changes in the allTodosSelector
+  React.useEffect(() => {
+    // Get initial todos
+    setTodos(store.get(allTodosSelector));
+    
+    // Subscribe to changes
+    const unsubscribe = store.subscribe(allTodosSelector, (newTodos) => {
+      setTodos(newTodos);
+    });
+    
+    // Cleanup subscription
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const addTodo = () => {
     if (newTodoText.trim()) {
@@ -67,9 +84,6 @@ export const App = () => {
     store.set(todoIdsAtom, currentIds.filter(todoId => todoId !== id));
     // Note: We don't delete the atom itself, just remove it from the list
   };
-
-  // Get todos using the selector
-  const todos = store.get(allTodosSelector);
 
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '600px', margin: '0 auto' }}>
