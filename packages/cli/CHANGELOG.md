@@ -1,5 +1,11 @@
 # @nexus-state/cli
 
+## 0.1.3
+
+### Patch Changes
+
+- fix links
+
 ## 0.1.2
 
 ### Patch Changes

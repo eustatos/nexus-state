@@ -1,5 +1,13 @@
 # @nexus-state/immer
 
+## 0.1.3
+
+### Patch Changes
+
+- fix links
+- Updated dependencies
+  - @nexus-state/core@0.1.4
+
 ## 0.1.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @nexus-state/core
 
+## 0.1.4
+
+### Patch Changes
+
+- fix links
+
 ## 0.1.3
 
 ### Patch Changes
