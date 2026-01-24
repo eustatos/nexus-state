@@ -50,6 +50,32 @@ const unsubscribe = store.subscribe(countAtom, (value) => {
 });
 ```
 
+## Demo Applications
+
+This repository contains several demo applications showcasing different aspects of the Nexus State library:
+
+- [demo-react](apps/demo-react) - Basic React integration
+- [demo-svelte](apps/demo-svelte) - Basic Svelte integration
+- [demo-vanilla](apps/demo-vanilla) - Vanilla JavaScript usage
+- [demo-vue](apps/demo-vue) - Basic Vue integration
+- [demo-async](apps/demo-async) - Async operations with atoms
+- [demo-family](apps/demo-family) - Working with atom families
+- [demo-immer](apps/demo-immer) - Immer integration for complex state
+- [demo-middleware](apps/demo-middleware) - Middleware usage
+- [demo-persist](apps/demo-persist) - State persistence
+- [demo-forms-granularity](apps/demo-forms-granularity) - Form state management with granularity comparison
+
+To run any demo application, use the corresponding script from the root package.json:
+
+```bash
+npm run dev:async
+npm run dev:family
+npm run dev:immer
+npm run dev:middleware
+npm run dev:persist
+npm run dev:forms
+```
+
 ## Packages
 
 - [@nexus-state/core](packages/core) - Core library
