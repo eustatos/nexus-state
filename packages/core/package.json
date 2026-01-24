@@ -2,6 +2,11 @@
   "name": "@nexus-state/core",
   "version": "0.1.1",
   "main": "index.ts",
+  "homepage": "https://nexus-state.website.yandexcloud.net/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eustatos/nexus-state.git"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",

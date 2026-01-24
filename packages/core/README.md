@@ -2,6 +2,8 @@
 
 The core package of the Nexus State ecosystem - a powerful state management solution for modern JavaScript applications.
 
+[Documentation](https://nexus-state.website.yandexcloud.net/) • [Repository](https://github.com/eustatos/nexus-state)
+
 ## Installation
 
 ```bash
