@@ -1,25 +1,22 @@
 import React from 'react';
 import { atom, createStore } from '@nexus-state/core';
-import { family } from '@nexus-state/family';
+import { atomFamily } from '@nexus-state/family';
 
-// Создаем хранилище
+// Create store
 const store = createStore();
 
-// Создаем атом-семью для управления списком задач
-const todosFamily = family({
-  key: 'todos',
-  create: (id) => atom({
-    id,
-    text: '',
-    completed: false,
-    createdAt: new Date()
-  })
-});
+// Create atom family for managing todo items
+const todosFamily = atomFamily((id) => atom({
+  id,
+  text: '',
+  completed: false,
+  createdAt: new Date()
+}));
 
-// Создаем атом для хранения списка ID задач
+// Create atom for storing list of todo IDs
 const todoIdsAtom = atom([]);
 
-// Создаем селектор для получения всех задач
+// Create selector for getting all todos
 const allTodosSelector = atom((get) => {
   const ids = get(todoIdsAtom);
   return ids.map(id => get(todosFamily(id)));
@@ -33,9 +30,9 @@ export const App = () => {
   const addTodo = () => {
     if (newTodoText.trim()) {
       const id = nextId++;
-      // Добавляем новый ID в список
+      // Add new ID to the list
       store.set(todoIdsAtom, [...store.get(todoIdsAtom), id]);
-      // Устанавливаем данные для новой задачи
+      // Set data for the new todo
       store.set(todosFamily(id), {
         id,
         text: newTodoText,
@@ -55,9 +52,9 @@ export const App = () => {
   };
 
   const deleteTodo = (id) => {
-    // Удаляем ID из списка
+    // Remove ID from the list
     store.set(todoIdsAtom, store.get(todoIdsAtom).filter(todoId => todoId !== id));
-    // Удаляем атом задачи (опционально)
+    // Remove todo atom (optional)
   };
 
   const todos = store.get(allTodosSelector);
@@ -65,28 +62,28 @@ export const App = () => {
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '600px', margin: '0 auto' }}>
       <h1>Nexus State Family Demo</h1>
-      <p>Демонстрация работы с атомами-семьями для управления коллекциями данных</p>
+      <p>Demonstration of working with atom families for managing data collections</p>
       
       <div style={{ marginBottom: '20px' }}>
-        <h2>Добавить новую задачу</h2>
+        <h2>Add New Todo</h2>
         <div style={{ display: 'flex', gap: '10px' }}>
           <input
             type="text"
             value={newTodoText}
             onChange={(e) => setNewTodoText(e.target.value)}
-            placeholder="Введите текст задачи"
+            placeholder="Enter todo text"
             style={{ flex: 1, padding: '8px' }}
           />
           <button onClick={addTodo} style={{ padding: '8px 16px' }}>
-            Добавить
+            Add
           </button>
         </div>
       </div>
       
       <div>
-        <h2>Список задач ({todos.length})</h2>
+        <h2>Todo List ({todos.length})</h2>
         {todos.length === 0 ? (
-          <p>Нет задач. Добавьте первую задачу!</p>
+          <p>No todos. Add your first todo!</p>
         ) : (
           <ul style={{ listStyle: 'none', padding: 0 }}>
             {todos.map(todo => (
@@ -125,7 +122,7 @@ export const App = () => {
                     cursor: 'pointer'
                   }}
                 >
-                  Удалить
+                  Delete
                 </button>
               </li>
             ))}
@@ -134,12 +131,12 @@ export const App = () => {
       </div>
       
       <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e8f4fd', borderRadius: '4px' }}>
-        <h3>Как это работает:</h3>
+        <h3>How it works:</h3>
         <ul>
-          <li><strong>family</strong> создает атомы по запросу с уникальным ключом</li>
-          <li>Каждая задача хранится в отдельном атоме, идентифицируемом по ID</li>
-          <li>todoIdsAtom хранит список всех активных ID задач</li>
-          <li>allTodosSelector собирает все задачи в один массив для отображения</li>
+          <li><strong>atomFamily</strong> creates atoms on demand with unique keys</li>
+          <li>Each todo is stored in a separate atom identified by ID</li>
+          <li>todoIdsAtom stores the list of all active todo IDs</li>
+          <li>allTodosSelector collects all todos into one array for display</li>
         </ul>
       </div>
     </div>
