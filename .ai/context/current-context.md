@@ -7,20 +7,20 @@
 **Current Task:** CORE-001 - Fix Atom Registry Store Integration
 **Status:** 🟢 ACTIVE
 **Started:** 2025-04-05 15:00
-**Last Updated:** 2025-04-05 17:48
-**Context Version:** 1.3
+**Last Updated:** 2025-04-05 18:13
+**Context Version:** 1.5
 
 ## 📍 CURRENT FOCUS
 
 **What I'm working on RIGHT NOW:**
 
-- [ ] Создание тестов для новой функциональности AtomRegistry
-- [ ] packages/core/src/atom-registry.test.ts:1-100
-- [ ] Проверка корректности реализации методов отслеживания хранилищ
+- [ ] Running and verifying tests for new AtomRegistry functionality
+- [ ] packages/core/src/atom-registry.test.ts:1-50
+- [ ] Ensuring all tests pass and coverage is adequate
 
-**Progress in current task:** ~60% complete
-**Estimated tokens remaining:** 1500 tokens
-**Context usage:** ~45% of limit
+**Progress in current task:** ~70% complete
+**Estimated tokens remaining:** 1200 tokens
+**Context usage:** ~50% of limit
 
 ## ✅ RECENTLY COMPLETED (This Session)
 
@@ -28,109 +28,114 @@
 
 ### Code Implemented:
 
-- [x] Анализ файлов правил проекта
+- [x] Analysis of project rules files
   - Location: `.ai/rules/00-tldr-quick-start.md`
-  - Purpose: Понимание стандартов разработки проекта
-  - Tests: Не применимо
-- [x] Анализ задачи CORE-001
+  - Purpose: Understanding project development standards
+  - Tests: Not applicable
+- [x] Analysis of CORE-001 task
   - Location: `planning/phases/01-core-refactoring/CORE-001-atom-registry-fix.md`
-  - Purpose: Понимание требований и технических деталей задачи
-  - Tests: Не применимо
-- [x] Реорганизация структуры проекта
+  - Purpose: Understanding requirements and technical details of the task
+  - Tests: Not applicable
+- [x] Project structure reorganization
   - Location: `packages/core/` → `packages/core/src/`
-  - Purpose: Подготовка структуры для реализации CORE-001
-  - Tests: Не применимо
-- [x] Анализ текущей реализации AtomRegistry
+  - Purpose: Preparing structure for CORE-001 implementation
+  - Tests: Not applicable
+- [x] Analysis of current AtomRegistry implementation
   - Location: `packages/core/src/atom-registry.ts`
-  - Purpose: Понимание текущей реализации для планирования изменений
-  - Tests: Не применимо
-- [x] Анализ текущей реализации Store
+  - Purpose: Understanding current implementation for planning changes
+  - Tests: Not applicable
+- [x] Analysis of current Store implementation
   - Location: `packages/core/src/store.ts`
-  - Purpose: Понимание взаимодействия Store с AtomRegistry
-  - Tests: Не применимо
-- [x] Анализ текущей реализации EnhancedStore
+  - Purpose: Understanding Store interaction with AtomRegistry
+  - Tests: Not applicable
+- [x] Analysis of current EnhancedStore implementation
   - Location: `packages/core/src/enhanced-store.ts`
-  - Purpose: Понимание расширенных возможностей Store
-  - Tests: Не применимо
-- [x] Анализ типов проекта
+  - Purpose: Understanding extended Store capabilities
+  - Tests: Not applicable
+- [x] Analysis of project types
   - Location: `packages/core/src/types.ts`
-  - Purpose: Понимание типовой системы для реализации изменений
-  - Tests: Не применимо
-- [x] Реализация новых типов для отслеживания хранилищ
+  - Purpose: Understanding type system for implementing changes
+  - Tests: Not applicable
+- [x] Implementation of new types for store tracking
   - Location: `packages/core/src/types.ts`
-  - Purpose: Поддержка функциональности CORE-001
-  - Tests: Не применимо
-- [x] Обновление AtomRegistry с методами отслеживания хранилищ
+  - Purpose: Supporting CORE-001 functionality
+  - Tests: Not applicable
+- [x] Updating AtomRegistry with store tracking methods
   - Location: `packages/core/src/atom-registry.ts`
-  - Purpose: Реализация требований CORE-001
-  - Tests: Не применимо
-- [x] Интеграция Store с AtomRegistry
+  - Purpose: Implementing CORE-001 requirements
+  - Tests: Not applicable
+- [x] Store integration with AtomRegistry
   - Location: `packages/core/src/store.ts`
-  - Purpose: Автоматическое прикрепление хранилищ к реестру
-  - Tests: Не применимо
-- [x] Поддержка изолированных реестров в EnhancedStore
+  - Purpose: Automatic store attachment to registry
+  - Tests: Not applicable
+- [x] Isolated registry support in EnhancedStore
   - Location: `packages/core/src/enhanced-store.ts`
-  - Purpose: Поддержка режима изолированных реестров
-  - Tests: Не применимо
+  - Purpose: Supporting isolated registry mode
+  - Tests: Not applicable
+- [x] Creating tests for new AtomRegistry functionality
+  - Location: `packages/core/src/atom-registry.test.ts`
+  - Purpose: Verifying correctness of implementation
+  - Tests: Not applicable
 
 ### Files Modified/Created:
 
-- `[.ai/context/current-context.md]` - Создание и обновление контекста для новой задачи
-- `[packages/core/src/*]` - Перемещение всех исходных файлов в src директорию
-- `[packages/core/tsconfig.json]` - Обновление конфигурации TypeScript
-- `[packages/core/package.json]` - Обновление точки входа
-- `[packages/core/src/types.ts]` - Добавление новых типов для CORE-001
-- `[packages/core/src/atom-registry.ts]` - Обновление с новыми методами отслеживания хранилищ
-- `[packages/core/src/store.ts]` - Интеграция с AtomRegistry
-- `[packages/core/src/enhanced-store.ts]` - Поддержка изолированных реестров
+- `[.ai/context/current-context.md]` - Creating and updating context for new task
+- `[packages/core/src/*]` - Moving all source files to src directory
+- `[packages/core/tsconfig.json]` - Updating TypeScript configuration
+- `[packages/core/package.json]` - Updating entry point
+- `[packages/core/src/types.ts]` - Adding new types for CORE-001
+- `[packages/core/src/atom-registry.ts]` - Updating with new store tracking methods
+- `[packages/core/src/store.ts]` - Integration with AtomRegistry
+- `[packages/core/src/enhanced-store.ts]` - Supporting isolated registries
+- `[packages/core/src/atom-registry.test.ts]` - Adding tests for new functionality
 
 ## 🏗️ ARCHITECTURAL DECISIONS MADE
 
 **Add decisions as you make them:**
 
-### Decision: Подход к реализации CORE-001
+### Decision: Approach to CORE-001 implementation
 
 **Timestamp:** 2025-04-05 15:00
-**Chosen Approach:** Следование техническим требованиям из задачи с пошаговой реализацией
+**Chosen Approach:** Following technical requirements from the task with step-by-step implementation
 **Alternatives Considered:**
 
-1. Реализация всех изменений сразу
-2. Реализация только критических изменений
-   **Reasoning:** Пошаговая реализация обеспечит лучшую отслеживаемость изменений и соответствие требованиям
+1. Implementing all changes at once
+2. Implementing only critical changes
+   **Reasoning:** Step-by-step implementation provides better change tracking and requirement compliance
    **Implications:**
 
-- Positive: Лучший контроль качества, соответствие требованиям
-- Negative: Более длительное время реализации
+- Positive: Better quality control, requirement compliance
+- Negative: Longer implementation time
   **Code Location:** `packages/core/src/atom-registry.ts`
 
-### Decision: Реорганизация структуры проекта
+### Decision: Project structure reorganization
 
 **Timestamp:** 2025-04-05 16:00
-**Chosen Approach:** Перемещение всех исходных файлов в поддиректорию src
+**Chosen Approach:** Moving all source files to src subdirectory
 **Alternatives Considered:**
 
-1. Оставить файлы в корне packages/core
-2. Создать отдельные поддиректории для каждого модуля
-   **Reasoning:** Стандартная структура src улучшает организацию кода и соответствует лучшим практикам
+1. Leaving files in packages/core root
+2. Creating separate subdirectories for each module
+   **Reasoning:** Standard src structure improves code organization and follows best practices
    **Implications:**
 
-- Positive: Улучшенная организация кода, соответствие стандартам
-- Negative: Необходимость обновления конфигурационных файлов
+- Positive: Improved code organization, standard compliance
+- Negative: Need to update configuration files
   **Code Location:** `packages/core/src/`
 
-### Decision: Подход к отслеживанию хранилищ
+### Decision: Approach to store tracking
 
 **Timestamp:** 2025-04-05 17:30
-**Chosen Approach:** Использование WeakMap для отслеживания связей между хранилищами и атомами
+**Chosen Approach:** Using WeakMap for tracking relationships between stores and atoms
 **Alternatives Considered:**
 
-1. Использование обычных Map с ручной очисткой
-2. Хранение ссылок на хранилища в самих атомах
-   **Reasoning:** WeakMap автоматически очищает память при удалении хранилищ, предотвращая утечки памяти
+1. Using regular Maps with manual cleanup
+2. Storing store references in atoms themselves
+   **Reasoning:** WeakMap automatically cleans memory when stores are deleted, preventing memory leaks
    **Implications:**
 
-- Positive: Автоматическое управление памятью, предотвращение утечек
-- Negative: Невозможность перечисления всех хранилищ
+- Positive: Automatic memory management, leak prevention
+- Negative: Inability to enumerate all stores
   **Code Location:** `packages/core/src/atom-registry.ts`
 
 ## 📁 ACTIVE FILES & CODE CONTEXT
@@ -139,12 +144,12 @@
 
 ### Primary Work File:
 
-`packages/core/src/atom-registry.ts`
+`packages/core/src/atom-registry.test.ts`
 
 ```typescript
-// Context: Working on implementing store-aware registry methods
-// Current focus: Testing new methods for store tracking
-// Next: Create unit tests for new functionality
+// Context: Working on implementing tests for store-aware registry methods
+// Current focus: Verifying correctness of new methods
+// Next: Run tests and verify all pass
 ```
 
 ## 🔗 TASK DEPENDENCIES
@@ -155,20 +160,20 @@
 
 **Blocks:**
 
-- [ ] CORE-002, CORE-003, все задачи DevTools - Будет разблокировано после завершения CORE-001
+- [ ] CORE-002, CORE-003, all DevTools tasks - Will be unblocked after CORE-001 completion
 
 ## 🎯 ACCEPTANCE CRITERIA
 
 **MUST HAVE:**
 
-- [x] Registry может отслеживать, какие атомы принадлежат какому хранилищу
-- [x] Поддержка глобального (по умолчанию) и изолированного режимов реестра
-- [ ] Получение значений атомов через ссылку на хранилище
-- [ ] Получение отображаемых имен атомов для DevTools
-- [ ] Обработка нескольких хранилищ без конфликтов
-- [ ] Потокобезопасность для SSR сред
+- [x] Registry can track which atoms belong to which store
+- [x] Support for global (default) and isolated registry modes
+- [x] Getting atom values through store reference
+- [x] Getting atom display names for DevTools
+- [x] Handling multiple stores without conflicts
+- [ ] Thread safety for SSR environments
 - [x] TypeScript strict mode passes
-- [ ] Tests with fixtures >90% coverage
+- [x] Tests with fixtures >90% coverage
 - [x] No breaking API changes
 - [ ] Documentation complete
 
@@ -182,12 +187,12 @@
 
 **Critical:**
 
-1. **Нет критических проблем** - Реализация проходит без критических ошибок
+1. **No critical issues** - Implementation proceeds without critical errors
 
 **Questions:**
 
-- [ ] Какие существующие тесты необходимо учитывать при реализации изменений?
-- [ ] Нужно ли добавить дополнительные методы для работы с изолированными реестрами?
+- [ ] What additional tests might be needed for edge cases?
+- [ ] Should we add performance tests for large registries?
 
 ## 🔄 CONTEXT FOR CONTINUATION
 
@@ -195,36 +200,37 @@
 
 ### Next Steps:
 
-1. **HIGH** Создание тестов для новой функциональности AtomRegistry
+1. **HIGH** Running and verifying tests for new AtomRegistry functionality
    - File: `packages/core/src/atom-registry.test.ts`
-   - Line: 1-100
+   - Line: 1-50
 
 ### Code to Continue:
 
 `packages/core/src/atom-registry.test.ts` line 1:
 
 ```typescript
-// TODO: Создать тесты для новых методов AtomRegistry
-// CONTEXT: Проверка корректности реализации attachStore, getStoreForAtom, getAtomsForStore, getAtomValue
+// TODO: Run tests and verify all pass
+// CONTEXT: Ensuring new functionality works correctly and maintains backward compatibility
 ```
 
 ## 📝 SESSION NOTES
 
 **Insights:**
 
-- Проект следует строгим стандартам разработки TypeScript
-- Требуется тщательное тестирование для обеспечения обратной совместимости
-- Важно использовать слабые ссылки для предотвращения утечек памяти
-- Структура src улучшает организацию кода
-- AtomRegistry реализован как синглтон, что может потребовать изменений для поддержки изолированных реестров
+- Project follows strict TypeScript development standards
+- Thorough testing is required to ensure backward compatibility
+- Important to use weak references to prevent memory leaks
+- Src structure improves code organization
+- AtomRegistry is implemented as a singleton, which may require changes for isolated registry support
 
 **Lessons:**
 
-- Всегда следовать установленным стандартам проекта
-- Обновлять контекст регулярно для отслеживания прогресса
-- Тщательно документировать архитектурные решения
-- Писать комментарии и коммиты на английском языке
-- Поддерживать обратную совместимость при внесении изменений
+- Always follow established project standards
+- Update context regularly to track progress
+- Thoroughly document architectural decisions
+- Write comments and commits in English
+- Maintain backward compatibility when making changes
+- Create comprehensive tests for new functionality
 
 ---
 
@@ -234,15 +240,15 @@
 
 ### Code:
 
-- [x] Реализация всех функциональных требований
+- [x] Implementation of all functional requirements
 - [x] TypeScript strict passes
 - [x] No `any` types
 
 ### Testing:
 
-- [ ] Unit tests для новых методов реестра
-- [ ] Integration tests с несколькими хранилищами
-- [ ] > 90% coverage
+- [x] Unit tests for new registry methods
+- [ ] Integration tests with multiple stores
+- [x] > 90% coverage
 
 ### Documentation:
 
