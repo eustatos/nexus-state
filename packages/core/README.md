@@ -21,6 +21,7 @@ Nexus State is a modern state management library designed for simplicity, perfor
 - **TypeScript Support**: First-class TypeScript integration with full type inference
 - **Framework Agnostic**: Works with any JavaScript framework or vanilla JavaScript
 - **Extensible**: Easily extend functionality with middleware and plugins
+- **DevTools Integration**: Automatic atom registration for debugging
 
 ## Core Concepts
 
@@ -34,12 +35,35 @@ import { atom } from '@nexus-state/core';
 // Create an atom with initial value
 const countAtom = atom(0);
 
-// Read the current value
-console.log(countAtom.get()); // 0
+// Create an atom with a name for better debugging
+const namedCountAtom = atom(0, 'count');
 
-// Update the value
-countAtom.set(5);
-console.log(countAtom.get()); // 5
+// Create a computed atom
+const doubleCountAtom = atom((get) => get(countAtom) * 2);
+
+// Create a writable atom
+const writableCountAtom = atom(0, (get, set, value) => {
+  set(countAtom, value);
+});
+```
+
+All atoms are automatically registered in a global registry for DevTools integration and time travel support. You can provide an optional name parameter to atoms for better debugging experience in DevTools.
+
+### Global Atom Registry
+
+Nexus State automatically maintains a global registry of all created atoms to support DevTools integration and time travel features.
+
+```javascript
+import { atom, atomRegistry } from '@nexus-state/core';
+
+// Create atoms (automatically registered)
+const countAtom = atom(0, 'count');
+const nameAtom = atom('John', 'name');
+
+// Access the registry
+const allAtoms = atomRegistry.getAll();
+const atomName = atomRegistry.getName(countAtom);
+const retrievedAtom = atomRegistry.get(countAtom.id);
 ```
 
 ### Stores
@@ -47,19 +71,25 @@ console.log(countAtom.get()); // 5
 Stores are containers that hold multiple atoms and provide methods for managing state.
 
 ```javascript
-import { atom, store } from '@nexus-state/core';
+import { atom, createStore } from '@nexus-state/core';
 
 const countAtom = atom(0);
 const nameAtom = atom('John');
 
-const myStore = store({
-  count: countAtom,
-  name: nameAtom
-});
+const myStore = createStore();
 
-// Access atoms through the store
-console.log(myStore.get('count')); // 0
-myStore.set('name', 'Jane');
+// Set initial values
+myStore.set(countAtom, 5);
+myStore.set(nameAtom, 'Jane');
+
+// Get current values
+console.log(myStore.get(countAtom)); // 5
+console.log(myStore.get(nameAtom)); // "Jane"
+
+// Subscribe to changes
+const unsubscribe = myStore.subscribe(countAtom, (value) => {
+  console.log('Count changed to:', value);
+});
 ```
 
 ## Ecosystem
