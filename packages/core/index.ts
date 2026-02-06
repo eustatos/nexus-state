@@ -87,12 +87,21 @@ export { createStore } from './store';
  */
 export { createEnhancedStore } from './enhanced-store';
 
+// Time travel functionality
+export { StateSnapshotManager } from './time-travel/state-snapshot';
+export { StateRestorer } from './time-travel/state-restorer';
+export { ComputedAtomHandler } from './time-travel/computed-atom-handler';
+
 // Export utility functions
 export { serializeState } from './utils/serialization';
 export { ActionTracker, globalActionTracker, createActionWithStackTrace } from './utils/action-tracker';
+export { snapshotSerialization } from './utils/snapshot-serialization';
 
 // Export types
 export type { Atom, Store, Plugin, ActionMetadata } from './types';
 export type { EnhancedStore, Plugin as EnhancedPlugin, StoreEnhancementOptions } from './enhanced-store';
 export type { SerializationOptions } from './utils/serialization';
 export type { ActionTrackingOptions, ActionMetadata as TrackedActionMetadata } from './utils/action-tracker';
+export type { StateSnapshot, SnapshotMetadata } from './time-travel/state-snapshot';
+export type { ComputedAtomInfo } from './time-travel/computed-atom-handler';
+export type { SerializableValue, ObjectReference } from './utils/snapshot-serialization';

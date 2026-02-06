@@ -50,6 +50,28 @@ const unsubscribe = store.subscribe(countAtom, (value) => {
 });
 ```
 
+## Time Travel
+
+Nexus State now includes powerful Time Travel functionality that allows you to track state changes and move between different states for debugging and historical state restoration.
+
+```javascript
+import { 
+  StateSnapshotManager, 
+  StateRestorer 
+} from '@nexus-state/core';
+import { atomRegistry } from '@nexus-state/core';
+
+// Create time travel components
+const snapshotManager = new StateSnapshotManager(atomRegistry);
+const stateRestorer = new StateRestorer(atomRegistry);
+
+// Create a snapshot of the current state
+const snapshot = snapshotManager.createSnapshot('USER_ACTION');
+
+// Restore state from a snapshot
+const success = stateRestorer.restoreFromSnapshot(snapshot);
+```
+
 ## Demo Applications
 
 This repository contains several demo applications showcasing different aspects of the Nexus State library:

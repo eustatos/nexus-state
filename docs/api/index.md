@@ -10,6 +10,10 @@ Welcome to the Nexus State API reference. Here you'll find detailed information 
 - [store.set()](/api/core) - Set atom values
 - [store.subscribe()](/api/core) - Subscribe to atom changes
 
+## Time Travel
+
+- [Time Travel API](/api/time-travel) - Time travel functionality for state debugging and historical state restoration
+
 ## Framework Integrations
 
 - [React](/api/react) - React hooks for Nexus State
