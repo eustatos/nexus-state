@@ -52,3 +52,13 @@ export interface Atom<Value> {
   read: (get: Getter) => Value;
   write?: (get: Getter, set: Setter, value: Value) => void;
 }
+
+// Enhanced store types
+export interface EnhancedStore extends Store {
+  connectDevTools?: () => void;
+}
+
+export type StoreEnhancementOptions = {
+  enableDevTools?: boolean;
+  devToolsName?: string;
+};
