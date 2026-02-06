@@ -7,20 +7,20 @@
 **Current Task:** TASK-007-COMPREHENSIVE-TESTING - Ensure 100% test coverage and comprehensive validation of all DevTools integration features
 **Status:** 🟢 ACTIVE
 **Started:** 2025-04-05 12:00
-**Last Updated:** 2025-04-05 13:30
-**Context Version:** 1.2
+**Last Updated:** 2025-04-05 14:30
+**Context Version:** 1.4
 
 ## 📍 CURRENT FOCUS
 
 **What I'm working on RIGHT NOW:**
 
-- [ ] Проверка исправления конфигурации тестов
-- [ ] [vitest.config.js, packages/core/index.test.ts:1-50]
-- [ ] Подготовка к фиксации изменений
+- [ ] Исправление ошибки с запуском тестов для пакета @nexus-state/core
+- [ ] [packages/core/package.json, vitest.config.js:1-20]
+- [ ] Подготовка коммита с изменениями
 
-**Progress in current task:** ~60% complete
-**Estimated tokens remaining:** 1000 tokens
-**Context usage:** ~25% of limit
+**Progress in current task:** ~80% complete
+**Estimated tokens remaining:** 600 tokens
+**Context usage:** ~35% of limit
 
 ## ✅ RECENTLY COMPLETED (This Session)
 
@@ -101,12 +101,12 @@
 
 ### Primary Work File:
 
-`[vitest.config.js]`
+`[packages/core/package.json]`
 
-```typescript
-// Context: Working on updating test configuration
-// Current focus: Verifying test discovery works correctly
-// Next: Prepare for commit
+```json
+// Context: Working on fixing test script for core package
+// Current focus: Adding explicit config path to vitest command
+// Next: Commit changes
 ```
 
 ```
@@ -119,7 +119,7 @@
 
 **Blocks:**
 
-- [ ] Запуск тестов для пакета @nexus-state/core - Should be unblocked now
+- [ ] Запуск тестов для пакета @nexus-state/core - Still blocked
 
 ## 🎯 ACCEPTANCE CRITERIA
 
@@ -141,7 +141,7 @@
 
 **Critical:**
 
-1. **Тесты не находятся для пакета @nexus-state/core** - Исправлено обновлением конфигурации
+1. **Тесты не находятся для пакета @nexus-state/core** - Требуется обновление скрипта тестирования в package.json
 
 **Questions:**
 
@@ -153,17 +153,17 @@
 
 ### Next Steps:
 
-1. **HIGH** Зафиксировать изменения в репозитории
-   - File: `git`
-   - Command: `git commit -am "fix: Обновление конфигурации vitest для поиска тестов в пакетах"`
+1. **HIGH** Обновить скрипт тестирования в packages/core/package.json
+   - File: `packages/core/package.json`
+   - Change: Update "test" script from "vitest" to "vitest --config ../../vitest.config.js"
 
 ### Code to Continue:
 
-`vitest.config.js` line 5:
+`packages/core/package.json` line 12:
 
-```typescript
-// TODO: Проверить, что тесты теперь находятся корректно
-// CONTEXT: После обновления конфигурации тесты должны находиться в packages/*/*.test.ts
+```json
+// TODO: Обновить скрипт тестирования для явного указания конфигурации
+// CONTEXT: vitest не может найти конфигурацию при запуске из поддиректории
 ```
 
 ## 📝 SESSION NOTES
