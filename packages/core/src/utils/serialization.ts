@@ -41,27 +41,105 @@ const DEFAULT_OPTIONS: SerializationOptions = {
 };
 
 /**
- * Serialize the entire store state safely
- * @param store - The store to serialize
- * @param options - Serialization options
- * @returns Serialized state object
+ * Serialization utilities class for state management
  */
-export function serializeState(store: Store, options: SerializationOptions = {}): Record<string, any> {
-  const opts = { ...DEFAULT_OPTIONS, ...options };
-  const state = store.getState();
-  const seen = opts.handleCircularRefs ? new WeakMap() : null;
-  
-  const result: Record<string, any> = {};
-  
-  for (const [key, value] of Object.entries(state)) {
-    try {
-      result[key] = serializeValue(value, opts, seen, 0);
-    } catch (error) {
-      result[key] = `[Serialization Error: ${error instanceof Error ? error.message : String(error)}]`;
-    }
+export class SerializationUtils {
+  /**
+   * Serialize a value safely
+   * @param value - The value to serialize
+   * @param options - Serialization options
+   * @returns Serialized value
+   */
+  serialize(value: any, options: SerializationOptions = {}): any {
+    const opts = { ...DEFAULT_OPTIONS, ...options };
+    const seen = opts.handleCircularRefs ? new WeakMap() : null;
+    return serializeValue(value, opts, seen, 0);
   }
-  
-  return result;
+
+  /**
+   * Serialize the entire store state safely
+   * @param store - The store to serialize
+   * @param options - Serialization options
+   * @returns Serialized state object
+   */
+  serializeState(store: Store, options: SerializationOptions = {}): Record<string, any> {
+    const opts = { ...DEFAULT_OPTIONS, ...options };
+    const state = store.getState();
+    const seen = opts.handleCircularRefs ? new WeakMap() : null;
+    
+    const result: Record<string, any> = {};
+    
+    for (const [key, value] of Object.entries(state)) {
+      try {
+        result[key] = serializeValue(value, opts, seen, 0);
+      } catch (error) {
+        result[key] = `[Serialization Error: ${error instanceof Error ? error.message : String(error)}]`;
+      }
+    }
+    
+    return result;
+  }
+
+  /**
+   * Register a custom serializer for a specific type
+   * @param typeName - The name of the type to serialize
+   * @param serializer - Function to serialize the type
+   * @param options - Current serialization options to modify
+   */
+  registerCustomSerializer(
+    typeName: string,
+    serializer: (value: any) => any,
+    options: SerializationOptions
+  ): void {
+    if (!options.customSerializers) {
+      options.customSerializers = new Map();
+    }
+    options.customSerializers.set(typeName, serializer);
+  }
+
+  /**
+   * Create a serializer for Map objects
+   * @param map - The Map to serialize
+   * @returns Serialized representation of the Map
+   */
+  serializeMap(map: Map<any, any>): Record<string, any> {
+    const result: Record<string, any> = { __type: 'Map', entries: [] };
+    
+    for (const [key, value] of map.entries()) {
+      result.entries.push([key, value]);
+    }
+    
+    return result;
+  }
+
+  /**
+   * Create a serializer for Set objects
+   * @param set - The Set to serialize
+   * @returns Serialized representation of the Set
+   */
+  serializeSet(set: Set<any>): Record<string, any> {
+    const result: Record<string, any> = { __type: 'Set', values: [] };
+    
+    for (const value of set) {
+      result.values.push(value);
+    }
+    
+    return result;
+  }
+
+  /**
+   * Create a serializer for Error objects
+   * @param error - The Error to serialize
+   * @returns Serialized representation of the Error
+   */
+  serializeError(error: Error): Record<string, any> {
+    return {
+      __type: 'Error',
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    };
+  }
 }
 
 /**
@@ -153,6 +231,17 @@ function serializeValue(
 }
 
 /**
+ * Serialize the entire store state safely
+ * @param store - The store to serialize
+ * @param options - Serialization options
+ * @returns Serialized state object
+ */
+export function serializeState(store: Store, options: SerializationOptions = {}): Record<string, any> {
+  const serializationUtils = new SerializationUtils();
+  return serializationUtils.serializeState(store, options);
+}
+
+/**
  * Register a custom serializer for a specific type
  * @param typeName - The name of the type to serialize
  * @param serializer - Function to serialize the type
@@ -163,10 +252,8 @@ export function registerCustomSerializer(
   serializer: (value: any) => any,
   options: SerializationOptions
 ): void {
-  if (!options.customSerializers) {
-    options.customSerializers = new Map();
-  }
-  options.customSerializers.set(typeName, serializer);
+  const serializationUtils = new SerializationUtils();
+  serializationUtils.registerCustomSerializer(typeName, serializer, options);
 }
 
 /**
@@ -175,13 +262,8 @@ export function registerCustomSerializer(
  * @returns Serialized representation of the Map
  */
 export function serializeMap(map: Map<any, any>): Record<string, any> {
-  const result: Record<string, any> = { __type: 'Map', entries: [] };
-  
-  for (const [key, value] of map.entries()) {
-    result.entries.push([key, value]);
-  }
-  
-  return result;
+  const serializationUtils = new SerializationUtils();
+  return serializationUtils.serializeMap(map);
 }
 
 /**
@@ -190,13 +272,8 @@ export function serializeMap(map: Map<any, any>): Record<string, any> {
  * @returns Serialized representation of the Set
  */
 export function serializeSet(set: Set<any>): Record<string, any> {
-  const result: Record<string, any> = { __type: 'Set', values: [] };
-  
-  for (const value of set) {
-    result.values.push(value);
-  }
-  
-  return result;
+  const serializationUtils = new SerializationUtils();
+  return serializationUtils.serializeSet(set);
 }
 
 /**
@@ -205,10 +282,6 @@ export function serializeSet(set: Set<any>): Record<string, any> {
  * @returns Serialized representation of the Error
  */
 export function serializeError(error: Error): Record<string, any> {
-  return {
-    __type: 'Error',
-    name: error.name,
-    message: error.message,
-    stack: error.stack,
-  };
+  const serializationUtils = new SerializationUtils();
+  return serializationUtils.serializeError(error);
 }

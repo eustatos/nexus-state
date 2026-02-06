@@ -1,6 +1,6 @@
 // enhanced-store.ts
 
-import type { Store, Plugin } from './types';
+import type { Store, Plugin, EnhancedStore, StoreEnhancementOptions } from './types';
 import { createStore } from './store';
 import { atomRegistry } from './atom-registry';
 
@@ -59,6 +59,3 @@ export function createEnhancedStore(plugins: Plugin[] = [], options: StoreEnhanc
   
   return store;
 }
-
-// Export types
-export type { EnhancedStore, StoreEnhancementOptions } from './types';

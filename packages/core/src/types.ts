@@ -41,10 +41,29 @@ export interface Store {
   getPlugins?: () => Plugin[];
 }
 
-export interface Atom<Value> {
+// Atom types - supporting both primitive and computed atoms
+export interface PrimitiveAtom<Value> {
+  readonly id: symbol;
+  read: () => Value;
+  write?: (set: Setter, value: Value) => void;
+}
+
+export interface ComputedAtom<Value> {
   readonly id: symbol;
   read: (get: Getter) => Value;
-  write?: (get: Getter, set: Setter, value: Value) => void;
+  write?: undefined; // Computed atoms are read-only
+}
+
+// Union type for all atom types
+export type Atom<Value> = PrimitiveAtom<Value> | ComputedAtom<Value>;
+
+// Type guards for atom types
+export function isPrimitiveAtom<Value>(atom: Atom<Value>): atom is PrimitiveAtom<Value> {
+  return typeof atom.read === 'function' && atom.read.length === 0;
+}
+
+export function isComputedAtom<Value>(atom: Atom<Value>): atom is ComputedAtom<Value> {
+  return typeof atom.read === 'function' && atom.read.length > 0;
 }
 
 // Store registry interface for tracking atom ownership

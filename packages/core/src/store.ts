@@ -1,6 +1,6 @@
 // Implementation of createStore function
 
-import type { Atom, Store, Subscriber, Getter, Setter, Plugin, ActionMetadata } from './types';
+import type { Atom, Store, Subscriber, Getter, Setter, Plugin, ActionMetadata, PrimitiveAtom, ComputedAtom, isPrimitiveAtom, isComputedAtom } from './types';
 import { serializeState as serializeStoreState } from './utils/serialization';
 import { atomRegistry } from './atom-registry';
 
@@ -36,20 +36,20 @@ export function createStore(plugins: Plugin[] = []): Store {
     // Get or create atom state
     let atomState = atomStates.get(atom) as AtomState<Value> | undefined;
     if (!atomState) {
-      // Determine if this is a computed atom by checking if read function expects parameters
+      // Determine atom type and get initial value
       let initialValue: Value;
-      if (atom.read.length > 0) {
-        // This is a computed atom - it expects a get parameter
+      if (isPrimitiveAtom(atom)) {
+        // This is a primitive atom - read() takes no parameters
+        initialValue = (atom as PrimitiveAtom<Value>).read();
+      } else {
+        // This is a computed atom - read() takes get parameter
         const previousAtom = currentAtom;
         currentAtom = atom;
         try {
-          initialValue = atom.read(get as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+          initialValue = (atom as ComputedAtom<Value>).read(get);
         } finally {
           currentAtom = previousAtom;
         }
-      } else {
-        // This is a primitive atom - it doesn't expect parameters
-        initialValue = atom.read();
       }
       
       atomState = {
@@ -75,12 +75,26 @@ export function createStore(plugins: Plugin[] = []): Store {
     if (!atomState) {
       // This must be a primitive atom since it doesn't have state yet
       // Create initial state
+      let initialValue: Value;
+      if (isPrimitiveAtom(atom)) {
+        // This is a primitive atom - read() takes no parameters
+        initialValue = (atom as PrimitiveAtom<Value>).read();
+      } else {
+        // Computed atoms cannot be set directly
+        throw new Error('Cannot set value of computed atom');
+      }
+      
       atomState = {
-        value: atom.read(), // For primitive atoms, read() returns initial value
+        value: initialValue,
         subscribers: new Set(),
         dependents: new Set(),
       };
       atomStates.set(atom, atomState as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    }
+
+    // Check if this is a primitive atom (only primitive atoms can be set)
+    if (!isPrimitiveAtom(atom)) {
+      throw new Error('Cannot set value of computed atom');
     }
 
     // Calculate new value
@@ -101,16 +115,16 @@ export function createStore(plugins: Plugin[] = []): Store {
     // Notify dependents
     atomState.dependents.forEach((dependent) => {
       // For computed atoms, we need to recompute their values
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       const dependentState = atomStates.get(dependent) as AtomState<any> | undefined;
-      if (dependentState) {
+      if (dependentState && isComputedAtom(dependent)) {
         // Track which atom is being evaluated
         const previousAtom = currentAtom;
         currentAtom = dependent;
         try {
           // Recompute the value
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const newValue = dependent.read(get as any);
+          // eslint-disable-line @typescript-eslint/no-explicit-any
+          const newValue = (dependent as ComputedAtom<any>).read(get);
           if (dependentState.value !== newValue) {
             dependentState.value = newValue;
             dependentState.subscribers.forEach((subscriber) => {
@@ -153,20 +167,20 @@ export function createStore(plugins: Plugin[] = []): Store {
     // Get or create atom state
     let atomState = atomStates.get(atom) as AtomState<Value> | undefined;
     if (!atomState) {
-      // Determine if this is a computed atom by checking if read function expects parameters
+      // Determine atom type and get initial value
       let initialValue: Value;
-      if (atom.read.length > 0) {
-        // This is a computed atom - it expects a get parameter
+      if (isPrimitiveAtom(atom)) {
+        // This is a primitive atom - read() takes no parameters
+        initialValue = (atom as PrimitiveAtom<Value>).read();
+      } else {
+        // This is a computed atom - read() takes get parameter
         const previousAtom = currentAtom;
         currentAtom = atom;
         try {
-          initialValue = atom.read(get as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+          initialValue = (atom as ComputedAtom<Value>).read(get);
         } finally {
           currentAtom = previousAtom;
         }
-      } else {
-        // This is a primitive atom - it doesn't expect parameters
-        initialValue = atom.read();
       }
       
       atomState = {
@@ -187,9 +201,9 @@ export function createStore(plugins: Plugin[] = []): Store {
   };
 
   // Add method to get state of all atoms (for devtools)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-line @typescript-eslint/no-explicit-any
   const getState = (): Record<string, any> => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-line @typescript-eslint/no-explicit-any
     const state: Record<string, any> = {};
     atomStates.forEach((atomState, atom) => {
       // Here we use the atom's internal ID or other identification

@@ -10,7 +10,7 @@
  * - Store-aware registry for DevTools integration
  */
 
-import type { Store, StoreRegistry } from './types';
+import type { Store, StoreRegistry, Atom } from './types';
 
 type AtomType = 'primitive' | 'computed' | 'writable';
 
@@ -213,6 +213,59 @@ export class AtomRegistry {
     
     // If no store owns this atom, return the atom itself
     return atom;
+  }
+
+  // Additional methods for time-travel functionality
+
+  /**
+   * Get all computed atoms
+   * @returns Map of computed atoms with their IDs
+   */
+  getAllComputedAtoms(): Map<string, any> {
+    const computedAtoms = new Map<string, any>();
+    for (const [id, atom] of this.registry) {
+      const metadata = this.metadata.get(id);
+      if (metadata && metadata.type === 'computed') {
+        computedAtoms.set(id.toString(), atom);
+      }
+    }
+    return computedAtoms;
+  }
+
+  /**
+   * Get computed atom by ID
+   * @param atomId The atom ID
+   * @returns The computed atom or undefined if not found
+   */
+  getComputedAtom(atomId: string): any | undefined {
+    const atom = this.registry.get(Symbol.for(atomId));
+    if (atom) {
+      const metadata = this.metadata.get(Symbol.for(atomId));
+      if (metadata && metadata.type === 'computed') {
+        return atom;
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Get all atom IDs
+   * @returns Array of all atom IDs
+   */
+  getAllAtomIds(): string[] {
+    return Array.from(this.registry.keys()).map(id => id.toString());
+  }
+
+  /**
+   * Get all atoms (alias for getAll for compatibility)
+   * @returns Map of all atoms with their IDs
+   */
+  getAllAtoms(): Map<string, any> {
+    const allAtoms = new Map<string, any>();
+    for (const [id, atom] of this.registry) {
+      allAtoms.set(id.toString(), atom);
+    }
+    return allAtoms;
   }
 }
 
