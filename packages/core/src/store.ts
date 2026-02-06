@@ -32,11 +32,6 @@ export function createStore(plugins: Plugin[] = []): Store {
   let debounceTimer: NodeJS.Timeout | null = null;
   const debounceDelay = 100;
 
-  // Auto-attach to registry in global mode (CORE-001 requirement)
-  if (typeof atomRegistry.attachStore === "function") {
-    atomRegistry.attachStore(store, "global");
-  }
-
   const get: Getter = <Value>(atom: Atom<Value>): Value => {
     // Get or create atom state
     let atomState = atomStates.get(atom) as AtomState<Value> | undefined;
@@ -74,10 +69,7 @@ export function createStore(plugins: Plugin[] = []): Store {
     return atomState.value as Value;
   };
 
-  const set: Setter = <Value>(
-    atom: Atom<Value>,
-    update: Value | ((prev: Value) => Value)
-  ): void => {
+  const set: Setter = <Value>(atom: Atom<Value>, update: Value | ((prev: Value) => Value)): void => {
     // For primitive atoms, we create state if it doesn't exist
     let atomState = atomStates.get(atom) as AtomState<Value> | undefined;
     if (!atomState) {
@@ -157,10 +149,7 @@ export function createStore(plugins: Plugin[] = []): Store {
     }
   };
 
-  const subscribe = <Value>(
-    atom: Atom<Value>,
-    subscriber: Subscriber<Value>
-  ): (() => void) => {
+  const subscribe = <Value>(atom: Atom<Value>, subscriber: Subscriber<Value>): (() => void) => {
     // Get or create atom state
     let atomState = atomStates.get(atom) as AtomState<Value> | undefined;
     if (!atomState) {
@@ -286,6 +275,12 @@ export function createStore(plugins: Plugin[] = []): Store {
     setIntercepted,
     getPlugins,
   };
+
+  // Auto-attach to registry in global mode (CORE-001 requirement)
+  // This must be after store is defined to avoid ReferenceError
+  if (typeof atomRegistry.attachStore === "function") {
+    atomRegistry.attachStore(store, "global");
+  }
 
   // Apply plugins
   plugins.forEach(plugin => plugin(store));

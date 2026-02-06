@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { atomRegistry } from "./atom-registry";
 import { createStore } from "./store";
 import { createEnhancedStore } from "./enhanced-store";
+import { atom } from "./atom"; // Add import for atom function
 
 describe("atomRegistry", () => {
   it("should attach store in global mode", () => {
