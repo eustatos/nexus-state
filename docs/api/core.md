@@ -1,19 +1,40 @@
 # Core API
 
-## atom(initialValue)
+## atom(initialValue, name?)
 
 Creates an atom with an initial value.
 
 ```javascript
 const countAtom = atom(0);
+
+// With optional name for DevTools
+const namedCountAtom = atom(0, 'count');
 ```
 
-## atom(getterFn)
+## atom(getterFn, name?)
 
 Creates a computed atom based on other atoms.
 
 ```javascript
 const doubleCountAtom = atom((get) => get(countAtom) * 2);
+
+// With optional name for DevTools
+const namedDoubleCountAtom = atom((get) => get(countAtom) * 2, 'doubleCount');
+```
+
+## atom(initialValue, writeFn, name?)
+
+Creates a writable atom with custom write behavior.
+
+```javascript
+const writableCountAtom = atom(0, (get, set, value) => {
+  set(countAtom, value);
+});
+
+// With optional name for DevTools
+const namedWritableCountAtom = atom(0, (get, set, value) => {
+  set(countAtom, value);
+}, 'writableCount');
 ```
 
 ## createStore(plugins)
