@@ -59,32 +59,42 @@ export function atom<Value>(...args: any[]): Atom<Value> {
 
   if (args.length === 1) {
     const [initialValue] = args;
-    if (typeof initialValue === 'function') {
-      // Computed atom
-      atomInstance = {
-        id: Symbol('atom'),
-        type: 'computed',
-        name,
-        read: initialValue,
-      } as ComputedAtom<Value>;
-    } else {
-      // Primitive atom
-      atomInstance = {
-        id: Symbol('atom'),
-        type: 'primitive',
-        name,
-        read: () => initialValue,
-      } as PrimitiveAtom<Value>;
-    }
-  } else if (args.length === 2) {
-    const [read, write] = args;
+    // Primitive atom
     atomInstance = {
       id: Symbol('atom'),
-      type: 'writable',
+      type: 'primitive',
       name,
-      read,
-      write,
-    } as WritableAtom<Value>;
+      read: () => initialValue,
+    } as PrimitiveAtom<Value>;
+  } else if (args.length === 2) {
+    const [read, write] = args;
+    if (typeof read === 'function' && typeof write === 'function') {
+      // Writable atom
+      atomInstance = {
+        id: Symbol('atom'),
+        type: 'writable',
+        name,
+        read,
+        write,
+      } as WritableAtom<Value>;
+    } else {
+      throw new Error('Invalid arguments for atom function');
+    }
+  } else if (args.length === 3) {
+    // This case handles when we have read, write, and name (name was already popped)
+    const [read, write] = args;
+    if (typeof read === 'function' && typeof write === 'function') {
+      // Writable atom
+      atomInstance = {
+        id: Symbol('atom'),
+        type: 'writable',
+        name,
+        read,
+        write,
+      } as WritableAtom<Value>;
+    } else {
+      throw new Error('Invalid arguments for atom function');
+    }
   } else {
     throw new Error('Invalid arguments for atom function');
   }
