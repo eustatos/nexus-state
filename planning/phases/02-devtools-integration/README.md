@@ -1,3 +1,5 @@
+<content>
+
 # Phase 2: DevTools Integration
 
 ## 🎯 Phase Objectives
@@ -43,24 +45,49 @@ Current DevTools integration has several issues:
 **Current Issue:** Atoms show as anonymous in DevTools  
 **Solution:** Use atom registry names for better visualization
 
-## 📋 Required Tasks
+## 📋 Required Tasks (Refined for Better Context Management)
 
 ### Priority Order:
 
-1. **DEV-001**: Refactor DevTools Plugin for New Architecture
-   - Integrate with enhanced store API
-   - Use atom registry for atom identification
-   - Add proper error handling and fallbacks
+#### 🎯 DEV-001: DevTools Plugin Foundation (Core Integration)
 
-2. **DEV-002**: Implement Time Travel Command Handling
-   - Map DevTools JUMP_TO_STATE/JUMP_TO_ACTION commands
-   - Sync DevTools timeline with SimpleTimeTravel history
-   - Handle IMPORT_STATE and RESET commands
+**Estimated:** 4-5 hours, 2-3 files, ~150 lines
 
-3. **DEV-003**: Add Action Naming and Stack Trace Support
-   - Configurable action naming strategies
-   - Stack trace capture in development mode
-   - Action grouping for batched updates
+- **DEV-001-A**: Basic plugin structure with enhanced store API
+- **DEV-001-B**: Atom registry integration for naming
+- **DEV-001-C**: Graceful degradation and SSR compatibility
+
+#### 🎯 DEV-002: Time Travel Command System
+
+**Estimated:** 4-5 hours, 2-3 files, ~120 lines
+
+- **DEV-002-A**: Command handler base with JUMP_TO_STATE/JUMP_TO_ACTION
+- **DEV-002-B**: Snapshot mapping system (bidirectional)
+- **DEV-002-C**: State import/export functionality
+
+#### 🎯 DEV-003: Enhanced Debugging Features
+
+**Estimated:** 4-5 hours, 2-3 files, ~100 lines
+
+- **DEV-003-A**: Action naming strategies (auto, simple, pattern)
+- **DEV-003-B**: Stack trace capture (development only)
+- **DEV-003-C**: Action metadata and grouping system
+
+#### 🎯 DEV-004: Performance Optimizations
+
+**Estimated:** 3-4 hours, 2 files, ~80 lines
+
+- **DEV-004-A**: Batch update system with throttling
+- **DEV-004-B**: Lazy state serialization
+- **DEV-004-C**: Production mode optimizations
+
+#### 🎯 DEV-005: Comprehensive Testing
+
+**Estimated:** 4-5 hours, 3-4 files, ~150 lines
+
+- **DEV-005-A**: Unit tests for all components
+- **DEV-005-B**: Integration tests with mock DevTools
+- **DEV-005-C**: Performance benchmarks and E2E tests
 
 ## 🔧 Technical Approach
 
@@ -128,7 +155,7 @@ Current DevTools integration has several issues:
 
 Phase is complete when:
 
-1. All three tasks are implemented and tested
+1. All five main tasks are implemented and tested
 2. DevTools integration works with the new core architecture
 3. Time travel commands are fully functional
 4. Performance meets acceptable thresholds
@@ -182,56 +209,26 @@ Phase is complete when:
 
 ## 📈 Progress Tracking
 
-| Task    | Status      | Started | Completed | Notes           |
-| ------- | ----------- | ------- | --------- | --------------- |
-| DEV-001 | Not Started | -       | -         | High priority   |
-| DEV-002 | Not Started | -       | -         | High priority   |
-| DEV-003 | Not Started | -       | -         | Medium priority |
+| Task      | Status      | Started | Completed | Notes           |
+| --------- | ----------- | ------- | --------- | --------------- |
+| DEV-001-A | Not Started | -       | -         | High priority   |
+| DEV-001-B | Not Started | -       | -         | High priority   |
+| DEV-001-C | Not Started | -       | -         | High priority   |
+| DEV-002-A | Not Started | -       | -         | High priority   |
+| DEV-002-B | Not Started | -       | -         | High priority   |
+| DEV-002-C | Not Started | -       | -         | Medium priority |
+| DEV-003-A | Not Started | -       | -         | Medium priority |
+| DEV-003-B | Not Started | -       | -         | Medium priority |
+| DEV-003-C | Not Started | -       | -         | Medium priority |
+| DEV-004-A | Not Started | -       | -         | Medium priority |
+| DEV-004-B | Not Started | -       | -         | Medium priority |
+| DEV-004-C | Not Started | -       | -         | Medium priority |
+| DEV-005-A | Not Started | -       | -         | Low priority    |
+| DEV-005-B | Not Started | -       | -         | Low priority    |
+| DEV-005-C | Not Started | -       | -         | Low priority    |
 
 ## 🔄 Integration Points
 
 ### With Core Architecture:
 
-```typescript
-// 1. Atom Registry for names
-const atomName = atomRegistry.getName(atom);
-
-// 2. SimpleTimeTravel for history
-const snapshot = timeTravel.capture("ACTION_NAME");
-
-// 3. Enhanced Store for events
-store.onStateChange((state, action) => {
-  devTools.send(action, state);
-});
-```
-
-### With Redux DevTools:
-
-```typescript
-// Protocol compliance
-const connection = window.__REDUX_DEVTOOLS_EXTENSION__.connect({
-  name: storeName,
-  features: {
-    jump: true, // Time travel
-    import: true, // State import
-    test: true, // Test generation
-  },
-});
-```
-
-## 🎯 Quality Gates
-
-Before moving to Phase 3:
-
-1. **All tests pass** including E2E with DevTools
-2. **Performance benchmarks** meet targets
-3. **Memory leaks** verified absent
-4. **Documentation** complete for new features
-5. **Backward compatibility** maintained for plugin users
-
----
-
-_Phase Lead: AI/Developer_  
-_Approval Required: Self-review + DevTools integration tests_  
-_Next Phase: 03-polish-and-optimize_  
-_Prerequisites: Phase 1 must be 100% complete_
+The following code was suggested as an edit:
