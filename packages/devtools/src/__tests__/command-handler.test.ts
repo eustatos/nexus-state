@@ -1,0 +1,321 @@
+/**
+ * Unit tests for CommandHandler
+ *
+ * This file contains comprehensive tests for the CommandHandler class,
+ * covering command parsing, execution, error handling, and edge cases.
+ */
+
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { CommandHandler } from "../command-handler";
+import type { Command } from "../types";
+import {
+  unknownCommand,
+  missingPayloadCommand,
+  missingTypeCommand,
+  mockTimeTravel,
+  emptyTimeTravel,
+} from "../__fixtures__/command-handler-fixtures";
+
+// Mock console.warn in tests
+vi.mock("console", () => ({
+  warn: vi.fn(),
+}));
+
+describe("CommandHandler", () => {
+  describe("JUMP_TO_STATE", () => {
+    let handler: CommandHandler;
+
+    beforeEach(() => {
+      handler = new CommandHandler();
+    });
+
+    it("should handle valid state jumps", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_STATE",
+        payload: { index: 2 },
+      });
+
+      expect(result).toBe(true);
+      expect(mockTimeTravel.pointer).toBe(2);
+    });
+
+    it("should handle jumps to first state", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_STATE",
+        payload: { index: 0 },
+      });
+
+      expect(result).toBe(true);
+      expect(mockTimeTravel.pointer).toBe(0);
+    });
+
+    it("should handle jumps to last state", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_STATE",
+        payload: { index: mockTimeTravel.history.length - 1 },
+      });
+
+      expect(result).toBe(true);
+      expect(mockTimeTravel.pointer).toBe(mockTimeTravel.history.length - 1);
+    });
+
+    it("should return false for out of bounds indices", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_STATE",
+        payload: { index: 100 },
+      });
+
+      expect(result).toBe(false);
+      expect(mockTimeTravel.pointer).toBe(4); // Unchanged
+    });
+
+    it("should return false for negative indices", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_STATE",
+        payload: { index: -1 },
+      });
+
+      expect(result).toBe(false);
+    });
+
+    it("should return false for non-integer indices", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_STATE",
+        payload: { index: 1.5 },
+      });
+
+      expect(result).toBe(false);
+    });
+
+    it("should return false when SimpleTimeTravel not initialized", () => {
+      const result = handler.handleCommand({
+        type: "JUMP_TO_STATE",
+        payload: { index: 0 },
+      });
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("JUMP_TO_ACTION", () => {
+    let handler: CommandHandler;
+
+    beforeEach(() => {
+      handler = new CommandHandler();
+    });
+
+    it("should handle valid action jumps", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_ACTION",
+        payload: { actionName: "INCREMENT" },
+      });
+
+      expect(result).toBe(true);
+      // Should find most recent "INCREMENT" at index 3
+      expect(mockTimeTravel.pointer).toBe(3);
+    });
+
+    it("should find most recent matching action", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      // There are three "INCREMENT" actions at indices 1, 2, and 3
+      // Should jump to index 3 (most recent)
+      handler.handleCommand({
+        type: "JUMP_TO_ACTION",
+        payload: { actionName: "INCREMENT" },
+      });
+
+      expect(mockTimeTravel.pointer).toBe(3);
+    });
+
+    it("should handle action jumps to first action", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_ACTION",
+        payload: { actionName: "INIT" },
+      });
+
+      expect(result).toBe(true);
+      expect(mockTimeTravel.pointer).toBe(0);
+    });
+
+    it("should return false for unknown action names", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_ACTION",
+        payload: { actionName: "NONEXISTENT" },
+      });
+
+      expect(result).toBe(false);
+    });
+
+    it("should return false for empty action names", () => {
+      handler.setTimeTravel(mockTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_ACTION",
+        payload: { actionName: "" },
+      });
+
+      expect(result).toBe(false);
+    });
+
+    it("should return false for null action names", () => {
+      const result = handler.handleCommand({
+        type: "JUMP_TO_ACTION",
+        payload: { actionName: null },
+      });
+
+      expect(result).toBe(false);
+    });
+
+    it("should return false when SimpleTimeTravel not initialized", () => {
+      const result = handler.handleCommand({
+        type: "JUMP_TO_ACTION",
+        payload: { actionName: "INCREMENT" },
+      });
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("Error Handling", () => {
+    let handler: CommandHandler;
+
+    beforeEach(() => {
+      const errors: Array<{ command: Command; error: Error }> = [];
+
+      handler = new CommandHandler({
+        onCommandError: (command, error) => {
+          errors.push({ command, error });
+        },
+      });
+
+      // Reset errors at start of each test
+      errors.length = 0;
+    });
+
+    it("should handle unknown command types", () => {
+      const result = handler.handleCommand(unknownCommand);
+
+      expect(result).toBe(false);
+      expect(errors.length).toBe(1);
+      expect(errors[0].error.message).toBe(
+        "Unknown command type: UNKNOWN_COMMAND",
+      );
+    });
+
+    it("should handle missing payload", () => {
+      const result = handler.handleCommand(missingPayloadCommand);
+
+      expect(result).toBe(false);
+      expect(errors.length).toBe(1);
+    });
+
+    it("should handle missing type", () => {
+      const result = handler.handleCommand(missingTypeCommand);
+
+      expect(result).toBe(false);
+      expect(errors.length).toBe(1);
+    });
+
+    it("should return false for empty history (JUMP_TO_STATE)", () => {
+      handler.setTimeTravel(emptyTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_STATE",
+        payload: { index: 0 },
+      });
+
+      expect(result).toBe(false);
+    });
+
+    it("should return false for empty history (JUMP_TO_ACTION)", () => {
+      handler.setTimeTravel(emptyTimeTravel);
+
+      const result = handler.handleCommand({
+        type: "JUMP_TO_ACTION",
+        payload: { actionName: "INCREMENT" },
+      });
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("Command History", () => {
+    let handler: CommandHandler;
+
+    beforeEach(() => {
+      handler = new CommandHandler();
+      handler.setTimeTravel(mockTimeTravel);
+    });
+
+    it("should track executed commands", () => {
+      handler.handleCommand({
+        type: "JUMP_TO_STATE",
+        payload: { index: 2 },
+      });
+
+      const history = handler.getCommandHistory();
+      expect(history.length).toBe(1);
+      expect(history[0]).toEqual({
+        type: "JUMP_TO_STATE",
+        payload: { index: 2 },
+      });
+    });
+
+    it("should clear command history", () => {
+      handler.handleCommand({
+        type: "JUMP_TO_STATE",
+        payload: { index: 2 },
+      });
+
+      handler.clearCommandHistory();
+
+      const history = handler.getCommandHistory();
+      expect(history.length).toBe(0);
+    });
+  });
+
+  describe("Integration with DevToolsPlugin", () => {
+    it("should work with DevTools message structure", () => {
+      const handler = new CommandHandler();
+      handler.setTimeTravel(mockTimeTravel);
+
+      // Simulate DevTools message structure
+      const devToolsMessage = {
+        type: "DISPATCH",
+        payload: {
+          type: "JUMP_TO_STATE",
+          index: 2,
+        },
+      };
+
+      // Extract command from DevTools message
+      const command: Command = {
+        type: devToolsMessage.payload.type,
+        payload: { index: devToolsMessage.payload.index },
+      };
+
+      const result = handler.handleCommand(command);
+
+      expect(result).toBe(true);
+    });
+  });
+});

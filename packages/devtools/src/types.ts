@@ -84,6 +84,48 @@ export interface DevToolsMessage {
 }
 
 /**
+ * Command interface for JUMP_TO_STATE
+ */
+export interface JumpToStateCommand {
+  /** Command type */
+  type: "JUMP_TO_STATE";
+  /** Index to jump to in history */
+  payload: {
+    index: number;
+  };
+}
+
+/**
+ * Command interface for JUMP_TO_ACTION
+ */
+export interface JumpToActionCommand {
+  /** Command type */
+  type: "JUMP_TO_ACTION";
+  /** Action name to jump to */
+  payload: {
+    actionName: string;
+    /** Optional current state for validation */
+    state?: unknown;
+  };
+}
+/**
+ * Union type for all command types
+ */
+export type Command = JumpToStateCommand | JumpToActionCommand;
+
+/**
+ * Configuration for CommandHandler
+ */
+export interface CommandHandlerConfig {
+  /** Maximum number of history entries to consider */
+  maxHistory?: number;
+  /** Callback when command is executed successfully */
+  onCommandExecuted?: (command: Command, success: boolean) => void;
+  /** Callback when command execution fails */
+  onCommandError?: (command: Command, error: Error) => void;
+}
+
+/**
  * Basic atom interface for type definitions
  */
 export interface BasicAtom {
