@@ -106,10 +106,11 @@ describe('DevToolsPlugin Atom Name Display', () => {
       unsubscribe: vi.fn()
     };
     
-    // Mock window with DevTools extension
+    // Mock window with DevTools extension and addEventListener
     const originalWindow = global.window;
     global.window = {
       ...global.window,
+      addEventListener: vi.fn(),
       __REDUX_DEVTOOLS_EXTENSION__: {
         connect: vi.fn().mockReturnValue(mockConnection)
       }
@@ -125,9 +126,6 @@ describe('DevToolsPlugin Atom Name Display', () => {
     
     // Apply plugin
     plugin.apply(store);
-    
-    // Store the original set method
-    const originalSet = store.set;
     
     // Call set method which should use setWithMetadata
     store.set(atom, 'test-value');
