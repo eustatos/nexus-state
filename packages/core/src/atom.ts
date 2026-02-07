@@ -57,6 +57,7 @@ export function atom<Value>(...args: any[]): Atom<Value> {
 
   let atomInstance: Atom<Value>;
 
+  // Check the number of arguments to determine the type
   if (args.length === 1) {
     const [initialValue] = args;
     // Primitive atom
@@ -67,23 +68,23 @@ export function atom<Value>(...args: any[]): Atom<Value> {
       read: () => initialValue,
     } as PrimitiveAtom<Value>;
   } else if (args.length === 2) {
-    const [read, write] = args;
-    if (typeof read === 'function' && typeof write === 'function') {
-      // Writable atom
+    const [arg1, arg2] = args;
+    if (typeof arg1 === 'function' && typeof arg2 === 'function') {
+      // Writable atom: both arguments are functions
       atomInstance = {
         id: Symbol('atom'),
         type: 'writable',
         name,
-        read,
-        write,
+        read: arg1,
+        write: arg2,
       } as WritableAtom<Value>;
-    } else if (typeof read === 'function') {
-      // Computed atom (only read function provided)
+    } else if (typeof arg1 === 'function') {
+      // Computed atom: first argument is a function, second is not a function
       atomInstance = {
         id: Symbol('atom'),
         type: 'computed',
         name,
-        read,
+        read: arg1,
       } as ComputedAtom<Value>;
     } else {
       // Primitive atom with non-function value
@@ -91,7 +92,7 @@ export function atom<Value>(...args: any[]): Atom<Value> {
         id: Symbol('atom'),
         type: 'primitive',
         name,
-        read: () => read,
+        read: () => arg1,
       } as PrimitiveAtom<Value>;
     }
   } else {
