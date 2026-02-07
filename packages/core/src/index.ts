@@ -98,7 +98,18 @@ export { ActionTracker, globalActionTracker, createActionWithStackTrace } from '
 export { snapshotSerialization } from './utils/snapshot-serialization';
 
 // Export types
-export type { Atom, Store, Plugin, ActionMetadata } from './types';
+export type { 
+  Atom, 
+  BaseAtom,
+  PrimitiveAtom, 
+  ComputedAtom, 
+  WritableAtom,
+  Store, 
+  Plugin, 
+  ActionMetadata,
+  AtomValue,
+  AnyAtom
+} from './types';
 export type { EnhancedStore, StoreEnhancementOptions } from './enhanced-store';
 export type { SerializationOptions } from './utils/serialization';
 export type { ActionTrackingOptions, ActionMetadata as TrackedActionMetadata } from './utils/action-tracker';

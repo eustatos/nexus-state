@@ -1,23 +1,55 @@
 // Implementation of createStore function
 
-import type { Atom, Store, Subscriber, Getter, Setter, Plugin, ActionMetadata, PrimitiveAtom, ComputedAtom } from './types';
-import { isPrimitiveAtom, isComputedAtom } from './types';
+import type { 
+  Atom, 
+  Store, 
+  Subscriber, 
+  Getter, 
+  Setter, 
+  Plugin, 
+  ActionMetadata, 
+  PrimitiveAtom, 
+  ComputedAtom,
+  WritableAtom,
+  BaseAtom
+} from './types';
+import { isPrimitiveAtom, isComputedAtom, isWritableAtom } from './types';
 import { serializeState as serializeStoreState } from './utils/serialization';
 import { atomRegistry } from './atom-registry';
 
+/**
+ * Internal state for an atom
+ * @template Value The type of value the atom holds
+ */
 type AtomState<Value> = {
+  /** The current value of the atom */
   value: Value;
+  /** Set of subscribers to notify when the value changes */
   subscribers: Set<Subscriber<Value>>;
+  /** Set of dependent atoms that depend on this atom */
   dependents: Set<Atom<any>>; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
-// Store enhancement options
+/**
+ * Options for enhancing a store
+ */
 type StoreEnhancementOptions = {
+  /** Enable DevTools integration */
   enableDevTools?: boolean;
+  /** Enable stack trace tracking */
   enableStackTrace?: boolean;
+  /** Debounce delay for state updates */
   debounceDelay?: number;
 };
 
+/**
+ * Create a new store to hold atoms
+ * @param plugins Array of plugins to apply to the store
+ * @returns A new store instance
+ * @example
+ * const store = createStore();
+ * const storeWithPlugins = createStore([loggerPlugin, devToolsPlugin]);
+ */
 export function createStore(plugins: Plugin[] = []): Store {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const atomStates = new Map<Atom<any>, AtomState<any>>();
@@ -42,7 +74,7 @@ export function createStore(plugins: Plugin[] = []): Store {
       if (isPrimitiveAtom(atom)) {
         // This is a primitive atom - read() takes no parameters
         initialValue = (atom as PrimitiveAtom<Value>).read();
-      } else {
+      } else if (isComputedAtom(atom)) {
         // This is a computed atom - read() takes get parameter
         const previousAtom = currentAtom;
         currentAtom = atom;
@@ -51,6 +83,17 @@ export function createStore(plugins: Plugin[] = []): Store {
         } finally {
           currentAtom = previousAtom;
         }
+      } else if (isWritableAtom(atom)) {
+        // This is a writable atom - read() takes get parameter
+        const previousAtom = currentAtom;
+        currentAtom = atom;
+        try {
+          initialValue = (atom as WritableAtom<Value>).read(get);
+        } finally {
+          currentAtom = previousAtom;
+        }
+      } else {
+        throw new Error('Unknown atom type');
       }
       
       atomState = {
@@ -80,9 +123,14 @@ export function createStore(plugins: Plugin[] = []): Store {
       if (isPrimitiveAtom(atom)) {
         // This is a primitive atom - read() takes no parameters
         initialValue = (atom as PrimitiveAtom<Value>).read();
-      } else {
+      } else if (isComputedAtom(atom)) {
         // Computed atoms cannot be set directly
         throw new Error('Cannot set value of computed atom');
+      } else if (isWritableAtom(atom)) {
+        // This is a writable atom - we can set it
+        initialValue = (atom as WritableAtom<Value>).read(get);
+      } else {
+        throw new Error('Unknown atom type');
       }
       
       atomState = {
@@ -93,8 +141,8 @@ export function createStore(plugins: Plugin[] = []): Store {
       atomStates.set(atom, atomState as any); // eslint-disable-line @typescript-eslint/no-explicit-any
     }
 
-    // Check if this is a primitive atom (only primitive atoms can be set)
-    if (!isPrimitiveAtom(atom)) {
+    // Check if this atom can be set
+    if (isComputedAtom(atom)) {
       throw new Error('Cannot set value of computed atom');
     }
 
@@ -118,14 +166,20 @@ export function createStore(plugins: Plugin[] = []): Store {
       // For computed atoms, we need to recompute their values
       // eslint-disable-line @typescript-eslint/no-explicit-any
       const dependentState = atomStates.get(dependent) as AtomState<any> | undefined;
-      if (dependentState && isComputedAtom(dependent)) {
+      if (dependentState && (isComputedAtom(dependent) || isWritableAtom(dependent))) {
         // Track which atom is being evaluated
         const previousAtom = currentAtom;
         currentAtom = dependent;
         try {
           // Recompute the value
           // eslint-disable-line @typescript-eslint/no-explicit-any
-          const newValue = (dependent as ComputedAtom<any>).read(get);
+          let newValue: any;
+          if (isComputedAtom(dependent)) {
+            newValue = (dependent as ComputedAtom<any>).read(get);
+          } else if (isWritableAtom(dependent)) {
+            newValue = (dependent as WritableAtom<any>).read(get);
+          }
+          
           if (dependentState.value !== newValue) {
             dependentState.value = newValue;
             dependentState.subscribers.forEach((subscriber) => {
@@ -173,7 +227,7 @@ export function createStore(plugins: Plugin[] = []): Store {
       if (isPrimitiveAtom(atom)) {
         // This is a primitive atom - read() takes no parameters
         initialValue = (atom as PrimitiveAtom<Value>).read();
-      } else {
+      } else if (isComputedAtom(atom)) {
         // This is a computed atom - read() takes get parameter
         const previousAtom = currentAtom;
         currentAtom = atom;
@@ -182,6 +236,17 @@ export function createStore(plugins: Plugin[] = []): Store {
         } finally {
           currentAtom = previousAtom;
         }
+      } else if (isWritableAtom(atom)) {
+        // This is a writable atom - read() takes get parameter
+        const previousAtom = currentAtom;
+        currentAtom = atom;
+        try {
+          initialValue = (atom as WritableAtom<Value>).read(get);
+        } finally {
+          currentAtom = previousAtom;
+        }
+      } else {
+        throw new Error('Unknown atom type');
       }
       
       atomState = {
