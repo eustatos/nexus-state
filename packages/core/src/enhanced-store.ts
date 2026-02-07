@@ -1,6 +1,6 @@
 // enhanced-store.ts
 
-import type { Store, Plugin, EnhancedStore, StoreEnhancementOptions } from './types';
+import type { Store, Plugin, EnhancedStore as EnhancedStoreType, StoreEnhancementOptions as StoreEnhancementOptionsType } from './types';
 import { createStore } from './store';
 import { atomRegistry } from './atom-registry';
 
@@ -27,6 +27,10 @@ import { atomRegistry } from './atom-registry';
  * @property {string} [devToolsName] - Name to display in DevTools
  * @property {string} [registryMode] - Registry mode: 'global' or 'isolated'
  */
+
+// Export the types
+export type EnhancedStore = EnhancedStoreType;
+export type StoreEnhancementOptions = StoreEnhancementOptionsType;
 
 /**
  * Creates an enhanced store with DevTools integration capabilities.

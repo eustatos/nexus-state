@@ -93,6 +93,15 @@ export class AtomRegistry {
   }
 
   /**
+   * Get atom by symbol ID (alias for get)
+   * @param id Symbol ID of the atom
+   * @returns The atom or undefined if not found
+   */
+  getAtom(id: symbol): any | undefined {
+    return this.get(id);
+  }
+
+  /**
    * Get display name for atom
    * @param atom The atom
    * @returns Display name for the atom
