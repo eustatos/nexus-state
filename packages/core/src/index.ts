@@ -119,6 +119,9 @@ export type {
   SnapshotMetadata as SnapshotMetadataType,
   SnapshotStateEntry,
   TimeTravelAPI,
+  Getter,
+  Setter,
+  Subscriber,
 } from "./types";
 export type { EnhancedStore, StoreEnhancementOptions } from "./enhanced-store";
 export type { SerializationOptions } from "./utils/serialization";

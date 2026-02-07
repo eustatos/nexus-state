@@ -1,0 +1,13 @@
+# Test files
+*.test.ts
+*.test-d.ts
+*.spec.ts
+
+# Source files
+src/
+
+# Build artifacts
+dist/*.test.*
+
+types.backup.*
+

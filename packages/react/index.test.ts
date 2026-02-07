@@ -1,8 +1,9 @@
 // Tests for React adapter
-import { atom, createStore } from "@nexus-state/core";
+import { atom, createStore, Getter } from "@nexus-state/core";
 import { useAtom } from "./index";
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
+
 describe("useAtom", () => {
   it("should return the initial value of the atom", () => {
     const store = createStore();
@@ -29,7 +30,7 @@ describe("useAtom", () => {
   it("should work with computed atoms", () => {
     const store = createStore();
     const countAtom = atom(0);
-    const doubleAtom = atom((get) => get(countAtom) * 2);
+    const doubleAtom = atom((get: Getter) => get(countAtom) * 2);
 
     const { result } = renderHook(() => useAtom(doubleAtom, store));
     expect(result.current).toBe(0);

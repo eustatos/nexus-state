@@ -1,7 +1,8 @@
 {
   "name": "@nexus-state/core",
   "version": "0.1.4",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "homepage": "https://nexus-state.website.yandexcloud.net/",
   "repository": {
     "type": "git",
@@ -9,10 +10,16 @@
   },
   "scripts": {
     "build": "tsc",
+    "clean": "rm -rf dist && mkdir dist",
     "dev": "tsc -w",
     "test": "vitest run",
     "lint": "eslint . --ext .ts"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "devDependencies": {
     "typescript": "^5.0.0",
     "vitest": "^0.34.0",
