@@ -36,7 +36,12 @@ describe('DevToolsPlugin Atom Name Display', () => {
   });
 
   it('should use atom toString method when showAtomNames is disabled', () => {
-    const atom = createMockAtom('test-atom'); // No name registered
+    const atomId = Symbol('test-atom');
+    const atom: any = {
+      id: atomId,
+      toString: () => `Atom(test-atom)`,
+    };
+    // Do not register the atom to test fallback behavior
     const plugin = new DevToolsPlugin({ showAtomNames: false });
     
     // Access private method through reflection for testing
@@ -63,7 +68,12 @@ describe('DevToolsPlugin Atom Name Display', () => {
   });
 
   it('should provide fallback name for unregistered atoms', () => {
-    const atom = createMockAtom('test-atom'); // No name provided
+    const atomId = Symbol('test-atom');
+    const atom: any = {
+      id: atomId,
+      toString: () => `Atom(test-atom)`,
+    };
+    // Do not register the atom to test fallback behavior
     const plugin = new DevToolsPlugin({ showAtomNames: true });
     
     // Access private method through reflection for testing
