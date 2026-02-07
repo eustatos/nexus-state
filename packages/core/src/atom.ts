@@ -77,23 +77,22 @@ export function atom<Value>(...args: any[]): Atom<Value> {
         read,
         write,
       } as WritableAtom<Value>;
-    } else {
-      throw new Error('Invalid arguments for atom function');
-    }
-  } else if (args.length === 3) {
-    // This case handles when we have read, write, and name (name was already popped)
-    const [read, write] = args;
-    if (typeof read === 'function' && typeof write === 'function') {
-      // Writable atom
+    } else if (typeof read === 'function') {
+      // Computed atom (only read function provided)
       atomInstance = {
         id: Symbol('atom'),
-        type: 'writable',
+        type: 'computed',
         name,
         read,
-        write,
-      } as WritableAtom<Value>;
+      } as ComputedAtom<Value>;
     } else {
-      throw new Error('Invalid arguments for atom function');
+      // Primitive atom with function as value
+      atomInstance = {
+        id: Symbol('atom'),
+        type: 'primitive',
+        name,
+        read: () => read,
+      } as PrimitiveAtom<Value>;
     }
   } else {
     throw new Error('Invalid arguments for atom function');
