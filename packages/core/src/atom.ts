@@ -86,7 +86,7 @@ export function atom<Value>(...args: any[]): Atom<Value> {
         read,
       } as ComputedAtom<Value>;
     } else {
-      // Primitive atom with function as value
+      // Primitive atom with non-function value
       atomInstance = {
         id: Symbol('atom'),
         type: 'primitive',
