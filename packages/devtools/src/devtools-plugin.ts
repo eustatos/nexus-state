@@ -1,4 +1,5 @@
 import type { DevToolsConfig, DevToolsConnection, DevToolsMessage, EnhancedStore } from './types';
+import { atomRegistry } from '../../core/src/atom-registry';
 
 // Declare global types for Redux DevTools
 declare global {
@@ -32,6 +33,8 @@ export class DevToolsPlugin {
       maxAge: config.maxAge ?? 50,
       actionSanitizer: config.actionSanitizer ?? (() => true),
       stateSanitizer: config.stateSanitizer ?? ((state) => state),
+      showAtomNames: config.showAtomNames ?? true,
+      atomNameFormatter: config.atomNameFormatter ?? ((atom, defaultName) => defaultName),
     };
   }
 
@@ -68,6 +71,32 @@ export class DevToolsPlugin {
     } else {
       // Fallback to polling for basic stores
       this.setupPolling(store);
+    }
+  }
+
+  /**
+   * Get display name for an atom
+   * @param atom The atom to get name for
+   * @returns Display name for the atom
+   */
+  private getAtomName(atom: any): string {
+    try {
+      // Use custom formatter if provided
+      if (this.config.atomNameFormatter) {
+        const defaultName = atomRegistry.getName(atom);
+        return this.config.atomNameFormatter(atom, defaultName);
+      }
+      
+      // Use registry name if available
+      if (this.config.showAtomNames) {
+        return atomRegistry.getName(atom);
+      }
+      
+      // Fallback to atom's toString method
+      return atom.toString();
+    } catch (error) {
+      // Fallback for any errors
+      return `atom-${atom.id?.toString() || 'unknown'}`;
     }
   }
 
@@ -175,11 +204,13 @@ export class DevToolsPlugin {
     
     // Override set method to capture metadata
     store.set = ((atom: any, update: any) => {
-      // Create action metadata
+      // Create action metadata with atom name
+      const atomName = this.getAtomName(atom);
       const metadata = {
-        type: `SET ${atom.toString()}`,
+        type: `SET ${atomName}`,
         timestamp: Date.now(),
         source: 'DevToolsPlugin',
+        atomName: atomName,
       };
       
       // Capture stack trace if enabled

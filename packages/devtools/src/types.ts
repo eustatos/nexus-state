@@ -19,6 +19,12 @@ export interface DevToolsConfig {
   
   /** Function to sanitize state before sending to DevTools */
   stateSanitizer?: (state: unknown) => unknown;
+  
+  /** Enable display of atom names in DevTools actions */
+  showAtomNames?: boolean;
+  
+  /** Custom formatter for atom names */
+  atomNameFormatter?: (atom: any, defaultName: string) => string;
 }
 
 /**

@@ -22,6 +22,8 @@ npm install @nexus-state/devtools
 - Time-travel debugging support
 - Enhanced store API integration
 - SSR environment compatibility
+- Atom name display in DevTools actions
+- Configurable atom name formatting
 
 ## Usage Example
 
@@ -52,7 +54,12 @@ const store = createStore([
   devTools({ 
     name: 'My App',
     trace: true,  // Capture stack traces for actions
-    latency: 50   // Debounce state updates for performance
+    latency: 50,  // Debounce state updates for performance
+    showAtomNames: true,  // Display atom names in DevTools
+    atomNameFormatter: (atom, defaultName) => {
+      // Custom formatting for atom names
+      return `Atom:${defaultName}`;
+    }
   })
 ]);
 ```
@@ -98,6 +105,8 @@ Creates a DevTools plugin for Nexus State stores.
   - `maxAge` (number): Maximum number of actions to keep in DevTools history (defaults to 50)
   - `actionSanitizer` (function): Function to determine if an action should be sent to DevTools
   - `stateSanitizer` (function): Function to sanitize state before sending to DevTools
+  - `showAtomNames` (boolean): Whether to display atom names in DevTools actions (defaults to true)
+  - `atomNameFormatter` (function): Function to customize atom name display
 
 #### Returns
 
@@ -123,12 +132,55 @@ The package exports several TypeScript types for enhanced type safety:
 - `DevToolsMessage`: Message interface from DevTools
 - `EnhancedStore`: Extended store interface with enhanced DevTools support
 
+## Atom Name Display
+
+The DevTools plugin can display meaningful names for atoms in Redux DevTools instead of generic identifiers. This feature enhances debugging by providing clear context about which atoms are being updated.
+
+### How it works
+
+1. Atoms are automatically registered with the global atom registry when created
+2. The DevTools plugin uses the atom registry to look up display names
+3. Atom names are included in action metadata sent to Redux DevTools
+4. Unregistered atoms fall back to auto-generated names
+
+### Configuration
+
+- `showAtomNames`: Enable/disable atom name display (default: true)
+- `atomNameFormatter`: Custom function to format atom names
+
+### Example
+
+```javascript
+import { atom } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
+
+// Create atoms with meaningful names
+const userAtom = atom({ name: 'John', age: 30 }, 'userAtom');
+const themeAtom = atom('light', 'themeAtom');
+
+// Create store with DevTools
+const store = createStore([
+  devTools({
+    name: 'My App',
+    showAtomNames: true,
+    atomNameFormatter: (atom, defaultName) => {
+      // Add prefix to all atom names
+      return `App:${defaultName}`;
+    }
+  })
+]);
+
+// In Redux DevTools, actions will show:
+// "SET App:userAtom" instead of "SET Atom(1)"
+```
+
 ## Performance Considerations
 
 - DevTools integration adds minimal overhead (<5ms per update) when properly configured
 - Stack trace capture has performance impact and should be disabled in production
 - State updates are debounced by default to reduce DevTools communication overhead
 - Serialization is optimized to handle large state trees efficiently
+- Atom name resolution has minimal performance impact
 
 ## SSR Compatibility
 
