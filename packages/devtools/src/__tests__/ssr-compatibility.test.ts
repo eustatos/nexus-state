@@ -2,10 +2,10 @@
  * @jest-environment node
  */
 
-import { DevToolsPlugin } from '../devtools-plugin';
+import { DevToolsPlugin } from "../devtools-plugin";
 
-describe('DevToolsPlugin SSR Compatibility', () => {
-  it('should not throw errors when initialized in server environment', () => {
+describe("DevToolsPlugin SSR Compatibility", () => {
+  it("should not throw errors when initialized in server environment", () => {
     expect(() => {
       const plugin = new DevToolsPlugin();
       plugin.apply({
@@ -16,7 +16,7 @@ describe('DevToolsPlugin SSR Compatibility', () => {
     }).not.toThrow();
   });
 
-  it('should not attempt to connect to DevTools in server environment', () => {
+  it("should not attempt to connect to DevTools in server environment", () => {
     const plugin = new DevToolsPlugin();
     const store = {
       get: () => ({}),
@@ -25,14 +25,14 @@ describe('DevToolsPlugin SSR Compatibility', () => {
     };
 
     expect(() => {
-      plugin.apply(store as any);
+      plugin.apply(store as Parameters<DevToolsPlugin["apply"]>[0]);
     }).not.toThrow();
   });
 
-  it('should handle configuration in server environment', () => {
+  it("should handle configuration in server environment", () => {
     expect(() => {
       const plugin = new DevToolsPlugin({
-        name: 'test-store',
+        name: "test-store",
         trace: true,
         latency: 50,
         maxAge: 100,

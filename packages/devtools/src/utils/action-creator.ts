@@ -3,12 +3,12 @@
  * Implements action creator API as per TASK-005
  */
 
-import { ActionMetadata, ActionNamingStrategy } from './action-naming';
-import { CapturedStackTrace } from './stack-tracer';
+import { ActionMetadata, ActionNamingStrategy } from "./action-naming";
+import { CapturedStackTrace } from "./stack-tracer";
 
 export interface Action {
   type: string;
-  payload?: any;
+  payload?: unknown;
   metadata?: ActionMetadata;
   stackTrace?: CapturedStackTrace;
   timestamp: number;
@@ -28,18 +28,18 @@ export interface ActionGroup {
  * @param stackTrace - Optional stack trace
  * @returns Created action
  */
-export function createAction<T = any>(
+export function createAction<T = unknown>(
   name: string,
   payload?: T,
   metadata?: ActionMetadata,
-  stackTrace?: CapturedStackTrace
+  stackTrace?: CapturedStackTrace,
 ): Action {
   return {
     type: name,
     payload,
     metadata,
     stackTrace,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 }
 
@@ -49,11 +49,14 @@ export function createAction<T = any>(
  * @param groupName - Name for the action group
  * @returns Action group
  */
-export function createActionGroup(actions: Action[], groupName: string): ActionGroup {
+export function createActionGroup(
+  actions: Action[],
+  groupName: string,
+): ActionGroup {
   return {
     actions,
     groupName,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 }
 
@@ -66,17 +69,18 @@ export function createActionGroup(actions: Action[], groupName: string): ActionG
  * @param stackTrace - Optional stack trace
  * @returns Created action
  */
-export function createActionWithNaming<T = any>(
-  atom: any,
+export function createActionWithNaming<T = unknown>(
+  atom: { id?: { toString(): string } },
   value: T,
   strategy: ActionNamingStrategy,
   metadata: ActionMetadata,
-  stackTrace?: CapturedStackTrace
+  stackTrace?: CapturedStackTrace,
 ): Action {
   // Generate action name based on strategy
-  const actionName = typeof strategy === 'function' 
-    ? strategy(atom, value) 
-    : metadata.customName || `ATOM_UPDATE/${metadata.atomName}`;
-  
+  const actionName =
+    typeof strategy === "function"
+      ? strategy(atom, value)
+      : metadata.customName || `ATOM_UPDATE/${metadata.atomName}`;
+
   return createAction(actionName, value, metadata, stackTrace);
 }

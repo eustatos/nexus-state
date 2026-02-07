@@ -3,12 +3,15 @@
  * Implements configurable action naming strategies as per TASK-005
  */
 
-export type ActionNamingStrategy = 'auto' | 'custom' | ((atom: any, value: any) => string);
+export type ActionNamingStrategy =
+  | "auto"
+  | "custom"
+  | ((atom: { id?: { toString(): string } }, value: unknown) => string);
 
 export interface ActionMetadata {
   atomName: string;
   atomType: string;
-  updateType: 'direct' | 'computed';
+  updateType: "direct" | "computed";
   customName?: string;
   timestamp: number;
 }
@@ -19,7 +22,11 @@ export interface ActionMetadata {
  * @param metadata - Action metadata
  * @returns Formatted action name
  */
-export function defaultActionNaming(atomName: string, metadata: ActionMetadata): string {
+export function defaultActionNaming(
+  atomName: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  metadata: ActionMetadata,
+): string {
   return `ATOM_UPDATE/${atomName}`;
 }
 
@@ -33,18 +40,19 @@ export function defaultActionNaming(atomName: string, metadata: ActionMetadata):
  */
 export function generateActionName(
   strategy: ActionNamingStrategy,
-  atom: any,
-  value: any,
-  metadata: ActionMetadata
+  atom: { id?: { toString(): string } },
+  value: unknown,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  metadata: ActionMetadata,
 ): string {
-  if (typeof strategy === 'function') {
+  if (typeof strategy === "function") {
     return strategy(atom, value);
   }
-  
-  if (strategy === 'custom' && metadata.customName) {
+
+  if (strategy === "custom" && metadata.customName) {
     return metadata.customName;
   }
-  
+
   // Default auto strategy
   return defaultActionNaming(metadata.atomName, metadata);
 }
@@ -60,14 +68,14 @@ export function generateActionName(
 export function createActionMetadata(
   atomName: string,
   atomType: string,
-  updateType: 'direct' | 'computed',
-  customName?: string
+  updateType: "direct" | "computed",
+  customName?: string,
 ): ActionMetadata {
   return {
     atomName,
     atomType,
     updateType,
     customName,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 }

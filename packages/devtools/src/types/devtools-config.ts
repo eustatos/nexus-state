@@ -58,7 +58,10 @@ export type DevToolsConfig = {
    * Action naming strategy.
    * @default 'auto'
    */
-  actionNaming?: 'auto' | 'custom' | ((atom: any, value: any) => string);
+  actionNaming?:
+    | "auto"
+    | "custom"
+    | ((atom: { id?: { toString(): string } }, value: unknown) => string);
 
   /**
    * Enable action grouping for related updates.

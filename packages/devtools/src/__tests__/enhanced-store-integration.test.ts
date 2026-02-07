@@ -1,8 +1,8 @@
-import { DevToolsPlugin } from '../devtools-plugin';
-import { vi } from 'vitest';
+import { DevToolsPlugin } from "../devtools-plugin";
+import { vi } from "vitest";
 
-describe('DevToolsPlugin Enhanced Store Integration', () => {
-  it('should integrate with enhanced store API', () => {
+describe("DevToolsPlugin Enhanced Store Integration", () => {
+  it("should integrate with enhanced store API", () => {
     const plugin = new DevToolsPlugin();
     const store = {
       get: vi.fn(),
@@ -13,11 +13,11 @@ describe('DevToolsPlugin Enhanced Store Integration', () => {
     };
 
     expect(() => {
-      plugin.apply(store as any);
+      plugin.apply(store as Parameters<DevToolsPlugin["apply"]>[0]);
     }).not.toThrow();
   });
 
-  it('should use setWithMetadata when available', () => {
+  it("should use setWithMetadata when available", () => {
     const plugin = new DevToolsPlugin();
     const store = {
       get: vi.fn(),
@@ -27,13 +27,13 @@ describe('DevToolsPlugin Enhanced Store Integration', () => {
       serializeState: vi.fn(),
     };
 
-    plugin.apply(store as any);
-    
+    plugin.apply(store as Parameters<DevToolsPlugin["apply"]>[0]);
+
     // Verify that set method was overridden
-    expect(typeof store.set).toBe('function');
+    expect(typeof store.set).toBe("function");
   });
 
-  it('should fall back to polling when setWithMetadata is not available', () => {
+  it("should fall back to polling when setWithMetadata is not available", () => {
     const plugin = new DevToolsPlugin();
     const store = {
       get: vi.fn(),
@@ -43,11 +43,11 @@ describe('DevToolsPlugin Enhanced Store Integration', () => {
     };
 
     expect(() => {
-      plugin.apply(store as any);
+      plugin.apply(store as Parameters<DevToolsPlugin["apply"]>[0]);
     }).not.toThrow();
   });
 
-  it('should handle serializeState method', () => {
+  it("should handle serializeState method", () => {
     const plugin = new DevToolsPlugin();
     const store = {
       get: vi.fn(),
@@ -57,7 +57,7 @@ describe('DevToolsPlugin Enhanced Store Integration', () => {
     };
 
     expect(() => {
-      plugin.apply(store as any);
+      plugin.apply(store as Parameters<DevToolsPlugin["apply"]>[0]);
     }).not.toThrow();
   });
 });

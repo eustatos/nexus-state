@@ -2,10 +2,16 @@ import { DevToolsPlugin } from "../devtools-plugin";
 import { atomRegistry } from "@nexus-state/core";
 import { vi } from "vitest";
 
+// Define proper types for mock atom
+interface MockAtom {
+  id: symbol;
+  toString: () => string;
+}
+
 // Mock atom for testing
-const createMockAtom = (id: string, name?: string) => {
+const createMockAtom = (id: string, name?: string): MockAtom => {
   const atomId = Symbol(id);
-  const atom: any = {
+  const atom: MockAtom = {
     id: atomId,
     toString: () => `Atom(${id})`,
   };
@@ -29,7 +35,9 @@ describe("DevToolsPlugin Atom Name Display", () => {
     const plugin = new DevToolsPlugin({ showAtomNames: true });
 
     // Access private method through reflection for testing
-    const getAtomName = (plugin as any).getAtomName.bind(plugin);
+    const getAtomName = (
+      plugin as unknown as { getAtomName: (atom: MockAtom) => string }
+    ).getAtomName.bind(plugin);
     const name = getAtomName(atom);
 
     expect(name).toBe("TestAtom");
@@ -37,7 +45,7 @@ describe("DevToolsPlugin Atom Name Display", () => {
 
   it("should use atom toString method when showAtomNames is disabled", () => {
     const atomId = Symbol("test-atom");
-    const atom: any = {
+    const atom: MockAtom = {
       id: atomId,
       toString: () => `Atom(test-atom)`,
     };
@@ -45,7 +53,9 @@ describe("DevToolsPlugin Atom Name Display", () => {
     const plugin = new DevToolsPlugin({ showAtomNames: false });
 
     // Access private method through reflection for testing
-    const getAtomName = (plugin as any).getAtomName.bind(plugin);
+    const getAtomName = (
+      plugin as unknown as { getAtomName: (atom: MockAtom) => string }
+    ).getAtomName.bind(plugin);
     const name = getAtomName(atom);
 
     expect(name).toBe("Atom(test-atom)");
@@ -60,7 +70,9 @@ describe("DevToolsPlugin Atom Name Display", () => {
     });
 
     // Access private method through reflection for testing
-    const getAtomName = (plugin as any).getAtomName.bind(plugin);
+    const getAtomName = (
+      plugin as unknown as { getAtomName: (atom: MockAtom) => string }
+    ).getAtomName.bind(plugin);
     const name = getAtomName(atom);
 
     expect(name).toBe("CustomName");
@@ -69,7 +81,7 @@ describe("DevToolsPlugin Atom Name Display", () => {
 
   it("should provide fallback name for unregistered atoms", () => {
     const atomId = Symbol("test-atom");
-    const atom: any = {
+    const atom: MockAtom = {
       id: atomId,
       toString: () => `Atom(test-atom)`,
     };
@@ -77,7 +89,9 @@ describe("DevToolsPlugin Atom Name Display", () => {
     const plugin = new DevToolsPlugin({ showAtomNames: true });
 
     // Access private method through reflection for testing
-    const getAtomName = (plugin as any).getAtomName.bind(plugin);
+    const getAtomName = (
+      plugin as unknown as { getAtomName: (atom: MockAtom) => string }
+    ).getAtomName.bind(plugin);
     const name = getAtomName(atom);
 
     // The name should contain the atom's symbol identifier
@@ -85,7 +99,7 @@ describe("DevToolsPlugin Atom Name Display", () => {
   });
 
   it("should handle error in atom name resolution", () => {
-    const atom: any = { id: Symbol("test") };
+    const atom: MockAtom = { id: Symbol("test"), toString: () => "Atom(test)" };
     // Mock registry to throw error
     const originalGetName = atomRegistry.getName;
     atomRegistry.getName = () => {
@@ -95,7 +109,9 @@ describe("DevToolsPlugin Atom Name Display", () => {
     const plugin = new DevToolsPlugin({ showAtomNames: true });
 
     // Access private method through reflection for testing
-    const getAtomName = (plugin as any).getAtomName.bind(plugin);
+    const getAtomName = (
+      plugin as unknown as { getAtomName: (atom: MockAtom) => string }
+    ).getAtomName.bind(plugin);
     const name = getAtomName(atom);
 
     expect(name).toContain("atom-");
@@ -124,9 +140,18 @@ describe("DevToolsPlugin Atom Name Display", () => {
       __REDUX_DEVTOOLS_EXTENSION__: {
         connect: vi.fn().mockReturnValue(mockConnection),
       },
-    } as any;
+    } as Window & {
+      __REDUX_DEVTOOLS_EXTENSION__?: {
+        connect: (options: {
+          name?: string;
+          trace?: boolean;
+          latency?: number;
+          maxAge?: number;
+        }) => unknown;
+      };
+    };
 
-    const store: any = {
+    const store = {
       get: vi.fn(),
       set: null, // Will be overridden by plugin
       getState: vi.fn().mockReturnValue({}),
