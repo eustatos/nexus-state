@@ -20,6 +20,7 @@ npm install @nexus-state/devtools
 - Performance optimized updates
 - Stack trace capture for debugging
 - Time-travel debugging support
+- Enhanced store API integration
 - SSR environment compatibility
 
 ## Usage Example
@@ -50,8 +51,8 @@ import { devTools } from '@nexus-state/devtools';
 const store = createStore([
   devTools({ 
     name: 'My App',
-    enableStackTrace: true,  // Capture stack traces for actions
-    debounceDelay: 50         // Debounce state updates for performance
+    trace: true,  // Capture stack traces for actions
+    latency: 50   // Debounce state updates for performance
   })
 ]);
 ```
@@ -67,14 +68,14 @@ const store = createEnhancedStore([
   devTools({ name: 'My App' })
 ], {
   enableDevTools: true,
-  enableStackTrace: true
+  enableTimeTravel: true
 });
 
 // Set value with metadata
 store.setWithMetadata(countAtom, 5, {
   type: 'USER_INCREMENT',
   source: 'CounterComponent',
-  custom: { userId: 123 }
+  timestamp: Date.now()
 });
 
 // Serialize state for debugging
@@ -92,8 +93,11 @@ Creates a DevTools plugin for Nexus State stores.
 
 - `config` (Object, optional): Configuration options
   - `name` (string): Name to use for the DevTools instance (defaults to 'nexus-state')
-  - `enableStackTrace` (boolean): Whether to capture stack traces for actions (defaults to false)
-  - `debounceDelay` (number): Delay in ms for debouncing state updates (defaults to 100)
+  - `trace` (boolean): Whether to capture stack traces for actions (defaults to false)
+  - `latency` (number): Delay in ms for debouncing state updates (defaults to 100)
+  - `maxAge` (number): Maximum number of actions to keep in DevTools history (defaults to 50)
+  - `actionSanitizer` (function): Function to determine if an action should be sent to DevTools
+  - `stateSanitizer` (function): Function to sanitize state before sending to DevTools
 
 #### Returns
 
@@ -110,6 +114,15 @@ When using `createEnhancedStore`, additional methods are available:
 - `setIntercepted(atom, update)`: Set atom value with interception
 - `getPlugins()`: Get list of applied plugins
 
+### Types
+
+The package exports several TypeScript types for enhanced type safety:
+
+- `DevToolsConfig`: Configuration options for the DevTools plugin
+- `DevToolsConnection`: Connection interface for DevTools integration
+- `DevToolsMessage`: Message interface from DevTools
+- `EnhancedStore`: Extended store interface with enhanced DevTools support
+
 ## Performance Considerations
 
 - DevTools integration adds minimal overhead (<5ms per update) when properly configured
@@ -119,7 +132,7 @@ When using `createEnhancedStore`, additional methods are available:
 
 ## SSR Compatibility
 
-The DevTools plugin automatically detects SSR environments and disables DevTools integration when `window` is not available, ensuring compatibility with server-side rendering.
+The DevTools plugin automatically detects SSR environments and disables DevTools integration when `window` is not available, ensuring compatibility with server-side rendering. The plugin gracefully handles server environments without throwing errors or attempting to access browser APIs.
 
 ## License
 

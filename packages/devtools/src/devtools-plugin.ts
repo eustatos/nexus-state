@@ -1,5 +1,4 @@
-import type { Plugin, Store, ActionMetadata } from '@nexus-state/core';
-import type { DevToolsConfig } from './types/devtools-config';
+import type { DevToolsConfig, DevToolsConnection, DevToolsMessage, EnhancedStore } from './types';
 
 // Declare global types for Redux DevTools
 declare global {
@@ -15,23 +14,10 @@ declare global {
   }
 }
 
-interface DevToolsConnection {
-  send: (action: string | { type: string }, state: unknown) => void;
-  subscribe: (listener: (message: DevToolsMessage) => void) => () => void;
-  init: (state: unknown) => void;
-  unsubscribe: () => void;
-}
-
-type DevToolsMessage = {
-  type: string;
-  payload?: unknown;
-  state?: string;
-};
-
 /**
- * DevToolsPlugin class implementing the Plugin interface for Redux DevTools integration.
+ * DevToolsPlugin class implementing integration with enhanced store API.
  */
-export class DevToolsPlugin implements Plugin {
+export class DevToolsPlugin {
   private config: Required<DevToolsConfig>;
   private connection: DevToolsConnection | null = null;
   private isTracking = true;
@@ -53,7 +39,7 @@ export class DevToolsPlugin implements Plugin {
    * Apply the plugin to a store.
    * @param store The store to apply the plugin to
    */
-  apply(store: Store): void {
+  apply(store: EnhancedStore): void {
     // Check if Redux DevTools are available
     if (typeof window === 'undefined' || !window.__REDUX_DEVTOOLS_EXTENSION__) {
       if (process.env.NODE_ENV !== 'production') {
@@ -89,7 +75,7 @@ export class DevToolsPlugin implements Plugin {
    * Send initial state to DevTools.
    * @param store The store to get initial state from
    */
-  private sendInitialState(store: Store): void {
+  private sendInitialState(store: EnhancedStore): void {
     try {
       const state = store.serializeState?.() || store.getState();
       this.lastState = state;
@@ -105,7 +91,7 @@ export class DevToolsPlugin implements Plugin {
    * Setup message listeners for DevTools commands.
    * @param store The store to handle commands for
    */
-  private setupMessageListeners(store: Store): void {
+  private setupMessageListeners(store: EnhancedStore): void {
     const unsubscribe = this.connection?.subscribe((message: DevToolsMessage) => {
       try {
         this.handleDevToolsMessage(message, store);
@@ -130,7 +116,7 @@ export class DevToolsPlugin implements Plugin {
    * @param message The message from DevTools
    * @param store The store to apply commands to
    */
-  private handleDevToolsMessage(message: DevToolsMessage, store: Store): void {
+  private handleDevToolsMessage(message: DevToolsMessage, store: EnhancedStore): void {
     if (message.type === 'DISPATCH') {
       const payload = message.payload as { type: string; [key: string]: unknown } | undefined;
       
@@ -181,7 +167,7 @@ export class DevToolsPlugin implements Plugin {
    * Enhance store with metadata support.
    * @param store The store to enhance
    */
-  private enhanceStoreWithMetadata(store: Store): void {
+  private enhanceStoreWithMetadata(store: EnhancedStore): void {
     if (!store.setWithMetadata) return;
     
     // Store reference to original set method
@@ -190,7 +176,7 @@ export class DevToolsPlugin implements Plugin {
     // Override set method to capture metadata
     store.set = ((atom: any, update: any) => {
       // Create action metadata
-      const metadata: ActionMetadata = {
+      const metadata = {
         type: `SET ${atom.toString()}`,
         timestamp: Date.now(),
         source: 'DevToolsPlugin',
@@ -217,7 +203,7 @@ export class DevToolsPlugin implements Plugin {
    * Setup polling for state updates (fallback for basic stores).
    * @param store The store to poll
    */
-  private setupPolling(store: Store): void {
+  private setupPolling(store: EnhancedStore): void {
     const interval = setInterval(() => {
       if (this.isTracking) {
         this.sendStateUpdate(store, 'STATE_UPDATE');
@@ -237,7 +223,7 @@ export class DevToolsPlugin implements Plugin {
    * @param store The store to get state from
    * @param action The action name
    */
-  private sendStateUpdate(store: Store, action: string): void {
+  private sendStateUpdate(store: EnhancedStore, action: string): void {
     // Debounce updates to prevent performance issues
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
