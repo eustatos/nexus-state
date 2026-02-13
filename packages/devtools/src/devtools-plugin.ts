@@ -10,6 +10,7 @@ import type {
 import type { SnapshotMapper } from "./snapshot-mapper";
 import { atomRegistry } from "@nexus-state/core";
 import { createSnapshotMapper } from "./snapshot-mapper";
+import { StateSerializer, createStateSerializer } from "./state-serializer";
 
 /**
  * Feature detection for DevTools extension
@@ -142,6 +143,7 @@ export class DevToolsPlugin {
   private lastState: unknown = null;
   private debounceTimer: NodeJS.Timeout | null = null;
   private snapshotMapper: SnapshotMapper;
+  private stateSerializer: StateSerializer;
 
   constructor(config: DevToolsConfig = {}) {
     this.config = {
@@ -160,6 +162,7 @@ export class DevToolsPlugin {
       maxMappings: config.maxAge ?? 50,
       autoCleanup: true,
     });
+    this.stateSerializer = createStateSerializer();
   }
 
   /**
@@ -344,18 +347,94 @@ export class DevToolsPlugin {
           break;
 
         case "IMPORT_STATE":
-          // Import state would require parsing the state and applying it
-          if (process.env.NODE_ENV !== "production") {
-            console.warn(
-              "Import state is not fully supported without core modifications",
-            );
-          }
+          this.handleImportState(payload, store);
           break;
 
         default:
           if (process.env.NODE_ENV !== "production") {
             console.warn("Unknown DevTools dispatch type:", payload?.type);
           }
+      }
+    }
+  }
+
+  /**
+   * Handle IMPORT_STATE command from DevTools
+   * @param payload The IMPORT_STATE payload
+   * @param store The store to import state into
+   */
+  private handleImportState(
+    payload: { type: string; [key: string]: unknown },
+    store: EnhancedStore,
+  ): void {
+    try {
+      // Extract import data from payload
+      const importData = payload.state || payload.payload;
+
+      if (!importData) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("IMPORT_STATE: No state data provided");
+        }
+        return;
+      }
+
+      // Use StateSerializer to deserialize and validate
+      const result = this.stateSerializer.importState(importData);
+
+      if (!result.success) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("IMPORT_STATE: Failed to import state:", result.error);
+        }
+        return;
+      }
+
+      // Import state into store
+      this.importStateIntoStore(result.state!, store);
+
+      // Send updated state to DevTools
+      this.sendInitialState(store);
+
+      if (process.env.NODE_ENV !== "production") {
+        console.log("IMPORT_STATE: State imported successfully");
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("IMPORT_STATE: Error importing state:", error);
+      }
+    }
+  }
+
+  /**
+   * Import state into store
+   * @param state The state to import
+   * @param store The store to import into
+   */
+  private importStateIntoStore(
+    state: Record<string, unknown>,
+    store: EnhancedStore,
+  ): void {
+    // Check if store has importState method (from SimpleTimeTravel)
+    if (typeof (store as any).importState === "function") {
+      (store as any).importState(state);
+      return;
+    }
+
+    // Fallback: manually set each atom value
+    for (const [atomIdStr, value] of Object.entries(state)) {
+      try {
+        // Convert string atom ID to symbol
+        const atomId = Symbol.for(atomIdStr);
+        const atom = atomRegistry.get(atomId);
+
+        if (atom) {
+          store.set(atom, value);
+        } else if (process.env.NODE_ENV !== "production") {
+          console.warn(`IMPORT_STATE: Atom ${atomIdStr} not found in registry`);
+        }
+      } catch (error) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn(`IMPORT_STATE: Failed to set atom ${atomIdStr}:`, error);
+        }
       }
     }
   }
@@ -458,6 +537,40 @@ export class DevToolsPlugin {
         }
       }
     }, this.config.latency);
+  }
+
+  /**
+   * Export current state in DevTools-compatible format
+   * @param store The store to export state from
+   * @param metadata Optional metadata to include
+   * @returns Serialized state with checksum
+   */
+  exportState(
+    store: EnhancedStore,
+    metadata?: Record<string, unknown>,
+  ): Record<string, unknown> {
+    try {
+      const state = store.serializeState?.() || store.getState();
+
+      // Use StateSerializer to export with checksum
+      const exported = this.stateSerializer.exportState(state, metadata);
+
+      return exported;
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("Failed to export state:", error);
+      }
+
+      // Fallback: return basic state without checksum
+      const state = store.serializeState?.() || store.getState();
+      return {
+        state,
+        timestamp: Date.now(),
+        checksum: "",
+        version: "1.0.0",
+        metadata: metadata || {},
+      };
+    }
   }
 
   /**

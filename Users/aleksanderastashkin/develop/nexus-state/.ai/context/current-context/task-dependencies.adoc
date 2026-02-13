@@ -1,0 +1,11 @@
+== 🔗 TASK DEPENDENCIES
+
+**Prerequisites:**
+
+* [x] DEV-002-A - Command Handler Base - 🟢 DONE
+* [x] DEV-002-B - Snapshot Mapping System - 🟢 DONE
+* [x] StateSerializer implementation - 🟢 DONE
+
+**Blocks:**
+
+* [ ] DEV-002-D - Time Travel UI Integration - Will unblock when this task completes

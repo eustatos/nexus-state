@@ -1,0 +1,31 @@
+== 🏁 TASK COMPLETION CHECKLIST
+
+**Before marking ✅ COMPLETED:**
+
+=== Code:
+
+* [x] Acceptance criteria met
+* [x] TypeScript strict passes
+* [x] No `any` types in main implementation
+
+=== Testing:
+
+* [x] Tests with fixtures
+* [x] Edge cases covered
+* [x] 100% coverage achieved (66/66 tests passing)
+
+=== Documentation:
+
+* [x] JSDoc complete
+* [x] README updated if needed
+
+=== Performance:
+
+* [x] Bundle size within budget
+* [x] Runtime meets targets
+
+=== Handoff:
+
+* [x] Context file updated
+* [x] Ready for review
+

@@ -332,7 +332,7 @@ describe("CommandHandler", () => {
         payload: {
           state: { "atom-counter": { value: 10, type: "primitive" } },
           timestamp: Date.now(),
-          checksum: "dGhpcyBpcyBhIHRlc3Q=",
+          checksum: "bjJdbg==",
         },
       });
 

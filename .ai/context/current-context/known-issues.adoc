@@ -1,8 +1,10 @@
 == ⚠️ KNOWN ISSUES
 
-**Critical:** None
+**Critical:**
+
+1. **[Issue]** - [Description]
 
 **Questions:**
 
-* None - Implementation is complete and tested
+* [ ] [Question needing answer]
 

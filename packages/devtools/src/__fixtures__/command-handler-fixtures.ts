@@ -95,7 +95,7 @@ export const invalidJumpToActionCommands = [
  * Unknown command type for error handling tests
  */
 export const unknownCommand = {
-  type: "UNKNOWN_COMMAND" as "UNKNOWN_COMMAND",
+  type: "UNKNOWN_COMMAND" as const,
   payload: { foo: "bar" },
 };
 
@@ -103,7 +103,7 @@ export const unknownCommand = {
  * Missing payload command for validation tests
  */
 export const missingPayloadCommand = {
-  type: "JUMP_TO_STATE" as "JUMP_TO_STATE",
+  type: "JUMP_TO_STATE" as const,
   payload: undefined as unknown as { index: number },
 };
 
@@ -202,15 +202,7 @@ export const mockTimeTravel: {
     this.pointer = -1;
   },
 
-1. The current state of the file
-2. Where exactly this `emptyTimeTravel` object should be inserted
-3. Any surrounding context or imports that might be relevant
-
-Could you please provide:
-- The full file content or the section where this should be added?
-- Or specify the file path so I can help you apply the changes?
-
-Once you share that, I'll be able to help you integrate this `emptyTimeTravel` mock object while preserving existing comments and maintaining code style.
+  capture(action?: string): Snapshot | null {
     const snapshot = {
       id: `snap-${this.history.length + 1}`,
       state: {} as Record<string, SnapshotStateEntry>,
@@ -223,6 +215,36 @@ Once you share that, I'll be able to help you integrate this `emptyTimeTravel` m
     }
     this.history.push(snapshot);
     return snapshot;
+  },
+
+  importState(state: Record<string, unknown>): boolean {
+    // Clear current history
+    this.clearHistory();
+
+    // Create a new snapshot from imported state
+    const newSnapshot: Snapshot = {
+      id: `imported-${Date.now()}`,
+      state: {} as Record<string, SnapshotStateEntry>,
+      metadata: {
+        timestamp: Date.now(),
+        action: "IMPORT_STATE",
+        atomCount: Object.keys(state).length,
+      },
+    };
+
+    // Convert imported state to snapshot format
+    for (const [atomIdStr, value] of Object.entries(state)) {
+      newSnapshot.state[atomIdStr] = {
+        value,
+        type: "primitive" as const,
+      };
+    }
+
+    // Add to history
+    this.history.push(newSnapshot);
+    this.pointer = 0;
+
+    return true;
   },
 };
 

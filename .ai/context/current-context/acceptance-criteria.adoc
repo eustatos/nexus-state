@@ -2,13 +2,9 @@
 
 **MUST HAVE:**
 
-* [x] Bidirectional mapping between actions and snapshots
-* [x] Memory-efficient storage using Maps
-* [x] Cleanup functionality for old mappings
-* [x] Integration with CommandHandler
-* [x] Integration with DevToolsPlugin
-* [x] TypeScript strict mode passes
-* [x] Tests with fixtures >90% coverage (100% achieved)
-* [x] No breaking API changes
-* [x] Documentation complete
+* [ ] [Functionality criterion]
+* [ ] TypeScript strict mode passes
+* [ ] Tests with fixtures >90% coverage
+* [ ] No breaking API changes
+* [ ] Documentation complete
 

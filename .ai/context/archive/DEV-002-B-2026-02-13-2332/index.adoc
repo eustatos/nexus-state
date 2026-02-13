@@ -1,11 +1,8 @@
-= 🎯 ACTIVE DEVELOPMENT CONTEXT - TEMPLATE
+= 🎯 ACTIVE DEVELOPMENT CONTEXT
 :icons: font
 :toc: left
 :toclevels: 3
 :sectnums:
-
-> **AI INSTRUCTIONS:** Copy this template to `.ai/context/current-context/` when starting a new task.
-> Update regularly during work. Archive when task is complete.
 
 include::basic-info.adoc[]
 

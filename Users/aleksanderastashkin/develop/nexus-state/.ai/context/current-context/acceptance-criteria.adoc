@@ -1,0 +1,12 @@
+== 🎯 ACCEPTANCE CRITERIA
+
+**MUST HAVE:**
+
+* [ ] Полная обработка IMPORT_STATE команды в DevToolsPlugin
+* [ ] Интеграция StateSerializer с CommandHandler для проверки контрольной суммы
+* [ ] Экспорт состояния через DevTools
+* [ ] Валидация импортируемого состояния
+* [ ] TypeScript strict mode passes
+* [ ] Tests with fixtures >90% coverage
+* [ ] No breaking API changes
+* [ ] Documentation complete

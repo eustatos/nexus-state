@@ -5,18 +5,6 @@
  * from Redux DevTools, integrating with SimpleTimeTravel for
  * state navigation.
  *
- * @example
- * ```typescript
- * const handler = new CommandHandler({
- *   maxHistory: 100,
- *   onCommandError: (command, error) => {
- *     console.warn("Command failed:", command, error);
- *   },
- * });
- *
- * handler.setTimeTravel(timeTravel);
- * handler.handleCommand({ type: "JUMP_TO_STATE", payload: { index: 5 } });
- * ```
  */
 
 import type {
@@ -29,6 +17,7 @@ import type {
 } from "./types";
 import { SnapshotMapper } from "./snapshot-mapper";
 import type { SimpleTimeTravel } from "@nexus-state/core";
+import { StateSerializer, createStateSerializer } from "./state-serializer";
 
 /**
  * CommandHandler class for processing DevTools time travel commands
@@ -44,6 +33,7 @@ export class CommandHandler {
   private snapshotMapper: SnapshotMapper | null = null;
   private config: Required<CommandHandlerConfig>;
   private history: Command[] = [];
+  private stateSerializer: StateSerializer;
 
   /**
    * Creates a new CommandHandler instance
@@ -55,6 +45,7 @@ export class CommandHandler {
       onCommandExecuted: config.onCommandExecuted ?? (() => {}),
       onCommandError: config.onCommandError ?? (() => {}),
     };
+    this.stateSerializer = createStateSerializer();
   }
 
   /**
@@ -87,7 +78,9 @@ export class CommandHandler {
 
       // Validate command payload
       if (!(command as Command).payload) {
-        throw new Error(`Invalid command payload for ${(command as Command).type}`);
+        throw new Error(
+          `Invalid command payload for ${(command as Command).type}`,
+        );
       }
 
       // Route to appropriate handler
@@ -262,22 +255,11 @@ export class CommandHandler {
       throw new Error("Invalid import state payload");
     }
 
-    // Validate state field
-    const state = (payload as ImportStateFormat).state;
-    if (!state || typeof state !== "object" || Array.isArray(state)) {
-      throw new Error("Invalid state: must be an object");
-    }
+    // Use StateSerializer to validate and deserialize
+    const result = this.stateSerializer.importState(payload);
 
-    // Validate timestamp
-    const timestamp = (payload as ImportStateFormat).timestamp;
-    if (typeof timestamp !== "number") {
-      throw new Error("Invalid timestamp: must be a number");
-    }
-
-    // Validate checksum
-    const checksum = (payload as ImportStateFormat).checksum;
-    if (typeof checksum !== "string") {
-      throw new Error("Invalid checksum: must be a string");
+    if (!result.success) {
+      throw new Error(`Failed to import state: ${result.error}`);
     }
 
     // Check SimpleTimeTravel integration
@@ -287,15 +269,75 @@ export class CommandHandler {
       );
     }
 
+    // Extract values from SnapshotStateEntry format if needed
+    const stateToImport: Record<string, unknown> = {};
+    for (const [atomIdStr, atomData] of Object.entries(result.state!)) {
+      if (atomData && typeof atomData === "object" && "value" in atomData) {
+        // This is a SnapshotStateEntry object, extract the value
+        stateToImport[atomIdStr] = (atomData as any).value;
+      } else {
+        // This is already a plain value
+        stateToImport[atomIdStr] = atomData;
+      }
+    }
+
     // Import state into SimpleTimeTravel
-    const success = this.timeTravel.importState(state);
+    const success = this.timeTravel.importState(stateToImport);
 
     if (success) {
       this.history.push(command);
       this.config.onCommandExecuted(command, true);
       return true;
     } else {
-      throw new Error("Failed to import state");
+      throw new Error("Failed to import state into SimpleTimeTravel");
+    }
+  }
+
+  /**
+   * Export current state in DevTools-compatible format
+   * @returns Serialized state with checksum
+   */
+  exportState(): Record<string, unknown> | null {
+    try {
+      // Check SimpleTimeTravel integration
+      if (!this.timeTravel) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn(
+            "SimpleTimeTravel not initialized. Call setTimeTravel() first.",
+          );
+        }
+        return null;
+      }
+
+      // Get current state from SimpleTimeTravel
+      const history = this.timeTravel.getHistory();
+      if (history.length === 0) {
+        return null;
+      }
+
+      const currentSnapshot = history[history.length - 1];
+      const state: Record<string, unknown> = {};
+
+      // Convert snapshot state to plain object
+      for (const [atomIdStr, atomData] of Object.entries(
+        currentSnapshot.state,
+      )) {
+        state[atomIdStr] = atomData.value;
+      }
+
+      // Use StateSerializer to export with checksum
+      const exported = this.stateSerializer.exportState(state, {
+        source: "CommandHandler",
+        snapshotId: currentSnapshot.id,
+        timestamp: currentSnapshot.metadata.timestamp,
+      });
+
+      return exported;
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("Failed to export state:", error);
+      }
+      return null;
     }
   }
 }

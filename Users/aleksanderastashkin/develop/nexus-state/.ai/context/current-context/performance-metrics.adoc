@@ -1,0 +1,5 @@
+== 📊 PERFORMANCE & METRICS
+
+**Bundle Size:** Target < 50KB, Current: ~15KB (estimated)
+**Runtime:** Import/export operations < 5ms, Current: ~1ms (estimated)
+**Memory:** Efficient state serialization/deserialization

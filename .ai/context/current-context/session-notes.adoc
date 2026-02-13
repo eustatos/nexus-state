@@ -2,14 +2,9 @@
 
 **Insights:**
 
-* The SnapshotMapper implementation is comprehensive and well-tested
-* CommandHandler properly integrates with SnapshotMapper for JUMP_TO_ACTION
-* DevToolsPlugin creates and exposes SnapshotMapper for external use
-* All 66 tests pass across 5 test files
+* [Insight 1]
 
 **Lessons:**
 
-* Always verify task status before starting work
-* Task files may be outdated - check actual implementation
-* Comprehensive test coverage indicates mature implementation
+* [Lesson 1]
 

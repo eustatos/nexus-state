@@ -1,6 +1,6 @@
 == 📊 PERFORMANCE & METRICS
 
-**Bundle Size:** Target < 50KB, Current: ~15KB (estimated)
-**Runtime:** Snapshot operations < 1ms, Current: ~0.1ms
-**Memory:** < 10MB for 1000 mappings, Current: ~2MB
+**Bundle Size:** Target < [ ]KB, Current: [ ]KB
+**Runtime:** [Operation] < [ ]ms, Current: [ ]ms
+**Memory:** < [ ]MB, Current: [ ]MB
 

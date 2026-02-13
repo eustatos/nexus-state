@@ -2,33 +2,26 @@
 
 **What was just finished:**
 
-=== Task Review and Status Update - COMPLETED
+=== [Task/Feature Name] - [STATUS]
 
-**Timestamp:** 2026-02-09
+**Timestamp:** YYYY-MM-DD HH:MM
 
 **Code Implemented:**
 
-* ✅ Reviewed DEV-002-B task file
-* ✅ Verified existing implementation of SnapshotMapper
-* ✅ Verified CommandHandler integration with SnapshotMapper
-* ✅ Verified DevToolsPlugin integration with SnapshotMapper
-* ✅ All tests passing (66/66 tests)
+* [x] [Function/class with description]
+  * Location: `[file.ts:line-range]`
+  * Purpose: [Why implemented]
+  * Tests: [Coverage status]
 
-**Files Reviewed:**
+**Files Modified/Created:**
 
-* `packages/devtools/src/snapshot-mapper.ts` - Full implementation
-* `packages/devtools/src/types.ts` - All types defined
-* `packages/devtools/src/command-handler.ts` - Integration complete
-* `packages/devtools/src/devtools-plugin.ts` - Integration complete
-* `packages/devtools/src/__tests__/snapshot-mapper.test.ts` - 31 tests
-* `packages/devtools/src/__tests__/command-handler.test.ts` - 22 tests
+* `[path/to/file.ts]` - [added/modified/refactored]
+* `[path/to/test.test.ts]` - [Test files]
+* `[path/to/fixture.ts]` - [Fixture files]
 
 **Results:**
 
-* ✅ SnapshotMapper fully implemented with bidirectional mapping
-* ✅ CommandHandler properly uses SnapshotMapper for JUMP_TO_ACTION
-* ✅ DevToolsPlugin creates and exposes SnapshotMapper
-* ✅ All tests passing (66/66)
-* ✅ TypeScript strict mode compliant
-* ✅ No linting errors
+* [x] [Result 1]
+* [x] [Result 2]
+* [x] [Result 3]
 

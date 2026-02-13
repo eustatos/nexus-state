@@ -2,10 +2,9 @@
 
 **Prerequisites:**
 
-* [x] DEV-002-A - Command Handler Base - ✅ COMPLETED
-* [x] DEV-001-B - Atom Registry Integration - ✅ COMPLETED
+* [ ] [Task] - 🟢 DONE | 🟡 IN PROGRESS | ⏳ PENDING
 
 **Blocks:**
 
-* [ ] DEV-002-C - Time Travel Integration - Will unblock when this task completes
+* [ ] [Task] - Will unblock when this task completes
 

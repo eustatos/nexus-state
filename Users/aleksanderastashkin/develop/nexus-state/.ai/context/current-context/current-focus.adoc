@@ -1,0 +1,11 @@
+== 📍 CURRENT FOCUS
+
+**What I'm working on RIGHT NOW:**
+
+* Интеграция StateSerializer в DevToolsPlugin
+* Реализация обработки IMPORT_STATE с проверкой контрольной суммы
+* Добавление экспорта состояния через DevTools
+
+**Progress in current task:** ~25% complete
+**Estimated tokens remaining:** ~135K tokens
+**Context usage:** ~45% of limit

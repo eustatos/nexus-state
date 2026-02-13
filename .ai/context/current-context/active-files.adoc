@@ -2,36 +2,14 @@
 
 **Files currently being modified:**
 
-=== Primary Work Files:
+=== Primary Work File:
 
-`packages/devtools/src/snapshot-mapper.ts`
+`[main/file.ts]`
+
 [source,typescript]
 ----
-// SnapshotMapper class - Bidirectional mapping between actions and snapshots
-// Status: FULLY IMPLEMENTED ✅
-// - mapSnapshotToAction() - Map snapshot ID to action ID
-// - getActionIdBySnapshotId() - Get action ID by snapshot ID
-// - getSnapshotIdByActionId() - Get snapshot ID by action ID
-// - cleanup() - Remove old mappings
-// - clear() - Clear all mappings
-----
-
-`packages/devtools/src/command-handler.ts`
-[source,typescript]
-----
-// CommandHandler class - Processes DevTools time travel commands
-// Status: FULLY IMPLEMENTED ✅
-// - setSnapshotMapper() - Set SnapshotMapper instance
-// - handleJumpToAction() - Uses mapper for action-to-snapshot lookup
-----
-
-`packages/devtools/src/devtools-plugin.ts`
-[source,typescript]
-----
-// DevToolsPlugin class - Main DevTools integration
-// Status: FULLY IMPLEMENTED ✅
-// - Creates SnapshotMapper in constructor
-// - Maps actions to snapshots in sendStateUpdate()
-// - getSnapshotMapper() - Exposes mapper for external use
+// Context: Working on [what]
+// Current focus: [specific area]
+// Next: [what to implement next]
 ----
 

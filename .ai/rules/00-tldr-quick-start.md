@@ -1,5 +1,3 @@
-# `.ai/rules/00-tldr-quick-start.md`
-
 ## ⚡ TL;DR - Read in 90 seconds:
 
 ### 🚨 NON-NEGOTIABLE RULES:
@@ -17,27 +15,49 @@
 - [ ] Check existing patterns in similar modules
 - [ ] Understand dependencies between modules
 - [ ] Review related fixtures in `tests/fixtures/`
-- [ ] **CHECK & UPDATE** `.ai/context/current-context.md`
+- [ ] **CHECK & UPDATE** `.ai/context/current-context/` (AsciiDoc format)
 - [ ] Estimate if task fits in context (split if >3K tokens or >5 files)
 
 ### 🎯 CONTEXT FILE QUICK GUIDE:
 
-#### **Workflow for `.ai/context/current-context.md`:**
+#### **AsciiDoc Context Structure:**
 
-1. **ALWAYS check first** → What phase/task am I continuing?
+```
+.ai/context/
+├── current-context/          # Active context (AsciiDoc format)
+│   ├── index.adoc            # Main index with includes
+│   ├── basic-info.adoc       # Project, phase, task info
+│   ├── current-focus.adoc    # What's being worked on now
+│   ├── recently-completed.adoc # Recent progress
+│   ├── architectural-decisions.adoc # Design decisions
+│   ├── active-files.adoc     # Files being modified
+│   ├── task-dependencies.adoc # Task relationships
+│   ├── acceptance-criteria.adoc # Success criteria
+│   ├── performance-metrics.adoc # Performance targets
+│   ├── known-issues.adoc     # Problems and questions
+│   ├── continuation-context.adoc # Where to continue
+│   ├── session-notes.adoc    # Insights and lessons
+│   └── completion-checklist.adoc # Final checklist
+├── template/                 # Template structure
+└── archive/                  # Completed tasks
+```
+
+#### **Workflow for AsciiDoc Context:**
+
+1. **ALWAYS check first** → Read `current-context/index.adoc` for current phase/task
 2. **Update at key moments:**
-   - ✅ **Starting** → Fill template from `.ai/context/template.md`
-   - ✅ **Completing subtask** → Add to RECENTLY COMPLETED
-   - ✅ **Making decision** → Add to ARCHITECTURAL DECISIONS
-   - ✅ **Pausing** → Fill CONTEXT FOR CONTINUATION section
-   - ✅ **Every 30 mins** → Update "Last Updated" timestamp
-3. **Task done** → Move to archive, start fresh template
+   - ✅ **Starting** → Copy template structure to `current-context/`
+   - ✅ **Completing subtask** → Update `recently-completed.adoc`
+   - ✅ **Making decision** → Update `architectural-decisions.adoc`
+   - ✅ **Pausing** → Update `continuation-context.adoc`
+   - ✅ **Every 30 mins** → Update relevant `.adoc` files
+3. **Task done** → Move `current-context/` to archive, copy fresh template
 
 #### **Status Emojis (USE THESE):**
 
 - 🟢 **ACTIVE** - Currently working
-- 🟡 **PAUSED** - Stopped mid-task (fill continuation section)
-- 🔴 **BLOCKED** - Needs human input/unresolved issue
+- 🟡 **PAUSED** - Stopped mid-task (update continuation-context.adoc)
+- 🔴 **BLOCKED** - Needs human input (update known-issues.adoc)
 - ✅ **COMPLETED** - Task done, ready for archive
 
 ### 🔧 QUALITY GATES (MUST PASS):
@@ -47,7 +67,7 @@
 - ✅ No performance regressions (measure!)
 - ✅ Documentation updated (JSDoc + examples)
 - ✅ No breaking changes to public API
-- ✅ **Context file updated** with decisions/progress
+- ✅ **AsciiDoc context files updated** with decisions/progress
 
 ### 🔄 CONTEXT & TOKEN MANAGEMENT:
 
@@ -67,28 +87,30 @@ Split task immediately if ANY:
 - > 3 major functions to implement
 - Task has >5 acceptance criteria
 
-#### **Token Optimization:**
+#### **Token Optimization (AsciiDoc aware):**
 
 - Reference files (`see src/core/file.ts`), don't include contents
+- Use AsciiDoc includes for modular context
 - Show patterns once, reference variations
-- Summarize completed work before continuing
+- Summarize completed work in `recently-completed.adoc`
 - Use TL;DR sections in all documents
 
 ### 🚀 WORKFLOW SUMMARY:
 
-1. **START:** Check context file → Understand current phase/task
+1. **START:** Check `current-context/index.adoc` → Understand current phase/task
 2. **PLAN:** Read task → Estimate complexity → Split if needed
-3. **CODE:** Follow standards → Use fixtures → Update context regularly
-4. **TEST:** Write tests → Measure performance → Update metrics
-5. **DOCUMENT:** Add JSDoc → Update examples → Fill completion checklist
-6. **HANDOFF:** Update context → Archive if done → Clear for next task
+3. **CODE:** Follow standards → Use fixtures → Update `.adoc` files regularly
+4. **TEST:** Write tests → Measure performance → Update `performance-metrics.adoc`
+5. **DOCUMENT:** Add JSDoc → Update examples → Fill `completion-checklist.adoc`
+6. **HANDOFF:** Archive context → Clear `current-context/` → Copy fresh template
 
 ### ⚠️ CRITICAL REMINDERS:
 
 - **NEVER use `any` type** - use `unknown` with type guards
 - **ALWAYS use fixtures** - create in `tests/fixtures/` if missing
 - **MEASURE performance** - before and after optimizations
-- **UPDATE context file** - at every significant milestone
+- **UPDATE AsciiDoc context files** - at every significant milestone
+- **USE AsciiDoc formatting** - for better readability and organization
 - **SPLIT EARLY** - better small PRs than incomplete context-heavy attempts
 
 ---
@@ -98,9 +120,9 @@ Split task immediately if ANY:
 - [TypeScript Rules](./01-typescript-standards.md)
 - [Testing Guide](./02-testing-standards.md)
 - [Performance Guide](./03-performance-standards.md)
-- [Context Management](./04-context-management.md)
+- [Context Management](./04-context-management.md) ← **UPDATED!**
 - [Documentation Guide](./05-documentation-standards.md)
 
-**ALWAYS CHECK & UPDATE:** `.ai/context/current-context.md`  
-**TEMPLATE AT:** `.ai/context/template.md`  
+**ALWAYS CHECK & UPDATE:** `.ai/context/current-context/` (AsciiDoc format)  
+**TEMPLATE AT:** `.ai/context/template/`  
 **ARCHIVES:** `.ai/context/archive/` for completed tasks

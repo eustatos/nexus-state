@@ -2,9 +2,11 @@
 
 **What I'm working on RIGHT NOW:**
 
-DEV-002-B Snapshot Mapping System - COMPLETED ✅
+* [ ] [Specific implementation detail]
+* [ ] [File and line: `path/to/file.ts:start-end`]
+* [ ] [Goal for this session]
 
-**Progress in current task:** 100% complete
-**Estimated tokens remaining:** ~145K tokens
-**Context usage:** ~35% of limit
+**Progress in current task:** ~[0-100]% complete
+**Estimated tokens remaining:** [estimate] tokens
+**Context usage:** ~[percentage]% of limit
 

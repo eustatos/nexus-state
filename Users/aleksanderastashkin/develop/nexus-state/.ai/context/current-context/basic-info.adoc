@@ -1,0 +1,9 @@
+== 📋 BASIC INFO
+
+**Project:** nexus-state
+**Phase:** 2 - DevTools Integration
+**Current Task:** DEV-002-C - State Import/Export Functionality
+**Status:** 🟢 ACTIVE
+**Started:** 2026-02-13
+**Last Updated:** 2026-02-13
+**Context Version:** 1.0

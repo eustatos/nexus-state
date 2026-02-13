@@ -4,11 +4,17 @@
 
 === Next Steps:
 
-1. **Update task file status** - Mark DEV-002-B as COMPLETED
-2. **Update context file** - This file documents completion
-3. **Archive context** - Move to archive folder when task is fully complete
+1. **[PRIORITY]** [Next action]
+   * File: `[path.ts]`
+   * Line: [number]
 
 === Code to Continue:
 
-No additional code needed. Implementation is complete.
+`[file.ts]` line [number]:
+
+[source,typescript]
+----
+// TODO: [What to do next]
+// CONTEXT: [Relevant info]
+----
 

@@ -1,0 +1,30 @@
+== 🔄 CONTEXT FOR CONTINUATION
+
+**If stopping, continue here:**
+
+=== Next Steps:
+
+1. **Интегрировать StateSerializer в DevToolsPlugin**
+   * File: `packages/devtools/src/devtools-plugin.ts`
+   * Line: ~250 (handleDevToolsMessage метод)
+
+2. **Улучшить CommandHandler для использования StateSerializer**
+   * File: `packages/devtools/src/command-handler.ts`
+   * Line: ~257 (handleImportState метод)
+
+3. **Добавить экспорт состояния в DevToolsPlugin**
+   * File: `packages/devtools/src/devtools-plugin.ts`
+   * Line: Добавить новый метод
+
+=== Code to Continue:
+
+`packages/devtools/src/devtools-plugin.ts` line ~250:
+
+[source,typescript]
+----
+case "IMPORT_STATE":
+  // TODO: Реализовать реальную обработку IMPORT_STATE
+  // Использовать StateSerializer для десериализации
+  // Проверить контрольную сумму
+  // Импортировать состояние в SimpleTimeTravel
+----
