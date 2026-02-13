@@ -31,7 +31,7 @@ describe("CommandHandler", () => {
     });
 
     it("should handle valid state jumps", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_STATE",
@@ -43,7 +43,7 @@ describe("CommandHandler", () => {
     });
 
     it("should handle jumps to first state", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_STATE",
@@ -55,7 +55,7 @@ describe("CommandHandler", () => {
     });
 
     it("should handle jumps to last state", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_STATE",
@@ -67,7 +67,7 @@ describe("CommandHandler", () => {
     });
 
     it("should return false for out of bounds indices", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_STATE",
@@ -79,7 +79,7 @@ describe("CommandHandler", () => {
     });
 
     it("should return false for negative indices", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_STATE",
@@ -90,7 +90,7 @@ describe("CommandHandler", () => {
     });
 
     it("should return false for non-integer indices", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_STATE",
@@ -118,7 +118,7 @@ describe("CommandHandler", () => {
     });
 
     it("should handle valid action jumps", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_ACTION",
@@ -131,7 +131,7 @@ describe("CommandHandler", () => {
     });
 
     it("should find most recent matching action", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       // There are three "INCREMENT" actions at indices 1, 2, and 3
       // Should jump to index 3 (most recent)
@@ -144,7 +144,7 @@ describe("CommandHandler", () => {
     });
 
     it("should handle action jumps to first action", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_ACTION",
@@ -156,7 +156,7 @@ describe("CommandHandler", () => {
     });
 
     it("should return false for unknown action names", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_ACTION",
@@ -167,7 +167,7 @@ describe("CommandHandler", () => {
     });
 
     it("should return false for empty action names", () => {
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_ACTION",
@@ -180,7 +180,7 @@ describe("CommandHandler", () => {
     it("should return false for null action names", () => {
       const result = handler.handleCommand({
         type: "JUMP_TO_ACTION",
-        payload: { actionName: null as unknown },
+        payload: { actionName: null as any },
       });
 
       expect(result).toBe(false);
@@ -235,7 +235,7 @@ describe("CommandHandler", () => {
     });
 
     it("should return false for empty history (JUMP_TO_STATE)", () => {
-      handler.setTimeTravel(emptyTimeTravel as unknown);
+      handler.setTimeTravel(emptyTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_STATE",
@@ -246,7 +246,7 @@ describe("CommandHandler", () => {
     });
 
     it("should return false for empty history (JUMP_TO_ACTION)", () => {
-      handler.setTimeTravel(emptyTimeTravel as unknown);
+      handler.setTimeTravel(emptyTimeTravel as any);
 
       const result = handler.handleCommand({
         type: "JUMP_TO_ACTION",
@@ -262,7 +262,7 @@ describe("CommandHandler", () => {
 
     beforeEach(() => {
       handler = new CommandHandler();
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
     });
 
     it("should track executed commands", () => {
@@ -295,7 +295,7 @@ describe("CommandHandler", () => {
   describe("Integration with DevToolsPlugin", () => {
     it("should work with DevTools message structure", () => {
       const handler = new CommandHandler();
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
 
       // Simulate DevTools message structure
       const devToolsMessage = {
@@ -323,7 +323,7 @@ describe("CommandHandler", () => {
 
     beforeEach(() => {
       handler = new CommandHandler();
-      handler.setTimeTravel(mockTimeTravel as unknown);
+      handler.setTimeTravel(mockTimeTravel as any);
     });
 
     it("should handle valid import state command", () => {

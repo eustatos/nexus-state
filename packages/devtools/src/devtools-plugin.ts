@@ -7,7 +7,9 @@ import type {
   DevToolsMode,
   DevToolsFeatureDetectionResult,
 } from "./types";
+import type { SnapshotMapper } from "./snapshot-mapper";
 import { atomRegistry } from "@nexus-state/core";
+import { createSnapshotMapper } from "./snapshot-mapper";
 
 /**
  * Feature detection for DevTools extension
@@ -139,6 +141,7 @@ export class DevToolsPlugin {
   private isTracking = true;
   private lastState: unknown = null;
   private debounceTimer: NodeJS.Timeout | null = null;
+  private snapshotMapper: SnapshotMapper;
 
   constructor(config: DevToolsConfig = {}) {
     this.config = {
@@ -153,6 +156,10 @@ export class DevToolsPlugin {
         config.atomNameFormatter ??
         ((atom: BasicAtom, defaultName: string) => defaultName),
     };
+    this.snapshotMapper = createSnapshotMapper({
+      maxMappings: config.maxAge ?? 50,
+      autoCleanup: true,
+    });
   }
 
   /**
@@ -438,6 +445,11 @@ export class DevToolsPlugin {
           // Check if action should be sent
           if (this.config.actionSanitizer(action, sanitizedState)) {
             this.connection.send(action, sanitizedState);
+            // Map action to snapshot for time travel support
+            this.snapshotMapper.mapSnapshotToAction(
+              `snap-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+              action,
+            );
           }
         }
       } catch (error) {
@@ -446,5 +458,13 @@ export class DevToolsPlugin {
         }
       }
     }, this.config.latency);
+  }
+
+  /**
+   * Get the snapshot mapper for time travel lookups
+   * @returns The SnapshotMapper instance
+   */
+  getSnapshotMapper(): SnapshotMapper {
+    return this.snapshotMapper;
   }
 }

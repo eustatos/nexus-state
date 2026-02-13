@@ -1,0 +1,10 @@
+== ⚠️ KNOWN ISSUES
+
+**Critical:**
+
+1. **[Issue]** - [Description]
+
+**Questions:**
+
+* [ ] [Question needing answer]
+

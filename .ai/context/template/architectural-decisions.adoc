@@ -1,0 +1,19 @@
+== 🏗️ ARCHITECTURAL DECISIONS MADE
+
+**Add decisions as you make them:**
+
+=== Decision: [Decision Topic]
+
+**Timestamp:** YYYY-MM-DD HH:MM
+**Chosen Approach:** [What was chosen]
+**Alternatives Considered:**
+
+1. [Alternative 1]
+2. [Alternative 2]
+   **Reasoning:** [Why chosen]
+   **Implications:**
+
+* Positive: [Benefits]
+* Negative: [Trade-offs]
+  **Code Location:** `[file.ts:line-numbers]`
+

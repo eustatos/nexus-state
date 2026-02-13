@@ -1,0 +1,10 @@
+== 🔗 TASK DEPENDENCIES
+
+**Prerequisites:**
+
+* [ ] [Task] - 🟢 DONE | 🟡 IN PROGRESS | ⏳ PENDING
+
+**Blocks:**
+
+* [ ] [Task] - Will unblock when this task completes
+

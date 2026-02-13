@@ -1,0 +1,38 @@
+= 🎯 ACTIVE DEVELOPMENT CONTEXT
+:icons: font
+:toc: left
+:toclevels: 3
+:sectnums:
+
+include::basic-info.adoc[]
+
+include::current-focus.adoc[]
+
+include::recently-completed.adoc[]
+
+include::architectural-decisions.adoc[]
+
+include::active-files.adoc[]
+
+include::task-dependencies.adoc[]
+
+include::acceptance-criteria.adoc[]
+
+include::performance-metrics.adoc[]
+
+include::known-issues.adoc[]
+
+include::continuation-context.adoc[]
+
+include::session-notes.adoc[]
+
+include::completion-checklist.adoc[]
+
+== AI REMINDERS
+
+* Update this context every 30 minutes
+* Add decisions as you make them
+* Fill continuation section if pausing
+* Archive when task complete
+* Use emoji statuses: 🟢🟡🔴✅
+

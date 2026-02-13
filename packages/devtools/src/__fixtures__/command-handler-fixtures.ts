@@ -95,7 +95,7 @@ export const invalidJumpToActionCommands = [
  * Unknown command type for error handling tests
  */
 export const unknownCommand = {
-  type: "UNKNOWN_COMMAND" as const,
+  type: "UNKNOWN_COMMAND" as "UNKNOWN_COMMAND",
   payload: { foo: "bar" },
 };
 
@@ -103,15 +103,15 @@ export const unknownCommand = {
  * Missing payload command for validation tests
  */
 export const missingPayloadCommand = {
-  type: "JUMP_TO_STATE" as const,
-  payload: undefined,
+  type: "JUMP_TO_STATE" as "JUMP_TO_STATE",
+  payload: undefined as unknown as { index: number },
 };
 
 /**
  * Missing type command for validation tests
  */
 export const missingTypeCommand = {
-  type: undefined,
+  type: undefined as unknown as string,
   payload: { index: 0 },
 };
 
@@ -119,7 +119,19 @@ export const missingTypeCommand = {
  * Mock SimpleTimeTravel instance for testing
  * This simulates the behavior of SimpleTimeTravel
  */
-export const mockTimeTravel = {
+export const mockTimeTravel: {
+  history: Snapshot[];
+  pointer: number;
+  jumpTo(index: number): boolean;
+  getHistory(): Snapshot[];
+  undo(): boolean;
+  redo(): boolean;
+  canUndo(): boolean;
+  canRedo(): boolean;
+  clearHistory(): void;
+  capture(action?: string): Snapshot | null;
+  importState(state: Record<string, unknown>): boolean;
+} = {
   history: [
     {
       id: "snap-1",
@@ -190,12 +202,20 @@ export const mockTimeTravel = {
     this.pointer = -1;
   },
 
-  capture(action?: string): Snapshot | null {
+1. The current state of the file
+2. Where exactly this `emptyTimeTravel` object should be inserted
+3. Any surrounding context or imports that might be relevant
+
+Could you please provide:
+- The full file content or the section where this should be added?
+- Or specify the file path so I can help you apply the changes?
+
+Once you share that, I'll be able to help you integrate this `emptyTimeTravel` mock object while preserving existing comments and maintaining code style.
     const snapshot = {
       id: `snap-${this.history.length + 1}`,
       state: {} as Record<string, SnapshotStateEntry>,
       metadata: { timestamp: Date.now(), action, atomCount: 0 },
-    };
+    } as Snapshot;
 
     this.pointer++;
     if (this.pointer < this.history.length) {

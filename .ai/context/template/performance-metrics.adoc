@@ -1,0 +1,6 @@
+== 📊 PERFORMANCE & METRICS
+
+**Bundle Size:** Target < [ ]KB, Current: [ ]KB
+**Runtime:** [Operation] < [ ]ms, Current: [ ]ms
+**Memory:** < [ ]MB, Current: [ ]MB
+

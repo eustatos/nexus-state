@@ -1,0 +1,12 @@
+== 📍 CURRENT FOCUS
+
+**What I'm working on RIGHT NOW:**
+
+* [ ] [Specific implementation detail]
+* [ ] [File and line: `path/to/file.ts:start-end`]
+* [ ] [Goal for this session]
+
+**Progress in current task:** ~[0-100]% complete
+**Estimated tokens remaining:** [estimate] tokens
+**Context usage:** ~[percentage]% of limit
+

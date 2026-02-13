@@ -1,0 +1,20 @@
+== 🔄 CONTEXT FOR CONTINUATION
+
+**If stopping, continue here:**
+
+=== Next Steps:
+
+1. **[PRIORITY]** [Next action]
+   * File: `[path.ts]`
+   * Line: [number]
+
+=== Code to Continue:
+
+`[file.ts]` line [number]:
+
+[source,typescript]
+----
+// TODO: [What to do next]
+// CONTEXT: [Relevant info]
+----
+

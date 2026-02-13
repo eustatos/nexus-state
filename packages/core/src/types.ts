@@ -298,6 +298,7 @@ export interface TimeTravelAPI {
   jumpTo(index: number): boolean;
   clearHistory(): void;
   getHistory(): Snapshot[];
+  importState(state: Record<string, unknown>): boolean;
 }
 
 // Enhanced store types

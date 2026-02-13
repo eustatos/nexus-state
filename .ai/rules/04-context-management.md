@@ -2,7 +2,88 @@
 
 ### 🎯 Core Principle: Proactive Context Management Saves Tokens ($$$)
 
-## 1. Context Limit Awareness
+## 1. Context Structure and Organization
+
+### AsciiDoc-Based Context Management:
+
+```typescript
+// ✅ NEW: Context is now stored in AsciiDoc format with modular structure
+const CONTEXT_STRUCTURE = {
+  ROOT_DIR: ".ai/context",
+  CURRENT_CONTEXT: ".ai/context/current-context",
+  TEMPLATE: ".ai/context/template",
+  ARCHIVE: ".ai/context/archive",
+
+  // File structure for current context
+  FILES: {
+    INDEX: "index.adoc",           // Main index file with includes
+    BASIC_INFO: "basic-info.adoc", // Project, phase, task info
+    CURRENT_FOCUS: "current-focus.adoc", // What's being worked on now
+    RECENTLY_COMPLETED: "recently-completed.adoc", // Recent progress
+    ARCHITECTURAL_DECISIONS: "architectural-decisions.adoc", // Design decisions
+    ACTIVE_FILES: "active-files.adoc", // Files being modified
+    TASK_DEPENDENCIES: "task-dependencies.adoc", // Task relationships
+    ACCEPTANCE_CRITERIA: "acceptance-criteria.adoc", // Success criteria
+    PERFORMANCE_METRICS: "performance-metrics.adoc", // Performance targets
+    KNOWN_ISSUES: "known-issues.adoc", // Problems and questions
+    CONTINUATION_CONTEXT: "continuation-context.adoc", // Where to continue
+    SESSION_NOTES: "session-notes.adoc", // Insights and lessons
+    COMPLETION_CHECKLIST: "completion-checklist.adoc", // Final checklist
+  },
+} as const;
+
+// ✅ USE this structure for all context management
+function getContextPath(file: keyof typeof CONTEXT_STRUCTURE.FILES): string {
+  return `${CONTEXT_STRUCTURE.CURRENT_CONTEXT}/${CONTEXT_STRUCTURE.FILES[file]}`;
+}
+```
+
+## 2. Context File Management Rules
+
+### File Creation and Updates:
+
+```typescript
+// ✅ RULES for AsciiDoc context management:
+const CONTEXT_RULES = {
+  // 1. Always start with template
+  START_NEW_CONTEXT: () => {
+    // Copy template structure to current-context
+    // Update basic-info.adoc with current task details
+    // Update index.adoc includes to match template structure
+  },
+
+  // 2. Update frequency
+  UPDATE_FREQUENCY: {
+    MINIMUM: "every 30 minutes", // Mandatory update interval
+    TRIGGERS: [
+      "After completing a significant code change",
+      "After making architectural decisions",
+      "When encountering blockers or questions",
+      "Before taking a break > 15 minutes",
+      "When context usage exceeds 70%",
+    ],
+  },
+
+  // 3. File organization
+  FILE_ORGANIZATION: {
+    // Each section in separate .adoc file
+    // Index file uses include:: directives
+    // Keep files focused and concise
+    // Use AsciiDoc formatting for better readability
+  },
+
+  // 4. Archiving
+  ARCHIVE_PROCESS: () => {
+    // When task is complete:
+    // 1. Create timestamped archive folder
+    // 2. Move current-context/* to archive/
+    // 3. Clear current-context/ directory
+    // 4. Copy template/* to current-context/
+  },
+} as const;
+```
+
+## 3. Context Limit Awareness
 
 ### Token Budget Monitoring:
 
@@ -21,7 +102,53 @@ const CONTEXT_LIMITS = {
     DOC_PARAGRAPH: 100, // Documentation paragraph
     FILE_REFERENCE: 20, // Mentioning a file
     EXPLANATION: 50, // Per explanation paragraph
+    ASCIIDOC_SECTION: 150, // AsciiDoc section with formatting
   },
+} as const;
+```
+
+## 4. AsciiDoc Formatting Standards
+
+### File Structure and Syntax:
+
+```asciidoc
+// ✅ CORRECT AsciiDoc format for context files:
+= Document Title
+:icons: font
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Section Title
+
+**Bold text** for important labels
+*Italic text* for emphasis
+
+* Bullet points for lists
+* Use consistent formatting
+
+=== Subsection Title
+
+[source,typescript]
+----
+// Code blocks with language specification
+const example = "properly formatted";
+----
+
+include::other-file.adoc[]
+
+// ✅ ALWAYS use this structure
+```
+
+### Template Requirements:
+
+```typescript
+// ✅ Template must mirror current-context structure
+const TEMPLATE_REQUIREMENTS = {
+  STRUCTURE: "Same file names and organization as current-context",
+  CONTENT: "Placeholder content with instructions",
+  FORMATTING: "Consistent AsciiDoc formatting",
+  INSTRUCTIONS: "Clear comments for AI to follow",
 } as const;
 ```
 

@@ -1,0 +1,10 @@
+== 🎯 ACCEPTANCE CRITERIA
+
+**MUST HAVE:**
+
+* [ ] [Functionality criterion]
+* [ ] TypeScript strict mode passes
+* [ ] Tests with fixtures >90% coverage
+* [ ] No breaking API changes
+* [ ] Documentation complete
+

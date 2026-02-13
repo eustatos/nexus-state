@@ -108,10 +108,6 @@ export interface JumpToActionCommand {
     state?: unknown;
   };
 }
-/**
- * Union type for all command types
- */
-export type Command = JumpToStateCommand | JumpToActionCommand;
 
 /**
  * Configuration for CommandHandler
@@ -165,3 +161,138 @@ export interface EnhancedStore {
  * DevTools mode for current environment
  */
 export type DevToolsMode = "active" | "fallback" | "disabled";
+
+/**
+ * Snapshot mapping entry
+ */
+export interface SnapshotMapping {
+  /** The snapshot ID from SimpleTimeTravel */
+  snapshotId: string;
+  /** The action ID (typically action name or type) */
+  actionId: string;
+  /** Timestamp when the mapping was created */
+  timestamp: number;
+  /** Optional metadata about the action */
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Map from action ID to snapshot ID
+ */
+export type ActionToSnapshotMap = Map<string, string>;
+
+/**
+ * Map from snapshot ID to action ID
+ */
+export type SnapshotToActionMap = Map<string, string>;
+
+/**
+ * Result of a mapping operation
+ */
+export interface SnapshotMapperResult {
+  /** Whether the mapping was successful */
+  success: boolean;
+  /** The created mapping if successful */
+  mapping?: SnapshotMapping;
+  /** Error message if failed */
+  error?: string;
+}
+
+/**
+ * Configuration for SnapshotMapper
+ */
+export interface SnapshotMapperConfig {
+  /** Maximum number of mappings to keep */
+  maxMappings?: number;
+  /** Whether to automatically cleanup when max exceeded */
+  autoCleanup?: boolean;
+  /** Callback when a mapping is added */
+  onMappingAdded?: (mapping: SnapshotMapping) => void;
+  /** Callback when cleanup is performed */
+  onCleanup?: (cleanedCount: number) => void;
+}
+
+/**
+ * Serialized state format for DevTools compatibility
+ */
+export interface SerializedState {
+  /** The serialized state object */
+  state: Record<string, unknown>;
+  /** Timestamp when state was serialized */
+  timestamp: number;
+  /** Checksum for data integrity verification */
+  checksum: string;
+  /** Optional metadata about the state */
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Result of state deserialization
+ */
+export interface DeserializeResult {
+  /** Whether deserialization was successful */
+  success: boolean;
+  /** The deserialized state if successful */
+  state?: Record<string, unknown>;
+  /** Error message if failed */
+  error?: string;
+  /** Checksum verification result */
+  checksumValid?: boolean;
+}
+
+/**
+ * State import format (from DevTools)
+ */
+export interface ImportStateFormat {
+  /** The state object */
+  state: Record<string, unknown>;
+  /** Timestamp of import */
+  timestamp: number;
+  /** Checksum for verification */
+  checksum: string;
+  /** Optional metadata */
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * State export format (for sharing)
+ */
+export interface ExportStateFormat {
+  /** The state object */
+  state: Record<string, unknown>;
+  /** Timestamp of export */
+  timestamp: number;
+  /** Checksum for verification */
+  checksum: string;
+  /** Version of serialization format */
+  version: string;
+  /** Optional metadata */
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Checksum verification result
+ */
+export interface ChecksumResult {
+  /** Whether checksum is valid */
+  valid: boolean;
+  /** Expected checksum */
+  expected: string;
+  /** Computed checksum */
+  computed: string;
+}
+
+/**
+ * Command interface for IMPORT_STATE
+ */
+export interface ImportStateCommand {
+  /** Command type */
+  type: "IMPORT_STATE";
+  /** The imported state data */
+  payload: ImportStateFormat;
+}
+
+/**
+ * Union type for all command types
+ */
+export type Command = JumpToStateCommand | JumpToActionCommand | ImportStateCommand | { type: string; payload?: unknown };

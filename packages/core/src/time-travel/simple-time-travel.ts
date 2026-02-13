@@ -239,4 +239,52 @@ export class SimpleTimeTravel implements TimeTravelAPI {
       Math.random().toString(36).substring(2, 15)
     );
   }
+  
+    /**
+     * Import state from serialized format
+     * @param state The serialized state to import
+     * @returns true if import was successful, false otherwise
+     */
+    importState(state: Record<string, unknown>): boolean {
+      try {
+        // Clear current history
+        this.clearHistory();
+  
+        // Create a snapshot from the imported state
+        const snapshot: Snapshot = {
+          id: this.generateSnapshotId(),
+          state: {} as Record<string, SnapshotStateEntry>,
+          metadata: {
+            timestamp: Date.now(),
+            action: "IMPORT_STATE",
+            atomCount: Object.keys(state).length,
+          },
+        };
+  
+        // Convert imported state to snapshot state format
+        for (const [atomIdStr, value] of Object.entries(state)) {
+          const atomId = Symbol.for(atomIdStr);
+          const atom = atomRegistry.get(atomId);
+  
+          if (atom) {
+            snapshot.state[atomIdStr] = {
+              value,
+              type: atom.type,
+            };
+          }
+        }
+  
+        // Add snapshot to history
+        this.pointer = 0;
+        this.history.push(snapshot);
+  
+        // Restore the snapshot
+        this.restoreSnapshot(snapshot);
+  
+        return true;
+      } catch (error) {
+        console.error("Failed to import state:", error);
+        return false;
+      }
+    }
 }

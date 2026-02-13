@@ -1,0 +1,15 @@
+== 📁 ACTIVE FILES & CODE CONTEXT
+
+**Files currently being modified:**
+
+=== Primary Work File:
+
+`[main/file.ts]`
+
+[source,typescript]
+----
+// Context: Working on [what]
+// Current focus: [specific area]
+// Next: [what to implement next]
+----
+

@@ -1,0 +1,10 @@
+== 📋 BASIC INFO
+
+**Project:** [REQUIRED: Project name, e.g., "nexus-state"]
+**Phase:** [REQUIRED: Phase number/name, e.g., "2 - Time Travel Implementation"]
+**Current Task:** [REQUIRED: Task ID and name, e.g., "CORE-002 - StateRestorer"]
+**Status:** 🟢 ACTIVE | 🟡 PAUSED | 🔴 BLOCKED | ✅ COMPLETED
+**Started:** YYYY-MM-DD HH:MM
+**Last Updated:** YYYY-MM-DD HH:MM
+**Context Version:** 1.0
+
