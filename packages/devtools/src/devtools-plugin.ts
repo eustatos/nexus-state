@@ -15,7 +15,11 @@ import {
 } from "./utils/stack-tracer";
 import { atomRegistry } from "@nexus-state/core";
 import { createSnapshotMapper } from "./snapshot-mapper";
-import { StateSerializer, createStateSerializer } from "./state-serializer";
+import {
+  StateSerializer,
+  createStateSerializer,
+  type LazySerializationOptions,
+} from "./state-serializer";
 import {
   ActionNamingSystem,
   createActionNamingSystem,
@@ -168,6 +172,8 @@ export class DevToolsPlugin {
   private batchUpdater: BatchUpdater;
   private currentBatchId: string | null = null;
   private currentStore: EnhancedStore | null = null;
+  /** Last lazy-serialized state (when serialization.lazy is enabled) for incremental updates */
+  private lastLazyState: Record<string, unknown> | null = null;
 
   constructor(config: DevToolsConfig = {}) {
     // Extract action naming config with defaults
@@ -369,14 +375,40 @@ export class DevToolsPlugin {
   }
 
   /**
-   * Send initial state to DevTools.
+   * Build lazy serialization options from plugin config.
+   */
+  private getLazySerializationOptions(): LazySerializationOptions | null {
+    const ser = this.config.serialization;
+    if (!ser?.lazy) return null;
+    return {
+      maxDepth: ser.maxDepth,
+      maxSerializedSize: ser.maxSerializedSize,
+      circularRefHandling: ser.circularRefHandling,
+      placeholder: ser.placeholder,
+    };
+  }
+
+  /**
+   * Send initial state to DevTools (with optional lazy serialization).
    * @param store The store to get initial state from
    */
   private sendInitialState(store: EnhancedStore): void {
     try {
       const state = store.serializeState?.() || store.getState();
-      this.lastState = state;
-      this.connection?.init(this.config.stateSanitizer(state));
+      const sanitized = this.config.stateSanitizer(state) as Record<string, unknown>;
+      this.lastState = sanitized;
+
+      const lazyOpts = this.getLazySerializationOptions();
+      let stateToSend: unknown = sanitized;
+      if (lazyOpts) {
+        const result = this.stateSerializer.serializeLazy(sanitized, lazyOpts);
+        this.lastLazyState = result.state as Record<string, unknown>;
+        stateToSend = result.state;
+      } else {
+        this.lastLazyState = null;
+      }
+
+      this.connection?.init(stateToSend);
     } catch (error) {
       if (process.env.NODE_ENV !== "production") {
         console.warn("Failed to send initial state to DevTools:", error);
@@ -656,6 +688,7 @@ export class DevToolsPlugin {
 
   /**
    * Send state update to DevTools (called by BatchUpdater on flush).
+   * Uses lazy serialization and incremental updates when config.serialization.lazy is set.
    * @param store The store to get state from
    * @param action The action name
    */
@@ -663,21 +696,42 @@ export class DevToolsPlugin {
     if (!this.isTracking || !this.connection) return;
     try {
       const currentState = store.serializeState?.() || store.getState();
-      const sanitizedState = this.config.stateSanitizer(currentState);
+      const sanitizedState = this.config.stateSanitizer(currentState) as Record<string, unknown>;
 
-      // Only send if state has changed
-      if (JSON.stringify(sanitizedState) !== JSON.stringify(this.lastState)) {
+      const lazyOpts = this.getLazySerializationOptions();
+      let stateToSend: unknown = sanitizedState;
+      let stateChanged: boolean;
+
+      if (lazyOpts) {
+        const prevState = this.lastState as Record<string, unknown> | null;
+        const changedKeys = this.stateSerializer.getChangedKeys(prevState, sanitizedState);
+        const result = this.stateSerializer.serializeLazy(
+          sanitizedState,
+          lazyOpts,
+          this.lastLazyState ?? undefined,
+          changedKeys.size > 0 ? changedKeys : undefined,
+        );
+        stateToSend = result.state;
+        const prevLazy = this.lastLazyState;
+        this.lastLazyState = result.state as Record<string, unknown>;
         this.lastState = sanitizedState;
-
-        // Check if action should be sent
-        if (this.config.actionSanitizer(action, sanitizedState)) {
-          this.connection.send(action, sanitizedState);
-          // Map action to snapshot for time travel support
-          this.snapshotMapper.mapSnapshotToAction(
-            `snap-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-            action,
-          );
+        stateChanged =
+          prevLazy === null ||
+          JSON.stringify(result.state) !== JSON.stringify(prevLazy);
+      } else {
+        stateChanged =
+          JSON.stringify(sanitizedState) !== JSON.stringify(this.lastState);
+        if (stateChanged) {
+          this.lastState = sanitizedState;
         }
+      }
+
+      if (stateChanged && this.config.actionSanitizer(action, stateToSend)) {
+        this.connection.send(action, stateToSend);
+        this.snapshotMapper.mapSnapshotToAction(
+          `snap-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+          action,
+        );
       }
     } catch (error) {
       if (process.env.NODE_ENV !== "production") {
@@ -696,7 +750,8 @@ export class DevToolsPlugin {
   }
 
   /**
-   * Export current state in DevTools-compatible format
+   * Export current state in DevTools-compatible format.
+   * Uses lazy serialization when config.serialization.lazy is set.
    * @param store The store to export state from
    * @param metadata Optional metadata to include
    * @returns Serialized state with checksum
@@ -707,11 +762,19 @@ export class DevToolsPlugin {
   ): Record<string, unknown> {
     try {
       const state = store.serializeState?.() || store.getState();
+      const lazyOpts = this.getLazySerializationOptions();
 
-      // Use StateSerializer to export with checksum
-      const exported = this.stateSerializer.exportState(state, metadata);
+      const exported = lazyOpts
+        ? this.stateSerializer.exportStateLazy(
+            state as Record<string, unknown>,
+            lazyOpts,
+            metadata,
+          )
+        : this.stateSerializer.exportState(
+            state as Record<string, unknown>,
+            metadata,
+          );
 
-      // Convert ExportStateFormat to Record<string, unknown>
       return {
         state: exported.state,
         timestamp: exported.timestamp,
@@ -724,7 +787,6 @@ export class DevToolsPlugin {
         console.warn("Failed to export state:", error);
       }
 
-      // Fallback: return basic state without checksum
       const state = store.serializeState?.() || store.getState();
       return {
         state,

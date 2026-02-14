@@ -387,5 +387,116 @@ describe("StateSerializer", () => {
       expect(checksumResult.valid).toBe(true);
     });
   });
+
+  describe("Lazy serialization", () => {
+    let serializer: StateSerializer;
+
+    beforeEach(() => {
+      serializer = new StateSerializer();
+    });
+
+    it("should serialize with depth limit", () => {
+      const state = {
+        a: { b: { c: { d: { e: { f: "deep" } } } } },
+      };
+      const result = serializer.serializeLazy(state, { maxDepth: 3 });
+
+      expect(result.state).toBeDefined();
+      expect((result.state as Record<string, unknown>).a).toBeDefined();
+      const a = (result.state as Record<string, unknown>).a as Record<string, unknown>;
+      const b = a.b as Record<string, unknown>;
+      const c = b.c;
+      expect(c).toBe("[...]");
+      expect(result.sizeLimitHit).toBe(false);
+    });
+
+    it("should handle circular references with placeholder", () => {
+      const circular: Record<string, unknown> = { name: "root" };
+      circular.self = circular;
+      const result = serializer.serializeLazy(circular, {
+        circularRefHandling: "placeholder",
+      });
+
+      expect(result.state).toEqual({ name: "root", self: "[...]" });
+      expect(result.hadCircularRefs).toBe(true);
+    });
+
+    it("should handle circular references with omit", () => {
+      const circular: Record<string, unknown> = { name: "root" };
+      circular.self = circular;
+      const result = serializer.serializeLazy(circular, {
+        circularRefHandling: "omit",
+      });
+
+      expect((result.state as Record<string, unknown>).name).toBe("root");
+      expect((result.state as Record<string, unknown>).self).toBeUndefined();
+      expect(result.hadCircularRefs).toBe(true);
+    });
+
+    it("should throw on circular when circularRefHandling is throw", () => {
+      const circular: Record<string, unknown> = { name: "root" };
+      circular.self = circular;
+      expect(() =>
+        serializer.serializeLazy(circular, { circularRefHandling: "throw" }),
+      ).toThrow("Circular reference");
+    });
+
+    it("should apply size limit", () => {
+      const state: Record<string, unknown> = {
+        big: "x".repeat(1000),
+        other: "small",
+      };
+      const result = serializer.serializeLazy(state, {
+        maxSerializedSize: 50,
+      });
+
+      expect(result.sizeLimitHit).toBe(true);
+      expect((result.state as Record<string, unknown>).big).toBe(state.big);
+      expect((result.state as Record<string, unknown>).other).toBe("[...]");
+    });
+
+    it("should support incremental update with previous state and changed keys", () => {
+      const prev = { a: 1, b: 2, c: 3 };
+      const next = { a: 1, b: 99, c: 3 };
+      const fullResult = serializer.serializeLazy(next);
+      const changedKeys = serializer.getChangedKeys(prev, next);
+      expect(changedKeys.has("b")).toBe(true);
+      expect(changedKeys.size).toBe(1);
+
+      const incrementalResult = serializer.serializeLazy(
+        next,
+        {},
+        fullResult.state as Record<string, unknown>,
+        changedKeys,
+      );
+      expect(incrementalResult.state).toEqual(fullResult.state);
+    });
+
+    it("getChangedKeys should detect added and removed keys", () => {
+      const prev = { a: 1, b: 2 };
+      const next = { a: 1, c: 3 };
+      const changed = serializer.getChangedKeys(prev, next);
+      expect(changed.has("b")).toBe(true);
+      expect(changed.has("c")).toBe(true);
+      expect(changed.has("a")).toBe(false);
+    });
+
+    it("exportStateLazy should return valid export format with checksum", () => {
+      const state = { counter: 5, nested: { a: 1, b: 2 } };
+      const exported = serializer.exportStateLazy(state, { maxDepth: 5 });
+
+      expect(exported.state).toBeDefined();
+      expect(exported.timestamp).toBeGreaterThan(0);
+      expect(exported.checksum).toBeDefined();
+      expect(exported.version).toBe("1.0.0");
+
+      const verified = serializer.verifyChecksum({
+        state: exported.state,
+        timestamp: exported.timestamp,
+        checksum: exported.checksum,
+      });
+      expect(verified.valid).toBe(true);
+    });
+  });
 });
 

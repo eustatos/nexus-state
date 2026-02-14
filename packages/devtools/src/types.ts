@@ -57,6 +57,9 @@ export interface DevToolsConfig {
 
   /** Optional batch update system config (throttling / batching latency) */
   batchUpdate?: BatchUpdateConfig;
+
+  /** Optional lazy state serialization config (depth, size limits, circular refs) */
+  serialization?: SerializationConfig;
 }
 /**
  * Connection interface for DevTools integration
@@ -378,4 +381,25 @@ export interface BatchUpdateConfig {
   throttleByFrame?: boolean;
   /** Maximum updates per second when not using frame throttle (0 = no limit; default: 0) */
   maxUpdatesPerSecond?: number;
+}
+
+/**
+ * How to handle circular references during lazy serialization.
+ */
+export type CircularRefHandling = "placeholder" | "omit" | "throw";
+
+/**
+ * Configuration for lazy state serialization (reduces DevTools overhead for large state trees).
+ */
+export interface SerializationConfig {
+  /** Use lazy serialization when sending state to DevTools (default: true) */
+  lazy?: boolean;
+  /** Maximum depth to serialize; deeper values become placeholders (default: 10) */
+  maxDepth?: number;
+  /** Approximate max serialized size in bytes; overflow is replaced with placeholder (default: 512_000) */
+  maxSerializedSize?: number;
+  /** How to handle circular references (default: "placeholder") */
+  circularRefHandling?: CircularRefHandling;
+  /** Placeholder string for truncated or circular values (default: "[...]") */
+  placeholder?: string;
 }
