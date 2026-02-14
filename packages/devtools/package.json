@@ -2,10 +2,20 @@
   "name": "@nexus-state/devtools",
   "version": "0.1.3",
   "main": "index.ts",
+  "types": "./src/index.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "production": "./src/devtools-noop.ts",
+      "development": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
     "test": "vitest run",
+    "test:production": "vitest run src/__tests__/production-noop.test.ts",
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {

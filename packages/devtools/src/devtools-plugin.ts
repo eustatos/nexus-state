@@ -1,3 +1,10 @@
+/**
+ * Full DevTools plugin implementation.
+ * For production builds with zero overhead, use package conditional exports
+ * ("production" condition resolves to ./devtools-noop.ts). This file is
+ * tree-shakeable when the production entry is used.
+ */
+
 import type {
   DevToolsConfig,
   DevToolsConnection,
@@ -285,6 +292,10 @@ export class DevToolsPlugin {
    */
   apply(store: EnhancedStore): void {
     this.currentStore = store;
+    // Runtime production guard: no-op when NODE_ENV is production (e.g. bundler did not use conditional exports)
+    if (process.env.NODE_ENV === "production") {
+      return;
+    }
     // Detect DevTools features
     const features = detectDevToolsFeatures();
     this.mode = features.mode;

@@ -31,4 +31,12 @@ Optimize DevTools plugin for production builds with zero overhead when disabled.
 
 ## ⏱️ Estimated: 1.5-2 hours
 ## 🎯 Priority: Medium
-## 📊 Status: Not Started
+## 📊 Status: Done
+
+## ✅ Implementation Notes (done)
+- **Production no-op entry**: `packages/devtools/src/devtools-noop.ts` – minimal stub implementing the same public API (devTools, DevToolsPlugin, SnapshotMapper, feature detection, action metadata/grouper/batch stubs). Zero DevTools logic, no serialization, no batching.
+- **Conditional exports**: `packages/devtools/package.json` – `exports["."]` with `production` → `./src/devtools-noop.ts`, `development`/`default` → `./src/index.ts`. Bundlers that set the `production` condition resolve to the no-op for zero overhead.
+- **sideEffects: false** in package.json for tree-shaking of unused exports.
+- **Runtime production guard** in `devtools-plugin.ts`: `apply()` returns immediately when `process.env.NODE_ENV === "production"` so that if the full module is ever loaded in production, it still does nothing.
+- **Production build validation**: `packages/devtools/src/__tests__/production-noop.test.ts` – tests no-op API and behavior; `pnpm test:production` runs these. Full test suite includes them.
+- **Tree-shaking**: Comments in `devtools-plugin.ts` and `index.ts` document conditional exports and tree-shaking. No `#__PURE__` in index needed when using conditional exports (production entry is a separate file).

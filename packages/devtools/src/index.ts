@@ -3,6 +3,9 @@ import { DevToolsPlugin } from './devtools-plugin';
 
 /**
  * Factory function to create a DevToolsPlugin instance.
+ * Tree-shakeable: when unused, bundlers can eliminate this and DevToolsPlugin.
+ * For zero overhead in production, use package.json conditional exports (production → devtools-noop).
+ *
  * @param config Optional configuration for the DevTools plugin
  * @returns A configured DevToolsPlugin instance
  * @example
