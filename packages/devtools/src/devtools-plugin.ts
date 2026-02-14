@@ -11,6 +11,14 @@ import type { SnapshotMapper } from "./snapshot-mapper";
 import { atomRegistry } from "@nexus-state/core";
 import { createSnapshotMapper } from "./snapshot-mapper";
 import { StateSerializer, createStateSerializer } from "./state-serializer";
+import {
+  ActionNamingSystem,
+  createActionNamingSystem,
+  defaultActionNamingSystem,
+  type ActionNamingStrategy,
+  type ActionNamingStrategyType,
+  type PatternNamingConfig,
+} from "./action-naming";
 
 /**
  * Feature detection for DevTools extension
@@ -60,6 +68,7 @@ export function detectDevToolsFeatures(): DevToolsFeatureDetectionResult {
 export function isSSREnvironment(): boolean {
   return typeof window === "undefined";
 }
+
 /**
  * Check if DevTools extension is available
  * @returns True if DevTools is available
@@ -144,8 +153,17 @@ export class DevToolsPlugin {
   private debounceTimer: NodeJS.Timeout | null = null;
   private snapshotMapper: SnapshotMapper;
   private stateSerializer: StateSerializer;
+  private actionNamingSystem: ActionNamingSystem;
 
   constructor(config: DevToolsConfig = {}) {
+    // Extract action naming config with defaults
+    const {
+      actionNamingStrategy = "auto",
+      actionNamingPattern,
+      actionNamingFunction,
+      defaultNamingStrategy = "auto",
+    } = config;
+
     this.config = {
       name: config.name ?? "nexus-state",
       trace: config.trace ?? false,
@@ -157,12 +175,72 @@ export class DevToolsPlugin {
       atomNameFormatter:
         config.atomNameFormatter ??
         ((atom: BasicAtom, defaultName: string) => defaultName),
+      actionNamingStrategy,
+      actionNamingPattern,
+      actionNamingFunction,
+      defaultNamingStrategy,
     };
     this.snapshotMapper = createSnapshotMapper({
       maxMappings: config.maxAge ?? 50,
       autoCleanup: true,
     });
     this.stateSerializer = createStateSerializer();
+    this.actionNamingSystem = this.createActionNamingSystem();
+  }
+
+  /**
+   * Create action naming system based on config
+   */
+  private createActionNamingSystem(): ActionNamingSystem {
+    const {
+      actionNamingStrategy,
+      actionNamingPattern,
+      actionNamingFunction,
+      defaultNamingStrategy,
+    } = this.config;
+
+    // If strategy is already an instance, use it directly
+    if (
+      typeof actionNamingStrategy === "object" &&
+      "getName" in actionNamingStrategy
+    ) {
+      const system = new ActionNamingSystem();
+      system
+        .getRegistry()
+        .register(actionNamingStrategy as ActionNamingStrategy, true);
+      return system;
+    }
+
+    // Handle string strategy types
+    const strategyType = actionNamingStrategy as ActionNamingStrategyType;
+
+    // Build options based on config
+    const options: any = {
+      defaultStrategy: defaultNamingStrategy,
+    };
+
+    if (strategyType === "pattern" && actionNamingPattern) {
+      options.strategy = "pattern";
+      options.patternConfig = {
+        pattern: actionNamingPattern,
+        placeholders: {
+          atomName: true,
+          operation: true,
+          timestamp: true,
+          date: false,
+          time: false,
+        },
+      };
+    } else if (strategyType === "custom" && actionNamingFunction) {
+      options.strategy = "custom";
+      options.customConfig = {
+        namingFunction: actionNamingFunction,
+      };
+    } else {
+      options.strategy = strategyType;
+    }
+
+    return createActionNamingSystem(options);
   }
 
   /**
@@ -226,6 +304,7 @@ export class DevToolsPlugin {
       this.setupPolling(store);
     }
   }
+
   /**
    * Get display name for an atom
    * @param atom The atom to get name for
@@ -450,6 +529,10 @@ export class DevToolsPlugin {
     store.set = ((atom: BasicAtom, update: unknown) => {
       // Create action metadata with atom name
       const atomName = this.getAtomName(atom);
+
+      // Generate action name using naming system
+      const actionName = this.getActionName(atom, atomName, "SET");
+
       const metadata: {
         type: string;
         timestamp: number;
@@ -457,7 +540,7 @@ export class DevToolsPlugin {
         atomName: string;
         stackTrace?: string;
       } = {
-        type: `SET ${atomName}`,
+        type: actionName,
         timestamp: Date.now(),
         source: "DevToolsPlugin",
         atomName: atomName,
@@ -481,13 +564,34 @@ export class DevToolsPlugin {
   }
 
   /**
+   * Get action name using naming system
+   */
+  private getActionName(
+    atom: BasicAtom,
+    atomName: string,
+    operation: string,
+  ): string {
+    return this.actionNamingSystem.getName({
+      atom,
+      atomName,
+      operation,
+    });
+  }
+
+  /**
    * Setup polling for state updates (fallback for basic stores).
    * @param store The store to poll
    */
   private setupPolling(store: EnhancedStore): void {
     const interval = setInterval(() => {
       if (this.isTracking) {
-        this.sendStateUpdate(store, "STATE_UPDATE");
+        // Generate action name for polling updates
+        const actionName = this.getActionName(
+          { id: { toString: () => "polling" } } as BasicAtom,
+          "polling",
+          "STATE_UPDATE",
+        );
+        this.sendStateUpdate(store, actionName);
       }
     }, this.config.latency);
 
@@ -512,7 +616,6 @@ export class DevToolsPlugin {
 
     this.debounceTimer = setTimeout(() => {
       if (!this.isTracking || !this.connection) return;
-
       try {
         const currentState = store.serializeState?.() || store.getState();
         const sanitizedState = this.config.stateSanitizer(currentState);
@@ -555,7 +658,14 @@ export class DevToolsPlugin {
       // Use StateSerializer to export with checksum
       const exported = this.stateSerializer.exportState(state, metadata);
 
-      return exported;
+      // Convert ExportStateFormat to Record<string, unknown>
+      return {
+        state: exported.state,
+        timestamp: exported.timestamp,
+        checksum: exported.checksum,
+        version: exported.version,
+        metadata: exported.metadata,
+      };
     } catch (error) {
       if (process.env.NODE_ENV !== "production") {
         console.warn("Failed to export state:", error);

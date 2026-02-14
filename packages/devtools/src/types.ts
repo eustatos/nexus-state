@@ -1,5 +1,16 @@
+// Import action naming types
+export type {
+  ActionNamingContext,
+  ActionNamingStrategy,
+  ActionNamingStrategyType,
+  BuiltInActionNamingStrategyType,
+  PatternNamingConfig,
+  CustomNamingConfig,
+  ActionNamingOptions,
+} from "./action-naming/index";
+
 /**
- * Configuration options for the DevTools plugin.
+ * Configuration for DevTools plugin with action naming support
  */
 export interface DevToolsConfig {
   /** The name to display in DevTools for this store instance */
@@ -25,8 +36,19 @@ export interface DevToolsConfig {
 
   /** Custom formatter for atom names */
   atomNameFormatter?: (atom: BasicAtom, defaultName: string) => string;
-}
 
+  /** Strategy for naming actions in DevTools */
+  actionNamingStrategy?: ActionNamingStrategyType | ActionNamingStrategy;
+
+  /** Custom pattern for pattern-based naming */
+  actionNamingPattern?: string;
+
+  /** Custom function for naming actions */
+  actionNamingFunction?: (context: ActionNamingContext) => string;
+
+  /** Default strategy type if using pattern or custom */
+  defaultNamingStrategy?: BuiltInActionNamingStrategyType;
+}
 /**
  * Connection interface for DevTools integration
  */
@@ -43,7 +65,6 @@ export interface DevToolsConnection {
   /** Unsubscribe from DevTools */
   unsubscribe: () => void;
 }
-
 /**
  * Fallback connection interface for when DevTools is unavailable
  * Implements no-op behavior for graceful degradation
@@ -54,7 +75,6 @@ export interface DevToolsConnectionFallback {
   init: (state: unknown) => void;
   unsubscribe: () => void;
 }
-
 /**
  * Result of DevTools feature detection
  */
@@ -68,7 +88,6 @@ export interface DevToolsFeatureDetectionResult {
   /** Error message if any, null if none */
   error: Error | null;
 }
-
 /**
  * Message interface from DevTools
  */
@@ -82,7 +101,6 @@ export interface DevToolsMessage {
   /** State as JSON string */
   state?: string;
 }
-
 /**
  * Command interface for JUMP_TO_STATE
  */
@@ -256,20 +274,9 @@ export interface ImportStateFormat {
 
 /**
  * State export format (for sharing)
+ * @deprecated Use ExportStateFormat from './state-serializer' instead
  */
-export interface ExportStateFormat {
-  /** The state object */
-  state: Record<string, unknown>;
-  /** Timestamp of export */
-  timestamp: number;
-  /** Checksum for verification */
-  checksum: string;
-  /** Version of serialization format */
-  version: string;
-  /** Optional metadata */
-  metadata?: Record<string, unknown>;
-}
-
+export type ExportStateFormat = import("./state-serializer").ExportStateFormat;
 /**
  * Checksum verification result
  */
@@ -295,4 +302,8 @@ export interface ImportStateCommand {
 /**
  * Union type for all command types
  */
-export type Command = JumpToStateCommand | JumpToActionCommand | ImportStateCommand | { type: string; payload?: unknown };
+export type Command =
+  | JumpToStateCommand
+  | JumpToActionCommand
+  | ImportStateCommand
+  | { type: string; payload?: unknown };

@@ -332,7 +332,14 @@ export class CommandHandler {
         timestamp: currentSnapshot.metadata.timestamp,
       });
 
-      return exported;
+      // Convert ExportStateFormat to Record<string, unknown>
+      return {
+        state: exported.state,
+        timestamp: exported.timestamp,
+        checksum: exported.checksum,
+        version: exported.version,
+        metadata: exported.metadata,
+      };
     } catch (error) {
       if (process.env.NODE_ENV !== "production") {
         console.warn("Failed to export state:", error);

@@ -166,11 +166,12 @@ describe("DevToolsPlugin Atom Name Display", () => {
     store.set(atom, "test-value");
 
     // Verify that setWithMetadata was called with metadata containing atom name
+    // Note: Default action naming strategy is 'auto', which generates "atomName operation"
     expect(store.setWithMetadata).toHaveBeenCalledWith(
       atom,
       "test-value",
       expect.objectContaining({
-        type: "SET TestAtom",
+        type: "TestAtom SET", // Auto strategy: atomName + " " + operation
         atomName: "TestAtom",
       }),
     );
