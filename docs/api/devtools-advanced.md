@@ -49,9 +49,8 @@ interface ActionMetadata {
 import { devTools } from '@nexus-state/devtools';
 
 const plugin = devTools({
-  enableStackTrace: true,    // Включить захват стек-трейсов
-  traceLimit: 10,           // Максимальное количество фреймов
-  isDevelopment: true      // Режим разработки
+  trace: true,       // Включить захват стек-трейсов (только в development)
+  traceLimit: 10,   // Максимальное количество фреймов (по умолчанию 10)
 });
 ```
 
@@ -101,8 +100,8 @@ interface DevToolsConfig {
   maxAge?: number;
   
   // Расширенные параметры
-  enableStackTrace?: boolean;  // Включить захват стек-трейсов
-  traceLimit?: number;          // Максимальное количество фреймов
+  trace?: boolean;    // Включить захват стек-трейсов (только в development)
+  traceLimit?: number;  // Максимальное количество фреймов (по умолчанию 10)
   actionNaming?: ActionNamingStrategy; // Стратегия именования
   enableGrouping?: boolean;     // Включить группировку действий
   maxGroupSize?: number;         // Максимальный размер группы
@@ -123,7 +122,7 @@ const config = getDevToolsConfig();
 
 // Обновить конфигурацию
 updateDevToolsConfig({
-  enableStackTrace: true,
+  trace: true,
   traceLimit: 15
 });
 

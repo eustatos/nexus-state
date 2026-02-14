@@ -8,6 +8,10 @@ import type {
   DevToolsFeatureDetectionResult,
 } from "./types";
 import type { SnapshotMapper } from "./snapshot-mapper";
+import {
+  captureStackTrace,
+  formatStackTraceForDevTools,
+} from "./utils/stack-tracer";
 import { atomRegistry } from "@nexus-state/core";
 import { createSnapshotMapper } from "./snapshot-mapper";
 import { StateSerializer, createStateSerializer } from "./state-serializer";
@@ -167,6 +171,7 @@ export class DevToolsPlugin {
     this.config = {
       name: config.name ?? "nexus-state",
       trace: config.trace ?? false,
+      traceLimit: config.traceLimit ?? 10,
       latency: config.latency ?? 100,
       maxAge: config.maxAge ?? 50,
       actionSanitizer: config.actionSanitizer ?? (() => true),
@@ -546,12 +551,11 @@ export class DevToolsPlugin {
         atomName: atomName,
       };
 
-      // Capture stack trace if enabled
+      // Capture stack trace if enabled (dev only; stack-tracer returns null in production)
       if (this.config.trace) {
-        try {
-          throw new Error("Stack trace capture");
-        } catch (error) {
-          metadata.stackTrace = (error as Error).stack;
+        const captured = captureStackTrace(this.config.traceLimit);
+        if (captured) {
+          metadata.stackTrace = formatStackTraceForDevTools(captured);
         }
       }
 

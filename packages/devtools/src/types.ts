@@ -19,6 +19,9 @@ export interface DevToolsConfig {
   /** Enable stack traces for actions in DevTools */
   trace?: boolean;
 
+  /** Maximum number of stack frames to capture when trace is true (default: 10) */
+  traceLimit?: number;
+
   /** Debounce time (in ms) for sending updates to DevTools */
   latency?: number;
 
