@@ -25,19 +25,34 @@ const plugin = devTools({
 });
 ```
 
-### Метаданные действий
+### Метаданные действий (DEV-003-C)
 
-Каждое действие содержит метаданные для улучшенной отладки:
+Каждое действие содержит метаданные для улучшенной отладки. Используйте типобезопасный билдер с fluent API:
 
 ```typescript
-interface ActionMetadata {
-  atomName: string;
-  atomType: string;
-  updateType: 'direct' | 'computed';
-  customName?: string;
-  timestamp: number;
-}
+import { createActionMetadata } from '@nexus-state/devtools';
+
+// Базовые поля
+const meta = createActionMetadata()
+  .type('user/SET_NAME')
+  .atomName('user')
+  .timestamp(Date.now())
+  .source('DevToolsPlugin')
+  .stackTrace('at set...')  // при trace: true
+  .groupId('batch-1')       // для группировки
+  .build();
+
+// Пользовательские поля (type-safe)
+interface CustomMeta { requestId: string; retries: number; }
+const custom = createActionMetadata<CustomMeta>()
+  .type('api/CALL')
+  .atomName('api')
+  .set('requestId', 'req-1')
+  .set('retries', 2)
+  .build();
 ```
+
+Базовый интерфейс метаданных: `type`, `timestamp`, `source`, `atomName`, `stackTrace?`, `groupId?`; к нему можно добавлять произвольные поля через `.set()` или `.merge()`.
 
 ## Захват стек-трейсов
 
@@ -63,28 +78,37 @@ const plugin = devTools({
 - Настраиваемая глубина захвата
 - Полное исключение кода в production сборках
 
-## Создание действий
+## Группировка действий (батчи)
 
-### Базовое создание действий
+Связанные обновления можно объединять в один «батч» в DevTools через группировку.
+
+### Через плагин (startBatch / endBatch)
 
 ```typescript
-import { createAction } from '@nexus-state/devtools';
+import { devTools } from '@nexus-state/devtools';
 
-const action = createAction('INCREMENT_COUNTER', 1);
+const plugin = devTools({ actionGroupOptions: { flushAfterMs: 100, maxGroupSize: 50 } });
+plugin.apply(store);
+
+plugin.startBatch('form-submit');
+store.set(formAtom, data);
+store.set(loadingAtom, false);
+plugin.endBatch('form-submit');  // в DevTools отобразится один сгруппированный action
 ```
 
-### Группировка действий
+### Программная группировка (createActionGrouper)
 
 ```typescript
-import { createAction, createActionGroup } from '@nexus-state/devtools';
+import { createActionMetadata, createActionGrouper } from '@nexus-state/devtools';
 
-const actions = [
-  createAction('SET_LOADING', true),
-  createAction('FETCH_DATA'),
-  createAction('SET_LOADING', false)
-];
+const grouper = createActionGrouper({ flushAfterMs: 100, maxGroupSize: 10 });
+const groupId = 'batch-1';
 
-const group = createActionGroup(actions, 'DATA_FETCHING');
+grouper.startGroup(groupId);
+grouper.add(createActionMetadata().type('a/SET').atomName('a').groupId(groupId).build());
+grouper.add(createActionMetadata().type('b/SET').atomName('b').groupId(groupId).build());
+const result = grouper.endGroup(groupId);
+// result.type === "Batch (2 updates)", result.count === 2, result.metadata.atomNames
 ```
 
 ## Конфигурация
@@ -96,15 +120,21 @@ interface DevToolsConfig {
   // Базовые параметры
   name?: string;
   trace?: boolean;
+  traceLimit?: number;  // Глубина стек-трейса (по умолчанию 10)
   latency?: number;
   maxAge?: number;
-  
-  // Расширенные параметры
-  trace?: boolean;    // Включить захват стек-трейсов (только в development)
-  traceLimit?: number;  // Максимальное количество фреймов (по умолчанию 10)
-  actionNaming?: ActionNamingStrategy; // Стратегия именования
-  enableGrouping?: boolean;     // Включить группировку действий
-  maxGroupSize?: number;         // Максимальный размер группы
+
+  // Именование и метаданные
+  actionNamingStrategy?: ActionNamingStrategyType | ActionNamingStrategy;
+  showAtomNames?: boolean;
+  atomNameFormatter?: (atom: BasicAtom, defaultName: string) => string;
+
+  // Группировка действий (DEV-003-C)
+  actionGroupOptions?: {
+    flushAfterMs?: number;   // Таймаут авто-сброса группы (по умолчанию 100)
+    maxGroupSize?: number;   // Макс. размер группы до авто-сброса (по умолчанию 50)
+    onFlush?: (result: ActionGroupResult) => void;
+  };
 }
 ```
 
@@ -143,12 +173,21 @@ resetDevToolsConfig();
 ### Unit тесты
 
 ```typescript
-import { defaultActionNaming, createActionMetadata } from '@nexus-state/devtools';
+import { createActionMetadata, createActionGrouper } from '@nexus-state/devtools';
 
-test('default action naming', () => {
-  const metadata = createActionMetadata('counter', 'atom', 'direct');
-  const name = defaultActionNaming('counter', metadata);
-  expect(name).toBe('ATOM_UPDATE/counter');
+test('metadata builder and grouping', () => {
+  const meta = createActionMetadata()
+    .type('counter/INCREMENT')
+    .atomName('counter')
+    .build();
+  expect(meta.type).toBe('counter/INCREMENT');
+  expect(meta.atomName).toBe('counter');
+
+  const grouper = createActionGrouper({ maxGroupSize: 10 });
+  grouper.startGroup('g1');
+  grouper.add(createActionMetadata().type('a/SET').atomName('a').groupId('g1').build());
+  const result = grouper.endGroup('g1');
+  expect(result?.count).toBe(1);
 });
 ```
 
