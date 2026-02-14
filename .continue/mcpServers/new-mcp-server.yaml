@@ -1,9 +1,10 @@
-name: New MCP server
+name: ts-language-mcp
 version: 0.0.1
 schema: v1
 mcpServers:
-  - name: New MCP server
-    command: node
+  - name: ts-language-mcp
+    command: /Users/aleksanderastashkin/.nvm/versions/node/v20.19.4/bin/node
     args:
-      - /Users/aleksanderastashkin/develop/typescript-analyzer-mcp/dist/index.js
+      - /Users/aleksanderastashkin/develop/ts-language-mcp/dist/index.js
+      - /Users/aleksanderastashkin/develop/nexus-state
     env: {}

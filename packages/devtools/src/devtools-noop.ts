@@ -61,7 +61,10 @@ export function getDevToolsMode(_forceDisable?: boolean): DevToolsMode {
 
 export class SnapshotMapper {
   constructor(_config: SnapshotMapperConfig = {}) {}
-  mapSnapshotToAction(_snapshotId: string, _actionId: string): SnapshotMapperResult {
+  mapSnapshotToAction(
+    _snapshotId: string,
+    _actionId: string,
+  ): SnapshotMapperResult {
     return { success: true };
   }
   getActionIdBySnapshotId(_snapshotId: string): string | undefined {
@@ -75,7 +78,9 @@ export class SnapshotMapper {
   }
 }
 
-export function createSnapshotMapper(config?: SnapshotMapperConfig): SnapshotMapper {
+export function createSnapshotMapper(
+  config?: SnapshotMapperConfig,
+): SnapshotMapper {
   return new SnapshotMapper(config);
 }
 
@@ -122,16 +127,24 @@ export function devTools(_config: DevToolsConfig = {}): DevToolsPlugin {
 class NoOpActionMetadataBuilder<
   T extends Record<string, unknown> = Record<string, unknown>,
 > {
-  type(_v: string): this {
+  private typeValue: string = "";
+  private atomNameValue: string = "";
+  private timestampValue: number = 0;
+  private sourceValue: string = "production";
+  type(v: string): this {
+    this.typeValue = v;
     return this;
   }
-  timestamp(_v: number): this {
+  timestamp(v: number): this {
+    this.timestampValue = v;
     return this;
   }
-  source(_v: string): this {
+  source(v: string): this {
+    this.sourceValue = v;
     return this;
   }
-  atomName(_v: string): this {
+  atomName(v: string): this {
+    this.atomNameValue = v;
     return this;
   }
   stackTrace(_v: string): this {
@@ -140,7 +153,10 @@ class NoOpActionMetadataBuilder<
   groupId(_v: string): this {
     return this;
   }
-  set<K extends string, V>(_key: K, _value: V): NoOpActionMetadataBuilder<T & Record<K, V>> {
+  set<K extends string, V>(
+    _key: K,
+    _value: V,
+  ): NoOpActionMetadataBuilder<T & Record<K, V>> {
     return this as NoOpActionMetadataBuilder<T & Record<K, V>>;
   }
   merge(_custom: Record<string, unknown>): this {
@@ -148,10 +164,10 @@ class NoOpActionMetadataBuilder<
   }
   build(): ActionMetadata<T> {
     return {
-      type: "",
-      timestamp: 0,
-      source: "production",
-      atomName: "",
+      type: this.typeValue,
+      timestamp: this.timestampValue,
+      source: this.sourceValue,
+      atomName: this.atomNameValue,
     } as ActionMetadata<T>;
   }
 }

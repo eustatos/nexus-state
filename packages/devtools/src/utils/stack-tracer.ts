@@ -117,6 +117,35 @@ export function captureStackTrace(
 }
 
 /**
+ * Capture stack trace for testing (always returns a result)
+ * @param limit - Number of stack frames to capture (before filtering)
+ * @param options - Optional filter options; if omitted, default filtering is applied
+ * @returns Captured stack trace for testing
+ */
+export function captureStackTraceForTesting(
+  limit: number = 10,
+  options: StackTraceFilterOptions = {},
+): CapturedStackTrace {
+  const stack = new Error().stack || "";
+
+  // Parse stack frames (skip first frame which is this function)
+  const rawFrames = stack
+    .split("\n")
+    .slice(1, limit + 1)
+    .map((frame) => frame.trim())
+    .filter((frame) => frame.length > 0);
+
+  const frames = filterStackTraceFrames(rawFrames, {
+    ...options,
+    maxFrames: options.maxFrames ?? limit,
+  });
+  return {
+    frames,
+    timestamp: Date.now(),
+  };
+}
+
+/**
  * Lazy stack trace generator
  * @param config - Stack trace configuration
  * @returns Function that captures stack trace when called

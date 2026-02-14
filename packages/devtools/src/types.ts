@@ -9,6 +9,29 @@ export type {
   ActionNamingOptions,
 } from "./action-naming/index";
 
+// Re-export the types for backward compatibility
+// These are defined here to avoid circular dependencies
+type ActionNamingStrategyType =
+  | "auto"
+  | "pattern"
+  | "custom"
+  | "minimal"
+  | "verbose";
+type BuiltInActionNamingStrategyType =
+  | "auto"
+  | "pattern"
+  | "custom"
+  | "minimal"
+  | "verbose";
+interface ActionNamingContext {
+  atom: BasicAtom;
+  atomName: string;
+  operation: string;
+}
+interface ActionNamingStrategy {
+  getName(context: ActionNamingContext): string;
+}
+
 /**
  * Configuration for DevTools plugin with action naming support
  */
@@ -342,8 +365,9 @@ export interface ActionMetadataBase {
  * Action metadata with type-safe custom fields.
  * Use ActionMetadata<YourCustomFields> for typed custom metadata.
  */
-export type ActionMetadata<T extends Record<string, unknown> = Record<string, unknown>> =
-  ActionMetadataBase & T;
+export type ActionMetadata<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> = ActionMetadataBase & T;
 
 /**
  * Options for action grouping (batched updates)

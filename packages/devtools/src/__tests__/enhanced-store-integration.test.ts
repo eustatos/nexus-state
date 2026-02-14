@@ -3,6 +3,27 @@ import { vi } from "vitest";
 import * as stackTracer from "../utils/stack-tracer";
 
 describe("DevToolsPlugin Enhanced Store Integration", () => {
+  beforeEach(() => {
+    // Mock the environment to allow captureStackTrace to work
+    vi.stubEnv("NODE_ENV", "development");
+    // Mock Redux DevTools extension
+    (global as any).window = {
+      __REDUX_DEVTOOLS_EXTENSION__: {
+        connect: vi.fn().mockReturnValue({
+          send: vi.fn(),
+          subscribe: vi.fn().mockReturnValue(() => {}),
+          init: vi.fn(),
+          unsubscribe: vi.fn(),
+        }),
+      },
+    };
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    delete (global as any).window;
+  });
+
   it("should integrate with enhanced store API", () => {
     const plugin = new DevToolsPlugin();
     const store = {
@@ -63,7 +84,12 @@ describe("DevToolsPlugin Enhanced Store Integration", () => {
   });
 
   it("should call captureStackTrace with traceLimit when trace is true", () => {
-    const captureSpy = vi.spyOn(stackTracer, "captureStackTrace").mockReturnValue(null);
+    const captureSpy = vi
+      .spyOn(stackTracer, "captureStackTrace")
+      .mockReturnValue({
+        frames: [],
+        timestamp: Date.now(),
+      });
     const plugin = new DevToolsPlugin({ trace: true, traceLimit: 5 });
     const store = {
       get: vi.fn(),
@@ -120,9 +146,9 @@ describe("DevToolsPlugin Enhanced Store Integration", () => {
     store.set(atom1 as any, 1);
     store.set(atom2 as any, 2);
     expect(store.setWithMetadata).toHaveBeenCalledTimes(2);
-    const [firstMeta, secondMeta] = (store.setWithMetadata as ReturnType<typeof vi.fn>).mock.calls.map(
-      (c: unknown[]) => c[2],
-    );
+    const [firstMeta, secondMeta] = (
+      store.setWithMetadata as ReturnType<typeof vi.fn>
+    ).mock.calls.map((c: unknown[]) => c[2]);
     expect(firstMeta).toBeDefined();
     expect(firstMeta?.groupId).toBe("batch-1");
     expect(secondMeta?.groupId).toBe("batch-1");

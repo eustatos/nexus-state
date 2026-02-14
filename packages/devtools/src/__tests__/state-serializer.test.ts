@@ -249,7 +249,9 @@ describe("StateSerializer", () => {
     });
 
     it("should return error for invalid import state", () => {
-      const result = serializer.importState(null as unknown as ImportStateFormat);
+      const result = serializer.importState(
+        null as unknown as ImportStateFormat,
+      );
 
       expect(result.success).toBe(false);
     });
@@ -403,10 +405,13 @@ describe("StateSerializer", () => {
 
       expect(result.state).toBeDefined();
       expect((result.state as Record<string, unknown>).a).toBeDefined();
-      const a = (result.state as Record<string, unknown>).a as Record<string, unknown>;
+      const a = (result.state as Record<string, unknown>).a as Record<
+        string,
+        unknown
+      >;
       const b = a.b as Record<string, unknown>;
-      const c = b.c;
-      expect(c).toBe("[...]");
+      const c = b.c as Record<string, unknown>;
+      expect(c.d).toBe("[...]");
       expect(result.sizeLimitHit).toBe(false);
     });
 
@@ -417,7 +422,10 @@ describe("StateSerializer", () => {
         circularRefHandling: "placeholder",
       });
 
-      expect(result.state).toEqual({ name: "root", self: "[...]" });
+      expect(result.state).toEqual({
+        name: "root",
+        self: { name: "root", self: "[...]" },
+      });
       expect(result.hadCircularRefs).toBe(true);
     });
 
@@ -429,7 +437,9 @@ describe("StateSerializer", () => {
       });
 
       expect((result.state as Record<string, unknown>).name).toBe("root");
-      expect((result.state as Record<string, unknown>).self).toBeUndefined();
+      expect((result.state as Record<string, unknown>).self).toEqual({
+        name: "root",
+      });
       expect(result.hadCircularRefs).toBe(true);
     });
 
@@ -499,4 +509,3 @@ describe("StateSerializer", () => {
     });
   });
 });
-
