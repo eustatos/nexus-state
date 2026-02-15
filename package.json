@@ -24,7 +24,8 @@
     "dev:forms": "npm run dev --workspace=demo-forms-granularity",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish"
+    "release": "pnpm run release:packages && changeset publish",
+    "release:packages": "turbo run build --filter=@nexus-state/*"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.0",

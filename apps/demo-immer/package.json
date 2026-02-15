@@ -10,8 +10,8 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@nexus-state/react": "^0.1.0",
-    "@nexus-state/immer": "^0.1.0"
+    "@nexus-state/react": "workspace:*",
+    "@nexus-state/immer": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",

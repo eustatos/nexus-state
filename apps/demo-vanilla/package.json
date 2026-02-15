@@ -7,6 +7,10 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "@nexus-state/core": "workspace:*",
+    "@nexus-state/devtools": "workspace:*"
+  },
   "devDependencies": {
     "vite": "^4.0.0"
   }

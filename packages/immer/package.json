@@ -9,7 +9,7 @@
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {
-    "@nexus-state/core": "*",
+    "@nexus-state/core": "workspace:*",
     "immer": "^10.0.0"
   },
   "devDependencies": {

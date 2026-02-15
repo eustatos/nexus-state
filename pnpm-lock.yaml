@@ -127,12 +127,15 @@ importers:
 
   apps/demo-family:
     dependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@nexus-state/family':
-        specifier: ^0.1.0
-        version: 0.1.3
+        specifier: workspace:*
+        version: link:../../packages/family
       '@nexus-state/react':
-        specifier: ^0.1.0
-        version: 0.1.4(react@18.3.1)
+        specifier: workspace:*
+        version: link:../../packages/react
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -168,11 +171,11 @@ importers:
   apps/demo-forms-granularity:
     dependencies:
       '@nexus-state/core':
-        specifier: ^0.1.0
-        version: 0.1.2
+        specifier: workspace:*
+        version: link:../../packages/core
       '@nexus-state/react':
-        specifier: ^0.1.0
-        version: 0.1.4(react@18.3.1)
+        specifier: workspace:*
+        version: link:../../packages/react
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -196,11 +199,11 @@ importers:
   apps/demo-immer:
     dependencies:
       '@nexus-state/immer':
-        specifier: ^0.1.0
-        version: 0.1.3
+        specifier: workspace:*
+        version: link:../../packages/immer
       '@nexus-state/react':
-        specifier: ^0.1.0
-        version: 0.1.4(react@18.3.1)
+        specifier: workspace:*
+        version: link:../../packages/react
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -223,12 +226,15 @@ importers:
 
   apps/demo-middleware:
     dependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@nexus-state/middleware':
-        specifier: ^0.1.0
-        version: 0.1.3
+        specifier: workspace:*
+        version: link:../../packages/middleware
       '@nexus-state/react':
-        specifier: ^0.1.0
-        version: 0.1.4(react@18.3.1)
+        specifier: workspace:*
+        version: link:../../packages/react
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -251,12 +257,15 @@ importers:
 
   apps/demo-persist:
     dependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@nexus-state/persist':
-        specifier: ^0.1.0
-        version: 0.1.3
+        specifier: workspace:*
+        version: link:../../packages/persist
       '@nexus-state/react':
-        specifier: ^0.1.0
-        version: 0.1.4(react@18.3.1)
+        specifier: workspace:*
+        version: link:../../packages/react
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -376,6 +385,13 @@ importers:
         version: 4.5.14(@types/node@20.19.33)
 
   apps/demo-vanilla:
+    dependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@nexus-state/devtools':
+        specifier: workspace:*
+        version: link:../../packages/devtools
     devDependencies:
       vite:
         specifier: ^4.0.0
@@ -460,8 +476,8 @@ importers:
   packages/immer:
     dependencies:
       '@nexus-state/core':
-        specifier: '*'
-        version: 0.1.2
+        specifier: workspace:*
+        version: link:../core
       immer:
         specifier: ^10.0.0
         version: 10.2.0
@@ -1910,18 +1926,6 @@ packages:
 
   '@nexus-state/core@0.1.2':
     resolution: {integrity: sha512-dvpWwzORnSu9KGiy7iV90QdHAAJXgEAhs4yjWgcFlnDaDzhPpdO5QitWwbXkvGXjKLVtmBG4fOHIn+gAHNEpJg==}
-
-  '@nexus-state/family@0.1.3':
-    resolution: {integrity: sha512-jl/wiBpCzmgL0KPTUTsqXkbJqBV49lwTCNbZ7XUCDoFN32qxKf+mA/xL+e6ZatEX7/teP/28lmJMABzTj7/FDQ==}
-
-  '@nexus-state/immer@0.1.3':
-    resolution: {integrity: sha512-vVbpO9JQQgKTSTGVTLKf+ujEVYqRfNAesVO1k1uDlWdcWH/NWjd3f5fYwioOYyQ7dRNLJhQWfdJrrGOsq93Y8w==}
-
-  '@nexus-state/middleware@0.1.3':
-    resolution: {integrity: sha512-OwSwootVM8DyzEpXetXtpTlVtIz23NI2n9LPOXHeTzM2Q055iNZIqzElzDyzLXOZuHhqX3ez5+u/n/NznAS/iA==}
-
-  '@nexus-state/persist@0.1.3':
-    resolution: {integrity: sha512-MKpzUVvaHRivOjFDIozShVXQf5wtZQmMeEKyrxI/3KEqkoxcZdc5DkySoan53JzE/2Lu48nkyuXSq2UsTnbJhA==}
 
   '@nexus-state/react@0.1.4':
     resolution: {integrity: sha512-FUY0wayzqY4ngbAQxnojOJjGbyLT4d4pyvZMZzZwP+C+VmOfz6CsRTxyFIf7qkcfpOlADmCtFQUGbHTGysCbqA==}
@@ -6990,23 +6994,6 @@ snapshots:
       '@nexus-state/core': 0.1.2
 
   '@nexus-state/core@0.1.2': {}
-
-  '@nexus-state/family@0.1.3':
-    dependencies:
-      '@nexus-state/core': 0.1.2
-
-  '@nexus-state/immer@0.1.3':
-    dependencies:
-      '@nexus-state/core': 0.1.2
-      immer: 10.2.0
-
-  '@nexus-state/middleware@0.1.3':
-    dependencies:
-      '@nexus-state/core': 0.1.2
-
-  '@nexus-state/persist@0.1.3':
-    dependencies:
-      '@nexus-state/core': 0.1.2
 
   '@nexus-state/react@0.1.4(react@18.3.1)':
     dependencies:
