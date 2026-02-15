@@ -11,6 +11,7 @@ These recipes provide solutions to common patterns and advanced usage scenarios.
 
 ## Advanced Patterns
 
+- [DevTools Integration](/recipes/devtools) - Debugging and time-travel with DevTools
 - State Normalization - Managing complex nested state
 - Performance Optimization - Optimizing performance for large applications
 - [Package-Specific Examples](/recipes/package-examples) - Examples for each @nexus-state package

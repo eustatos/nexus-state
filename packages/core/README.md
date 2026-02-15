@@ -92,6 +92,99 @@ const unsubscribe = myStore.subscribe(countAtom, (value) => {
 });
 ```
 
+## Usage Examples
+
+### Basic Counter with Computed Atoms
+
+This example demonstrates a simple counter with computed values:
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+
+// Basic atom for counter
+const countAtom = atom(0, 'counter');
+
+// Computed atom for doubled value
+const doubleCountAtom = atom((get) => get(countAtom) * 2, 'doubleCount');
+
+// Computed atom for even/odd check
+const isEvenAtom = atom((get) => get(countAtom) % 2 === 0, 'isEven');
+
+// Create store
+const store = createStore();
+
+// Subscribe to changes
+store.subscribe(countAtom, (value) => {
+  console.log('Count changed to:', value);
+});
+
+// Update atom
+store.set(countAtom, 5);
+
+// Get computed values
+console.log(store.get(doubleCountAtom)); // 10
+console.log(store.get(isEvenAtom)); // false
+```
+
+### React Integration
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+import { useAtom } from '@nexus-state/react';
+
+const countAtom = atom(0, 'counter');
+const store = createStore();
+
+function Counter() {
+  const [count, setCount] = useAtom(countAtom, store);
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
+}
+```
+
+### Computed Atoms
+
+Computed atoms automatically recalculate when their dependencies change:
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+
+// User profile atoms
+const firstNameAtom = atom('John', 'firstName');
+const lastNameAtom = atom('Doe', 'lastName');
+const ageAtom = atom(30, 'age');
+
+// Computed atoms
+const fullNameAtom = atom(
+  (get) => `${get(firstNameAtom)} ${get(lastNameAtom)}`,
+  'fullName'
+);
+
+const isAdultAtom = atom(
+  (get) => get(ageAtom) >= 18,
+  'isAdult'
+);
+
+const profileSummaryAtom = atom(
+  (get) => {
+    const name = get(fullNameAtom);
+    const age = get(ageAtom);
+    return `${name}, ${age} years old`;
+  },
+  'profileSummary'
+);
+
+const store = createStore();
+
+// Update firstName - only fullName and profileSummary recalculate
+store.set(firstNameAtom, 'Jane');
+```
+
 ## Ecosystem
 
 Nexus State provides additional packages for enhanced functionality:

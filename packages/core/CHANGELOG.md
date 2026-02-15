@@ -1,5 +1,11 @@
 # @nexus-state/core
 
+## 0.1.6
+
+### Patch Changes
+
+- add devtools functionality
+
 ## 0.1.5
 
 ### Patch Changes

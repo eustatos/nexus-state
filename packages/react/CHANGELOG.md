@@ -1,5 +1,13 @@
 # @nexus-state/react
 
+## 0.1.5
+
+### Patch Changes
+
+- add devtools functionality
+- Updated dependencies
+  - @nexus-state/core@0.1.6
+
 ## 0.1.4
 
 ### Patch Changes
