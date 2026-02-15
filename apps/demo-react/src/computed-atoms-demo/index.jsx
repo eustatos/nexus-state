@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { atom, createStore } from '@nexus-state/core';
 import { useAtom } from '@nexus-state/react';
 // Temporarily disabled DevTools import for debugging
@@ -79,13 +79,20 @@ const isValidAtom = atom(
 const store = createStore();
 
 // --- 5. Компонент с счетчиком ререндеров ---
-const RenderCounter = ({ atom, label }) => {
+const RenderCounter = memo(({ atom, label }) => {
   const [renderCount, setRenderCount] = useState(0);
-  const value = useAtom(atom, store);
+  const [value, setValue] = useAtom(atom, store);
   
+  // Log when component renders
   React.useEffect(() => {
+    console.log(`RenderCounter ${label} re-render, value:`, value);
+  }, [label, value]);
+  
+  // Increase render count only when atom value changes
+  React.useEffect(() => {
+    console.log(`RenderCounter ${label} value changed, incrementing count`);
     setRenderCount(c => c + 1);
-  });
+  }, [value]); // Depend on value, not on every render
 
   return (
     <div style={{ 
@@ -108,10 +115,10 @@ const RenderCounter = ({ atom, label }) => {
       </span>
     </div>
   );
-};
+});
 
 // --- 6. Компонент поля ввода с селективным обновлением ---
-const InputField = ({ atom, label, type = 'text' }) => {
+const InputField = memo(({ atom, label, type = 'text' }) => {
   const [value, setValue] = useAtom(atom, store);
   
   const handleChange = useCallback((e) => {
@@ -138,10 +145,10 @@ const InputField = ({ atom, label, type = 'text' }) => {
       />
     </div>
   );
-};
+});
 
 // --- 7. Компонент переключателя ---
-const ToggleField = ({ atom, label }) => {
+const ToggleField = memo(({ atom, label }) => {
   const [value, setValue] = useAtom(atom, store);
   
   return (
@@ -165,7 +172,7 @@ const ToggleField = ({ atom, label }) => {
       </button>
     </div>
   );
-};
+});
 
 // --- 8. Главный компонент демонстрации ---
 const ComputedAtomsDemo = () => {

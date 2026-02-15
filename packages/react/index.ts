@@ -1,4 +1,4 @@
-import { Atom, Store, createStore } from "@nexus-state/core";
+import { Atom, Store, createStore, Getter, Setter } from "@nexus-state/core";
 import { useEffect, useMemo, useState } from "react";
 
 /**
@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
  * @template T - The type of the atom's value
  * @param {Atom<T>} atom - The atom to use
  * @param {Store} [store] - The store to use (defaults to a new store)
- * @returns {T} The current value of the atom
+ * @returns {[T, (value: T | ((prev: T) => T)) => void]} A tuple of [value, setter]
  * @example
  * function Counter() {
  *   const [count, setCount] = useAtom(countAtom);
@@ -19,7 +19,7 @@ import { useEffect, useMemo, useState } from "react";
  *   );
  * }
  */
-export function useAtom<T>(atom: Atom<T>, store?: Store): T {
+export function useAtom<T>(atom: Atom<T>, store?: Store): [T, (value: T | ((prev: T) => T)) => void] {
   // Если store не передан, создаем новый store с помощью useMemo
   const resolvedStore = useMemo(() => store || createStore(), [store]);
 
@@ -36,5 +36,12 @@ export function useAtom<T>(atom: Atom<T>, store?: Store): T {
     return unsubscribe;
   }, [atom, resolvedStore]);
 
-  return value;
+  // Create a setter function that uses the store's set method
+  const setter = useMemo(() => {
+    return (update: T | ((prev: T) => T)) => {
+      resolvedStore.set(atom, update);
+    };
+  }, [resolvedStore, atom]);
+
+  return [value, setter];
 }
