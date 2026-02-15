@@ -62,7 +62,7 @@ export function createStore(plugins: Plugin[] = []): Store {
   let isDevToolsEnabled = false;
   let isStackTraceEnabled = false;
   let pendingStateUpdates: Array<{ atom: Atom<any>, value: any }> = [];
-  let debounceTimer: NodeJS.Timeout | null = null;
+  let debounceTimer: any | null = null;
   const debounceDelay = 100;
 
   const get: Getter = <Value>(atom: Atom<Value>): Value => {

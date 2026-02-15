@@ -16,7 +16,7 @@
     "CHANGELOG.md"
   ],
   "dependencies": {
-    "@nexus-state/core": "*"
+    "@nexus-state/core": "workspace:*"
   },
   "devDependencies": {
     "@jest/globals": "^30.2.0",

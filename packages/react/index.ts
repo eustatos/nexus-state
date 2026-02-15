@@ -1,4 +1,4 @@
-import { Atom, Store, createStore, Getter, Setter } from "@nexus-state/core";
+import { Atom, Store, createStore } from "@nexus-state/core";
 import { useEffect, useMemo, useState } from "react";
 
 /**

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAtom } from "@nexus-state/react";
 import { atom, createStore } from "@nexus-state/core";
-// Temporarily disabled DevTools import for debugging
-// import { devTools } from "@nexus-state/devtools";
 import ComputedAtomsDemo from "./computed-atoms-demo";
 
 // Простой пример счетчика
@@ -10,7 +8,7 @@ const countAtom = atom(0, "counter");
 const doubleCountAtom = atom((get) => get(countAtom) * 2, "doubleCounter");
 const isEvenAtom = atom((get) => get(countAtom) % 2 === 0, "isEven");
 
-// Создаем store без devtools для простого демо (temporarily disabled for debugging)
+// Создаем store без devtools для простого демо
 const simpleStore = createStore();
 
 const SimpleCounterDemo = () => {
