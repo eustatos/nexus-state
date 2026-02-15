@@ -83,16 +83,11 @@ const RenderCounter = memo(({ atom, label }) => {
   const [renderCount, setRenderCount] = useState(0);
   const [value, setValue] = useAtom(atom, store);
   
-  // Log when component renders
-  React.useEffect(() => {
-    console.log(`RenderCounter ${label} re-render, value:`, value);
-  }, [label, value]);
-  
   // Increase render count only when atom value changes
+  // This useEffect runs on mount and when value changes
   React.useEffect(() => {
-    console.log(`RenderCounter ${label} value changed, incrementing count`);
     setRenderCount(c => c + 1);
-  }, [value]); // Depend on value, not on every render
+  }, [value]);
 
   return (
     <div style={{ 
