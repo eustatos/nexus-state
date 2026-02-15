@@ -51,14 +51,14 @@ const SimpleCounterDemo = () => {
         </h3>
                   <ul style={{ marginBottom: 0 }}>
           <li>
-            <strong>Базовые атомы</strong> — простой счетчик
+            <strong>Basic atoms</strong> — simple counter
           </li>
           <li>
-            <strong>Вычисляемые атомы</strong> — удвоенное значение и проверка
+            <strong>Computed atoms</strong> — doubled value and parity check
             четности
           </li>
           <li>
-            <strong>Атомарное обновление</strong> — React компоненты обновляются только при изменении их атомов
+            <strong>Atomic updates</strong> — React components update only when their atoms change
           </li>
         </ul>
       </div>
@@ -144,7 +144,7 @@ const SimpleCounterDemo = () => {
         </div>
 
         <div>
-          <h2 style={{ color: "#9C27B0" }}>Вычисляемые значения</h2>
+          <h2 style={{ color: "#9C27B0" }}>Computed values</h2>
 
           <div
             style={{
@@ -235,9 +235,9 @@ const SimpleCounterDemo = () => {
           color: "#2E7D32",
         }}
       >
-        <strong>ℹ️ Информация:</strong> Это демонстрация базового использования
-        атомов в React. Обратите внимание, как вычисляемые атомы автоматически
-        обновляются при изменении счетчика и как React компоненты обновляются селективно.
+        <strong>ℹ️ Information:</strong> This is a demonstration of basic usage
+        of atoms in React. Notice how computed atoms automatically update
+        when the counter changes and how React components selectively update.
       </div>
     </div>
   );
@@ -262,7 +262,7 @@ export const App = () => {
         <div>
           <h2 style={{ margin: 0, color: "#333" }}>🧪 Nexus State Demos</h2>
           <div style={{ fontSize: "14px", color: "#666", marginTop: "5px" }}>
-            Демонстрация возможностей state management библиотеки
+            Demonstration of state management library capabilities
           </div>
         </div>
 
@@ -325,34 +325,34 @@ export const App = () => {
           }}
         >
           <div>
-            <h4 style={{ marginTop: 0, color: "#2196F3" }}>🧪 Тестирование</h4>
+            <h4 style={{ marginTop: 0, color: "#2196F3" }}>🧪 Testing</h4>
             <ul style={{ margin: 0, paddingLeft: "20px" }}>
               <li>
-                Запустите <code>npm test</code> для unit-тестов
+                Run <code>npm test</code> for unit tests
               </li>
               <li>
-                Запустите <code>npm run test:e2e</code> для E2E тестов
+                Run <code>npm run test:e2e</code> for E2E tests
               </li>
-              <li>Проверьте консоль на наличие ошибок</li>
+              <li>Check console for errors</li>
             </ul>
           </div>
 
           <div>
-            <h4 style={{ marginTop: 0, color: "#4CAF50" }}>✅ Атомарное обновление</h4>
+            <h4 style={{ marginTop: 0, color: "#4CAF50" }}>✅ Atomic updates</h4>
             <ul style={{ margin: 0, paddingLeft: "20px" }}>
-              <li>React компоненты обновляются только при изменении их атомов</li>
-              <li>Вычисляемые атомы автоматически пересчитываются</li>
-              <li>Batch операции для группового обновления</li>
+              <li>React components update only when their atoms change</li>
+              <li>Computed atoms automatically recalculate</li>
+              <li>Batch operations for grouped updates</li>
             </ul>
           </div>
 
           <div>
-            <h4 style={{ marginTop: 0, color: "#9C27B0" }}>🎯 Возможности</h4>
+            <h4 style={{ marginTop: 0, color: "#9C27B0" }}>🎯 Capabilities</h4>
             <ul style={{ margin: 0, paddingLeft: "20px" }}>
-              <li>Вычисляемые атомы</li>
-              <li>Селективное обновление</li>
-              <li>Batch операции</li>
-              <li>Валидация состояния</li>
+              <li>Computed atoms</li>
+              <li>Selective updates</li>
+              <li>Batch operations</li>
+              <li>State validation</li>
             </ul>
           </div>
         </div>

@@ -4,13 +4,13 @@ import { useAtom } from '@nexus-state/react';
 // Temporarily disabled DevTools import for debugging
 // import { devTools } from '@nexus-state/devtools';
 
-// --- 1. Основные атомы (state atoms) ---
+// --- 1. State atoms ---
 const firstNameAtom = atom('John', 'firstName');
 const lastNameAtom = atom('Doe', 'lastName');
 const ageAtom = atom(30, 'age');
 const isActiveAtom = atom(true, 'isActive');
 
-// --- 2. Вычисляемые атомы (computed atoms) ---
+// --- 2. Computed atoms ---
 const fullNameAtom = atom(
   (get) => `${get(firstNameAtom)} ${get(lastNameAtom)}`,
   'fullName'
@@ -31,7 +31,7 @@ const profileSummaryAtom = atom(
   'profileSummary'
 );
 
-// --- 3. Атомы для демонстрации селективного обновления ---
+// --- 3. Atoms for demonstrating selective updates ---
 const needsUpdateAtom = atom(
   (get) => {
     const firstName = get(firstNameAtom);
@@ -39,7 +39,7 @@ const needsUpdateAtom = atom(
     const age = get(ageAtom);
     const isActive = get(isActiveAtom);
     
-    // Проверяем, отличается ли текущее состояние от начального
+    // Check if current state differs from initial
     return firstName !== 'John' || 
            lastName !== 'Doe' || 
            age !== 30 || 
@@ -63,7 +63,7 @@ const isValidAtom = atom(
   'isValid'
 );
 
-// --- 4. Создание store без DevTools ---
+// --- 4. Create store without DevTools ---
 // const store = createStore([
 //   devTools({
 //     name: 'Computed Atoms Demo',
@@ -112,7 +112,7 @@ const RenderCounter = memo(({ atom, label }) => {
   );
 });
 
-// --- 6. Компонент поля ввода с селективным обновлением ---
+// --- 6. Input field component with selective updates ---
 const InputField = memo(({ atom, label, type = 'text' }) => {
   const [value, setValue] = useAtom(atom, store);
   
@@ -142,7 +142,7 @@ const InputField = memo(({ atom, label, type = 'text' }) => {
   );
 });
 
-// --- 7. Компонент переключателя ---
+// --- 7. Toggle component ---
 const ToggleField = memo(({ atom, label }) => {
   const [value, setValue] = useAtom(atom, store);
   
@@ -181,10 +181,10 @@ const ComputedAtomsDemo = () => {
   }, []);
 
   const handleUpdateAll = useCallback(() => {
-    // Демонстрация batch-обновлений
+    // Demo batch updates
     const batchId = `batch-${Date.now()}`;
     
-    // Если store поддерживает startBatch/endBatch
+    // If store supports startBatch/endBatch
     if (store.startBatch && store.endBatch) {
       store.startBatch(batchId);
     }
@@ -225,17 +225,17 @@ const ComputedAtomsDemo = () => {
         marginBottom: '20px',
         border: '1px solid #c8e6c9'
       }}>
-        <h3 style={{ marginTop: 0, color: '#2e7d32' }}>💡 Что демонстрируется:</h3>
+        <h3 style={{ marginTop: 0, color: '#2e7d32' }}>💡 What's demonstrated:</h3>
         <ul style={{ marginBottom: 0 }}>
-          <li><strong>Вычисляемые атомы</strong> — автоматически пересчитываются при изменении зависимостей</li>
-          <li><strong>Селективное обновление</strong> — React компоненты обновляются только при изменении их атомов</li>
+          <li><strong>Computed atoms</strong> — automatically recalculate when dependencies change</li>
+          <li><strong>Selective updates</strong> — React components update only when their atoms change</li>
         </ul>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-        {/* Левая колонка: Форма */}
+        {/* Left column: Form */}
         <div>
-          <h2 style={{ color: '#2196F3' }}>📝 Форма</h2>
+          <h2 style={{ color: '#2196F3' }}>📝 Form</h2>
           
           <InputField atom={firstNameAtom} label="First Name" />
           <InputField atom={lastNameAtom} label="Last Name" />
@@ -305,16 +305,16 @@ const ComputedAtomsDemo = () => {
           </div>
         </div>
 
-        {/* Правая колонка: Вычисляемые значения */}
+        {/* Right column: Computed values */}
         <div>
-          <h2 style={{ color: '#9C27B0' }}>🧮 Вычисляемые атомы</h2>
+          <h2 style={{ color: '#9C27B0' }}>🧮 Computed atoms</h2>
           
           <RenderCounter atom={fullNameAtom} label="Full Name" />
           <RenderCounter atom={isAdultAtom} label="Is Adult" />
           <RenderCounter atom={profileSummaryAtom} label="Profile Summary" />
           
           <div style={{ marginTop: '30px' }}>
-            <h3 style={{ color: '#FF5722' }}>🔍 Состояние формы</h3>
+            <h3 style={{ color: '#FF5722' }}>🔍 Form state</h3>
             <RenderCounter atom={needsUpdateAtom} label="Form has changes" />
             <RenderCounter atom={isValidAtom} label="Form is valid" />
           </div>
@@ -329,28 +329,28 @@ const ComputedAtomsDemo = () => {
         borderRadius: '5px',
         border: '1px solid #e1bee7'
       }}>
-        <h3 style={{ marginTop: 0, color: '#7B1FA2' }}>🎬 Примеры для проверки:</h3>
+        <h3 style={{ marginTop: 0, color: '#7B1FA2' }}>🎬 Examples for testing:</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
           <div>
-            <h4 style={{ color: '#7B1FA2', fontSize: '14px' }}>Селективное обновление:</h4>
+            <h4 style={{ color: '#7B1FA2', fontSize: '14px' }}>Selective updates:</h4>
             <ul style={{ fontSize: '14px', margin: 0 }}>
-              <li>Измените <strong>First Name</strong> → обновятся только <code>fullName</code> и <code>profileSummary</code></li>
-              <li>Измените <strong>Age</strong> → обновятся <code>isAdult</code> и <code>profileSummary</code></li>
-              <li>Переключите <strong>Status</strong> → обновится только <code>profileSummary</code></li>
+              <li>Change <strong>First Name</strong> → only <code>fullName</code> and <code>profileSummary</code> update</li>
+              <li>Change <strong>Age</strong> → <code>isAdult</code> and <code>profileSummary</code> update</li>
+              <li>Toggle <strong>Status</strong> → only <code>profileSummary</code> updates</li>
             </ul>
           </div>
           <div>
-            <h4 style={{ color: '#7B1FA2', fontSize: '14px' }}>Атомарное обновление:</h4>
+            <h4 style={{ color: '#7B1FA2', fontSize: '14px' }}>Atomic updates:</h4>
             <ul style={{ fontSize: '14px', margin: 0 }}>
-              <li>React компоненты обновляются только при изменении их атомов</li>
-              <li>Вычисляемые атомы автоматически пересчитываются</li>
-              <li>Изменения отслеживаются через консоль</li>
+              <li>React components update only when their atoms change</li>
+              <li>Computed atoms automatically recalculate</li>
+              <li>Changes are tracked through console</li>
             </ul>
           </div>
         </div>
       </div>
 
-      {/* Счетчики ререндеров для всех атомов */}
+      {/* Render counters for all atoms */}
       <div style={{ 
         marginTop: '30px',
         padding: '15px',
@@ -358,7 +358,7 @@ const ComputedAtomsDemo = () => {
         borderRadius: '5px',
         border: '1px solid #ffcc80'
       }}>
-        <h3 style={{ marginTop: 0, color: '#EF6C00' }}>📊 Счетчики ререндеров всех атомов:</h3>
+        <h3 style={{ marginTop: 0, color: '#EF6C00' }}>📊 Render counters for all atoms:</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
           <RenderCounter atom={firstNameAtom} label="firstName" />
           <RenderCounter atom={lastNameAtom} label="lastName" />
@@ -381,8 +381,8 @@ const ComputedAtomsDemo = () => {
         fontSize: '14px',
         color: '#1565c0'
       }}>
-        <strong>💡 Подсказка:</strong> Откройте консоль разработчика для наблюдения за обновлениями атомов.
-        Обратите внимание, как изменяются только те компоненты, чьи атомы действительно изменились.
+        <strong>💡 Tip:</strong> Open developer console to observe atom updates.
+        Notice how only the components whose atoms actually changed are updated.
       </div>
     </div>
   );
