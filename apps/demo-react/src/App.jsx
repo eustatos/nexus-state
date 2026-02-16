@@ -12,9 +12,9 @@ const isEvenAtom = atom((get) => get(countAtom) % 2 === 0, "isEven");
 const simpleStore = createStore();
 
 const SimpleCounterDemo = () => {
-  const count = useAtom(countAtom, simpleStore);
-  const doubleCount = useAtom(doubleCountAtom, simpleStore);
-  const isEven = useAtom(isEvenAtom, simpleStore);
+  const [count, setCount] = useAtom(countAtom, simpleStore);
+  const [doubleCount] = useAtom(doubleCountAtom, simpleStore);
+  const [isEven] = useAtom(isEvenAtom, simpleStore);
 
   return (
     <div
@@ -92,7 +92,7 @@ const SimpleCounterDemo = () => {
             }}
           >
             <button
-              onClick={() => simpleStore.set(countAtom, count + 1)}
+              onClick={() => setCount((prev) => prev + 1)}
               style={{
                 padding: "12px 24px",
                 backgroundColor: "#2196F3",
@@ -108,7 +108,7 @@ const SimpleCounterDemo = () => {
             </button>
 
             <button
-              onClick={() => simpleStore.set(countAtom, count - 1)}
+              onClick={() => setCount((prev) => prev - 1)}
               style={{
                 padding: "12px 24px",
                 backgroundColor: "#FF9800",
@@ -124,7 +124,7 @@ const SimpleCounterDemo = () => {
             </button>
 
             <button
-              onClick={() => simpleStore.set(countAtom, 0)}
+              onClick={() => setCount(0)}
               style={{
                 padding: "12px 24px",
                 backgroundColor: "#f44336",

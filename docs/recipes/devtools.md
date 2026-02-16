@@ -400,4 +400,4 @@ devtoolsPlugin.apply(store);
 - [Basic Counter](/examples/counter) - Simple counter with DevTools
 - [Form with Validation](/recipes/forms) - Complex form with computed atoms
 - [Async Data](/recipes/async-atoms) - Handling async state
-- [demo-devtools](/apps/demo-devtools) - Complete demo application
+- [DevTools Demo App](/examples/devtools-demo) - Complete demo application
