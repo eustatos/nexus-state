@@ -13,7 +13,7 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: View on GitHub
-      link: https://github.com/astashkin-a/nexus-state
+      link: https://github.com/eustatos/nexus-state
 
 features:
   - title: Simple API
