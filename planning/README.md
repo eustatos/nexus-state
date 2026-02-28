@@ -17,69 +17,160 @@ This directory contains the complete development plan for Nexus State v1.0.0 rel
 
 ---
 
-### 🟡 Phase 01: Type Safety & Code Quality
+### 🟡 Phase 01: Critical Fixes & React Hooks
 **Status:** Pending
 **Duration:** 2 weeks (10 days)
 **Start Date:** 2026-03-01
 **End Date:** 2026-03-14
 
+**Goal:** Fix production issues, add essential React hooks.
+
+**Key Deliverables:**
+- `useAtomValue` hook for read-only access
+- `useSetAtom` hook for write-only access
+- `StoreProvider` context for dependency injection
+- Remove `console.log` from production code
+- Time Travel extracted to separate package
+
+[View Phase 01 Details](phase-01-critical-fixes/README.md)
+
+**Key Tasks:**
+| ID | Title | Priority | Status |
+|----|-------|----------|--------|
+| TASK-001 | Remove console.log from Production | 🔴 | ⬜ |
+| TASK-002 | Add useAtomValue Hook | 🔴 | ⬜ |
+| TASK-003 | Add useSetAtom Hook | 🔴 | ⬜ |
+| TASK-004 | Add StoreProvider Context | 🟡 | ⬜ |
+| TASK-005 | Split Time Travel Package | 🟡 | ⬜ |
+
+---
+
+### ⬜ Phase 02: Code Quality & Type Safety
+**Status:** Pending
+**Duration:** 2 weeks (10 days)
+**Start Date:** 2026-03-15
+**End Date:** 2026-03-28
+
 **Goal:** Eliminate all `any` types, enable TypeScript strict mode, establish code quality standards.
 
 **Key Deliverables:**
-- TypeScript strict mode in all 12 packages
+- TypeScript strict mode in all packages
 - <10 `any` types remaining (with justification)
 - 0 ESLint errors, 0 warnings
 - Pre-commit hooks configured
 - Security audit clean
 
-[View Phase 01 Details](phase-01-code-quality/README.md)
-
-**Key Tasks:**
-| ID | Title | Priority | Status |
-|----|-------|----------|--------|
-| [TS-001](phase-01-code-quality/tasks/TS-001-audit-any-types.md) | Audit All `any` Types | 🔴 | ⬜ |
-| TS-002 to TS-005 | Enable Strict Mode (all packages) | 🔴 | ⬜ |
-| TS-006 to TS-008 | Eliminate `any` types | 🔴 | ⬜ |
-| TS-009 | Pre-commit Hooks | 🟡 | ⬜ |
-| TS-010 | Security Audit | 🔴 | ⬜ |
-| TS-011 | Documentation | 🟢 | ⬜ |
+[View Phase 02 Details](phase-02-code-quality/README.md)
 
 ---
 
-### ⬜ Phase 02: DevTools Optimization & Critical Features
+### ⬜ Phase 03: Architecture Fixes
 **Status:** Pending
-**Duration:** 4 weeks (20 days)
-**Start Date:** 2026-03-15
-**End Date:** 2026-04-11
+**Duration:** 1 week (5 days)
+**Start Date:** 2026-03-29
+**End Date:** 2026-04-04
 
-**Goal:** Optimize DevTools performance and implement critical missing features.
+**Goal:** Fix critical architecture issues in core.
 
 **Key Deliverables:**
-- DevTools performance improvements
-- Time Travel optimization
-- @nexus-state/query package (optional if time permits)
-- Complete documentation
+- Store isolation in atom registry
+- Proper encapsulation per store
 
-[View Phase 02 Details](phase-02-devtools-optimization/README.md)
+[View Phase 03 Details](phase-03-architecture/CORE-006-fix-store-isolation.md)
 
 ---
 
-### ⬜ Phase 03: v1.0 Release Preparation
+### ⬜ Phase 04: DevTools Optimization
 **Status:** Pending
-**Duration:** 2 weeks (10 days)
-**Start Date:** 2026-04-12
+**Duration:** 3 weeks (15 days)
+**Start Date:** 2026-04-05
 **End Date:** 2026-04-25
 
-**Goal:** Final testing, documentation, and v1.0.0 release.
+**Goal:** Optimize DevTools performance and time travel.
 
 **Key Deliverables:**
-- v1.0.0 published to npm
-- All packages with >85% test coverage
-- Complete documentation
-- Migration guides
-- Release announcement
+- HistoryManager queue logic fix
+- History compression
+- Transactional restoration
+- Advanced serialization
+- Incremental snapshots
+- Snapshot comparison
 
-[View Phase 03 Details](phase-03-release/README.md)
+[View Phase 04 Details](phase-04-devtools-optimization/)
+
+---
+
+### ⬜ Phase 05: Enhanced Features
+**Status:** Pending
+**Duration:** 2 weeks (10 days)
+**Start Date:** 2026-04-26
+**End Date:** 2026-05-09
+
+**Goal:** Add enhanced features and improve testing.
+
+**Key Deliverables:**
+- Test coverage ≥ 90%
+- Coverage reports in CI
+- Suspense support for async atoms
+
+[View Phase 05 Details](phase-05-enhanced-features/README.md)
+
+---
+
+### ⬜ Phase 06: Documentation & Community
+**Status:** Pending
+**Duration:** 4 weeks (20 days)
+**Start Date:** 2026-05-10
+**End Date:** 2026-06-06
+
+**Goal:** Complete documentation and build community.
+
+**Key Deliverables:**
+- Migration guide from Jotai
+- Benchmark suite
+- Complete API documentation
+- Contributing guide
+
+[View Phase 06 Details](phase-06-documentation-community/README.md)
+
+---
+
+### ⬜ Phase 07: Forms Package
+**Status:** Pending
+**Duration:** 3 weeks (15 days)
+**Start Date:** 2026-06-07
+**End Date:** 2026-06-27
+
+**Goal:** Implement forms state management.
+
+**Key Deliverables:**
+- Form state atoms
+- Validation integration
+- Touched/dirty tracking
+
+[View Phase 07 Details](phase-07-forms/README.md)
+
+---
+
+### ⬜ Phase 08: Query Package
+**Status:** Pending
+**Duration:** 4 weeks (20 days)
+**Start Date:** 2026-06-28
+**End Date:** 2026-07-25
+
+**Goal:** Implement data fetching and caching package with React Query-like functionality.
+
+**Key Deliverables:**
+- Query Atoms for async data
+- 3-tier caching (memory, session, IndexedDB)
+- Request deduplication
+- Background refetch (polling, focus, network)
+- Optimistic updates with rollback
+- Garbage collection
+- ≥95% test coverage
+- Complete documentation
+
+[View Phase 08 Details](phase-08-query/README.md)
 
 ---
 
@@ -89,10 +180,15 @@ This directory contains the complete development plan for Nexus State v1.0.0 rel
 |-------|--------|----------|-------|-----|
 | Phase 00 | ✅ Complete | 100% | - | - |
 | Phase 01 | 🟡 Pending | 0% | 2026-03-01 | 2026-03-14 |
-| Phase 02 | ⬜ Pending | 0% | 2026-03-15 | 2026-04-11 |
-| Phase 03 | ⬜ Pending | 0% | 2026-04-12 | 2026-04-25 |
+| Phase 02 | ⬜ Pending | 0% | 2026-03-15 | 2026-03-28 |
+| Phase 03 | ⬜ Pending | 0% | 2026-03-29 | 2026-04-04 |
+| Phase 04 | ⬜ Pending | 0% | 2026-04-05 | 2026-04-25 |
+| Phase 05 | 🟡 In Progress | 50% | 2026-04-26 | 2026-05-09 |
+| Phase 06 | ⬜ Pending | 0% | 2026-05-10 | 2026-06-06 |
+| Phase 07 | ⬜ Pending | 0% | 2026-06-07 | 2026-06-27 |
+| Phase 08 | ⬜ Pending | 0% | 2026-06-28 | 2026-07-25 |
 
-**Overall Project Progress:** 10% complete (1/4 phases)
+**Overall Project Progress:** 16.7% complete (1.5/9 phases)
 
 ---
 
