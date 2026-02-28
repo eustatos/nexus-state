@@ -32,10 +32,11 @@
     "@nexus-state/core": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "vitest": "^0.34.0",
+    "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^8.40.0",
-    "svelte": "^3.0.0"
+    "svelte": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "svelte": "^3.0.0"
