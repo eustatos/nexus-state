@@ -49,6 +49,7 @@ describe("enhancedStore - comprehensive scenarios", () => {
   });
 
   it("should work with DevTools and time travel together", () => {
+    const isDev = process.env.NODE_ENV === 'development';
     const consoleSpy = vi.spyOn(console, "log");
     const store = createEnhancedStore([], {
       enableDevTools: true,
@@ -57,7 +58,13 @@ describe("enhancedStore - comprehensive scenarios", () => {
     });
 
     store.connectDevTools?.();
-    expect(consoleSpy).toHaveBeenCalled();
+    
+    if (isDev) {
+      expect(consoleSpy).toHaveBeenCalled();
+    } else {
+      // In non-dev mode, debugStore is a no-op
+      expect(consoleSpy).not.toHaveBeenCalled();
+    }
 
     const counterAtom = atom(0);
     store.set(counterAtom, 5);

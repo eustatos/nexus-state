@@ -19,6 +19,7 @@ import type {
   RollbackResult,
 } from "./types";
 import { atomRegistry } from "../../atom-registry";
+import { debugTimeTravel } from "../../utils/debug";
 
 // Import disposal infrastructure
 import { BaseDisposable, type DisposableConfig } from "../core/disposable";
@@ -118,7 +119,7 @@ export class SnapshotRestorer extends BaseDisposable {
       this.emit("restore", snapshotToRestore);
       return true;
     } catch (error) {
-      console.error("Failed to restore snapshot:", error);
+      debugTimeTravel("Failed to restore snapshot:", error);
       return false;
     } finally {
       this.restoreInProgress = false;
@@ -230,17 +231,17 @@ export class SnapshotRestorer extends BaseDisposable {
    * @returns True if restored successfully
    */
   private restoreAtom(key: string, entry: SnapshotStateEntry): boolean {
-    console.log(`[RESTORE] Restoring atom: ${key}, entry.name=${entry.name}, value=${entry.value}`);
+    debugTimeTravel(`[RESTORE] Restoring atom: ${key}, entry.name=${entry.name}, value=${entry.value}`);
     
     // Try to find atom by name first
     let atom = this.findAtomByName(entry.name || key);
-    console.log(`[RESTORE] Found by name? ${!!atom}, atom.id=${atom?.id?.toString()}, atom.name=${atom?.name}`);
+    debugTimeTravel(`[RESTORE] Found by name? ${!!atom}, atom.id=${atom?.id?.toString()}, atom.name=${atom?.name}`);
 
     // If not found, try to find by ID string (though this is unreliable for symbols)
     if (!atom && entry.atomId) {
-      console.log(`[RESTORE] Trying to find by atomId: ${entry.atomId}`);
+      debugTimeTravel(`[RESTORE] Trying to find by atomId: ${entry.atomId}`);
       atom = this.findAtomById(entry.atomId);
-      console.log(`[RESTORE] Found by ID? ${!!atom}`);
+      debugTimeTravel(`[RESTORE] Found by ID? ${!!atom}`);
     }
 
     if (!atom) {
@@ -251,7 +252,7 @@ export class SnapshotRestorer extends BaseDisposable {
           const storedName = storedAtom.name || storedAtom.id?.description || "atom";
           if (storedName === entry.name) {
             atom = storedAtom as Atom<unknown>;
-            console.log(`[RESTORE] Found by name (fallback): ${entry.name}, id: ${atom.id?.toString()}`);
+            debugTimeTravel(`[RESTORE] Found by name (fallback): ${entry.name}, id: ${atom.id?.toString()}`);
             break;
           }
         }
@@ -263,20 +264,20 @@ export class SnapshotRestorer extends BaseDisposable {
         throw new Error(`Atom not found: ${key}`);
       }
       if (this.restorerConfig.onAtomNotFound === "warn") {
-        console.warn(`Atom not found: ${key}`);
+        debugTimeTravel(`Atom not found: ${key}`);
       }
-      console.log(`[RESTORE] Atom NOT FOUND: ${key}`);
+      debugTimeTravel(`[RESTORE] Atom NOT FOUND: ${key}`);
       return false;
     }
 
     // Deserialize value if needed
     const value = this.deserializeValue(entry.value, entry.type);
-    console.log(`[RESTORE] Restoring ${entry.name}: ${value}, calling this.store.set(atom, ${value})`);
-    console.log(`[RESTORE] Current value in store before set: ${this.store.get(atom)}`);
+    debugTimeTravel(`[RESTORE] Restoring ${entry.name}: ${value}, calling this.store.set(atom, ${value})`);
+    debugTimeTravel(`[RESTORE] Current value in store before set: ${this.store.get(atom)}`);
 
     // Set the value
     this.store.set(atom, value);
-    console.log(`[RESTORE] Set complete for ${entry.name}, new value: ${this.store.get(atom)}`);
+    debugTimeTravel(`[RESTORE] Set complete for ${entry.name}, new value: ${this.store.get(atom)}`);
     return true;
   }
 
@@ -617,7 +618,7 @@ export class SnapshotRestorer extends BaseDisposable {
         const currentValue = this.store.get(atom);
         previousValues.set(atom.id, currentValue);
       } catch (error) {
-        console.error(`Failed to capture previous value for atom ${atom.name}:`, error);
+        debugTimeTravel(`Failed to capture previous value for atom ${atom.name}:`, error);
       }
     }
 
@@ -1002,7 +1003,7 @@ export class SnapshotRestorer extends BaseDisposable {
           atomId,
           error: errorMsg,
         });
-        console.error(`Failed to rollback atom ${atomId.toString()}:`, error);
+        debugTimeTravel(`Failed to rollback atom ${atomId.toString()}:`, error);
         // Continue with other rollbacks
       }
     }
@@ -1045,7 +1046,7 @@ export class SnapshotRestorer extends BaseDisposable {
         }
       }
     } catch (error) {
-      console.error("Failed to parse atom ID:", error);
+      debugTimeTravel("Failed to parse atom ID:", error);
     }
     return null;
   }

@@ -6,6 +6,7 @@ import type { CompressionStrategy, CompressionStrategyConfig } from "../compress
 
 // Import disposal infrastructure
 import { BaseDisposable, type DisposableConfig } from "./disposable";
+import { debugTimeTravel } from "../../utils/debug";
 
 export class HistoryManager extends BaseDisposable {
   private past: Snapshot[] = [];
@@ -67,22 +68,22 @@ export class HistoryManager extends BaseDisposable {
   }
 
   add(snapshot: Snapshot): void {
-    console.log(`[HISTORY.add] Adding snapshot: ${snapshot.metadata.action || 'unknown'}, past.length: ${this.past.length}, current: ${this.current?.metadata.action || 'none'}`);
+    debugTimeTravel(`[HISTORY.add] Adding snapshot: ${snapshot.metadata.action || 'unknown'}, past.length: ${this.past.length}, current: ${this.current?.metadata.action || 'none'}`);
     
     // If maxHistory is 0, don't save any history
     if (this.maxHistory <= 0) {
-      console.log(`[HISTORY.add] maxHistory is ${this.maxHistory}, skipping history save`);
+      debugTimeTravel(`[HISTORY.add] maxHistory is ${this.maxHistory}, skipping history save`);
       this.current = snapshot;
       this.past = [];
       this.future = [];
-      console.log(`[HISTORY.add] Added. Total: ${this.getAll().length} (past: ${this.past.length}, current: ${this.current ? 1 : 0}, future: ${this.future.length})`);
+      debugTimeTravel(`[HISTORY.add] Added. Total: ${this.getAll().length} (past: ${this.past.length}, current: ${this.current ? 1 : 0}, future: ${this.future.length})`);
       return;
     }
     
     // First, push current to past if it exists
     if (this.current) {
       this.past.push(this.current);
-      console.log(`[HISTORY.add] Pushed current to past, past.length now: ${this.past.length}`);
+      debugTimeTravel(`[HISTORY.add] Pushed current to past, past.length now: ${this.past.length}`);
     }
     
     // Update current and clear future
@@ -100,16 +101,16 @@ export class HistoryManager extends BaseDisposable {
       
       // Keep only the most recent (maxPastSize) items
       this.past = this.past.slice(itemsToRemove);
-      console.log(`[HISTORY.add] Trimmed past from ${this.past.length + itemsToRemove} to ${this.past.length} items (maxPastSize: ${maxPastSize})`);
+      debugTimeTravel(`[HISTORY.add] Trimmed past from ${this.past.length + itemsToRemove} to ${this.past.length} items (maxPastSize: ${maxPastSize})`);
     }
     
     // Apply compression if strategy is configured and should compress
     if (this.compressionStrategy && this.compressionStrategy.shouldCompress(this.getAll(), this.past.length)) {
-      console.log(`[HISTORY.add] Applying compression`);
+      debugTimeTravel(`[HISTORY.add] Applying compression`);
       this.applyCompression();
     }
     
-    console.log(`[HISTORY.add] Added. Total: ${this.getAll().length} (past: ${this.past.length}, current: ${this.current ? 1 : 0}, future: ${this.future.length})`);
+    debugTimeTravel(`[HISTORY.add] Added. Total: ${this.getAll().length} (past: ${this.past.length}, current: ${this.current ? 1 : 0}, future: ${this.future.length})`);
   }
 
   getCurrent(): Snapshot | null {
@@ -134,7 +135,7 @@ export class HistoryManager extends BaseDisposable {
   }
 
   undo(): Snapshot | null {
-    console.log(`[HISTORY.undo] canUndo: ${this.canUndo()}, past.length: ${this.past.length}, future.length: ${this.future.length}`);
+    debugTimeTravel(`[HISTORY.undo] canUndo: ${this.canUndo()}, past.length: ${this.past.length}, future.length: ${this.future.length}`);
     if (!this.canUndo()) return null;
 
     const newFuture = this.current;
@@ -143,7 +144,7 @@ export class HistoryManager extends BaseDisposable {
     if (newCurrent && newFuture) {
       this.future.unshift(newFuture);
       this.current = newCurrent;
-      console.log(`[HISTORY.undo] Popped from past, new current: ${newCurrent.metadata.action || 'unknown'}, value: ${Object.values(newCurrent.state)[0]?.value}`);
+      debugTimeTravel(`[HISTORY.undo] Popped from past, new current: ${newCurrent.metadata.action || 'unknown'}, value: ${Object.values(newCurrent.state)[0]?.value}`);
     }
     
     return newCurrent;
@@ -199,13 +200,13 @@ export class HistoryManager extends BaseDisposable {
     const allSnapshots = this.getAll();
     this.originalHistorySize = allSnapshots.length;
     
-    console.log(`[HISTORY.compression] Original history size: ${this.originalHistorySize}`);
+    debugTimeTravel(`[HISTORY.compression] Original history size: ${this.originalHistorySize}`);
     
     // Apply compression
     const compressedHistory = this.compressionStrategy.compress(allSnapshots);
     this.compressedHistorySize = compressedHistory.length;
     
-    console.log(`[HISTORY.compression] Compressed history size: ${this.compressedHistorySize}`);
+    debugTimeTravel(`[HISTORY.compression] Compressed history size: ${this.compressedHistorySize}`);
     
     // To preserve navigation capabilities, we need to rebuild past/future
     // from the compressed history while keeping the same current snapshot
@@ -227,11 +228,11 @@ export class HistoryManager extends BaseDisposable {
       // The current is the snapshot at currentSnapshotIndex
       this.current = compressedHistory[currentSnapshotIndex];
       
-      console.log(`[HISTORY.compression] Rebuilt history: past=${this.past.length}, current=${this.current?.metadata.action}, future=${this.future.length}`);
+      debugTimeTravel(`[HISTORY.compression] Rebuilt history: past=${this.past.length}, current=${this.current?.metadata.action}, future=${this.future.length}`);
     } else {
       // Current snapshot not found in compressed history
       // This should not happen in normal operation, but we have a fallback
-      console.warn(`[HISTORY.compression] Current snapshot not found in compressed history`);
+      debugTimeTravel(`[HISTORY.compression] Current snapshot not found in compressed history`);
       
       // Use the index from before compression
       if (currentIndex < compressedHistory.length) {
@@ -239,7 +240,7 @@ export class HistoryManager extends BaseDisposable {
         this.future = compressedHistory.slice(currentIndex + 1);
         this.current = compressedHistory[currentIndex];
         
-        console.log(`[HISTORY.compression] Fallback: using index ${currentIndex}`);
+        debugTimeTravel(`[HISTORY.compression] Fallback: using index ${currentIndex}`);
       }
     }
     

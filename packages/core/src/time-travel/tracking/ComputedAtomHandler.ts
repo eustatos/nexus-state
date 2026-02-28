@@ -9,6 +9,7 @@ import type {
   TrackedAtom,
 } from "./types";
 import { AtomTracker } from "./AtomTracker";
+import { debugTimeTravel } from "../../utils/debug";
 
 export class ComputedAtomHandler {
   private tracker: AtomTracker;
@@ -127,7 +128,7 @@ export class ComputedAtomHandler {
     try {
       newValue = atom.read ? atom.read(...depValues) : atom(...depValues);
     } catch (error) {
-      console.error("Error computing atom:", error);
+      debugTimeTravel("Error computing atom:", error);
       return undefined;
     }
 

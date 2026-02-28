@@ -11,6 +11,7 @@ import type {
 } from "./types";
 import { AtomTracker } from "./AtomTracker";
 import { Atom } from "../../types";
+import { debugTimeTravel } from "../../utils/debug";
 
 export class AtomChangeDetector {
   private tracker: AtomTracker;
@@ -108,7 +109,7 @@ export class AtomChangeDetector {
         try {
           listener(event);
         } catch (error) {
-          console.error("Change listener error:", error);
+          debugTimeTravel("Change listener error:", error);
         }
       });
     }
@@ -118,7 +119,7 @@ export class AtomChangeDetector {
       try {
         listener(event);
       } catch (error) {
-        console.error("Global change listener error:", error);
+        debugTimeTravel("Global change listener error:", error);
       }
     });
   }

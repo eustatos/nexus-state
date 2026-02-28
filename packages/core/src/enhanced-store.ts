@@ -10,6 +10,7 @@ import type {
 import { createStore } from "./store";
 import { atomRegistry } from "./atom-registry";
 import { SimpleTimeTravel } from "./time-travel";
+import { debugStore } from "./utils/debug";
 
 /**
  * Represents an enhanced store with additional capabilities.
@@ -98,7 +99,7 @@ export function createEnhancedStore(
   // Add DevTools connection if enabled
   if (enableDevTools) {
     store.connectDevTools = () => {
-      console.log("DevTools connected for store:", devToolsName);
+      debugStore("DevTools connected for store:", devToolsName);
     };
   }
 

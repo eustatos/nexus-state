@@ -7,6 +7,7 @@ import type { Snapshot, SnapshotStateEntry } from "../types";
 import type { SnapshotCreatorConfig, CreationResult } from "./types";
 import { atomRegistry } from "../../atom-registry";
 import { AdvancedSerializer, SerializationOptions } from "../../utils/snapshot-serialization/advanced";
+import { debugTimeTravel } from "../../utils/debug";
 
 // Import disposal infrastructure
 import { BaseDisposable, type DisposableConfig } from "../core/disposable";
@@ -106,7 +107,7 @@ export class SnapshotCreator extends BaseDisposable {
       this.emit("create", transformed);
       return transformed;
     } catch (error) {
-      console.error("Failed to create snapshot:", error);
+      debugTimeTravel("Failed to create snapshot:", error);
       return null;
     }
   }
