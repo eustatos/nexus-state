@@ -16,7 +16,7 @@
     "@nexus-state/devtools": "workspace:*",
     "@nexus-state/react": "workspace:*",
     "@nexus-state/core": "workspace:*",
-    "react": "^18.2.0",
+    "react": "^19.2.4",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
@@ -24,7 +24,7 @@
     "@testing-library/jest-dom": "^6.1.0",
     "@testing-library/react": "^14.0.0",
     "@types/node": "^20.19.33",
-    "@types/react": "^18.0.0",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^18.0.0",
     "@vitejs/plugin-react": "^4.0.0",
     "@vitest/coverage-v8": "^3.2.4",
