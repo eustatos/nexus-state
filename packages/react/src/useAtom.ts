@@ -1,11 +1,12 @@
 import type { Atom, Store } from '@nexus-state/core';
 import { useEffect, useMemo, useState } from 'react';
+import { useStoreOptional } from './StoreProvider';
 
 /**
  * Hook to use an atom in a React component.
  * @template T - The type of the atom's value
  * @param atom - The atom to use
- * @param store - The store to use (defaults to a new store)
+ * @param store - The store to use (defaults to context store or a new store)
  * @returns {[T, (value: T | ((prev: T) => T)) => void]} A tuple of [value, setter]
  *
  * @example
@@ -28,8 +29,11 @@ import { useEffect, useMemo, useState } from 'react';
  * ```
  */
 export function useAtom<T>(atom: Atom<T>, store?: Store): [T, (value: T | ((prev: T) => T)) => void] {
-  // Если store не передан, создаем новый store с помощью useMemo
-  const resolvedStore = useMemo(() => store || createStore(), [store]);
+  // Get store from context if not provided explicitly
+  const contextStore = useStoreOptional();
+  
+  // Priority: explicit store > context store > new store
+  const resolvedStore = useMemo(() => store ?? contextStore ?? createStore(), [store, contextStore]);
 
   const [value, setValue] = useState(() => resolvedStore.get(atom));
 

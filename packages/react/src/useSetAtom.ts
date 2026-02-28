@@ -1,6 +1,7 @@
 import type { Atom, Store } from '@nexus-state/core';
 import { createStore } from '@nexus-state/core';
 import { useMemo } from 'react';
+import { useStoreOptional } from './StoreProvider';
 
 /**
  * Hook to get only the setter function for an atom.
@@ -9,7 +10,7 @@ import { useMemo } from 'react';
  *
  * @template T - The type of the atom's value
  * @param atom - The atom to get the setter for
- * @param store - Optional store instance
+ * @param store - Optional store instance (defaults to context store or auto-created store)
  * @returns A setter function to update the atom
  *
  * @example
@@ -48,7 +49,11 @@ export function useSetAtom<T>(
   atom: Atom<T>,
   store?: Store
 ): (value: T | ((prev: T) => T)) => void {
-  const resolvedStore = useMemo(() => store || createStore(), [store]);
+  // Get store from context if not provided explicitly
+  const contextStore = useStoreOptional();
+  
+  // Priority: explicit store > context store > new store
+  const resolvedStore = useMemo(() => store ?? contextStore ?? createStore(), [store, contextStore]);
 
   const setter = useMemo(() => {
     return (update: T | ((prev: T) => T)) => {
