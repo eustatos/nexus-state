@@ -14,6 +14,14 @@ export {
 } from './atom-helpers';
 
 export {
+  createDebugger,
+  debugStore,
+  debugAtom,
+  debugTimeTravel,
+  type DebugContext,
+} from './debug';
+
+export {
   serializeState,
   SerializationUtils,
   type SerializationOptions,

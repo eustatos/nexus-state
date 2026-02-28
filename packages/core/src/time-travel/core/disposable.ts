@@ -5,6 +5,8 @@
  * across all time travel components.
  */
 
+import { debugTimeTravel } from "../../utils/debug";
+
 /**
  * Error thrown when disposal fails
  */
@@ -137,7 +139,7 @@ export abstract class BaseDisposable implements Disposable {
       try {
         callback();
       } catch (error) {
-        console.error("Error in immediate dispose callback:", error);
+        debugTimeTravel("Error in immediate dispose callback:", error);
       }
       return () => {};
     }
@@ -206,7 +208,7 @@ export abstract class BaseDisposable implements Disposable {
       try {
         await callback();
       } catch (error) {
-        console.error("Error in dispose callback:", error);
+        debugTimeTravel("Error in dispose callback:", error);
       }
     }
   }
@@ -221,7 +223,7 @@ export abstract class BaseDisposable implements Disposable {
     if (this.config.onError) {
       this.config.onError(err);
     } else {
-      console.error("Disposal error:", err);
+      debugTimeTravel("Disposal error:", err);
     }
 
     if (this.config.throwOnError) {
@@ -235,7 +237,7 @@ export abstract class BaseDisposable implements Disposable {
    */
   protected log(message: string): void {
     if (this.config.logDisposal) {
-      console.log(`[DISPOSAL] ${message}`);
+      debugTimeTravel(`[DISPOSAL] ${message}`);
     }
   }
 
@@ -349,7 +351,7 @@ export class LeakDetector {
     }
 
     if (leaked.length > 0) {
-      console.warn(
+      debugTimeTravel(
         `[LeakDetector] Potential memory leaks detected: ${leaked.length} instance(s) not disposed before GC`,
       );
     }
@@ -377,7 +379,7 @@ export class LeakDetector {
       try {
         callback(id, instance);
       } catch (error) {
-        console.error("Error in leak callback:", error);
+        debugTimeTravel("Error in leak callback:", error);
       }
     }
   }

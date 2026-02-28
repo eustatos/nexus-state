@@ -536,6 +536,7 @@ describe("Disposal and Resource Cleanup", () => {
 
   describe("Disposal Configuration", () => {
     it("should log disposal steps when configured", async () => {
+      const isDev = process.env.NODE_ENV === 'development';
       const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
       const tt = new SimpleTimeTravel(store, {
@@ -544,9 +545,14 @@ describe("Disposal and Resource Cleanup", () => {
 
       await tt.dispose();
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Disposing SimpleTimeTravel"),
-      );
+      if (isDev) {
+        expect(consoleSpy).toHaveBeenCalledWith(
+          expect.stringContaining("Disposing SimpleTimeTravel"),
+        );
+      } else {
+        // In non-dev mode, debugTimeTravel is a no-op
+        expect(consoleSpy).not.toHaveBeenCalled();
+      }
 
       consoleSpy.mockRestore();
     });
@@ -567,6 +573,7 @@ describe("Disposal and Resource Cleanup", () => {
 
   describe("Error Handling", () => {
     it("should handle errors in child disposal", async () => {
+      const isDev = process.env.NODE_ENV === 'development';
       const tt = new SimpleTimeTravel(store);
 
       // Mock a child to throw on dispose
@@ -582,7 +589,12 @@ describe("Disposal and Resource Cleanup", () => {
       await expect(tt.dispose()).resolves.not.toThrow();
 
       // Verify that an error was logged (format may vary)
-      expect(consoleSpy).toHaveBeenCalled();
+      // In non-dev mode, debugTimeTravel is a no-op
+      if (isDev) {
+        expect(consoleSpy).toHaveBeenCalled();
+      } else {
+        expect(consoleSpy).not.toHaveBeenCalled();
+      }
 
       consoleSpy.mockRestore();
     });

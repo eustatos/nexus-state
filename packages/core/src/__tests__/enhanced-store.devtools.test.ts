@@ -22,7 +22,8 @@ describe("enhancedStore - DevTools connection", () => {
     expect(() => store.connectDevTools?.()).not.toThrow();
   });
 
-  it("should log connection message", () => {
+  it("should log connection message in dev mode", () => {
+    const isDev = process.env.NODE_ENV === 'development';
     const consoleSpy = vi.spyOn(console, "log");
     const store = createEnhancedStore([], {
       enableDevTools: true,
@@ -30,23 +31,36 @@ describe("enhancedStore - DevTools connection", () => {
     });
 
     store.connectDevTools?.();
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "DevTools connected for store:",
-      "CustomStore",
-    );
+    
+    if (isDev) {
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "DevTools connected for store:",
+        "CustomStore",
+      );
+    } else {
+      // In non-dev mode, debugStore is a no-op
+      expect(consoleSpy).not.toHaveBeenCalled();
+    }
 
     consoleSpy.mockRestore();
   });
 
   it("should use default name when not provided", () => {
+    const isDev = process.env.NODE_ENV === 'development';
     const consoleSpy = vi.spyOn(console, "log");
     const store = createEnhancedStore([], { enableDevTools: true });
 
     store.connectDevTools?.();
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "DevTools connected for store:",
-      "EnhancedStore",
-    );
+    
+    if (isDev) {
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "DevTools connected for store:",
+        "EnhancedStore",
+      );
+    } else {
+      // In non-dev mode, debugStore is a no-op
+      expect(consoleSpy).not.toHaveBeenCalled();
+    }
 
     consoleSpy.mockRestore();
   });

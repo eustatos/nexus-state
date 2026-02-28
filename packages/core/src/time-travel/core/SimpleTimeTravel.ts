@@ -39,6 +39,7 @@ import type {
 
 import { atomRegistry } from "../../atom-registry";
 import { Atom, Store } from "../../types";
+import { debugTimeTravel } from "../../utils/debug";
 
 // Comparison imports
 import {
@@ -116,7 +117,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     // Initialize finalization registry
     this.finalizationRegistry = new FinalizationHelper((msg) => {
       if (this.config.logDisposal) {
-        console.log(`[FINALIZATION] ${msg}`);
+        debugTimeTravel(`[FINALIZATION] ${msg}`);
       }
     });
     this.finalizationRegistry.track(this, this.instanceId);
@@ -264,14 +265,14 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
       return undefined;
     }
 
-    console.log(`[TIME_TRAVEL.capture] action: ${action}`);
+    debugTimeTravel(`[TIME_TRAVEL.capture] action: ${action}`);
     const snapshot = this.snapshotCreator.create(
       action,
       new Set(this.atomTracker.getTrackedAtoms().map((atom) => atom.id)),
     );
-    console.log(`[TIME_TRAVEL.capture] snapshot created: ${snapshot ? 'yes' : 'no'}`);
+    debugTimeTravel(`[TIME_TRAVEL.capture] snapshot created: ${snapshot ? 'yes' : 'no'}`);
     if (snapshot) {
-      console.log(`[TIME_TRAVEL.capture] snapshot state:`, Object.entries(snapshot.state).map(([k, v]) => ({ [k]: v.value })));
+      debugTimeTravel(`[TIME_TRAVEL.capture] snapshot state:`, Object.entries(snapshot.state).map(([k, v]) => ({ [k]: v.value })));
       this.historyManager.add(snapshot);
     }
 
@@ -431,7 +432,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
 
       return true;
     } catch (error) {
-      console.error("Failed to import state:", error);
+      debugTimeTravel("Failed to import state:", error);
       return false;
     } finally {
       this.isTimeTraveling = false;
@@ -717,37 +718,37 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     atom: Atom<Value>,
     update: Value | ((prev: Value) => Value),
   ): void {
-    console.log(`[WRAPPED_SET] Called with atom: ${atom.name}, value: ${update}, isTimeTraveling: ${this.isTimeTraveling}`);
-    console.log(`[WRAPPED_SET] atom.id: ${atom.id?.toString()}, isTracked: ${this.atomTracker.isTracked(atom)}`);
+    debugTimeTravel(`[WRAPPED_SET] Called with atom: ${atom.name}, value: ${update}, isTimeTraveling: ${this.isTimeTraveling}`);
+    debugTimeTravel(`[WRAPPED_SET] atom.id: ${atom.id?.toString()}, isTracked: ${this.atomTracker.isTracked(atom)}`);
     
     // Track atom if not already tracked
     if (!this.atomTracker.isTracked(atom)) {
-      console.log(`[WRAPPED_SET] Tracking new atom: ${atom.name}`);
+      debugTimeTravel(`[WRAPPED_SET] Tracking new atom: ${atom.name}`);
       this.atomTracker.track(atom);
       atomRegistry.register(atom, atom.name);
     } else {
-      console.log(`[WRAPPED_SET] Atom already tracked`);
+      debugTimeTravel(`[WRAPPED_SET] Atom already tracked`);
     }
 
     // Get old value for change tracking
     let oldValue: Value | undefined;
     try {
       oldValue = this.store.get(atom);
-      console.log(`[WRAPPED_SET] Old value: ${oldValue}`);
+      debugTimeTravel(`[WRAPPED_SET] Old value: ${oldValue}`);
     } catch {
       // Ignore if can't get old value
     }
 
     // Call original set
-    console.log(`[WRAPPED_SET] Calling originalSet`);
+    debugTimeTravel(`[WRAPPED_SET] Calling originalSet`);
     this.originalSet(atom, update);
-    console.log(`[WRAPPED_SET] originalSet complete`);
+    debugTimeTravel(`[WRAPPED_SET] originalSet complete`);
 
     // Get new value
     let newValue: Value | undefined;
     try {
       newValue = this.store.get(atom);
-      console.log(`[WRAPPED_SET] New value: ${newValue}`);
+      debugTimeTravel(`[WRAPPED_SET] New value: ${newValue}`);
     } catch {
       // Ignore if can't get new value
     }
@@ -759,7 +760,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
 
     // Auto-capture if enabled and not during time travel
     if (this.autoCapture && !this.isTimeTraveling) {
-      console.log(`[WRAPPED_SET] Auto-capturing`);
+      debugTimeTravel(`[WRAPPED_SET] Auto-capturing`);
       this.capture(`set ${atom.name || atom.id?.description || "atom"}`);
     }
   }
@@ -909,7 +910,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     const unsubscribeHistory = this.historyManager.subscribe((event) => {
       // Handle event - can be extended
       if (this.config.logDisposal) {
-        console.log(`[TIME_TRAVEL.history] Event: ${event.type}`);
+        debugTimeTravel(`[TIME_TRAVEL.history] Event: ${event.type}`);
       }
     });
     this.subscriptions.add(unsubscribeHistory);
@@ -918,7 +919,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     const unsubscribeSnapshots = this.snapshotCreator.subscribe((snapshot) => {
       // Handle snapshot - can be extended
       if (this.config.logDisposal) {
-        console.log(`[TIME_TRAVEL.snapshot] Created: ${snapshot.id}`);
+        debugTimeTravel(`[TIME_TRAVEL.snapshot] Created: ${snapshot.id}`);
       }
     });
     this.subscriptions.add(unsubscribeSnapshots);
@@ -927,7 +928,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     const unsubscribeTracking = this.atomTracker.subscribe((event) => {
       // Handle tracking event - can be extended
       if (this.config.logDisposal) {
-        console.log(`[TIME_TRAVEL.tracking] Event: ${event.type}`);
+        debugTimeTravel(`[TIME_TRAVEL.tracking] Event: ${event.type}`);
       }
     });
     this.subscriptions.add(unsubscribeTracking);
@@ -967,7 +968,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
       try {
         await child.dispose();
       } catch (error) {
-        console.error("Error disposing child:", error);
+        debugTimeTravel("Error disposing child:", error);
       }
     }
     this.children.clear();
