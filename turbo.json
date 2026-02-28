@@ -25,6 +25,9 @@
             ],
             "outputs": [
                 "coverage/**"
+            ],
+            "include": [
+                "packages/**"
             ]
         },
         "lint": {}

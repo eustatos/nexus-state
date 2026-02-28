@@ -1,14 +1,10 @@
 // Tests for demo-family application
+import { describe, it, expect } from 'vitest';
 import { atom, createStore } from "@nexus-state/core";
 import { atomFamily } from "@nexus-state/family";
 
-// Simple test without Jest globals
-console.log("Running demo-family functionality tests");
-
-// Test 1: should create and retrieve a todo atom
-(() => {
-  console.log("Running test: should create and retrieve a todo atom");
-  try {
+describe('atomFamily', () => {
+  it('should create and retrieve a todo atom', () => {
     const store = createStore();
     const todosFamily = atomFamily((id) =>
       atom({
@@ -20,12 +16,10 @@ console.log("Running demo-family functionality tests");
     );
 
     const todoAtom = todosFamily(1);
-
-    // Инициализируем атом в хранилище
     const initialValue = store.get(todoAtom);
-    console.log("Initial value:", initialValue);
+    expect(initialValue).toBeDefined();
+    expect(initialValue.id).toBe(1);
 
-    // Устанавливаем значение для атома
     const todoData = {
       id: 1,
       text: "Test todo",
@@ -34,53 +28,29 @@ console.log("Running demo-family functionality tests");
     };
     store.set(todoAtom, todoData);
 
-    // Проверяем, что значение установлено правильно
     const updatedValue = store.get(todoAtom);
-    console.log("Updated value:", updatedValue);
+    expect(updatedValue.text).toBe("Test todo");
+  });
 
-    console.log("✓ should create and retrieve a todo atom passed");
-  } catch (error) {
-    console.error("✗ should create and retrieve a todo atom failed:", error);
-    throw error;
-  }
-})();
-
-// Test 2: should manage todo IDs list
-(() => {
-  console.log("Running test: should manage todo IDs list");
-  try {
+  it('should manage todo IDs list', () => {
     const store = createStore();
     const todoIdsAtom = atom<number[]>([]);
 
-    // Проверяем начальное значение
     const initialValue = store.get(todoIdsAtom);
-    console.log("Initial todo IDs:", initialValue);
+    expect(initialValue).toEqual([]);
 
-    // Добавляем ID в список
     store.set(todoIdsAtom, [1, 2, 3]);
     const updatedValue = store.get(todoIdsAtom);
-    console.log("Updated todo IDs:", updatedValue);
+    expect(updatedValue).toEqual([1, 2, 3]);
 
-    // Удаляем ID из списка
     store.set(todoIdsAtom, [1, 3]);
     const finalValue = store.get(todoIdsAtom);
-    console.log("Final todo IDs:", finalValue);
+    expect(finalValue).toEqual([1, 3]);
+  });
 
-    console.log("✓ should manage todo IDs list passed");
-  } catch (error) {
-    console.error("✗ should manage todo IDs list failed:", error);
-    throw error;
-  }
-})();
-
-// Test 3: should work with allTodosSelector
-(() => {
-  console.log("Running test: should work with allTodosSelector");
-  try {
+  it('should work with allTodosSelector', () => {
     const store = createStore();
-
-    // Создаем атомы для теста
-    const todoIdsAtom = atom([]);
+    const todoIdsAtom = atom<number[]>([]);
     const todosFamily = atomFamily((id) =>
       atom({
         id,
@@ -90,24 +60,18 @@ console.log("Running demo-family functionality tests");
       }),
     );
 
-    // Создаем селектор
     const allTodosSelector = atom((get) => {
       const ids = get(todoIdsAtom);
       return ids.map((id) => get(todosFamily(id)));
     });
 
-    // Проверяем, что селектор возвращает пустой массив для пустого списка ID
     const initialTodos = store.get(allTodosSelector);
-    console.log("Initial todos:", initialTodos);
+    expect(initialTodos).toEqual([]);
 
-    // Добавляем ID в список
     store.set(todoIdsAtom, [1, 2]);
-
-    // Инициализируем атомы
     store.get(todosFamily(1));
     store.get(todosFamily(2));
 
-    // Устанавливаем значения для атомов
     store.set(todosFamily(1), {
       id: 1,
       text: "First todo",
@@ -122,15 +86,9 @@ console.log("Running demo-family functionality tests");
       createdAt: new Date(),
     });
 
-    // Проверяем, что селектор возвращает правильные значения
     const todos = store.get(allTodosSelector);
-    console.log("Todos from selector:", todos);
-
-    console.log("✓ should work with allTodosSelector passed");
-  } catch (error) {
-    console.error("✗ should work with allTodosSelector failed:", error);
-    throw error;
-  }
-})();
-
-console.log("All tests completed");
+    expect(todos).toHaveLength(2);
+    expect(todos[0].text).toBe("First todo");
+    expect(todos[1].text).toBe("Second todo");
+  });
+});
