@@ -9,14 +9,14 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "^19.2.4",
     "@nexus-state/react": "workspace:*",
     "@nexus-state/core": "workspace:*",
     "@nexus-state/immer": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.0.0",
     "vite": "^4.0.0"
   }
