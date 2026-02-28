@@ -53,7 +53,7 @@ jobs:
         if: success()
 
       - name: Run tests
-        run: pnpm run test
+        run: pnpm vitest run --workspace=vitest.workspace.ts
         if: success()
 
   code-scan:
