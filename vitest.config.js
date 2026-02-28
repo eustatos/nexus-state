@@ -25,6 +25,15 @@ export default defineConfig({
         "**/test-utils/**/*",
       ],
       reportsDirectory: "./coverage",
+      thresholds: {
+        // Global thresholds for core packages
+        lines: 90,
+        functions: 90,
+        branches: 85,
+        statements: 90,
+        // Per-package thresholds (override global)
+        perFile: true,
+      },
     },
     environmentMatchGlobs: [
       ["**/core/**", "node"],
