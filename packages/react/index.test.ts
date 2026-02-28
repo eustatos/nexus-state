@@ -1,6 +1,7 @@
 // Tests for React adapter
 import { atom, createStore, Setter, ComputedAtom, Atom } from "@nexus-state/core";
 import { useAtom } from "./index";
+import { useAtomValue } from "./src/useAtomValue";
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 
