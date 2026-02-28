@@ -3,6 +3,8 @@
 [![npm version](https://img.shields.io/npm/v/@nexus-state/react.svg)](https://www.npmjs.com/package/@nexus-state/react)
 [![Bundle Size](https://img.shields.io/bundlephobia/min/@nexus-state/react)](https://bundlephobia.com/package/@nexus-state/react)
 [![License](https://img.shields.io/npm/l/@nexus-state/react.svg)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
+[![Tests](https://img.shields.io/github/actions/workflow/status/eustatos/nexus-state/test.yml?branch=main)](https://github.com/eustatos/nexus-state/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/eustatos/nexus-state/main)](https://codecov.io/gh/eustatos/nexus-state)
 
 > ⚛️ Reactive state for React with hooks and full TypeScript support
 

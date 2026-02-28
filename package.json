@@ -6,6 +6,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
     "lint": "turbo run lint",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "lint:ci": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings 0",
@@ -36,6 +37,7 @@
     "@types/jest": "^30.0.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
+    "@vitest/coverage-v8": "^3.2.4",
     "commander": "^11.0.0",
     "eslint": "^8.57.1",
     "fs-extra": "^11.0.0",
@@ -47,11 +49,11 @@
     "turbo": "^1.10.0",
     "typescript": "^5.9.3",
     "vitepress": "^1.6.4",
-    "vitest": "^0.34.0"
+    "vitest": "^3.2.4"
   },
   "pnpm": {
     "overrides": {
-      "minimatch": "^10.2.3",
+      "minimatch": "^9.0.3",
       "basic-ftp": "^5.2.0",
       "rollup": "^4.59.0",
       "esbuild": "^0.25.0",
