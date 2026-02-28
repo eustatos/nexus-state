@@ -2,39 +2,57 @@
 
 Learn how to debug your Nexus State applications using the built-in DevTools.
 
-## Enabling DevTools
+## Quick Start
 
-First, enable DevTools when creating your store:
+### Basic DevTools Setup
 
-```typescript
-import { createEnhancedStore, devTools } from '@nexus-state/devtools';
+```javascript
+import { createStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
 
-const store = createEnhancedStore([devTools({
-  name: 'My App',
-  trace: true,
-  maxAge: 50
-})], {
+const store = createStore([
+  devTools({
+    name: 'My App',
+    trace: true,
+    maxAge: 50
+  })
+]);
+```
+
+### With Time Travel
+
+For undo/redo functionality, use `createEnhancedStore`:
+
+```javascript
+import { createEnhancedStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
+
+const store = createEnhancedStore([
+  devTools({
+    name: 'My App',
+    trace: true,
+    maxAge: 50
+  })
+], {
   enableDevTools: true,
   enableTimeTravel: true
 });
 ```
 
-## Using the DevTools Extension
+> 📚 **Learn more:** See [Enhanced Store Guide](./enhanced-store.md) for time travel features.
+
+## Using Redux DevTools Extension
 
 ### Installation
 
-Install the Nexus State DevTools browser extension:
+Install the Redux DevTools browser extension:
 
-- [Chrome Web Store](https://chrome.google.com/webstore/detail/nexus-state-devtools)
-- [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/nexus-state-devtools/)
+- [Chrome Web Store](https://chrome.google.com/webstore/detail/redux-devtools/)
+- [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/reduxdevtools/)
 
-### Connecting to DevTools
+### Connection
 
-DevTools should connect automatically when enabled. If not, you can manually connect:
-
-```typescript
-store.connectDevTools();
-```
+DevTools connects automatically when the plugin is enabled. No manual connection needed!
 
 ## DevTools Features
 
@@ -60,15 +78,17 @@ Use the slider to move between different states:
 
 - Drag the slider to see state at any point in history
 - Click on specific actions to jump to that state
-- See which actions are undoable/redoable
+- Use Undo/Redo buttons to navigate history
 
-### 4. Performance Monitor
+### 4. Stack Traces
 
-Monitor performance metrics:
+When `trace: true` is enabled, see exactly where state changes originate:
 
-- Track update frequency
-- Monitor memory usage
-- Identify slow updates
+```
+set countAtom
+  at Counter.tsx:15 (handleClick)
+  at onClick (react-dom.production.min.js)
+```
 
 ## Debugging Common Issues
 
@@ -78,7 +98,7 @@ Monitor performance metrics:
 
 **Solutions:**
 1. Check if the atom is registered (should appear in DevTools)
-2. Verify that the store is created with DevTools enabled
+2. Verify that the devTools plugin is added to the store
 3. Check for subscription issues in your framework integration
 
 ### Issue: DevTools Not Connecting
@@ -86,159 +106,169 @@ Monitor performance metrics:
 **Symptoms:** DevTools extension shows no state
 
 **Solutions:**
-1. Ensure DevTools plugin is added to the store
+1. Ensure devTools plugin is added to the store
 2. Check browser console for errors
-3. Verify that DevTools is enabled in store options
-4. Make sure you're using the correct DevTools extension
+3. Verify Redux DevTools extension is installed
 
 ### Issue: Too Many Snapshots
 
 **Symptoms:** DevTools slows down with many snapshots
 
 **Solutions:**
-1. Limit `maxHistory` in store options
-2. Use manual snapshots for important actions
+1. Limit `maxAge` in devTools options
+2. Use batch updates for related changes
 3. Clear history periodically
 
 ## Advanced Debugging Techniques
 
 ### 1. Custom Action Names
 
-Give your actions descriptive names for better debugging:
+Give your actions descriptive names:
 
-```typescript
-store.set(countAtom, 1); // Action: "set countAtom to 1"
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
 
-// Better
-store.captureSnapshot('User Incremented Count');
-store.set(countAtom, 1);
+const store = createStore([devTools()]);
+
+// Set with custom action name
+store.set(countAtom, 1, 'USER_INCREMENTED_COUNT');
 ```
 
 ### 2. Trace Mode
 
-Enable trace mode to see exactly where state changes originate:
+Enable trace mode to see where state changes originate:
 
-```typescript
-const store = createEnhancedStore([devTools({
-  trace: true
-})], {
-  enableDevTools: true
-});
+```javascript
+const store = createStore([
+  devTools({
+    trace: true,
+    traceLimit: 10  // Number of stack frames
+  })
+]);
 ```
 
-### 3. Action Groups
+### 3. Stack Trace Inspection
 
-Group related actions for better organization:
+When an error occurs, check the stack trace in DevTools:
 
-```typescript
-import { createActionGrouper } from '@nexus-state/devtools';
-
-const group = createActionGrouper({
-  label: 'User Actions',
-  match: (action) => action.type?.startsWith('user_')
-});
-
-store.addGroup(group);
+```javascript
+// In Redux DevTools:
+// 1. Find the action that caused the error
+// 2. Click on "Stack Trace" tab
+// 3. See exact file and line number
 ```
 
-### 4. Custom Snapshots
+### 4. State Sanitization
 
-Create meaningful snapshots at important points:
+Remove sensitive data before sending to DevTools:
 
-```typescript
-// After important user actions
-store.captureSnapshot('Form Submitted');
-store.captureSnapshot('User Login');
-store.captureSnapshot('Data Fetched');
+```javascript
+const store = createStore([
+  devTools({
+    stateSanitizer: (state) => {
+      const { password, token, ...safe } = state;
+      return safe;
+    }
+  })
+]);
+```
+
+### 5. Batch Updates
+
+Group related state changes:
+
+```javascript
+store.startBatch('user-update');
+store.set(firstNameAtom, 'Jane');
+store.set(lastNameAtom, 'Smith');
+store.set(emailAtom, 'jane@example.com');
+store.endBatch('user-update');
+
+// DevTools shows single action instead of three
 ```
 
 ## Framework-Specific Debugging
 
 ### React
 
-Use React DevTools alongside Nexus State DevTools:
+```javascript
+import { useAtom } from '@nexus-state/react';
 
-1. Install React DevTools extension
-2. Use React Profiler to identify slow components
-3. Check component props for expected state values
+function MyComponent() {
+  const [count, setCount] = useAtom(countAtom);
+  
+  // In DevTools, you'll see:
+  // - Component name in stack trace
+  // - Action: "set countAtom"
+  
+  return <button onClick={() => setCount(count + 1)}>+</button>;
+}
+```
 
 ### Vue
 
-Use Vue Devtools alongside Nexus State DevTools:
+```javascript
+import { useAtom } from '@nexus-state/vue';
 
-1. Install Vue Devtools extension
-2. Check component state in the Vue Devtools inspector
-3. Use the performance monitor to identify bottlenecks
+export default {
+  setup() {
+    const [count, setCount] = useAtom(countAtom);
+    return { count, setCount };
+  }
+};
+```
 
 ### Svelte
 
-Use Svelte Devtools alongside Nexus State DevTools:
+```javascript
+import { useAtom } from '@nexus-state/svelte';
 
-1. Install Svelte Devtools extension
-2. Check component store bindings
-3. Monitor re-render behavior
+const [count, setCount] = useAtom(countAtom);
 
-## Best Practices
-
-### 1. Use Descriptive Names
-
-Give your atoms and actions descriptive names for easier debugging:
-
-```typescript
-// Good
-const userAtom = atom({ name: '' }, 'user-profile');
-store.captureSnapshot('User Updated Profile');
+// DevTools shows Svelte component context
 ```
 
-### 2. Monitor Performance
+## Performance Tips
 
-Regularly check the performance monitor in DevTools to identify issues early.
+### Limit History
 
-### 3. Test Time Travel
-
-Use Time Travel to verify your application's state management:
-
-1. Perform several actions
-2. Use undo/redo to verify state changes
-3. Check that all state transitions are correct
-
-### 4. Keep History Manageable
-
-Limit history size and use manual snapshots for important actions:
-
-```typescript
-const store = createEnhancedStore([], {
-  enableTimeTravel: true,
-  maxHistory: 50,
-  autoCapture: false
-});
+```javascript
+const store = createStore([
+  devTools({
+    maxAge: 20  // Keep only last 20 states
+  })
+]);
 ```
 
-## Troubleshooting
+### Disable in Production
 
-### DevTools Not Showing Any State
+```javascript
+const store = createStore([
+  ...(process.env.NODE_ENV === 'development' 
+    ? [devTools({ name: 'My App' })] 
+    : [])
+]);
+```
 
-1. Check if DevTools plugin is properly configured
-2. Verify that DevTools is enabled in store options
-3. Check browser console for errors
-4. Ensure atoms are being created with the `atom()` function
+### Lazy Serialization
 
-### DevTools Causes Performance Issues
+For large state trees:
 
-1. Reduce `maxHistory` size
-2. Disable trace mode
-3. Use production builds for performance testing
-4. Limit the number of atoms in your store
-
-### Time Travel Not Working
-
-1. Ensure `enableTimeTravel` is set to `true`
-2. Check that the store is created with DevTools plugin
-3. Verify that atoms are registered properly
-4. Check for errors in browser console
+```javascript
+const store = createStore([
+  devTools({
+    latency: 100,  // Debounce updates by 100ms
+    stateSanitizer: (state) => {
+      // Serialize only changed parts
+      return JSON.stringify(state);
+    }
+  })
+]);
+```
 
 ## Next Steps
 
-- [Best Practices Guide](../guides/best-practices.md)
-- [Performance Guide](../performance/index.md)
-- [API Reference](../api/)
+- [Enhanced Store Guide](./enhanced-store.md) — Time travel features
+- [Performance Guide](../performance/index.md) — Optimize debugging
+- [API Reference](../api/devtools.md) — Complete DevTools API

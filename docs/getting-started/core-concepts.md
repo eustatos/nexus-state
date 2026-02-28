@@ -18,12 +18,11 @@ const countAtom = atom(0, 'count');
 const doubleCountAtom = atom((get) => get(countAtom) * 2, 'doubleCount');
 
 // Create a writable atom with custom write logic
-const userAtom = atom(
-  { name: '', age: 0 },
+const writableCountAtom = atom(
   (get, set, update) => {
-    set(userAtom, { ...get(userAtom), ...update });
+    set(countAtom, update);
   },
-  'user'
+  'writableCount'
 );
 ```
 
@@ -40,17 +39,10 @@ A store holds atoms and provides methods to interact with them.
 ### Creating a Store
 
 ```javascript
-import { createEnhancedStore } from '@nexus-state/core';
+import { createStore } from '@nexus-state/core';
 
 // Create a basic store
-const store = createEnhancedStore();
-
-// Create a store with options
-const store = createEnhancedStore([], {
-  enableTimeTravel: true,
-  enableDevTools: true,
-  maxHistory: 50
-});
+const store = createStore();
 ```
 
 ### Store Methods
@@ -59,70 +51,74 @@ const store = createEnhancedStore([], {
 - `set(atom, newValue | updater)`: Set the value of an atom
 - `subscribe(atom, listener)`: Subscribe to changes in an atom
 - `getState()`: Get the state of all atoms
-- `captureSnapshot(action)`: Capture a new snapshot (if time travel enabled)
-- `undo()`: Undo to the previous state (if time travel enabled)
-- `redo()`: Redo to the next state (if time travel enabled)
 
-## Time Travel
-
-Time Travel allows you to track state changes and move between different states.
-
-### Basic Time Travel
+### Store with Plugins
 
 ```javascript
-import { atom, createEnhancedStore } from '@nexus-state/core';
+import { createStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
+import { middleware } from '@nexus-state/middleware';
 
-const countAtom = atom(0, 'count');
-const store = createEnhancedStore([], { enableTimeTravel: true });
-
-store.set(countAtom, 1); // Snapshot 1
-store.set(countAtom, 2); // Snapshot 2
-store.set(countAtom, 3); // Snapshot 3
-
-store.undo(); // Back to 2
-store.undo(); // Back to 1
-store.redo(); // Forward to 2
+const store = createStore([
+  devTools({ name: 'My App' }),
+  // other plugins...
+]);
 ```
 
-### Manual Snapshots
+> 💡 **Need Time Travel?** For advanced features like undo/redo and time travel, see [Enhanced Store](../guides/enhanced-store.md).
+
+## Basic Time Travel (via DevTools)
+
+Time Travel is available through the DevTools plugin:
 
 ```javascript
-// Capture a snapshot with a custom action name
-store.captureSnapshot('USER_ACTION');
+import { atom, createStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
 
-// Get all history
-const history = store.getHistory();
+const countAtom = atom(0, 'count');
+const store = createStore([
+  devTools({ 
+    name: 'My App',
+    maxAge: 50  // Keep last 50 states
+  })
+]);
 
-// Jump to a specific snapshot
-store.jumpTo(2);
+store.set(countAtom, 1);
+store.set(countAtom, 2);
+store.set(countAtom, 3);
+
+// Use Redux DevTools UI to jump between states
 ```
 
 ## DevTools
 
-DevTools integration allows you to inspect and debug your state.
+DevTools integration allows you to inspect and debug your state in Redux DevTools.
 
 ### Basic DevTools
 
 ```javascript
-import { atom, createEnhancedStore } from '@nexus-state/core';
+import { atom, createStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
 
 const countAtom = atom(0, 'count');
-const store = createEnhancedStore([], { enableDevTools: true });
-
-// Connect to DevTools
-store.connectDevTools();
+const store = createStore([
+  devTools({ name: 'My App' })
+]);
 ```
 
-### Custom DevTools Configuration
+### DevTools Configuration
 
 ```javascript
 import { devTools } from '@nexus-state/devtools';
 
-const store = createEnhancedStore([devTools({
-  name: 'My App',
-  trace: true,
-  maxAge: 50
-})], { enableTimeTravel: true });
+const store = createStore([
+  devTools({
+    name: 'My App',
+    trace: true,        // Enable stack traces
+    maxAge: 50,         // Maximum history depth
+    showAtomNames: true // Show atom names in DevTools
+  })
+]);
 ```
 
 ## Framework Integration
@@ -136,7 +132,7 @@ import { useAtom } from '@nexus-state/react';
 
 function Counter() {
   const [count, setCount] = useAtom(countAtom);
-  
+
   return (
     <div>
       <p>Count: {count}</p>
@@ -153,9 +149,8 @@ import { useAtom } from '@nexus-state/vue';
 
 export default {
   setup() {
-    const count = useAtom(countAtom);
-    
-    return { count };
+    const [count, setCount] = useAtom(countAtom);
+    return { count, setCount };
   }
 };
 ```
@@ -165,11 +160,12 @@ export default {
 ```javascript
 import { useAtom } from '@nexus-state/svelte';
 
-let count = useAtom(countAtom);
+const [count, setCount] = useAtom(countAtom);
 ```
 
 ## Next Steps
 
 - Explore [Examples](../examples/index.md)
 - Check out [API Reference](../api/)
+- Learn about [Enhanced Store](../guides/enhanced-store.md) for time travel
 - See [Recipes](../recipes/index.md)
