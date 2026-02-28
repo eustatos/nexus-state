@@ -7,7 +7,7 @@ import { useAtom } from './useAtom';
  *
  * @template T - The type of the atom's value
  * @param atom - The atom to read
- * @param store - Optional store instance (defaults to auto-created store)
+ * @param store - Optional store instance (defaults to context store or auto-created store)
  * @returns The current value of the atom
  *
  * @example
