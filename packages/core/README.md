@@ -4,6 +4,7 @@
 [![Bundle Size](https://img.shields.io/bundlephobia/min/@nexus-state/core)](https://bundlephobia.com/package/@nexus-state/core)
 [![License](https://img.shields.io/npm/l/@nexus-state/core.svg)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
 [![Tests](https://img.shields.io/github/actions/workflow/status/eustatos/nexus-state/test.yml?branch=main)](https://github.com/eustatos/nexus-state/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/eustatos/nexus-state/main)](https://codecov.io/gh/eustatos/nexus-state)
 
 > 🎯 The core of Nexus State — a framework-agnostic state management library with atomic architecture
 
