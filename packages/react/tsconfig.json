@@ -7,5 +7,5 @@
     "jsx": "react-jsx"
   },
   "include": ["*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx", "src/__tests__/**/*"]
 }

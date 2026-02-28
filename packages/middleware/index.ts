@@ -14,7 +14,7 @@ export interface MiddlewareConfig<T> {
    * @returns Modified value or void
    */
   beforeSet?: (atom: Atom<T>, value: T) => T | void;
-  
+
   /**
    * Called after setting a new value.
    * @param atom - The atom that was updated
@@ -69,9 +69,10 @@ export function middleware<T>(
       // Apply beforeSet middleware
       let processedValue = newValue;
       if (beforeSet) {
-        const result = beforeSet(targetAtom as Atom<Value>, newValue);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const result = beforeSet(targetAtom as any, newValue as any);
         if (result !== undefined) {
-          processedValue = result;
+          processedValue = result as Value;
         }
       }
 
@@ -80,7 +81,8 @@ export function middleware<T>(
 
       // Apply afterSet middleware
       if (afterSet) {
-        afterSet(targetAtom as Atom<Value>, processedValue);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        afterSet(targetAtom as any, processedValue as any);
       }
 
       return processedValue;
@@ -198,7 +200,7 @@ export function createThrottle<T>(
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
   return middleware(targetAtom, {
-    beforeSet: (atom, value) => {
+    beforeSet: (_atom, value) => {
       const now = Date.now();
       
       if (now - lastUpdate < delay) {
