@@ -348,6 +348,9 @@ export function createStore(plugins: Plugin[] = []): Store {
     plugin(store);
   };
 
+  // Alias for applyPlugin (more intuitive name)
+  const use = applyPlugin;
+
   const setWithMetadata = <Value>(
     atom: Atom<Value>,
     update: Value | ((prev: Value) => Value),
@@ -413,6 +416,7 @@ export function createStore(plugins: Plugin[] = []): Store {
     getState,
     // Enhanced methods (optional for backward compatibility)
     applyPlugin,
+    use,
     setWithMetadata,
     serializeState,
     getIntercepted,

@@ -102,6 +102,12 @@ export interface Store {
   applyPlugin?: (plugin: Plugin) => void;
 
   /**
+   * Apply a plugin to the store (alias for applyPlugin)
+   * @param plugin The plugin to apply
+   */
+  use?: (plugin: Plugin) => void;
+
+  /**
    * Set the value of an atom with metadata for DevTools
    * @template Value The type of value the atom holds
    * @param atom The atom to set the value for

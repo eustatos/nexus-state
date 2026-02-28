@@ -24,7 +24,7 @@ describe('atomFamily', () => {
 
   it('should cache atoms for the same parameter', () => {
     const counterAtomFamily = atomFamily((id: string) =>
-      atom(id)
+      atom({ id, count: 0 })
     );
 
     const counter1 = counterAtomFamily('a');
@@ -38,10 +38,10 @@ describe('atomFamily', () => {
     expect(counter1).not.toBe(counter2);
 
     // Update one atom
-    store.set(counter1, 5);
-    expect(store.get(counter1)).toBe(5);
-    expect(store.get(counter1Again)).toBe(5); // Same atom, so updated
-    expect(store.get(counter2)).toBe(0); // Different atom, unchanged
+    store.set(counter1, { id: 'a', count: 5 });
+    expect(store.get(counter1)).toEqual({ id: 'a', count: 5 });
+    expect(store.get(counter1Again)).toEqual({ id: 'a', count: 5 }); // Same atom, so updated
+    expect(store.get(counter2)).toEqual({ id: 'b', count: 0 }); // Different atom, unchanged
   });
 
   it('should handle complex parameters', () => {

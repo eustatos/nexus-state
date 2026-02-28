@@ -1,191 +1,266 @@
-# Migrating from v0.x to v1.0
+# Migrating to Nexus State v1.0
 
 This guide helps you migrate your existing Nexus State code to v1.0.
 
 ## Overview
 
-v1.0 introduces several improvements and breaking changes that provide better performance, improved DevTools integration, and enhanced Time Travel functionality.
+v1.0 introduces a **simplified API** with better separation between basic and advanced features:
 
-## Automatic Migration
+- ✅ **`createStore()`** — for basic state management (recommended for most cases)
+- ✅ **`createEnhancedStore()`** — for advanced features (time travel, undo/redo)
+- ✅ **Plugin-based architecture** — DevTools, middleware as plugins
 
-Run the migration script (if available):
+## Migration Path
 
-```bash
-npx @nexus-state/migrate
+### For New Projects
+
+Use `createStore()` with plugins:
+
+```javascript
+import { createStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
+
+const store = createStore([
+  devTools({ name: 'My App' })
+]);
 ```
 
-## Manual Migration Steps
+### For Existing Projects
 
-### 1. Import Changes
+#### If you're using `createEnhancedStore`:
 
-```diff
-- import { createStore, atom } from 'nexus-state';
-+ import { createEnhancedStore, atom } from '@nexus-state/core';
+**Keep using it** — it's still supported! But consider if you need the advanced features:
+
+```javascript
+// Still works in v1.0
+import { createEnhancedStore } from '@nexus-state/core';
+
+const store = createEnhancedStore([], {
+  enableTimeTravel: true,
+  enableDevTools: true
+});
 ```
 
-### 2. Store Creation
+#### If you're using old plugin API:
 
 ```diff
-- const store = createStore();
-+ const store = createEnhancedStore([], {
-+   enableTimeTravel: true,
-+   enableDevTools: true
-+ });
-```
-
-### 3. Atom Creation
-
-```diff
-- const counter = atom(0);
-+ const counter = atom(0, 'counter'); // Add names for DevTools
-```
-
-### 4. Time Travel API
-
-```diff
-- // Old time travel API (if used)
-- store.timeTravel.undo();
-+ // New API
-+ store.undo?.();
-```
-
-### 5. DevTools Integration
-
-```diff
-- // Old way
-- import { devTools } from 'nexus-state';
+// Old (v0.x)
+- import { createStore, devTools } from 'nexus-state';
 - const store = createStore([devTools()]);
 
-+ // New way
-+ import { createEnhancedStore } from '@nexus-state/core';
+// New (v1.0)
++ import { createStore } from '@nexus-state/core';
 + import { devTools } from '@nexus-state/devtools';
-+
-+ const store = createEnhancedStore([devTools({
-+   name: 'My App',
-+   trace: true
-+ })], {
-+   enableDevTools: true
-+ });
++ const store = createStore([devTools({ name: 'My App' })]);
 ```
 
 ## Breaking Changes
 
-### Removed APIs
+### Package Imports
 
-- `store.timeTravel` property (use `store.undo()/redo()` directly)
-- `atom.constructor` access (use `atomRegistry`)
+All packages are now scoped under `@nexus-state/`:
 
-### Changed Behavior
+| Old Import | New Import |
+|------------|------------|
+| `nexus-state` | `@nexus-state/core` |
+| `nexus-state/devtools` | `@nexus-state/devtools` |
+| `nexus-state/react` | `@nexus-state/react` |
+| `nexus-state/immer` | `@nexus-state/immer` |
 
-- Computed atoms now cache results more aggressively
-- DevTools integration is now opt-in via configuration
-- Time Travel is now opt-in via configuration
-- All atoms must be created with the `atom()` function (no direct object creation)
+### Store Creation
 
-### New Features
+**Basic store (recommended):**
 
-- Built-in Time Travel with undo/redo capabilities
-- Improved DevTools integration with better performance
-- Enhanced type safety with improved TypeScript definitions
-- Better handling of async operations
+```javascript
+import { createStore } from '@nexus-state/core';
+const store = createStore();
+```
+
+**Enhanced store (for time travel):**
+
+```javascript
+import { createEnhancedStore } from '@nexus-state/core';
+const store = createEnhancedStore([], {
+  enableTimeTravel: true,
+  maxHistory: 50
+});
+```
+
+### Atom Names
+
+All atoms should have names for better DevTools support:
+
+```javascript
+// v0.x
+const count = atom(0);
+
+// v1.0 (recommended)
+const count = atom(0, 'count');
+```
+
+### DevTools Configuration
+
+```javascript
+// v0.x
+const store = createStore([devTools()]);
+
+// v1.0
+import { createStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
+
+const store = createStore([
+  devTools({
+    name: 'My App',
+    trace: true,
+    maxAge: 50
+  })
+]);
+```
 
 ## Migration Checklist
 
-- [ ] Update imports from `nexus-state` to `@nexus-state/*`
-- [ ] Replace `createStore` with `createEnhancedStore`
-- [ ] Add names to all atoms for DevTools support
-- [ ] Update Time Travel API calls
-- [ ] Configure DevTools integration
-- [ ] Enable Time Travel if needed
-- [ ] Update any custom plugins
+- [ ] Update package imports to `@nexus-state/*`
+- [ ] Decide: `createStore()` or `createEnhancedStore()`?
+- [ ] Add names to all atoms
+- [ ] Update DevTools configuration
 - [ ] Test all functionality
-- [ ] Update documentation and examples
+- [ ] Update documentation
 
 ## Common Issues & Solutions
 
+### Issue: "createEnhancedStore is not defined"
+
+**Solution:** Import it:
+
+```javascript
+import { createEnhancedStore } from '@nexus-state/core';
+```
+
 ### Issue: "store.undo is not a function"
 
-**Solution:** Enable time travel when creating store:
+**Solution:** Enable time travel:
 
-```typescript
-const store = createEnhancedStore([], { enableTimeTravel: true });
+```javascript
+const store = createEnhancedStore([], { 
+  enableTimeTravel: true 
+});
+```
+
+Or use basic store without time travel:
+
+```javascript
+const store = createStore([devTools()]);
+// Use DevTools UI for time travel instead
 ```
 
 ### Issue: Atoms not showing in DevTools
 
-**Solution:** Add names to atoms and enable DevTools:
+**Solution:** Add names to atoms:
 
-```typescript
-const counter = atom(0, "counter");
-const store = createEnhancedStore([], { enableDevTools: true });
+```javascript
+const counter = atom(0, 'counter');
+const user = atom({ name: '' }, 'user');
 ```
 
-### Issue: Computed atom not updating
+### Issue: "devTools is not defined"
 
-**Solution:** Ensure you're using the correct getter syntax:
+**Solution:** Import from correct package:
 
-```typescript
-// Wrong
-const double = atom((get) => count * 2);
-
-// Correct
-const double = atom((get) => get(count) * 2);
-```
-
-### Issue: Plugin compatibility
-
-**Solution:** Some plugins may need updates for v1.0. Check plugin documentation for v1.0 compatibility.
-
-## Breaking Changes Details
-
-### Time Travel API Changes
-
-The Time Travel API has been simplified and integrated directly into the store:
-
-**Before:**
-```typescript
-const store = createStore();
-const timeTravel = new TimeTravel(store);
-timeTravel.undo();
-```
-
-**After:**
-```typescript
-const store = createEnhancedStore([], { enableTimeTravel: true });
-store.undo();
-```
-
-### DevTools Integration
-
-DevTools integration is now more flexible and performant:
-
-**Before:**
-```typescript
-import { devTools } from 'nexus-state';
-const store = createStore([devTools()]);
-```
-
-**After:**
-```typescript
+```javascript
 import { devTools } from '@nexus-state/devtools';
-const store = createEnhancedStore([devTools({
-  name: 'My App',
-  trace: true
-})], { enableDevTools: true });
 ```
 
-### Performance Improvements
+## Code Examples
+
+### Basic Counter App
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
+import { useAtom } from '@nexus-state/react';
+
+const store = createStore([
+  devTools({ name: 'Counter App' })
+]);
+
+const countAtom = atom(0, 'count');
+
+function Counter() {
+  const [count, setCount] = useAtom(countAtom, store);
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  );
+}
+```
+
+### App with Time Travel
+
+```javascript
+import { atom, createEnhancedStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
+import { useAtom } from '@nexus-state/react';
+
+const store = createEnhancedStore([
+  devTools({ name: 'Drawing App' })
+], {
+  enableTimeTravel: true,
+  maxHistory: 100
+});
+
+const strokesAtom = atom([], 'strokes');
+
+function DrawingApp() {
+  const [strokes, setStrokes] = useAtom(strokesAtom, store);
+  
+  return (
+    <div>
+      <canvas />
+      <button onClick={() => store.undo()}>Undo</button>
+      <button onClick={() => store.redo()}>Redo</button>
+    </div>
+  );
+}
+```
+
+### Form with Validation
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+import { devTools } from '@nexus-state/devtools';
+import { middleware, createValidator } from '@nexus-state/middleware';
+import { useAtom } from '@nexus-state/react';
+
+const store = createStore([
+  devTools({ name: 'Form App' }),
+  middleware(userAtom, {
+    beforeSet: (atom, value) => {
+      if (!value.email.includes('@')) {
+        throw new Error('Invalid email');
+      }
+      return value;
+    }
+  })
+]);
+
+const userAtom = atom({ email: '' }, 'user');
+```
+
+## Performance Improvements
 
 v1.0 includes several performance improvements:
 
-- Reduced memory usage by 33%
-- Faster store creation (14-30% faster)
-- Optimized subscription updates
-- Better bundle size with tree-shaking
+- **Smaller bundle size** — tree-shaking improvements
+- **Faster store creation** — optimized initialization
+- **Better memory management** — improved garbage collection
+- **Optimized subscriptions** — fewer unnecessary rerenders
 
 ## Need Help?
 
-- [Join our Discord](https://discord.gg/nexus-state)
-- [Open an issue](https://github.com/nexus-state/nexus-state/issues)
-- [Check FAQs](../community/faq.md)
-- [Browse Examples](../examples/index.md)
+- 📚 [Documentation](../index.md)
+- 💬 [Discord Community](https://discord.gg/nexus-state)
+- 🐛 [Report Issues](https://github.com/eustatos/nexus-state/issues)
+- 📖 [Examples](../examples/index.md)

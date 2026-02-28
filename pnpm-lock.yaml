@@ -430,8 +430,8 @@ importers:
   packages/async:
     dependencies:
       '@nexus-state/core':
-        specifier: '*'
-        version: 0.1.2
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
       eslint:
         specifier: ^8.40.0
@@ -549,8 +549,8 @@ importers:
   packages/middleware:
     dependencies:
       '@nexus-state/core':
-        specifier: '*'
-        version: 0.1.2
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
       eslint:
         specifier: ^8.40.0
