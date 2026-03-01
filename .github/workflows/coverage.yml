@@ -32,8 +32,14 @@ jobs:
       - name: Merge coverage reports
         run: |
           mkdir -p coverage
-          # Объединяем все lcov.info файлы из пакетов
-          find packages -name "lcov.info" -exec cat {} \; > coverage/lcov.info 2>/dev/null || true
+          # Объединяем все lcov.info файлы из пакетов с префиксами путей
+          > coverage/lcov.info
+          for file in packages/*/coverage/lcov.info; do
+            if [ -f "$file" ]; then
+              package_name=$(echo "$file" | sed 's|packages/\([^/]*\)/coverage/lcov.info|\1|')
+              sed "s|^SF:|SF:packages/$package_name/|g" "$file" >> coverage/lcov.info
+            fi
+          done
       
       - name: Coveralls
         uses: coverallsapp/github-action@v2
