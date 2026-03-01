@@ -10,7 +10,7 @@
     "dev": "echo 'No development build required'"
   },
   "dependencies": {
-    "commander": "^11.0.0",
+    "commander": "^14.0.3",
     "fs-extra": "^11.0.0"
   },
   "devDependencies": {
