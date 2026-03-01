@@ -4,7 +4,7 @@
 >
 > [![npm version](https://img.shields.io/npm/v/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
 > [![npm downloads](https://img.shields.io/npm/dw/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
-> [![Coverage Status](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&flag=core)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
+> [![Coverage for core package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=core)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
 > [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
 
 [Documentation](https://nexus-state.website.yandexcloud.net/) • [Repository](https://github.com/eustatos/nexus-state)
