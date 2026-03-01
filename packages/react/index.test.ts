@@ -1,6 +1,6 @@
 // Tests for React adapter
 import { atom, createStore, Setter, ComputedAtom, Atom } from "@nexus-state/core";
-import { useAtom, useAtomValue, useSetAtom } from "./index";
+import { useAtom, useAtomValue, useSetAtom, useAtomCallback } from "./index";
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 
@@ -511,5 +511,155 @@ describe("useAtom - Performance", () => {
       store.set(nameAtom, "updated");
     });
     expect(result.current[0]).toBe(0); // countAtom should be unchanged
+  });
+});
+
+// === useAtomCallback TESTS ===
+describe("useAtomCallback", () => {
+  it("should create a callback with get and set functions", () => {
+    const store = createStore();
+    const countAtom = atom(0);
+
+    const { result } = renderHook(() =>
+      useAtomCallback((get, set) => {
+        const count = get(countAtom);
+        set(countAtom, count + 1);
+        return count;
+      }, store)
+    );
+
+    let returnValue: number;
+    act(() => {
+      returnValue = result.current();
+    });
+
+    expect(returnValue).toBe(0);
+    expect(store.get(countAtom)).toBe(1);
+  });
+
+  it("should pass arguments to the callback", () => {
+    const store = createStore();
+    const countAtom = atom(0);
+
+    const { result } = renderHook(() =>
+      useAtomCallback((get, set, amount: number) => {
+        const count = get(countAtom);
+        set(countAtom, count + amount);
+        return get(countAtom);
+      }, store)
+    );
+
+    let returnValue: number;
+    act(() => {
+      returnValue = result.current(5);
+    });
+
+    expect(returnValue).toBe(5);
+    expect(store.get(countAtom)).toBe(5);
+  });
+
+  it("should work with multiple atoms", () => {
+    const store = createStore();
+    const balanceAtom = atom(100);
+    const logAtom = atom<string[]>([]);
+
+    const { result } = renderHook(() =>
+      useAtomCallback((get, set, amount: number) => {
+        const balance = get(balanceAtom);
+        if (balance >= amount) {
+          set(balanceAtom, balance - amount);
+          set(logAtom, [...get(logAtom), `Transferred ${amount}`]);
+          return true;
+        }
+        return false;
+      }, store)
+    );
+
+    let success: boolean;
+    act(() => {
+      success = result.current(50);
+    });
+
+    expect(success).toBe(true);
+    expect(store.get(balanceAtom)).toBe(50);
+    expect(store.get(logAtom)).toEqual(["Transferred 50"]);
+  });
+
+  it("should have stable reference (not change on re-render)", () => {
+    const store = createStore();
+    const countAtom = atom(0);
+
+    const { result, rerender } = renderHook(() =>
+      useAtomCallback((get, set) => {
+        set(countAtom, get(countAtom) + 1);
+      }, store)
+    );
+
+    const firstCallback = result.current;
+    rerender();
+    const secondCallback = result.current;
+
+    expect(firstCallback).toBe(secondCallback);
+  });
+
+  it("should throw error if store is not provided", () => {
+    expect(() => {
+      renderHook(() =>
+        useAtomCallback((get, set) => {
+          set(atom(0), 1);
+        })
+      );
+    }).toThrow(
+      "useAtomCallback requires a store. Either provide one explicitly or wrap your component with <StoreProvider>."
+    );
+  });
+
+  it("should support function updates", () => {
+    const store = createStore();
+    const countAtom = atom(10);
+
+    const { result } = renderHook(() =>
+      useAtomCallback((get, set) => {
+        set(countAtom, (prev) => prev * 2);
+        return get(countAtom);
+      }, store)
+    );
+
+    let returnValue: number;
+    act(() => {
+      returnValue = result.current();
+    });
+
+    expect(returnValue).toBe(20);
+    expect(store.get(countAtom)).toBe(20);
+  });
+
+  it("should work with computed atoms", () => {
+    const store = createStore();
+    const countAtom = atom(5);
+    const doubleAtom = atom((get) => get(countAtom) * 2);
+
+    const { result } = renderHook(() =>
+      useAtomCallback((get) => {
+        return get(doubleAtom);
+      }, store)
+    );
+
+    let returnValue: number;
+    act(() => {
+      returnValue = result.current();
+    });
+
+    expect(returnValue).toBe(10);
+
+    act(() => {
+      store.set(countAtom, 10);
+    });
+
+    act(() => {
+      returnValue = result.current();
+    });
+
+    expect(returnValue).toBe(20);
   });
 });

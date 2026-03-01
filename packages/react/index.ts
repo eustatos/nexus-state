@@ -1,4 +1,4 @@
-import { Atom, Store } from "@nexus-state/core"; // eslint-disable-line sort-imports
+import type { Atom, Store, Getter, Setter } from "@nexus-state/core"; // eslint-disable-line sort-imports
 import {
   useCallback,
   useDebugValue,
@@ -138,6 +138,67 @@ export function useAtom<T>(
 }
 
 /**
+ * Hook to create a callback that can read and write atoms.
+ * Useful for complex operations that need to interact with multiple atoms.
+ * The callback has access to get and set functions.
+ *
+ * @template Args - Argument types for the callback
+ * @template Result - Return type of the callback
+ * @param {(get: Getter, set: Setter, ...args: Args) => Result} callback - Function that receives get and set
+ * @param {Store} [store] - The store to use (optional, uses context store if not provided)
+ * @returns {(...args: Args) => Result} Memoized callback function
+ *
+ * @example
+ * ```typescript
+ * function TransferButton() {
+ *   const handleTransfer = useAtomCallback(
+ *     (get, set, amount: number) => {
+ *       const balance = get(balanceAtom);
+ *       if (balance >= amount) {
+ *         set(balanceAtom, balance - amount);
+ *         set(logAtom, [...get(logAtom), `Transferred ${amount}`]);
+ *       }
+ *     },
+ *     store
+ *   );
+ *
+ *   return <button onClick={() => handleTransfer(100)}>Transfer</button>;
+ * }
+ * ```
+ */
+export function useAtomCallback<Args extends unknown[], Result>(
+  callback: (get: Getter, set: Setter, ...args: Args) => Result,
+  store?: Store
+): (...args: Args) => Result {
+  const contextStore = useStoreSafe();
+  const resolvedStore: Store | undefined = store || contextStore;
+
+  if (!resolvedStore) {
+    throw new Error(
+      "useAtomCallback requires a store. Either provide one explicitly or wrap your component with <StoreProvider>."
+    );
+  }
+
+  // Use useMemo to memoize the callback wrapper, ensuring stable reference
+  // The callback itself should be stable (useCallback in component)
+  return useMemo(
+    () => (...args: Args) => {
+      const get: Getter = <T>(atom: Atom<T>) => resolvedStore.get(atom);
+      const set: Setter = <T>(
+        atom: Atom<T>,
+        value: T | ((prev: T) => T)
+      ) => {
+        resolvedStore.set(atom, value);
+      };
+
+      return callback(get, set, ...args);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [resolvedStore]
+  );
+}
+
+/**
  * Legacy useAtom for React 17 compatibility.
  * Uses useEffect and useState instead of useSyncExternalStore.
  *
@@ -246,3 +307,9 @@ function useSyncExternalStoreWithSelector<T>(
 // Re-export context and provider
 export { StoreProvider, useStore } from "./context";
 export type { StoreProviderProps } from "./context";
+
+// Re-export core types
+export type { Atom, Store, Getter, Setter } from "@nexus-state/core";
+
+// Type for setter function
+export type SetAtom<T> = (value: T | ((prev: T) => T)) => void;

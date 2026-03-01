@@ -2,10 +2,41 @@
 
 ## 📋 Task Overview
 
-**Priority:** 🟡 Medium  
-**Estimated Time:** 1-2 hours  
-**Status:** ⬜ Not Started  
+**Priority:** 🟡 Medium
+**Estimated Time:** 1-2 hours
+**Status:** ❌ Blocked
 **Assignee:** AI Agent
+
+---
+
+## 🚫 Blocker
+
+**Issue:** Incompatible dependency versions in the project ecosystem:
+
+1. **commitlint v20** requires `ajv` v8+, but:
+   - `eslint@10` requires `ajv` v6
+   - `@commitlint/config-validator` bundles `ajv` v6
+
+2. **ES Module conflict:** Project uses `"type": "module"` but:
+   - `commitlint.config.js` causes `ERR_REQUIRE_CYCLE_MODULE`
+   - `commitlint.config.cjs` still fails due to ajv issue
+
+**Attempted Solutions:**
+- ✅ Lefthook installation — works
+- ❌ commitlint — fails with ajv v6/v8 conflict
+- ❌ ES module config — fails with cycle error
+
+**Recommended Resolution:**
+Wait for one of:
+- commitlint to fix ajv compatibility
+- eslint to support ajv v8
+- Project to downgrade eslint (not recommended)
+
+---
+
+## 📝 Current State
+
+Pre-commit hooks **not installed** due to dependency
 
 ---
 
