@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@nexus-state/core": "workspace:*",
-    "immer": "^10.0.0"
+    "immer": "^11.1.4"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
