@@ -46,7 +46,8 @@ export function createField<TValue>(
     asyncManager = new AsyncValidationManager<TValue>(
       options.store ?? _store,
       fieldAtom,
-      asyncValidators
+      asyncValidators,
+      options.debounce
     );
   }
 

@@ -63,9 +63,9 @@ export function createQuery<TData = unknown, TError = Error>(
 let globalCache: QueryCache | null = null;
 
 /**
- * Get or create global query cache
+ * Get the global query cache
  */
-function getQueryCache(): QueryCache {
+export function getQueryCache(): QueryCache {
   if (!globalCache) {
     globalCache = createQueryCache();
   }
