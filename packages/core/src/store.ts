@@ -119,7 +119,12 @@ export function createStore(plugins: Plugin[] = []): Store {
     // Get or create atom state
     let atomState = atomStates.get(atom) as AtomState<Value> | undefined;
     if (!atomState) {
-      logger.log('[GET] Creating state for atom:', (atom as Atom<Value & { name?: string }>).name || 'unnamed', 'type:', atom.type);
+      logger.log(
+        '[GET] Creating state for atom:',
+        (atom as Atom<Value & { name?: string }>).name || 'unnamed',
+        'type:',
+        atom.type
+      );
       // Register atom with the global registry (if not already registered)
       // and add it to this store's atom set
       const storesMap = atomRegistry.getStoresMap();
@@ -138,9 +143,21 @@ export function createStore(plugins: Plugin[] = []): Store {
         const previousAtom = currentAtom;
         currentAtom = atom;
         try {
-          logger.log('[GET] Evaluating computed atom:', (atom as Atom<Value & { name?: string }>).name, 'currentAtom:', currentAtom ? (currentAtom as Atom<unknown & { name?: string }>).name : 'null');
+          logger.log(
+            '[GET] Evaluating computed atom:',
+            (atom as Atom<Value & { name?: string }>).name,
+            'currentAtom:',
+            currentAtom
+              ? (currentAtom as Atom<unknown & { name?: string }>).name
+              : 'null'
+          );
           initialValue = (atom as ComputedAtom<Value>).read(get);
-          logger.log('[GET] Computed atom:', (atom as Atom<Value & { name?: string }>).name, 'value:', initialValue);
+          logger.log(
+            '[GET] Computed atom:',
+            (atom as Atom<Value & { name?: string }>).name,
+            'value:',
+            initialValue
+          );
         } finally {
           currentAtom = previousAtom;
         }
@@ -168,9 +185,23 @@ export function createStore(plugins: Plugin[] = []): Store {
     // Track dependency if we're currently evaluating another atom
     if (currentAtom && currentAtom !== atom) {
       // Add currentAtom as a dependent of atom
-      logger.log('[GET] Adding dependency:', (atom as Atom<Value & { name?: string }>).name, '->', (currentAtom as Atom<unknown & { name?: string }>).name);
+      logger.log(
+        '[GET] Adding dependency:',
+        (atom as Atom<Value & { name?: string }>).name,
+        '->',
+        (currentAtom as Atom<unknown & { name?: string }>).name
+      );
       const added = atomState.dependents.add(currentAtom);
-      logger.log('[GET] Added dependency:', (atom as Atom<Value & { name?: string }>).name, '->', (currentAtom as Atom<unknown & { name?: string }>).name, 'size now:', atomState.dependents.size, 'was new?', added);
+      logger.log(
+        '[GET] Added dependency:',
+        (atom as Atom<Value & { name?: string }>).name,
+        '->',
+        (currentAtom as Atom<unknown & { name?: string }>).name,
+        'size now:',
+        atomState.dependents.size,
+        'was new?',
+        added
+      );
     }
 
     // Apply onGet hooks
@@ -178,8 +209,16 @@ export function createStore(plugins: Plugin[] = []): Store {
     return executeOnGetHooks(atom, value);
   };
 
-  const set: Setter = <Value>(atom: Atom<Value>, update: Value | ((prev: Value) => Value)): void => {
-    logger.log('[SET] Setting atom:', (atom as Atom<Value & { name?: string }>).name, 'to:', update);
+  const set: Setter = <Value>(
+    atom: Atom<Value>,
+    update: Value | ((prev: Value) => Value)
+  ): void => {
+    logger.log(
+      '[SET] Setting atom:',
+      (atom as Atom<Value & { name?: string }>).name,
+      'to:',
+      update
+    );
     // Register atom with the global registry (if not already registered)
     // and add it to this store's atom set
     const storesMap = atomRegistry.getStoresMap();
@@ -240,7 +279,14 @@ export function createStore(plugins: Plugin[] = []): Store {
     // Update value
     const previousValue = atomState.value;
     atomState.value = processedValue;
-    logger.log('[SET] Updated atom:', (atom as Atom<Value & { name?: string }>).name, 'from:', previousValue, 'to:', processedValue);
+    logger.log(
+      '[SET] Updated atom:',
+      (atom as Atom<Value & { name?: string }>).name,
+      'from:',
+      previousValue,
+      'to:',
+      processedValue
+    );
 
     // Schedule subscriber notifications for batching
     batcher.schedule(() => {
@@ -250,7 +296,12 @@ export function createStore(plugins: Plugin[] = []): Store {
     });
 
     // Notify dependents using BFS to handle nested computed atoms
-    logger.log('[SET] Notifying dependents of:', (atom as Atom<Value & { name?: string }>).name, 'count:', atomState.dependents.size);
+    logger.log(
+      '[SET] Notifying dependents of:',
+      (atom as Atom<Value & { name?: string }>).name,
+      'count:',
+      atomState.dependents.size
+    );
     const toNotify = new Set<Atom<unknown>>(atomState.dependents);
     const notified = new Set<Atom<unknown>>();
 
@@ -261,11 +312,19 @@ export function createStore(plugins: Plugin[] = []): Store {
       if (notified.has(current)) continue;
       notified.add(current);
 
-      logger.log('[SET] Notifying dependent:', (current as Atom<unknown & { name?: string }>).name, 'dependents size:', (atomStates.get(current) as AtomState<unknown>)?.dependents?.size);
+      logger.log(
+        '[SET] Notifying dependent:',
+        (current as Atom<unknown & { name?: string }>).name,
+        'dependents size:',
+        (atomStates.get(current) as AtomState<unknown>)?.dependents?.size
+      );
 
       // For computed atoms, we need to recompute their values
       const currentState = atomStates.get(current);
-      if (currentState && (isComputedAtom(current) || isWritableAtom(current))) {
+      if (
+        currentState &&
+        (isComputedAtom(current) || isWritableAtom(current))
+      ) {
         logger.log('[SET] Dependent found, type:', current.type);
         // Track which atom is being evaluated
         const previousAtom = currentAtom;
@@ -274,15 +333,26 @@ export function createStore(plugins: Plugin[] = []): Store {
           // Recompute the value
           let newValue: unknown;
           if (isComputedAtom(current)) {
-            logger.log('[SET] Recomputing:', (current as Atom<unknown & { name?: string }>).name);
+            logger.log(
+              '[SET] Recomputing:',
+              (current as Atom<unknown & { name?: string }>).name
+            );
             newValue = (current as ComputedAtom<unknown>).read(get);
-            logger.log('[SET] Recomputed:', (current as Atom<unknown & { name?: string }>).name, 'value:', newValue);
+            logger.log(
+              '[SET] Recomputed:',
+              (current as Atom<unknown & { name?: string }>).name,
+              'value:',
+              newValue
+            );
           } else if (isWritableAtom(current)) {
             newValue = (current as WritableAtom<unknown>).read(get);
           }
 
           if (currentState.value !== newValue) {
-            logger.log('[SET] Value changed, updating dependent:', (current as Atom<unknown & { name?: string }>).name);
+            logger.log(
+              '[SET] Value changed, updating dependent:',
+              (current as Atom<unknown & { name?: string }>).name
+            );
             currentState.value = newValue;
 
             // Schedule subscriber notifications for batching
@@ -299,13 +369,25 @@ export function createStore(plugins: Plugin[] = []): Store {
               }
             });
           } else {
-            logger.log('[SET] Value not changed, skipping update for:', (current as Atom<unknown & { name?: string }>).name);
+            logger.log(
+              '[SET] Value not changed, skipping update for:',
+              (current as Atom<unknown & { name?: string }>).name
+            );
           }
         } finally {
           currentAtom = previousAtom;
         }
       } else {
-        logger.log('[SET] Dependent state not found or not computed/writable:', (current as Atom<unknown & { name?: string }>).name, 'found:', !!currentState, 'isComputedOrWritable:', currentState ? (isComputedAtom(current) || isWritableAtom(current)) : 'N/A');
+        logger.log(
+          '[SET] Dependent state not found or not computed/writable:',
+          (current as Atom<unknown & { name?: string }>).name,
+          'found:',
+          !!currentState,
+          'isComputedOrWritable:',
+          currentState
+            ? isComputedAtom(current) || isWritableAtom(current)
+            : 'N/A'
+        );
       }
     }
 
@@ -324,7 +406,7 @@ export function createStore(plugins: Plugin[] = []): Store {
     if (debounceTimer) {
       clearTimeout(debounceTimer);
     }
-    
+
     debounceTimer = setTimeout(() => {
       flushStateUpdates();
     }, debounceDelay);
@@ -338,7 +420,10 @@ export function createStore(plugins: Plugin[] = []): Store {
     }
   };
 
-  const subscribe = <Value>(atom: Atom<Value>, subscriber: Subscriber<Value>): (() => void) => {
+  const subscribe = <Value>(
+    atom: Atom<Value>,
+    subscriber: Subscriber<Value>
+  ): (() => void) => {
     // Register atom with the global registry (if not already registered)
     // and add it to this store's atom set
     const storesMap = atomRegistry.getStoresMap();
@@ -346,7 +431,7 @@ export function createStore(plugins: Plugin[] = []): Store {
     if (registry && !registry.atoms.has(atom.id)) {
       registry.atoms.add(atom.id);
     }
-    
+
     // Get or create atom state
     let atomState = atomStates.get(atom) as AtomState<Value> | undefined;
     if (!atomState) {
@@ -376,7 +461,7 @@ export function createStore(plugins: Plugin[] = []): Store {
       } else {
         throw new Error('Unknown atom type');
       }
-      
+
       atomState = {
         value: initialValue,
         subscribers: new Set(),
@@ -397,7 +482,6 @@ export function createStore(plugins: Plugin[] = []): Store {
   // Add method to get state of all atoms (for devtools)
 
   const getState = (): Record<string, unknown> => {
-
     const state: Record<string, unknown> = {};
     atomStates.forEach((atomState, atom) => {
       // Use atom name from registry if available, otherwise fall back to toString
@@ -430,10 +514,10 @@ export function createStore(plugins: Plugin[] = []): Store {
         metadata.stackTrace = stack;
       }
     }
-    
+
     // Set the value
     set(atom, update);
-    
+
     // In a real implementation, this would track the action metadata
     // for DevTools integration
   };
@@ -459,7 +543,7 @@ export function createStore(plugins: Plugin[] = []): Store {
       type: 'SET',
       timestamp: Date.now(),
     };
-    
+
     setWithMetadata(atom, update, metadata);
   };
 
@@ -492,12 +576,12 @@ export function createStore(plugins: Plugin[] = []): Store {
 
   // Auto-attach to registry in global mode (CORE-001 requirement)
   // This must be after store is defined to avoid ReferenceError
-  if (typeof atomRegistry.attachStore === "function") {
-    atomRegistry.attachStore(store, "global");
+  if (typeof atomRegistry.attachStore === 'function') {
+    atomRegistry.attachStore(store, 'global');
   }
 
   // Apply plugins
-  plugins.forEach(plugin => {
+  plugins.forEach((plugin) => {
     const hooks = plugin(store);
     // If plugin returns hooks, register them
     if (hooks && typeof hooks === 'object') {
