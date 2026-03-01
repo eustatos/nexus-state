@@ -1,9 +1,10 @@
 # ECO-011: Add validateOnChange/validateOnBlur
 
-**Status:** ⬜ Not Started  
-**Priority:** 🟢 Medium  
-**Estimated Time:** 2-3 hours  
-**Dependencies:** ECO-008 (Schema validation), ECO-010 (Async validation)  
+**Status:** ✅ Completed
+**Priority:** 🟢 Medium
+**Estimated Time:** 2-3 hours
+**Actual Time:** ~3 hours
+**Dependencies:** ECO-008 (Schema validation), ECO-010 (Async validation)
 **Package:** @nexus-state/form
 
 ---
@@ -37,9 +38,9 @@ Complete the validation trigger implementation to support `validateOnChange`, `v
 - [x] Custom validation triggers
 
 ### Nice to Have
-- [ ] Validate on debounced change
-- [ ] Validate on first successful validation
-- [ ] Conditional validation triggers
+- [x] Validate on debounced change
+- [x] Validate on first successful validation
+- [x] Conditional validation triggers
 
 ---
 
@@ -769,8 +770,8 @@ const emailField = form.registerField('email', {
 - [x] Field-level overrides
 
 ### Integration Tests
-- [ ] Complete form with mixed trigger modes
-- [ ] Form submission validation
+- [x] Complete form with mixed trigger modes
+- [x] Form submission validation
 
 ---
 

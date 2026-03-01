@@ -31,6 +31,7 @@ export default defineConfig({
     environmentMatchGlobs: [
       // Для не-React тестов используем node
       ["**/core/**", "node"],
+      ["**/family/**", "node"],
       ["**/tests/**", "node"],
       // Для React тестов используем jsdom
       ["**/react/**", "jsdom"],

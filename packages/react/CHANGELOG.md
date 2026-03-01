@@ -1,5 +1,25 @@
 # @nexus-state/react
 
+## 0.2.0
+
+### Minor Changes
+
+- ✨ Add `useAtomValue` hook for read-only atom access
+- ✨ Add `useSetAtom` hook for write-only atom access (no re-renders)
+- ✨ Add `useAtomCallback` hook for complex multi-atom operations
+- ♻️ Refactor `useAtom` to use `useAtomValue` + `useSetAtom` internally
+
+### Patch Changes
+
+- ⚡ Performance improvements for write-only scenarios
+- 📝 Updated README with performance tips and examples
+- ✅ Comprehensive test coverage for all hooks
+
+### Performance
+
+- 🚀 Write-only components no longer re-render unnecessarily
+- 📦 Bundle size increase: ~0.5KB (worth it for perf gains)
+
 ## 0.1.5
 
 ### Patch Changes

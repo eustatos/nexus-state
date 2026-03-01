@@ -226,6 +226,34 @@ const setCount = useSetAtom(countAtom, store);
 - ✅ Stable reference (memoized)
 - ✅ Best for forms with many fields
 
+### useAtomCallback(get, set, store)
+
+Advanced hook for complex operations involving multiple atoms.
+
+- `callback`: Function that receives `get`, `set`, and optional arguments
+- `store`: The store instance (optional, uses context if not provided)
+- Returns: Memoized callback function
+
+**Use when:** You need to perform complex operations with multiple atoms
+
+```javascript
+const handleTransfer = useAtomCallback(
+  (get, set, amount) => {
+    const balance = get(balanceAtom);
+    if (balance >= amount) {
+      set(balanceAtom, balance - amount);
+      set(historyAtom, [...get(historyAtom), `Transferred ${amount}`]);
+    }
+  },
+  store
+);
+```
+
+**Benefits:**
+- ✅ Access to multiple atoms in single callback
+- ✅ Stable reference (memoized)
+- ✅ Clean API for complex operations
+
 ### Comparison Table
 
 | Hook | Reads | Writes | Subscribes | Re-renders | Use Case |
@@ -233,6 +261,7 @@ const setCount = useSetAtom(countAtom, store);
 | `useAtom` | ✅ | ✅ | ✅ | ✅ | Controlled inputs |
 | `useAtomValue` | ✅ | ❌ | ✅ | ✅ | Display components |
 | `useSetAtom` | ❌ | ✅ | ❌ | ❌ | Buttons, form inputs |
+| `useAtomCallback` | ✅ | ✅ | ❌ | ❌ | Complex operations |
 
 ## License
 
