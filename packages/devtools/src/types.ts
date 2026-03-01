@@ -7,22 +7,22 @@ export type {
   PatternNamingConfig,
   CustomNamingConfig,
   ActionNamingOptions,
-} from "./action-naming/index";
+} from './action-naming/index';
 
 // Re-export the types for backward compatibility
 // These are defined here to avoid circular dependencies
 type ActionNamingStrategyType =
-  | "auto"
-  | "pattern"
-  | "custom"
-  | "minimal"
-  | "verbose";
+  | 'auto'
+  | 'pattern'
+  | 'custom'
+  | 'minimal'
+  | 'verbose';
 type BuiltInActionNamingStrategyType =
-  | "auto"
-  | "pattern"
-  | "custom"
-  | "minimal"
-  | "verbose";
+  | 'auto'
+  | 'pattern'
+  | 'custom'
+  | 'minimal'
+  | 'verbose';
 interface ActionNamingContext {
   atom: BasicAtom;
   atomName: string;
@@ -119,7 +119,7 @@ export interface DevToolsFeatureDetectionResult {
   /** Whether current environment is SSR */
   isSSR: boolean;
   /** Current mode: active, fallback, or disabled */
-  mode: "active" | "fallback" | "disabled";
+  mode: 'active' | 'fallback' | 'disabled';
   /** Error message if any, null if none */
   error: Error | null;
 }
@@ -141,7 +141,7 @@ export interface DevToolsMessage {
  */
 export interface JumpToStateCommand {
   /** Command type */
-  type: "JUMP_TO_STATE";
+  type: 'JUMP_TO_STATE';
   /** Index to jump to in history */
   payload: {
     index: number;
@@ -153,7 +153,7 @@ export interface JumpToStateCommand {
  */
 export interface JumpToActionCommand {
   /** Command type */
-  type: "JUMP_TO_ACTION";
+  type: 'JUMP_TO_ACTION';
   /** Action name to jump to */
   payload: {
     actionName: string;
@@ -180,9 +180,13 @@ export interface CommandHandlerConfig {
  * Basic atom interface for type definitions
  */
 export interface BasicAtom {
-  id?: {
-    toString(): string;
-  };
+  id:
+    | symbol
+    | {
+        toString(): string;
+      };
+  name?: string;
+  type?: string;
 }
 
 /**
@@ -195,7 +199,7 @@ export interface EnhancedStore {
   /** Set the value of an atom */
   set: <Value>(
     atom: BasicAtom,
-    update: Value | ((prev: Value) => Value),
+    update: Value | ((prev: Value) => Value)
   ) => void;
 
   /** Get the state of all atoms in the store */
@@ -205,7 +209,7 @@ export interface EnhancedStore {
   setWithMetadata?: <Value>(
     atom: BasicAtom,
     update: Value | ((prev: Value) => Value),
-    metadata?: Record<string, unknown>,
+    metadata?: Record<string, unknown>
   ) => void;
 
   /** Serialize the state of all atoms in the store */
@@ -215,7 +219,7 @@ export interface EnhancedStore {
 /**
  * DevTools mode for current environment
  */
-export type DevToolsMode = "active" | "fallback" | "disabled";
+export type DevToolsMode = 'active' | 'fallback' | 'disabled';
 
 /**
  * Snapshot mapping entry
@@ -313,7 +317,7 @@ export interface ImportStateFormat {
  * State export format (for sharing)
  * @deprecated Use ExportStateFormat from './state-serializer' instead
  */
-export type ExportStateFormat = import("./state-serializer").ExportStateFormat;
+export type ExportStateFormat = import('./state-serializer').ExportStateFormat;
 /**
  * Checksum verification result
  */
@@ -331,7 +335,7 @@ export interface ChecksumResult {
  */
 export interface ImportStateCommand {
   /** Command type */
-  type: "IMPORT_STATE";
+  type: 'IMPORT_STATE';
   /** The imported state data */
   payload: ImportStateFormat;
 }
@@ -412,7 +416,7 @@ export interface BatchUpdateConfig {
 /**
  * How to handle circular references during lazy serialization.
  */
-export type CircularRefHandling = "placeholder" | "omit" | "throw";
+export type CircularRefHandling = 'placeholder' | 'omit' | 'throw';
 
 /**
  * Configuration for lazy state serialization (reduces DevTools overhead for large state trees).

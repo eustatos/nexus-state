@@ -1,0 +1,68 @@
+{
+  "name": "@nexus-state/query",
+  "version": "0.1.0",
+  "description": "Powerful data fetching and caching for Nexus State",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js",
+      "require": "./dist/react/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "react",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --ext .ts,.tsx"
+  },
+  "keywords": [
+    "state-management",
+    "query",
+    "data-fetching",
+    "caching",
+    "nexus-state",
+    "react"
+  ],
+  "dependencies": {
+    "@nexus-state/core": "workspace:*",
+    "@nexus-state/react": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@testing-library/react": "^14.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.7",
+    "eslint": "^8.57.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eustatos/nexus-state",
+    "directory": "packages/query"
+  },
+  "homepage": "https://nexus-state.website.yandexcloud.net/",
+  "license": "MIT",
+  "author": "Nexus State Contributors"
+}

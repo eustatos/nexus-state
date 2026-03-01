@@ -1,13 +1,13 @@
 /**
  * AtomNameResolver - Resolves atom names for DevTools display
- * 
+ *
  * This service provides utilities for getting and formatting atom names
  * for display in DevTools. It integrates with the atom registry and
  * provides configurable formatting options.
  */
 
-import type { BasicAtom } from "./types";
-import { atomRegistry } from "@nexus-state/core";
+import type { BasicAtom } from './types';
+import { atomRegistry } from '@nexus-state/core';
 
 /**
  * Atom name formatting options
@@ -40,7 +40,7 @@ export class AtomNameResolver {
       includeId: options.includeId ?? false,
       includeType: options.includeType ?? false,
       maxLength: options.maxLength ?? 50,
-      ellipsis: options.ellipsis ?? "...",
+      ellipsis: options.ellipsis ?? '...',
     };
   }
 
@@ -60,11 +60,12 @@ export class AtomNameResolver {
       const defaultName = this.getDefaultName(atom);
 
       // Apply custom formatter if provided
-      const formattedName = this.options.formatter(atom, defaultName);
-      
+      const formattedName =
+        this.options.formatter?.(atom, defaultName) ?? defaultName;
+
       // Apply final formatting
       return this.formatName(formattedName);
-    } catch (error) {
+    } catch {
       // Fallback for any errors
       return this.getFallbackName(atom);
     }
@@ -94,24 +95,27 @@ export class AtomNameResolver {
    */
   private getDefaultName(atom: BasicAtom): string {
     // Try to get name from registry
-    const registryName = atomRegistry.getName(atom);
+    const registryName = atomRegistry.getName(atom as { id: symbol });
     if (registryName) {
       return registryName;
     }
 
     // Try to get name from atom's toString method
     const toStringName = atom.toString();
-    if (toStringName && toStringName !== "[object Object]") {
+    if (toStringName && toStringName !== '[object Object]') {
       return toStringName;
     }
 
     // Try to get name from atom's displayName property
-    if ((atom as any).displayName && typeof (atom as any).displayName === "string") {
+    if (
+      (atom as any).displayName &&
+      typeof (atom as any).displayName === 'string'
+    ) {
       return (atom as any).displayName;
     }
 
     // Try to get name from atom's name property
-    if ((atom as any).name && typeof (atom as any).name === "string") {
+    if ((atom as any).name && typeof (atom as any).name === 'string') {
       return (atom as any).name;
     }
 
@@ -120,7 +124,7 @@ export class AtomNameResolver {
       return atom.id.toString();
     }
 
-    return "unknown-atom";
+    return 'unknown-atom';
   }
 
   /**
@@ -149,12 +153,12 @@ export class AtomNameResolver {
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
+        hash = (hash << 5) - hash + char;
         hash = hash & hash; // Convert to 32-bit integer
       }
       return Math.abs(hash).toString(36).substring(0, 8);
     } catch (error) {
-      return "unknown";
+      return 'unknown';
     }
   }
 
@@ -186,7 +190,7 @@ export class AtomNameResolver {
     }
 
     try {
-      const registryName = atomRegistry.getName(atom);
+      const registryName = atomRegistry.getName(atom as { id: symbol });
       if (registryName) {
         result.registryName = registryName;
       }
@@ -203,20 +207,23 @@ export class AtomNameResolver {
    * @returns Atom type string
    */
   private getAtomType(atom: BasicAtom): string {
-    if (typeof atom === "function") {
-      return "function";
+    if (typeof atom === 'function') {
+      return 'function';
     }
-    if (atom && typeof atom === "object") {
-      if ((atom as any).read && typeof (atom as any).read === "function") {
-        return "readable";
+    if (atom && typeof atom === 'object') {
+      if ((atom as any).read && typeof (atom as any).read === 'function') {
+        return 'readable';
       }
-      if ((atom as any).write && typeof (atom as any).write === "function") {
-        return "writable";
+      if ((atom as any).write && typeof (atom as any).write === 'function') {
+        return 'writable';
       }
-      if ((atom as any).subscribe && typeof (atom as any).subscribe === "function") {
-        return "store";
+      if (
+        (atom as any).subscribe &&
+        typeof (atom as any).subscribe === 'function'
+      ) {
+        return 'store';
       }
-      return "object";
+      return 'object';
     }
     return typeof atom;
   }
@@ -246,7 +253,9 @@ export class AtomNameResolver {
  * @param options Resolver options
  * @returns New AtomNameResolver instance
  */
-export function createAtomNameResolver(options: AtomNameFormatOptions = {}): AtomNameResolver {
+export function createAtomNameResolver(
+  options: AtomNameFormatOptions = {}
+): AtomNameResolver {
   return new AtomNameResolver(options);
 }
 

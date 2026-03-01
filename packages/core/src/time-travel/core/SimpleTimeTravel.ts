@@ -13,33 +13,33 @@ import type {
   TransactionalRestorationResult,
   RestorationOptions,
   RollbackResult,
-} from "../types";
+} from '../types';
 
-import { HistoryManager } from "./HistoryManager";
-import { HistoryNavigator } from "./HistoryNavigator";
-import type { HistoryManagerConfig } from "./types";
+import { HistoryManager } from './HistoryManager';
+import { HistoryNavigator } from './HistoryNavigator';
+import type { HistoryManagerConfig } from './types';
 
-import { SnapshotCreator } from "../snapshot/SnapshotCreator";
-import { SnapshotRestorer } from "../snapshot/SnapshotRestorer";
+import { SnapshotCreator } from '../snapshot/SnapshotCreator';
+import { SnapshotRestorer } from '../snapshot/SnapshotRestorer';
 import type {
   SnapshotCreatorConfig,
   SnapshotRestorerConfig,
   TransactionalRestorerConfig,
   RestorationConfig,
-} from "../snapshot/types";
+} from '../snapshot/types';
 
-import { AtomTracker } from "../tracking/AtomTracker";
+import { AtomTracker } from '../tracking/AtomTracker';
 import type {
   TrackerConfig,
   TrackingEvent,
   TTLConfig,
   CleanupResult,
   TrackedAtom,
-} from "../tracking/types";
+} from '../tracking/types';
 
-import { atomRegistry } from "../../atom-registry";
-import { Atom, Store } from "../../types";
-import { storeLogger as logger } from "../../debug";
+import { atomRegistry } from '../../atom-registry';
+import { Atom, Store } from '../../types';
+import { storeLogger as logger } from '../../debug';
 
 // Comparison imports
 import {
@@ -49,17 +49,17 @@ import {
   type ComparisonOptions,
   type VisualizationFormat,
   type ExportFormat,
-} from "../comparison";
+} from '../comparison';
 
 // Delta imports for incremental snapshots
-import { DeltaAwareHistoryManager } from "../delta/delta-history-manager";
-import { DeltaCalculatorImpl } from "../delta/calculator";
-import { SnapshotReconstructor } from "../delta/reconstructor";
+import { DeltaAwareHistoryManager } from '../delta/delta-history-manager';
+import { DeltaCalculatorImpl } from '../delta/calculator';
+import { SnapshotReconstructor } from '../delta/reconstructor';
 import type {
   DeltaSnapshot,
   IncrementalSnapshotConfig,
   DeltaCompressionFactoryConfig,
-} from "../delta/types";
+} from '../delta/types';
 
 // Import disposal infrastructure
 import {
@@ -67,7 +67,7 @@ import {
   type DisposableConfig,
   LeakDetector,
   FinalizationHelper,
-} from "./disposable";
+} from './disposable';
 
 /**
  * Main SimpleTimeTravel class
@@ -84,7 +84,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
   private store: Store;
   private originalSet: <Value>(
     atom: Atom<Value>,
-    update: Value | ((prev: Value) => Value),
+    update: Value | ((prev: Value) => Value)
   ) => void;
   private subscriptions: Set<() => void> = new Set();
   private finalizationRegistry: FinalizationHelper;
@@ -105,7 +105,10 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    * @param store - The store to track
    * @param options - Configuration options
    */
-  constructor(store: Store, options: TimeTravelOptions & DisposableConfig = {}) {
+  constructor(
+    store: Store,
+    options: TimeTravelOptions & DisposableConfig = {}
+  ) {
     super(options);
     this.store = store;
     this.autoCapture = options.autoCapture ?? true;
@@ -132,13 +135,15 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
       enabled: options.deltaSnapshots?.enabled ?? false,
       fullSnapshotInterval: options.deltaSnapshots?.fullSnapshotInterval ?? 10,
       maxDeltaChainLength: options.deltaSnapshots?.maxDeltaChainLength ?? 20,
-      maxDeltaChainAge: options.deltaSnapshots?.maxDeltaChainAge ?? 5 * 60 * 1000,
-      maxDeltaChainSize: options.deltaSnapshots?.maxDeltaChainSize ?? 1024 * 1024,
-      changeDetection: options.deltaSnapshots?.changeDetection ?? "deep",
+      maxDeltaChainAge:
+        options.deltaSnapshots?.maxDeltaChainAge ?? 5 * 60 * 1000,
+      maxDeltaChainSize:
+        options.deltaSnapshots?.maxDeltaChainSize ?? 1024 * 1024,
+      changeDetection: options.deltaSnapshots?.changeDetection ?? 'deep',
       reconstructOnDemand: options.deltaSnapshots?.reconstructOnDemand ?? true,
       cacheReconstructed: options.deltaSnapshots?.cacheReconstructed ?? true,
       maxCacheSize: options.deltaSnapshots?.maxCacheSize ?? 100,
-      compressionLevel: options.deltaSnapshots?.compressionLevel ?? "light",
+      compressionLevel: options.deltaSnapshots?.compressionLevel ?? 'light',
     };
 
     this.useDeltaSnapshots = this.deltaConfig.enabled;
@@ -146,7 +151,8 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     // Build TTL configuration from options
     const ttlConfig: Partial<TTLConfig> = {
       defaultTTL: options.atomTTL || options.ttlConfig?.defaultTTL,
-      cleanupStrategy: options.cleanupStrategy || options.ttlConfig?.cleanupStrategy,
+      cleanupStrategy:
+        options.cleanupStrategy || options.ttlConfig?.cleanupStrategy,
       gcInterval: options.gcInterval || options.ttlConfig?.gcInterval,
       ...options.ttlConfig,
     };
@@ -163,14 +169,14 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
         ttl: ttlConfig,
         ...options.trackingConfig,
       } as Partial<TrackerConfig>,
-      { logDisposal: options.logDisposal },
+      { logDisposal: options.logDisposal }
     );
     this.registerChild(this.atomTracker);
 
     this.snapshotCreator = new SnapshotCreator(
       store,
       {
-        includeTypes: ["primitive", "computed", "writable"],
+        includeTypes: ['primitive', 'computed', 'writable'],
         excludeAtoms: options.excludeAtoms || [],
         validate: true,
         generateId: () => Math.random().toString(36).substring(2, 9),
@@ -178,7 +184,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
         skipStateCheck: true, // Skip state check for initial capture
         ...options.snapshotConfig,
       } as Partial<SnapshotCreatorConfig>,
-      { logDisposal: options.logDisposal },
+      { logDisposal: options.logDisposal }
     );
     this.registerChild(this.snapshotCreator);
 
@@ -187,17 +193,19 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
       {
         validateBeforeRestore: true,
         strictMode: false,
-        onAtomNotFound: "warn",
+        onAtomNotFound: 'warn',
         batchRestore: true,
         ...options.restoreConfig,
-      } as SnapshotRestorerConfig & Partial<TransactionalRestorerConfig> & Partial<RestorationConfig>,
-      { logDisposal: options.logDisposal },
+      } as SnapshotRestorerConfig &
+        Partial<TransactionalRestorerConfig> &
+        Partial<RestorationConfig>,
+      { logDisposal: options.logDisposal }
     );
     this.registerChild(this.snapshotRestorer);
 
     // Initialize delta components
     this.deltaCalculator = new DeltaCalculatorImpl({
-      deepEqual: this.deltaConfig.changeDetection === "deep",
+      deepEqual: this.deltaConfig.changeDetection === 'deep',
       skipEmpty: true,
     });
 
@@ -222,7 +230,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
       this.historyManager = new HistoryManager(
         options.maxHistory || 50,
         undefined,
-        { logDisposal: options.logDisposal },
+        { logDisposal: options.logDisposal }
       );
     }
     this.registerChild(this.historyManager as any);
@@ -230,11 +238,11 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     // HistoryNavigator works with both types via HistoryProvider interface
     this.historyNavigator = new HistoryNavigator(
       this.historyManager as any, // Safe cast since both implement required methods
-      this.snapshotRestorer,
+      this.snapshotRestorer
     );
 
     // Attach store to registry
-    atomRegistry.attachStore(store, options.registryMode || "global");
+    atomRegistry.attachStore(store, options.registryMode || 'global');
 
     // Register initial atoms if provided
     if (options.atoms && Array.isArray(options.atoms)) {
@@ -252,7 +260,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
 
     // Always capture initial state (to have something to undo to)
     // The autoCapture setting will control subsequent auto-captures
-    this.capture("initial");
+    this.capture('initial');
   }
 
   /**
@@ -268,11 +276,16 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     logger.log(`[TIME_TRAVEL.capture] action: ${action}`);
     const snapshot = this.snapshotCreator.create(
       action,
-      new Set(this.atomTracker.getTrackedAtoms().map((atom) => atom.id)),
+      new Set(this.atomTracker.getTrackedAtoms().map((atom) => atom.id))
     );
-    logger.log(`[TIME_TRAVEL.capture] snapshot created: ${snapshot ? 'yes' : 'no'}`);
+    logger.log(
+      `[TIME_TRAVEL.capture] snapshot created: ${snapshot ? 'yes' : 'no'}`
+    );
     if (snapshot) {
-      logger.log(`[TIME_TRAVEL.capture] snapshot state:`, Object.entries(snapshot.state).map(([k, v]) => ({ [k]: v.value })));
+      logger.log(
+        `[TIME_TRAVEL.capture] snapshot state:`,
+        Object.entries(snapshot.state).map(([k, v]) => ({ [k]: v.value }))
+      );
       this.historyManager.add(snapshot);
     }
 
@@ -289,13 +302,13 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
       return {
         success: false,
         snapshot: null,
-        error: "Cannot capture during time travel",
+        error: 'Cannot capture during time travel',
       };
     }
 
     const result = this.snapshotCreator.createWithResult(
       action,
-      new Set(this.atomTracker.getTrackedAtoms().map((atom) => atom.id)),
+      new Set(this.atomTracker.getTrackedAtoms().map((atom) => atom.id))
     );
 
     if (result.success && result.snapshot) {
@@ -421,18 +434,18 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
       Object.entries(state).forEach(([key, value]) => {
         const atom = atomRegistry.getByName(key);
         if (atom) {
-          this.originalSet(atom, value);
-          this.atomTracker.track(atom, key);
+          this.originalSet(atom as Atom<any>, value);
+          this.atomTracker.track(atom as Atom<any>, key);
         }
       });
 
       if (this.autoCapture) {
-        this.capture("imported");
+        this.capture('imported');
       }
 
       return true;
     } catch (error) {
-      console.error("Failed to import state:", error);
+      console.error('Failed to import state:', error);
       return false;
     } finally {
       this.isTimeTraveling = false;
@@ -444,8 +457,8 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    */
   getCurrentSnapshot(): Snapshot | null {
     return this.snapshotCreator.create(
-      "current",
-      new Set(this.atomTracker.getTrackedAtoms().map((atom) => atom.id)),
+      'current',
+      new Set(this.atomTracker.getTrackedAtoms().map((atom) => atom.id))
     );
   }
 
@@ -458,13 +471,13 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
   compareSnapshots(
     a: Snapshot | string,
     b: Snapshot | string,
-    options?: Partial<ComparisonOptions>,
+    options?: Partial<ComparisonOptions>
   ): SnapshotComparison {
-    const snapshotA = typeof a === "string" ? this.getSnapshotById(a) : a;
-    const snapshotB = typeof b === "string" ? this.getSnapshotById(b) : b;
+    const snapshotA = typeof a === 'string' ? this.getSnapshotById(a) : a;
+    const snapshotB = typeof b === 'string' ? this.getSnapshotById(b) : b;
 
     if (!snapshotA || !snapshotB) {
-      throw new Error("Invalid snapshot reference");
+      throw new Error('Invalid snapshot reference');
     }
 
     return this.snapshotComparator.compare(snapshotA, snapshotB, options);
@@ -478,22 +491,25 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    */
   compareWithCurrent(
     snapshot: Snapshot | string,
-    options?: Partial<ComparisonOptions>,
+    options?: Partial<ComparisonOptions>
   ): SnapshotComparison {
-    const targetSnapshot = typeof snapshot === "string"
-      ? this.getSnapshotById(snapshot)
-      : snapshot;
+    const targetSnapshot =
+      typeof snapshot === 'string' ? this.getSnapshotById(snapshot) : snapshot;
 
     if (!targetSnapshot) {
-      throw new Error("Invalid snapshot reference");
+      throw new Error('Invalid snapshot reference');
     }
 
     const currentSnapshot = this.getCurrentSnapshot();
     if (!currentSnapshot) {
-      throw new Error("Failed to capture current state");
+      throw new Error('Failed to capture current state');
     }
 
-    return this.snapshotComparator.compare(targetSnapshot, currentSnapshot, options);
+    return this.snapshotComparator.compare(
+      targetSnapshot,
+      currentSnapshot,
+      options
+    );
   }
 
   /**
@@ -504,7 +520,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    */
   getDiffSince(
     action?: string,
-    options?: Partial<ComparisonOptions>,
+    options?: Partial<ComparisonOptions>
   ): SnapshotComparison | null {
     const history = this.getHistory();
 
@@ -527,7 +543,11 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     // Compare with the most recent snapshot
     const recentSnapshot = history[history.length - 1];
 
-    return this.snapshotComparator.compare(baseSnapshot, recentSnapshot, options);
+    return this.snapshotComparator.compare(
+      baseSnapshot,
+      recentSnapshot,
+      options
+    );
   }
 
   /**
@@ -538,7 +558,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    */
   visualizeChanges(
     comparison: SnapshotComparison,
-    format: VisualizationFormat = "list",
+    format: VisualizationFormat = 'list'
   ): string {
     return this.comparisonFormatter.visualize(comparison, format);
   }
@@ -551,7 +571,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    */
   exportComparison(
     comparison: SnapshotComparison,
-    format: ExportFormat,
+    format: ExportFormat
   ): string {
     return this.comparisonFormatter.export(comparison, format);
   }
@@ -633,7 +653,10 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
   /**
    * Get cleanup statistics
    */
-  getCleanupStats(): CleanupResult & { totalCleanups: number; totalAtomsRemoved: number } {
+  getCleanupStats(): CleanupResult & {
+    totalCleanups: number;
+    totalAtomsRemoved: number;
+  } {
     return this.atomTracker.getCleanupStats() as any;
   }
 
@@ -666,7 +689,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    */
   async restoreWithTransaction(
     snapshotId: string,
-    options?: RestorationOptions,
+    options?: RestorationOptions
   ): Promise<TransactionalRestorationResult> {
     const snapshot = this.historyManager.getById(snapshotId);
     if (!snapshot) {
@@ -698,9 +721,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    * @param checkpointId Checkpoint ID
    * @returns Rollback result
    */
-  async rollbackToCheckpoint(
-    checkpointId: string,
-  ): Promise<RollbackResult> {
+  async rollbackToCheckpoint(checkpointId: string): Promise<RollbackResult> {
     return this.snapshotRestorer.rollback(checkpointId);
   }
 
@@ -716,11 +737,15 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    */
   private wrappedSet<Value>(
     atom: Atom<Value>,
-    update: Value | ((prev: Value) => Value),
+    update: Value | ((prev: Value) => Value)
   ): void {
-    logger.log(`[WRAPPED_SET] Called with atom: ${atom.name}, value: ${update}, isTimeTraveling: ${this.isTimeTraveling}`);
-    logger.log(`[WRAPPED_SET] atom.id: ${atom.id?.toString()}, isTracked: ${this.atomTracker.isTracked(atom)}`);
-    
+    logger.log(
+      `[WRAPPED_SET] Called with atom: ${atom.name}, value: ${update}, isTimeTraveling: ${this.isTimeTraveling}`
+    );
+    logger.log(
+      `[WRAPPED_SET] atom.id: ${atom.id?.toString()}, isTracked: ${this.atomTracker.isTracked(atom)}`
+    );
+
     // Track atom if not already tracked
     if (!this.atomTracker.isTracked(atom)) {
       logger.log(`[WRAPPED_SET] Tracking new atom: ${atom.name}`);
@@ -761,7 +786,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     // Auto-capture if enabled and not during time travel
     if (this.autoCapture && !this.isTimeTraveling) {
       logger.log(`[WRAPPED_SET] Auto-capturing`);
-      this.capture(`set ${atom.name || atom.id?.description || "atom"}`);
+      this.capture(`set ${atom.name || atom.id?.description || 'atom'}`);
     }
   }
 
@@ -790,7 +815,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    * Get version
    */
   getVersion(): string {
-    return "1.0.0";
+    return '1.0.0';
   }
 
   /**
@@ -813,7 +838,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
       this.historyManager.forceFullSnapshot();
     } else {
       // For regular history manager, just capture current state
-      this.capture("force-full");
+      this.capture('force-full');
     }
   }
 
@@ -887,16 +912,16 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
    */
   private updateConfigFromStrategy(
     config: IncrementalSnapshotConfig,
-    strategy: DeltaCompressionFactoryConfig,
+    strategy: DeltaCompressionFactoryConfig
   ): IncrementalSnapshotConfig {
     // Update config based on strategy type
-    if (strategy.strategy === "time" && strategy.time?.maxAge) {
+    if (strategy.strategy === 'time' && strategy.time?.maxAge) {
       return { ...config, maxDeltaChainAge: strategy.time.maxAge };
     }
-    if (strategy.strategy === "changes" && strategy.changes?.maxDeltas) {
+    if (strategy.strategy === 'changes' && strategy.changes?.maxDeltas) {
       return { ...config, maxDeltaChainLength: strategy.changes.maxDeltas };
     }
-    if (strategy.strategy === "size" && strategy.size?.maxSize) {
+    if (strategy.strategy === 'size' && strategy.size?.maxSize) {
       return { ...config, maxDeltaChainSize: strategy.size.maxSize };
     }
     return config;
@@ -942,7 +967,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
       return;
     }
 
-    this.log("Disposing SimpleTimeTravel");
+    this.log('Disposing SimpleTimeTravel');
 
     // 1. Stop all operations
     this.pauseAutoCapture();
@@ -968,7 +993,7 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
       try {
         await child.dispose();
       } catch (error) {
-        console.error("Error disposing child:", error);
+        console.error('Error disposing child:', error);
       }
     }
     this.children.clear();
@@ -996,12 +1021,12 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     await this.runDisposeCallbacks();
 
     this.disposed = true;
-    this.log("SimpleTimeTravel disposed");
+    this.log('SimpleTimeTravel disposed');
   }
 }
 
 // Extend TimeTravelOptions to include component-specific configs
-declare module "../types" {
+declare module '../types' {
   interface TimeTravelOptions {
     /** Atoms to exclude from tracking */
     excludeAtoms?: string[];

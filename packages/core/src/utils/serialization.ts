@@ -62,7 +62,10 @@ export class SerializationUtils {
    * @param options - Serialization options
    * @returns Serialized state object
    */
-  serializeState(store: Store, options: SerializationOptions = {}): Record<string, unknown> {
+  serializeState(
+    store: Store,
+    options: SerializationOptions = {}
+  ): Record<string, unknown> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
     const state = store.getState();
     const seen = opts.handleCircularRefs ? new WeakMap() : null;
@@ -73,7 +76,8 @@ export class SerializationUtils {
       try {
         result[key] = serializeValue(value, opts, seen, 0);
       } catch (error) {
-        result[key] = `[Serialization Error: ${error instanceof Error ? error.message : String(error)}]`;
+        result[key] =
+          `[Serialization Error: ${error instanceof Error ? error.message : String(error)}]`;
       }
     }
 
@@ -103,10 +107,13 @@ export class SerializationUtils {
    * @returns Serialized representation of the Map
    */
   serializeMap(map: Map<unknown, unknown>): Record<string, unknown> {
-    const result: Record<string, unknown> = { __type: 'Map', entries: [] };
+    const result: Record<string, unknown> = {
+      __type: 'Map',
+      entries: [],
+    } as any;
 
     for (const [key, value] of map.entries()) {
-      result.entries.push([key, value]);
+      (result.entries as any[]).push([key, value]);
     }
 
     return result;
@@ -118,10 +125,13 @@ export class SerializationUtils {
    * @returns Serialized representation of the Set
    */
   serializeSet(set: Set<unknown>): Record<string, unknown> {
-    const result: Record<string, unknown> = { __type: 'Set', values: [] };
+    const result: Record<string, unknown> = {
+      __type: 'Set',
+      values: [],
+    } as any;
 
     for (const value of set) {
-      result.values.push(value);
+      (result.values as any[]).push(value);
     }
 
     return result;
@@ -160,17 +170,21 @@ function serializeValue(
   if (value === null || value === undefined) {
     return value;
   }
-  
+
   // Handle primitive types
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
     return value;
   }
-  
+
   // Check depth limit
   if (depth >= (options.maxDepth ?? 10)) {
     return `[Max Depth Reached]`;
   }
-  
+
   // Handle circular references
   if (seen && typeof value === 'object' && value !== null) {
     if (seen.has(value)) {
@@ -179,27 +193,27 @@ function serializeValue(
     // Mark this object as seen
     seen.set(value, `Object@${depth}`);
   }
-  
+
   // Handle arrays
   if (Array.isArray(value)) {
-    return value.map(item => serializeValue(item, options, seen, depth + 1));
+    return value.map((item) => serializeValue(item, options, seen, depth + 1));
   }
-  
+
   // Handle functions
   if (typeof value === 'function') {
     return `[Function: ${value.name || 'anonymous'}]`;
   }
-  
+
   // Handle Date objects
   if (value instanceof Date) {
     return `[Date: ${value.toISOString()}]`;
   }
-  
+
   // Handle RegExp objects
   if (value instanceof RegExp) {
     return `[RegExp: ${value.toString()}]`;
   }
-  
+
   // Handle custom serializers
   if (options.customSerializers) {
     const constructorName = value.constructor?.name;
@@ -210,7 +224,7 @@ function serializeValue(
       }
     }
   }
-  
+
   // Handle plain objects
   if (typeof value === 'object') {
     const result: Record<string, unknown> = {};
@@ -219,7 +233,8 @@ function serializeValue(
       try {
         result[key] = serializeValue(val, options, seen, depth + 1);
       } catch (error) {
-        result[key] = `[Serialization Error: ${error instanceof Error ? error.message : String(error)}]`;
+        result[key] =
+          `[Serialization Error: ${error instanceof Error ? error.message : String(error)}]`;
       }
     }
 
@@ -236,7 +251,10 @@ function serializeValue(
  * @param options - Serialization options
  * @returns Serialized state object
  */
-export function serializeState(store: Store, options: SerializationOptions = {}): Record<string, unknown> {
+export function serializeState(
+  store: Store,
+  options: SerializationOptions = {}
+): Record<string, unknown> {
   const serializationUtils = new SerializationUtils();
   return serializationUtils.serializeState(store, options);
 }
@@ -261,7 +279,9 @@ export function registerCustomSerializer(
  * @param map - The Map to serialize
  * @returns Serialized representation of the Map
  */
-export function serializeMap(map: Map<unknown, unknown>): Record<string, unknown> {
+export function serializeMap(
+  map: Map<unknown, unknown>
+): Record<string, unknown> {
   const serializationUtils = new SerializationUtils();
   return serializationUtils.serializeMap(map);
 }
