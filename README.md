@@ -2,8 +2,8 @@
 
 > Framework-agnostic state management with built-in Time Travel debugging
 
-[![Coverage Status](https://coveralls.io/repos/github/astashkin-a/nexus-state/badge.svg?branch=main)](https://coveralls.io/github/astashkin-a/nexus-state?branch=main)
-[![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/astashkin-a/nexus-state/blob/main/LICENSE)
+[![Coverage Status](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
+[![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
 [![npm](https://img.shields.io/npm/v/@nexus-state/core?label=@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
 [![npm downloads](https://img.shields.io/npm/dw/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
 
