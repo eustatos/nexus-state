@@ -130,8 +130,9 @@ const result = await updateUser.mutateAsync({ id: 1, name: 'John' });
 - ✅ Query invalidation
 - ✅ Error boundary integration
 - ✅ SSR compatible
+- ✅ React Suspense support
+- ✅ Prefetching utilities
 - ⬜ Infinite Queries (coming soon)
-- ⬜ Suspense support (coming soon)
 
 ## React API
 
@@ -191,6 +192,55 @@ function UserProfile({ userId }: { userId: number }) {
 - `isStale` - Data is stale
 - `status` - 'idle' | 'loading' | 'success' | 'error'
 - `refetch()` - Manually refetch
+
+### useSuspenseQuery
+
+Hook for fetching data with React Suspense for declarative loading states.
+
+```tsx
+import { Suspense } from 'react';
+import { useSuspenseQuery } from '@nexus-state/query/react';
+
+function UserProfile({ userId }: { userId: number }) {
+  // No loading check needed - Suspense handles it
+  const { data, refetch } = useSuspenseQuery(
+    `user-${userId}`,
+    async () => {
+      const response = await fetch(`/api/users/${userId}`);
+      return response.json();
+    }
+  );
+
+  return (
+    <div>
+      <h1>{data.name}</h1>
+      <button onClick={refetch}>Refresh</button>
+    </div>
+  );
+}
+
+// Wrap with Suspense boundary
+function App() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <UserProfile userId={1} />
+    </Suspense>
+  );
+}
+```
+
+**Options:**
+- `staleTime` - Time in ms before data is considered stale (default: `0`)
+
+**Result:**
+- `data` - The fetched data (never undefined when rendered)
+- `error` - Always null (errors thrown to boundary)
+- `isLoading` - Always false (suspends instead)
+- `isSuccess` - Always true when rendered
+- `isFetching` - Currently fetching in background
+- `isStale` - Data is stale
+- `refetch()` - Manually refetch
+- `remove()` - Remove from cache
 
 ### useMutation
 
@@ -314,6 +364,101 @@ function GlobalLoadingIndicator() {
       )}
     </div>
   );
+}
+```
+
+### Prefetching
+
+Prefetch query data before component renders for optimal loading states.
+
+```tsx
+import { prefetchQuery, prefetchQueries, setQueryData, getQueryData, invalidateQuery } from '@nexus-state/query/react';
+
+// Prefetch single query
+await prefetchQuery({
+  queryKey: 'user-1',
+  queryFn: () => fetch('/api/users/1').then(r => r.json()),
+  staleTime: 5 * 60 * 1000,
+});
+
+// Prefetch multiple queries in parallel
+await prefetchQueries([
+  { queryKey: 'user', queryFn: fetchUser },
+  { queryKey: 'posts', queryFn: fetchPosts },
+  { queryKey: 'comments', queryFn: fetchComments },
+]);
+
+// Set query data manually (optimistic update)
+setQueryData('user-1', { id: 1, name: 'John' });
+
+// Get query data without suspending
+const userData = getQueryData('user-1');
+
+// Invalidate query cache
+invalidateQuery('users');
+```
+
+**Functions:**
+- `prefetchQuery(options)` - Prefetch single query
+- `prefetchQueries(queries)` - Prefetch multiple queries in parallel
+- `setQueryData(key, data)` - Set query data manually
+- `getQueryData(key)` - Get query data without suspending
+- `invalidateQuery(key)` - Invalidate query cache
+
+### Error Boundaries
+
+Integrate with React Error Boundaries for graceful error handling.
+
+```tsx
+import { ErrorBoundary } from 'react-error-boundary';
+import { useSuspenseQuery } from '@nexus-state/query/react';
+
+function UserProfile({ userId }: { userId: number }) {
+  const { data } = useSuspenseQuery(
+    `user-${userId}`,
+    async () => {
+      const response = await fetch(`/api/users/${userId}`);
+      return response.json();
+    }
+  );
+
+  return <div>{data.name}</div>;
+}
+
+function App() {
+  return (
+    <ErrorBoundary fallback={<ErrorFallback />}>
+      <Suspense fallback={<Loading />}>
+        <UserProfile userId={1} />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+```
+
+### SSR Support
+
+Server-side rendering with data prefetching.
+
+```tsx
+// Server-side prefetch (e.g., Next.js getServerSideProps)
+import { prefetchQuery } from '@nexus-state/query/react';
+
+export async function getServerSideProps() {
+  await prefetchQuery({
+    queryKey: 'user',
+    queryFn: fetchUser,
+  });
+
+  return {
+    props: {},
+  };
+}
+
+// Client hydrates from cache
+function Page() {
+  const { data } = useSuspenseQuery('user', fetchUser);
+  return <div>{data.name}</div>;
 }
 ```
 
