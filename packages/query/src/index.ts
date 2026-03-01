@@ -13,6 +13,11 @@ export { mutation, mutation as createMutation } from './mutation';
 export { createQueryCache } from './cache';
 export { createRequestTracker } from './request-tracker';
 export { createRefetchManager, createIntervalRefetch } from './refetch-manager';
+export {
+  SuspenseQueryCache,
+  getSuspenseCache,
+  setSuspenseCache,
+} from './suspense-cache';
 
 export type {
   QueryOptions,
@@ -38,6 +43,7 @@ export { useQuery as useReactQuery } from '../react/useQuery';
 export { useMutation } from '../react/useMutation';
 export { useQueries } from '../react/useQueries';
 export { useIsFetching } from '../react/useIsFetching';
+export { useSuspenseQuery } from '../react/useSuspenseQuery';
 export {
   QueryClientProvider,
   createQueryClient,
@@ -46,6 +52,13 @@ export {
   useInvalidateQueries,
   useRefetchQueries,
 } from '../react/QueryClientProvider';
+export {
+  prefetchQuery,
+  prefetchQueries,
+  setQueryData,
+  getQueryData,
+  invalidateQuery,
+} from '../react/prefetch';
 
 export type {
   UseQueryOptions,
@@ -57,4 +70,8 @@ export type {
   QueryClientConfig,
   UseIsFetchingOptions,
   QueryClientProviderProps,
+  SuspenseQueryOptions,
+  SuspenseQueryResult,
+  QueryCacheEntry,
+  PrefetchOptions,
 } from '../react/types';
