@@ -9,7 +9,9 @@ import {
   FormErrors,
   SchemaValidator,
   FieldArray,
-  FieldArrayMeta
+  FieldArrayMeta,
+  ValidationMode,
+  ReValidateMode,
 } from './types';
 import {
   createField,
@@ -18,7 +20,7 @@ import {
   setFieldTouched,
   setFieldError,
   resetField,
-  validateField
+  validateField,
 } from './field';
 import { createFieldArray, getFieldArray } from './field-array';
 
@@ -29,6 +31,13 @@ export function createForm<TValues extends FormValues>(
   store: Store,
   options: FormOptions<TValues>
 ): Form<TValues> {
+  // Form-level validation defaults
+  const defaultValidationMode: ValidationMode =
+    options.defaultValidationMode ?? 'onBlur';
+  const defaultRevalidateMode: ReValidateMode =
+    options.defaultRevalidateMode ?? 'onChange';
+  const showErrorsOnTouched = options.showErrorsOnTouched ?? true;
+
   // Create field atoms for each initial value
   const fieldMetas: Map<keyof TValues, FieldMeta<any>> = new Map();
 
@@ -36,7 +45,10 @@ export function createForm<TValues extends FormValues>(
 
   for (const key in initialValues) {
     const fieldMeta = createField(store, key as string, {
-      initialValue: initialValues[key]
+      initialValue: initialValues[key],
+      validateOn: defaultValidationMode,
+      revalidateOn: defaultRevalidateMode,
+      showErrorsOnTouched,
     });
     fieldMetas.set(key, fieldMeta);
   }
