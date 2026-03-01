@@ -1,29 +1,81 @@
 # @nexus-state/core
 
-The core package of the Nexus State ecosystem - a powerful state management solution for modern JavaScript applications.
+> The core package of the Nexus State ecosystem - a powerful state management solution for modern JavaScript applications
+>
+> [![npm version](https://img.shields.io/npm/v/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
+> [![npm downloads](https://img.shields.io/npm/dw/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
+> [![Coverage Status](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&flag=core)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
+> [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
 
 [Documentation](https://nexus-state.website.yandexcloud.net/) • [Repository](https://github.com/eustatos/nexus-state)
 
-## Installation
+---
+
+## 📦 Installation
 
 ```bash
 npm install @nexus-state/core
 ```
 
-## Overview
+---
 
-Nexus State is a modern state management library designed for simplicity, performance, and scalability. The `@nexus-state/core` package provides the fundamental building blocks for creating reactive state containers in your applications.
+## ✨ Features
 
-## Features
+- 🎯 **Atom-based architecture** — Fine-grained reactivity for precise updates
+- 🔄 **Reactive** — Automatic updates when state changes
+- 📘 **TypeScript First** — Full type inference with no `any` types
+- 🌐 **Framework Agnostic** — Works with React, Vue, Svelte, or vanilla JS
+- 🔌 **Extensible** — Middleware and plugin support
+- 🛠️ **DevTools Ready** — Automatic atom registration for debugging
 
-- **Lightweight**: Minimal overhead for maximum performance
-- **Reactive**: Automatic updates when state changes
-- **TypeScript Support**: First-class TypeScript integration with full type inference
-- **Framework Agnostic**: Works with any JavaScript framework or vanilla JavaScript
-- **Extensible**: Easily extend functionality with middleware and plugins
-- **DevTools Integration**: Automatic atom registration for debugging
+---
 
-## Core Concepts
+## 🤔 When to Use
+
+### If you need...
+
+✅ **Framework-agnostic state** — Share logic between React, Vue, and Svelte
+✅ **Fine-grained reactivity** — Atom-based updates, no unnecessary re-renders
+✅ **TypeScript support** — Full type inference out of the box
+✅ **Small bundle** — Lightweight core with tree-shaking
+✅ **DevTools integration** — Built-in debugging capabilities
+
+### If you don't need...
+
+❌ **Complex boilerplate** — No reducers, actions, or selectors required
+❌ **Context providers** — No wrapping your app in providers
+❌ **React-only solutions** — This works with any framework
+
+---
+
+## 🚀 Quick Start
+
+### Basic Counter
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+
+// Create an atom with initial value
+const countAtom = atom(0, 'count');
+
+// Create a store
+const store = createStore();
+
+// Get the value
+console.log(store.get(countAtom)); // 0
+
+// Update the value
+store.set(countAtom, 5);
+
+// Subscribe to changes
+const unsubscribe = store.subscribe(countAtom, (value) => {
+  console.log('Count changed:', value);
+});
+```
+
+---
+
+## 📖 Core Concepts
 
 ### Atoms
 
@@ -92,9 +144,11 @@ const unsubscribe = myStore.subscribe(countAtom, (value) => {
 });
 ```
 
-## Usage Examples
+---
 
-### Basic Counter with Computed Atoms
+## 📖 Examples
+
+### Counter with Computed Atoms
 
 This example demonstrates a simple counter with computed values:
 
@@ -128,7 +182,7 @@ console.log(store.get(isEvenAtom)); // false
 
 ### React Integration
 
-```javascript
+```tsx
 import { atom, createStore } from '@nexus-state/core';
 import { useAtom } from '@nexus-state/react';
 
@@ -137,7 +191,7 @@ const store = createStore();
 
 function Counter() {
   const [count, setCount] = useAtom(countAtom, store);
-  
+
   return (
     <div>
       <p>Count: {count}</p>
@@ -185,22 +239,30 @@ const store = createStore();
 store.set(firstNameAtom, 'Jane');
 ```
 
-## Ecosystem
+---
+
+## 📦 Ecosystem
 
 Nexus State provides additional packages for enhanced functionality:
 
-- [@nexus-state/react](../react) - React bindings for Nexus State
-- [@nexus-state/immer](../immer) - Immer integration for immutable state updates
-- [@nexus-state/persist](../persist) - State persistence utilities
-- [@nexus-state/middleware](../middleware) - Middleware for advanced state management
-- [@nexus-state/devtools](../devtools) - Developer tools integration
-- [@nexus-state/vue](../vue) - Vue.js bindings
-- [@nexus-state/svelte](../svelte) - Svelte bindings
-- [@nexus-state/async](../async) - Async state management utilities
-- [@nexus-state/web-worker](../web-worker) - Web Worker integration
-- [@nexus-state/family](../family) - Atom family utilities
-- [@nexus-state/cli](../cli) - Command-line interface tools
+| Package | Description |
+|---------|-------------|
+| [@nexus-state/react](https://github.com/eustatos/nexus-state/tree/main/packages/react) | React bindings |
+| [@nexus-state/vue](https://github.com/eustatos/nexus-state/tree/main/packages/vue) | Vue.js bindings |
+| [@nexus-state/svelte](https://github.com/eustatos/nexus-state/tree/main/packages/svelte) | Svelte bindings |
+| [@nexus-state/persist](https://github.com/eustatos/nexus-state/tree/main/packages/persist) | State persistence |
+| [@nexus-state/middleware](https://github.com/eustatos/nexus-state/tree/main/packages/middleware) | Middleware system |
+| [@nexus-state/devtools](https://github.com/eustatos/nexus-state/tree/main/packages/devtools) | DevTools integration |
+| [@nexus-state/immer](https://github.com/eustatos/nexus-state/tree/main/packages/immer) | Immer integration |
+| [@nexus-state/async](https://github.com/eustatos/nexus-state/tree/main/packages/async) | Async state management |
+| [@nexus-state/family](https://github.com/eustatos/nexus-state/tree/main/packages/family) | Atom families |
+| [@nexus-state/query](https://github.com/eustatos/nexus-state/tree/main/packages/query) | Data fetching & caching |
+| [@nexus-state/form](https://github.com/eustatos/nexus-state/tree/main/packages/form) | Form management |
+| [@nexus-state/web-worker](https://github.com/eustatos/nexus-state/tree/main/packages/web-worker) | Web Worker support |
+| [@nexus-state/cli](https://github.com/eustatos/nexus-state/tree/main/packages/cli) | CLI tools |
 
-## License
+---
+
+## 📄 License
 
 MIT
