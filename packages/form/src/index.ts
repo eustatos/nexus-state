@@ -12,6 +12,7 @@ export {
   validateField,
 } from './field';
 export { AsyncValidationManager } from './async-validation';
+export { ValidationTrigger } from './validation-trigger';
 export {
   required,
   email,
@@ -52,4 +53,7 @@ export type {
   AsyncValidator,
   AsyncValidatorOptions,
   AsyncValidatorWithConfig,
+  ValidationMode,
+  ReValidateMode,
+  ValidationConfig,
 } from './types';
