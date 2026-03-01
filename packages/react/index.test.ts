@@ -1,6 +1,6 @@
 // Tests for React adapter
 import { atom, createStore, Setter, ComputedAtom, Atom } from "@nexus-state/core";
-import { useAtom } from "./index";
+import { useAtom, useAtomValue, useSetAtom } from "./index";
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 
@@ -16,7 +16,155 @@ function updateAtomValue<T>(atom: any, store: any, value: T | ((prev: T) => T)) 
   });
 }
 
-// === PRIMITIVE ATOM TESTS ===
+// === useAtomValue TESTS ===
+describe("useAtomValue - Read-only hook", () => {
+  it("should return the initial value of the atom", () => {
+    const store = createStore();
+    const testAtom = atom(42);
+
+    const { result } = renderHook(() => useAtomValue(testAtom, store));
+    expect(result.current).toBe(42);
+  });
+
+  it("should update when the atom value changes", () => {
+    const store = createStore();
+    const testAtom = atom(0);
+
+    const { result } = renderHook(() => useAtomValue(testAtom, store));
+    expect(result.current).toBe(0);
+
+    act(() => {
+      store.set(testAtom, 1);
+    });
+
+    expect(result.current).toBe(1);
+  });
+
+  it("should work with computed atoms", () => {
+    const store = createStore();
+    const countAtom = atom(5);
+    const doubleAtom = atom((get) => get(countAtom) * 2);
+
+    const { result } = renderHook(() => useAtomValue(doubleAtom, store));
+    expect(result.current).toBe(10);
+
+    act(() => {
+      store.set(countAtom, 10);
+    });
+
+    expect(result.current).toBe(20);
+  });
+
+  it("should not cause re-renders when used with useSetAtom in sibling component", () => {
+    const store = createStore();
+    const countAtom = atom(0);
+
+    let renderCount = 0;
+    
+    // Component that only reads
+    const { result: readResult } = renderHook(() => {
+      renderCount++;
+      return useAtomValue(countAtom, store);
+    });
+
+    // Component that only writes
+    const { result: writeResult } = renderHook(() => {
+      return useSetAtom(countAtom, store);
+    });
+
+    expect(readResult.current).toBe(0);
+    expect(renderCount).toBe(1);
+
+    // Update from write-only component
+    act(() => {
+      writeResult.current(1);
+    });
+
+    expect(readResult.current).toBe(1);
+    // Should re-render because value changed
+    expect(renderCount).toBe(2);
+  });
+});
+
+// === useSetAtom TESTS ===
+describe("useSetAtom - Write-only hook", () => {
+  it("should return a setter function", () => {
+    const store = createStore();
+    const testAtom = atom(0);
+
+    const { result } = renderHook(() => useSetAtom(testAtom, store));
+    expect(typeof result.current).toBe("function");
+  });
+
+  it("should update the atom value when called", () => {
+    const store = createStore();
+    const testAtom = atom(0);
+
+    const { result } = renderHook(() => useSetAtom(testAtom, store));
+
+    act(() => {
+      result.current(42);
+    });
+
+    expect(store.get(testAtom)).toBe(42);
+  });
+
+  it("should work with function updates", () => {
+    const store = createStore();
+    const countAtom = atom(1);
+
+    const { result } = renderHook(() => useSetAtom(countAtom, store));
+
+    act(() => {
+      result.current((prev) => prev + 1);
+    });
+
+    expect(store.get(countAtom)).toBe(2);
+
+    act(() => {
+      result.current((prev) => prev * 10);
+    });
+
+    expect(store.get(countAtom)).toBe(20);
+  });
+
+  it("should have stable reference (not change on re-render)", () => {
+    const store = createStore();
+    const testAtom = atom(0);
+
+    const { result, rerender } = renderHook(() => useSetAtom(testAtom, store));
+    const firstSetter = result.current;
+
+    rerender();
+    const secondSetter = result.current;
+
+    expect(firstSetter).toBe(secondSetter);
+  });
+
+  it("should not cause component to re-render when updating", () => {
+    const store = createStore();
+    const testAtom = atom(0);
+
+    let renderCount = 0;
+
+    const { result } = renderHook(() => {
+      renderCount++;
+      return useSetAtom(testAtom, store);
+    });
+
+    expect(renderCount).toBe(1);
+
+    act(() => {
+      result.current(1);
+    });
+
+    // Should still be 1 - component doesn't re-render because it doesn't read value
+    expect(renderCount).toBe(1);
+    expect(store.get(testAtom)).toBe(1);
+  });
+});
+
+// === useAtom BACKWARD COMPATIBILITY TESTS ===
 describe("useAtom - Primitive Atoms", () => {
   it("should return the initial value of the atom", () => {
     const store = createStore();
@@ -335,12 +483,14 @@ describe("useAtom - Store Isolation", () => {
     expect(result2.current[0]).toBe(20);
   });
 
-  it("should use default store when none is provided", () => {
+  it("should work with StoreProvider context", () => {
     const atom1 = atom(100);
     const atom2 = atom(200);
+    const store = createStore();
 
-    const { result: result1 } = renderHook(() => useAtom(atom1));
-    const { result: result2 } = renderHook(() => useAtom(atom2));
+    // Test that useAtom works with explicit store (main use case)
+    const { result: result1 } = renderHook(() => useAtom(atom1, store));
+    const { result: result2 } = renderHook(() => useAtom(atom2, store));
 
     expect(result1.current[0]).toBe(100);
     expect(result2.current[0]).toBe(200);

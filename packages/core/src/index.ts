@@ -164,3 +164,9 @@ export type {
   ActionTrackingOptions,
   ActionMetadata as TrackedActionMetadata,
 } from "./utils/action-tracker";
+
+// Debug logger (development only)
+export { logger, storeLogger, atomLogger, reactLogger } from "./debug";
+
+// Batching utility
+export { batch, batcher, isBatching } from "./batching";

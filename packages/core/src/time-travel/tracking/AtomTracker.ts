@@ -18,6 +18,7 @@ import type {
 } from "./types";
 
 import { createCleanupStrategy } from "./CleanupStrategies";
+import { storeLogger as logger } from "../../debug";
 
 // Import disposal infrastructure
 import { BaseDisposable, type DisposableConfig } from "../core/disposable";
@@ -152,7 +153,7 @@ export class AtomTracker extends BaseDisposable {
    * @returns True if tracking started
    */
   track<Value>(atom: Atom<Value>, name?: string, ttl?: number): boolean {
-    console.log(`[TRACKER.track] Tracking atom: ${atom.name}, id: ${atom.id?.toString()}, atoms.size: ${this.atoms.size}`);
+    logger.log(`[TRACKER.track] Tracking atom: ${atom.name}, id: ${atom.id?.toString()}, atoms.size: ${this.atoms.size}`);
 
     if (this.atoms.size >= this.trackerConfig.maxAtoms) {
       // Try to cleanup before rejecting
@@ -167,7 +168,7 @@ export class AtomTracker extends BaseDisposable {
     if (this.atoms.has(atom.id)) {
       // Update existing atom (reactivate)
       this.reactivateAtom(atom.id);
-      console.log(`[TRACKER.track] Atom already tracked, reactivated!`);
+      logger.log(`[TRACKER.track] Atom already tracked, reactivated!`);
       return true;
     }
 
@@ -563,7 +564,7 @@ export class AtomTracker extends BaseDisposable {
     });
 
     if (this.ttlConfig.logCleanups && removed > 0) {
-      console.log(`[TRACKER.cleanup] Cleaned up ${removed} atoms, freed ${freed} bytes in ${duration}ms`);
+      logger.log(`[TRACKER.cleanup] Cleaned up ${removed} atoms, freed ${freed} bytes in ${duration}ms`);
     }
 
     return { removed, freed, duration };
@@ -599,7 +600,7 @@ export class AtomTracker extends BaseDisposable {
       this.emit("afterCleanup", { atom });
       return true;
     } catch (error) {
-      console.error(`Failed to cleanup atom ${atom.name}:`, error);
+      logger.error(`Failed to cleanup atom ${atom.name}:`, error);
       return false;
     }
   }

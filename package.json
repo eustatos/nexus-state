@@ -7,6 +7,8 @@
     "dev": "turbo run dev --parallel",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
+    "test:memory": "vitest run packages/core/src/__tests__/memory-leak.test.ts",
+    "bench": "vitest bench packages/core/src/__benchmarks__/",
     "lint": "turbo run lint",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "lint:ci": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings 0",
@@ -28,7 +30,8 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm run release:packages && changeset publish",
-    "release:packages": "turbo run build --filter=@nexus-state/*"
+    "release:packages": "turbo run build --filter=@nexus-state/*",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.0",
@@ -65,13 +68,19 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
+      "eslint --fix",
       "prettier --write"
     ],
     "*.{js,jsx}": [
+      "eslint --fix",
       "prettier --write"
     ],
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged",
+    "commit-msg": "pnpm exec commitlint --edit ${1}"
   }
 }
