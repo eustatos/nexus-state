@@ -31,7 +31,8 @@
     "typescript": "^5.0.0",
     "vitest": "^3.0.7",
     "eslint": "^8.40.0",
-    "@vue/reactivity": "^3.3.0"
+    "@vue/reactivity": "^3.3.0",
+    "jsdom": "^26.1.0"
   },
   "peerDependencies": {
     "vue": "^3.3.0"

@@ -31,7 +31,8 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm run release:packages && changeset publish",
-    "release:packages": "turbo run build --filter=@nexus-state/*"
+    "release:packages": "turbo run build --filter=@nexus-state/*",
+    "coverage:merge": "mkdir -p coverage && find packages -name \"lcov.info\" -exec cat {} \\; > coverage/lcov.info 2>/dev/null || true"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.0",

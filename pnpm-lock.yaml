@@ -187,13 +187,22 @@ importers:
       '@nexus-state/core':
         specifier: workspace:*
         version: link:../core
+      '@nexus-state/react':
+        specifier: workspace:*
+        version: link:../react
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.33
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
