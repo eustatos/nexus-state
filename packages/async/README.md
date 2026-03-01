@@ -1,5 +1,5 @@
 # @nexus-state/async
-
+> [![Coverage for core package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=async)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
 Asynchronous utilities for Nexus State
 
 ## Description
