@@ -14,15 +14,18 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
-      include: ["src/**/*"],
+      include: ["packages/*/src/**/*"],
       exclude: [
-        "src/**/*.d.ts",
-        "packages/**/*.d.ts",
+        "packages/**/src/**/*.d.ts",
         "**/legacy.ts",
         "**/*.config.*",
         "**/*.test.*",
         "**/*.spec.*",
+        "packages/**/dist/**",
+        "packages/**/node_modules/**",
       ],
+      // Выводим lcov в директорию пакета для последующего объединения
+      reportsDirectory: "./coverage",
     },
     // Настройка среды для разных типов тестов
     environmentMatchGlobs: [
