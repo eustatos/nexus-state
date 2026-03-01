@@ -32,9 +32,11 @@ export function createForm<TValues extends FormValues>(
   // Create field atoms for each initial value
   const fieldMetas: Map<keyof TValues, FieldMeta<any>> = new Map();
 
-  for (const key in options.initialValues) {
+  const initialValues = options.initialValues ?? {} as TValues;
+
+  for (const key in initialValues) {
     const fieldMeta = createField(store, key as string, {
-      initialValue: options.initialValues[key]
+      initialValue: initialValues[key]
     });
     fieldMetas.set(key, fieldMeta);
   }
@@ -167,7 +169,9 @@ export function createForm<TValues extends FormValues>(
 
     try {
       const values = getValues();
-      await options.onSubmit(values);
+      if (options.onSubmit) {
+        await options.onSubmit(values);
+      }
 
       // Update submit count
       store.set(formStateAtom, {
@@ -208,7 +212,7 @@ export function createForm<TValues extends FormValues>(
 
     if (!meta) {
       // Get initial value
-      const initialValue = options.initialValues[name];
+      const initialValue = options.initialValues?.[name];
 
       if (!Array.isArray(initialValue)) {
         throw new Error(`Field "${String(name)}" is not an array`);

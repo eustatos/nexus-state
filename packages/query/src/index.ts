@@ -5,7 +5,8 @@ export {
   setQueryCache,
   clearQueryCache,
   setRequestTracker,
-  setRefetchManager
+  setRefetchManager,
+  getQueryCache,
 } from './query';
 
 export { mutation, mutation as createMutation } from './mutation';
@@ -29,5 +30,31 @@ export type {
   MutationOptions,
   MutationState,
   MutationResult,
-  MutationStatus
+  MutationStatus,
 } from './types';
+
+// React exports
+export { useQuery as useReactQuery } from '../react/useQuery';
+export { useMutation } from '../react/useMutation';
+export { useQueries } from '../react/useQueries';
+export { useIsFetching } from '../react/useIsFetching';
+export {
+  QueryClientProvider,
+  createQueryClient,
+  useQueryClient,
+  useQueryClientStore,
+  useInvalidateQueries,
+  useRefetchQueries,
+} from '../react/QueryClientProvider';
+
+export type {
+  UseQueryOptions,
+  UseQueryResult,
+  UseMutationOptions,
+  UseMutationResult,
+  QueryConfig,
+  QueryClient,
+  QueryClientConfig,
+  UseIsFetchingOptions,
+  QueryClientProviderProps,
+} from '../react/types';

@@ -1,13 +1,18 @@
 import { Store } from '@nexus-state/core';
-import { FieldMeta, FieldValidator, AsyncFieldValidator, FormErrors, FormValues } from './types';
+import {
+  FieldMeta,
+  FieldValidator,
+  AsyncFieldValidator,
+  FormErrors,
+  FormValues,
+  AsyncValidatorOptions,
+} from './types';
 import { setFieldError } from './field';
 
 /**
  * Required field validator
  */
-export function required<TValue>(
-  value: TValue
-): string | null {
+export function required<TValue>(value: TValue): string | null {
   if (value === null || value === undefined || value === '') {
     return 'Required';
   }
@@ -132,7 +137,10 @@ export function debounceAsyncValidator<TValue>(
 ): AsyncFieldValidator<TValue> {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  return async (value: TValue, allValues: FormValues): Promise<string | null> => {
+  return async (
+    value: TValue,
+    allValues: FormValues
+  ): Promise<string | null> => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
@@ -144,6 +152,127 @@ export function debounceAsyncValidator<TValue>(
       }, delay);
     });
   };
+}
+
+/**
+ * Create async validator with full options support
+ */
+export function createAsyncValidator<TValue>(
+  validator: AsyncFieldValidator<TValue>,
+  options: AsyncValidatorOptions = {}
+): {
+  validate: AsyncFieldValidator<TValue>;
+  options: AsyncValidatorOptions;
+} {
+  const { debounce = 300, retry = 0, cache = true, timeout = 5000 } = options;
+
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  let abortController: AbortController | null = null;
+  const cacheMap = new Map<
+    string,
+    { result: string | null; timestamp: number }
+  >();
+
+  const wrappedValidator: AsyncFieldValidator<TValue> = async (
+    value: TValue,
+    allValues: FormValues
+  ): Promise<string | null> => {
+    // Clear existing timeout
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    // Cancel existing request
+    if (abortController) {
+      abortController.abort();
+    }
+
+    // Check cache
+    const cacheKey = JSON.stringify({ value, allValues });
+    if (cache) {
+      const cached = cacheMap.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < 60000) {
+        return cached.result;
+      }
+    }
+
+    return new Promise((resolve, reject) => {
+      abortController = new AbortController();
+      const { signal } = abortController;
+
+      timeoutId = setTimeout(async () => {
+        if (signal.aborted) {
+          resolve(null);
+          return;
+        }
+
+        try {
+          const result = await Promise.race([
+            validator(value, allValues),
+            new Promise<never>((_, rej) =>
+              setTimeout(() => rej(new Error('Validation timeout')), timeout)
+            ),
+          ]);
+
+          if (signal.aborted) {
+            resolve(null);
+            return;
+          }
+
+          // Cache result
+          if (cache) {
+            cacheMap.set(cacheKey, {
+              result: result ?? null,
+              timestamp: Date.now(),
+            });
+          }
+
+          resolve(result ?? null);
+        } catch (error) {
+          if (signal.aborted) {
+            resolve(null);
+            return;
+          }
+          reject(error);
+        }
+      }, debounce);
+    });
+  };
+
+  return {
+    validate: wrappedValidator,
+    options,
+  };
+}
+
+/**
+ * Create username availability validator
+ */
+export function usernameAvailable(
+  checkFn: (username: string) => Promise<boolean>,
+  message: string = 'Username is already taken',
+  options: AsyncValidatorOptions = {}
+) {
+  return createAsyncValidator(async (value: string) => {
+    if (!value) return null;
+    const available = await checkFn(value);
+    return available ? null : message;
+  }, options);
+}
+
+/**
+ * Create email uniqueness validator
+ */
+export function emailUnique(
+  checkFn: (email: string) => Promise<boolean>,
+  message: string = 'Email is already registered',
+  options: AsyncValidatorOptions = {}
+) {
+  return createAsyncValidator(async (value: string) => {
+    if (!value) return null;
+    const unique = await checkFn(value);
+    return unique ? null : message;
+  }, options);
 }
 
 /**

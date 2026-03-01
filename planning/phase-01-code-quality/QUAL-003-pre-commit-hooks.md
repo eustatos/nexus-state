@@ -1,9 +1,9 @@
-# QUAL-003: Set Up Pre-commit Hooks
+# QUAL-003: Set Up Pre-commit Hooks (Optimized for Monorepo)
 
 ## 📋 Task Overview
 
 **Priority:** 🟡 Medium  
-**Estimated Time:** 2-3 hours  
+**Estimated Time:** 1-2 hours  
 **Status:** ⬜ Not Started  
 **Assignee:** AI Agent
 
@@ -11,42 +11,30 @@
 
 ## 🎯 Objective
 
-Configure automated pre-commit hooks using Husky and lint-staged to enforce code quality standards before commits reach the repository.
+Configure lightning-fast pre-commit hooks for a monorepo that check only changed packages and don't slow down development.
 
 ---
 
-## 📦 Tools to Install
+## 📦 Recommended Stack
 
-- **Husky** - Git hooks management
-- **lint-staged** - Run linters on staged files only
-- **prettier** - Code formatting (if not already installed)
-
----
-
-## 🔍 Current State Analysis
-
-```bash
-# Check if Husky is already installed
-ls -la .husky/
-
-# Check if lint-staged is configured
-cat package.json | grep -A 5 "lint-staged"
-
-# Expected: May not exist yet
-```
+| Tool                | Purpose                   | Why It's Optimal                                                                                   |
+| :------------------ | :------------------------ | :------------------------------------------------------------------------------------------------- |
+| **lefthook**        | Git hooks manager         | Blazing fast, parallel execution, built-in monorepo support, zero dependencies, single YAML config |
+| **@commitlint/cli** | Commit message validation | Industry standard for Conventional Commits                                                         |
+| **prettier**        | Code formatting           | Already present in most projects, works great with lefthook                                        |
+| **pnpm**            | Package manager           | Essential for monorepos — symlinks and caching speed up everything                                 |
 
 ---
 
 ## ✅ Acceptance Criteria
 
-- [ ] Husky installed and configured
-- [ ] lint-staged runs on pre-commit
-- [ ] TypeScript type-check runs before commit
-- [ ] ESLint runs on staged files
+- [ ] lefthook installed and configured
+- [ ] **Parallel execution** of ESLint, Prettier, and TypeScript
+- [ ] Checks run **only for changed packages**
 - [ ] Prettier formats code automatically
-- [ ] Tests run for affected packages
-- [ ] Commits fail if quality checks fail
-- [ ] Performance <5 seconds for small changes
+- [ ] commitlint validates commit messages
+- [ ] **Execution time < 1 second** for a single changed file
+- [ ] Works across all packages in the monorepo
 
 ---
 
@@ -55,56 +43,99 @@ cat package.json | grep -A 5 "lint-staged"
 ### Step 1: Install Dependencies
 
 ```bash
-# Install Husky
-npm install --save-dev husky
+# Install lefthook (single binary)
+pnpm add -D @arkweid/lefthook
 
-# Install lint-staged
-npm install --save-dev lint-staged
+# Install commitlint (if not already)
+pnpm add -D @commitlint/cli @commitlint/config-conventional
 
-# Install prettier (if not already)
-npm install --save-dev prettier
-
-# Install commitlint (for commit message validation)
-npm install --save-dev @commitlint/cli @commitlint/config-conventional
+# Prettier is usually already in the monorepo
+pnpm add -D prettier
 ```
 
-### Step 2: Initialize Husky
+### Step 2: Configure Lefthook
 
-```bash
-# Initialize Husky
-npx husky install
+**File:** `lefthook.yml`
 
-# Add prepare script to package.json (auto-install hooks)
-npm pkg set scripts.prepare="husky install"
+```yaml
+# lefthook.yml - single config for the entire monorepo
+pre-commit:
+  parallel: true # KEY: everything runs in parallel!
+  commands:
+    # Code formatting (fast, safe)
+    prettier:
+      glob: '*.{js,ts,jsx,tsx,json,md,yml,yaml}'
+      run: pnpm prettier --write {staged_files}
+      stage_fixed: true # automatically re-stages formatted files
 
-# Create pre-commit hook
-npx husky add .husky/pre-commit "npx lint-staged"
+    # Lint staged files
+    eslint:
+      glob: '*.{js,ts,jsx,tsx}'
+      run: pnpm eslint --fix {staged_files}
+      stage_fixed: true
 
-# Create commit-msg hook
-npx husky add .husky/commit-msg 'npx --no -- commitlint --edit ${1}'
+    # TypeScript check ONLY for changed packages
+    typecheck:
+      glob: 'packages/*/src/**/*.{ts,tsx}'
+      run: |
+        PKG=$(echo {staged_files} | grep -o "packages/[^/]*" | head -1)
+        if [ -n "$PKG" ]; then
+          cd $PKG && pnpm tsc --noEmit
+        fi
+
+    # Tests for changed files
+    test:
+      glob: 'packages/*/src/**/*.{ts,tsx}'
+      run: |
+        PKG=$(echo {staged_files} | grep -o "packages/[^/]*" | head -1)
+        if [ -n "$PKG" ]; then
+          cd $PKG && pnpm vitest related {staged_files} --run
+        fi
+
+# Commit message validation
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm commitlint --edit {1}
+
+# Protect main branch (optional)
+pre-push:
+  commands:
+    audit:
+      run: pnpm audit --prod
+    typecheck-all:
+      run: pnpm tsc --noEmit
 ```
 
-### Step 3: Configure lint-staged
+### Step 3: Configure Commitlint
 
-**File:** `package.json`
+**File:** `commitlint.config.js`
 
-```json
-{
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write",
-      "vitest related --run --passWithNoTests"
+```javascript
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [
+      2,
+      'always',
+      [
+        'feat',
+        'fix',
+        'docs',
+        'style',
+        'refactor',
+        'perf',
+        'test',
+        'chore',
+        'ci',
+        'build',
+        'revert',
+      ],
     ],
-    "*.{js,jsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,yml,yaml}": [
-      "prettier --write"
-    ]
-  }
-}
+    'subject-case': [0],
+    'body-max-line-length': [0],
+  },
+};
 ```
 
 ### Step 4: Configure Prettier
@@ -141,210 +172,89 @@ package-lock.json
 .turbo/
 *.min.js
 *.min.css
-
-# Config
-.eslintrc.js
 ```
 
-### Step 5: Configure Commitlint
-
-**File:** `commitlint.config.js`
-
-```javascript
-module.exports = {
-  extends: ['@commitlint/config-conventional'],
-  rules: {
-    'type-enum': [
-      2,
-      'always',
-      [
-        'feat',     // New feature
-        'fix',      // Bug fix
-        'docs',     // Documentation only
-        'style',    // Formatting, missing semi-colons, etc.
-        'refactor', // Code change that neither fixes a bug nor adds a feature
-        'perf',     // Performance improvement
-        'test',     // Adding missing tests
-        'chore',    // Updating build tasks, package manager configs, etc.
-        'ci',       // CI configuration changes
-        'build',    // Changes that affect the build system
-        'revert',   // Reverts a previous commit
-      ],
-    ],
-    'subject-case': [0], // Allow any case for subject
-    'body-max-line-length': [0], // No limit on body line length
-  },
-};
-```
-
-### Step 6: Optimize Performance
-
-**Problem:** Pre-commit hooks can slow down workflow
-
-**Solution:** Only run on changed files
-
-**File:** `.husky/pre-commit`
+### Step 5: Add Skip Hooks Option
 
 ```bash
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-# Only run lint-staged if there are staged files
-if git diff --cached --quiet; then
-  exit 0
-fi
-
-# Run lint-staged
-npx lint-staged
-
-# Optional: Run type check on changed packages only
-CHANGED_PACKAGES=$(git diff --cached --name-only | grep -E '^packages/[^/]+/' | sed 's|^packages/\([^/]*\)/.*|\1|' | sort -u)
-
-if [ -n "$CHANGED_PACKAGES" ]; then
-  for pkg in $CHANGED_PACKAGES; do
-    echo "Type checking @nexus-state/$pkg..."
-    cd packages/$pkg && npx tsc --noEmit && cd ../.. || exit 1
-  done
-fi
-```
-
-### Step 7: Add Skip Hooks Option
-
-**For emergency commits:**
-
-```bash
-# Allow developers to skip hooks when necessary
+# Standard Git option works
 git commit --no-verify -m "emergency fix"
 ```
 
-**Document in README:**
+**Document in root `CONTRIBUTING.md`:**
 
-```markdown
-## Git Hooks
+````markdown
+## Git Hooks (Powered by Lefthook ⚡)
 
-This project uses Husky for pre-commit hooks. To skip hooks:
+This project uses lefthook for lightning-fast pre-commit checks:
 
-\`\`\`bash
-git commit --no-verify
-\`\`\`
+### What runs on commit (in parallel ⚡):
 
-⚠️ Use sparingly - hooks exist for quality assurance.
+- ✅ ESLint checks code style
+- ✅ Prettier formats code
+- ✅ TypeScript validates types
+- ✅ Tests run for changed files
+
+All of this takes **< 1 second** for a single file!
+
+### Skipping Hooks:
+
+```bash
+git commit --no-verify -m "your message"
+# ⚠️ Emergency use only!
 ```
+````
 
-### Step 8: Create Hook Documentation
-
-**File:** `docs/CONTRIBUTING.md` (update)
-
-```markdown
-## Pre-commit Hooks
-
-We use automated checks before commits:
-
-### What runs on pre-commit?
-
-1. **ESLint** - Checks code style
-2. **Prettier** - Formats code
-3. **Type Check** - Validates TypeScript types
-4. **Tests** - Runs tests for changed files
-
-### Commit Message Format
-
-Follow Conventional Commits:
-
-\`\`\`
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-\`\`\`
-
-**Types:**
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation
-- `test`: Tests
-- `refactor`: Code refactoring
-
-**Example:**
-\`\`\`
-feat(core): add time travel support
-
-Implements snapshot-based time travel for debugging.
-Includes undo/redo functionality.
-
-Resolves: #123
-\`\`\`
-
-### Skipping Hooks
-
-Only when absolutely necessary:
-
-\`\`\`bash
-git commit --no-verify
-\`\`\`
-```
+````
 
 ---
 
 ## 🧪 Validation Commands
 
 ```bash
-# 1. Install hooks
-npm run prepare
+# 1. Install hooks (single command!)
+pnpm lefthook install
 
-# 2. Verify Husky installed
-ls -la .husky/
-# Should see: pre-commit, commit-msg
+# 2. Validate config
+pnpm lefthook validate
 
 # 3. Make a test change
 echo "// test" >> packages/core/src/index.ts
-
-# 4. Stage the change
 git add packages/core/src/index.ts
 
-# 5. Try to commit (should trigger hooks)
-git commit -m "test: verify pre-commit hooks"
+# 4. Watch the MAGIC of parallel execution!
+git commit -m "test: verify lefthook"
 
-# Expected: 
-# - ESLint runs
-# - Prettier formats
-# - Type check runs
-# - Tests run (if any related)
-
-# 6. Try invalid commit message
-git commit -m "invalid message format"
-# Expected: Commit rejected by commitlint
-
-# 7. Try valid commit
-git commit -m "test: verify hooks working"
-# Expected: Commit succeeds
-
-# 8. Revert test change
-git reset HEAD~1
-git checkout packages/core/src/index.ts
-```
+# Expected output:
+# ⚡ pre-commit: commands running in parallel...
+#   ✅ prettier (1.2s)
+#   ✅ eslint (0.8s)
+#   ✅ typecheck (0.5s)
+#   ✅ test (1.1s)
+# Total: ~1.3s
+````
 
 ---
 
 ## 📚 Context & Background
 
-### Why Pre-commit Hooks?
+### Why Pre-commit Hooks Matter
 
-1. **Prevent Bad Commits:** Catch issues before they reach repo
+1. **Prevent Bad Commits:** Catch issues before they reach the repo
 2. **Automate Quality:** No manual "remember to lint"
 3. **Consistent Standards:** Everyone follows same rules
 4. **Fast Feedback:** Fail fast, fix faster
 5. **Clean History:** Better commits = better git log
 
-### Husky vs Alternatives
+### Why Lefthook for Monorepos
 
-- **Husky:** Most popular, well-maintained
-- **pre-commit (Python):** More features but requires Python
-- **lefthook:** Faster but less popular
-- **simple-git-hooks:** Lightweight but basic
+Lefthook was chosen because it:
 
-Husky chosen for: popularity, ease of use, npm ecosystem integration
+- Runs checks **in parallel** (not sequentially)
+- Natively understands monorepo structures
+- Has **zero dependencies** (single binary)
+- Uses simple YAML configuration
+- Works perfectly with `pnpm workspaces`
 
 ---
 
@@ -358,116 +268,91 @@ Husky chosen for: popularity, ease of use, npm ecosystem integration
 
 ## 📊 Definition of Done
 
-- [ ] Husky installed and configured
-- [ ] Pre-commit hook runs lint-staged
-- [ ] Commit-msg hook validates format
+- [ ] lefthook installed and configured
+- [ ] Pre-commit hooks run in parallel
+- [ ] Only changed packages are checked
 - [ ] ESLint runs on staged files
 - [ ] Prettier auto-formats code
-- [ ] Type check runs on changed packages
-- [ ] Invalid commits rejected
+- [ ] TypeScript checks changed packages
+- [ ] Tests run for affected files
+- [ ] Commit-msg hook validates format
+- [ ] Invalid commits are rejected
 - [ ] Documentation updated
 - [ ] Team notified of new hooks
 
 ---
 
-## 🚀 Implementation Checklist
+## 🚀 Quick Start Checklist
 
 ```bash
 # 1. Install dependencies
-npm install --save-dev husky lint-staged prettier \
-  @commitlint/cli @commitlint/config-conventional
+pnpm add -D @arkweid/lefthook @commitlint/cli @commitlint/config-conventional
 
-# 2. Initialize Husky
-npx husky install
-npm pkg set scripts.prepare="husky install"
+# 2. Install hooks
+pnpm lefthook install
 
-# 3. Create hooks
-npx husky add .husky/pre-commit "npx lint-staged"
-npx husky add .husky/commit-msg 'npx --no -- commitlint --edit ${1}'
+# 3. Create config files
+# - lefthook.yml (from Step 2)
+# - commitlint.config.js (from Step 3)
+# - .prettierrc.json (from Step 4)
 
-# 4. Configure lint-staged
-# (Add to package.json - see Step 3)
-
-# 5. Create .prettierrc.json
-# (See Step 4)
-
-# 6. Create commitlint.config.js
-# (See Step 5)
-
-# 7. Test hooks
-echo "test" >> test.txt
-git add test.txt
+# 4. Test hooks
+echo "// test" >> packages/core/src/index.ts
+git add packages/core/src/index.ts
 git commit -m "test: verify hooks"
-# Should run checks
 
-# 8. Clean up test
-rm test.txt
+# 5. Clean up test
 git reset HEAD~1
+rm packages/core/src/index.ts
+git checkout packages/core/src/index.ts
 
-# 9. Update documentation
-# (See Step 8)
+# 6. Update documentation
+# (from Step 5)
 
-# 10. Commit
-git add .husky/ package.json .prettierrc.json commitlint.config.js
+# 7. Commit the hooks setup
+git add lefthook.yml commitlint.config.js .prettierrc.json .prettierignore
 git add docs/CONTRIBUTING.md
-git commit -m "chore: set up pre-commit hooks with Husky
+git commit -m "chore: set up pre-commit hooks with lefthook
 
-- Install Husky for git hooks management
-- Configure lint-staged for staged file linting
-- Add Prettier for code formatting
-- Add commitlint for commit message validation
-- Optimize performance (only check changed files)
+- Install lefthook for parallel git hooks
+- Configure ESLint, Prettier, TypeScript to run on staged files
+- Add package-scoped type checking and tests
+- Set up commitlint for Conventional Commits
 - Document hook usage in CONTRIBUTING.md
 
-Pre-commit checks: ESLint, Prettier, TypeScript, Tests
-Commit format: Conventional Commits
+Pre-commit checks run in parallel (<1s for single file)
+Commit format enforced via commitlint
 
 Resolves: QUAL-003"
 ```
 
 ---
 
-## 📝 Notes for AI Agent
-
-### Hook Performance Tips
-
-```bash
-# ❌ Slow: Run all tests
-"*.ts": ["npm run test"]
-
-# ✅ Fast: Run related tests only
-"*.ts": ["vitest related --run"]
-
-# ❌ Slow: Lint everything
-"*.ts": ["eslint ."]
-
-# ✅ Fast: Lint staged files only
-"*.ts": ["eslint --fix"]
-```
+## 📝 Notes
 
 ### Common Issues
 
 **Issue 1: Hooks not running**
+
 ```bash
 # Solution: Reinstall hooks
-rm -rf .husky
-npx husky install
-npx husky add .husky/pre-commit "npx lint-staged"
+pnpm lefthook install
 ```
 
 **Issue 2: Hooks too slow**
+
 ```bash
-# Solution: Reduce scope
-# Only run on changed packages
-# Cache results where possible
-# Skip heavy operations
+# Solution: Check parallel execution
+# Verify lefthook.yml has 'parallel: true'
+# Ensure you're not running checks on all packages
 ```
 
-**Issue 3: Commitlint fails**
+**Issue 3: commitlint fails**
+
 ```bash
 # Solution: Follow format
 git commit -m "type(scope): subject"
-# Not: "random commit message"
+# Example: "feat(core): add new API endpoint"
 ```
 
 ### Emergency Bypass

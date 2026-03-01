@@ -1,4 +1,4 @@
-import { atom, computed, Store } from '@nexus-state/core';
+import { atom, Store, Atom } from '@nexus-state/core';
 import { AsyncValidationManager } from './async-validation';
 import {
   FieldState,
@@ -18,8 +18,8 @@ export function createField<TValue>(
   name: string,
   options: FieldOptions<TValue>
 ): FieldMeta<TValue> & {
-  error: ReturnType<typeof computed<string | null>>;
-  isValid: ReturnType<typeof computed<boolean>>;
+  error: Atom<string | null>;
+  isValid: Atom<boolean>;
   setValue: (value: TValue, formValues?: Record<string, unknown>) => void;
   setTouched: (touched: boolean) => void;
   setError: (error: string | null) => void;
@@ -66,16 +66,16 @@ export function createField<TValue>(
   };
 
   // Combined error (sync + async)
-  const errorAtom = computed<string | null>((get) => {
+  const errorAtom = atom<string | null>((get) => {
     const state = get(fieldAtom);
     return state.error || state.asyncError;
-  });
+  }, `field:${name}:error`);
 
   // Is valid (no sync or async errors, not validating)
-  const isValidAtom = computed<boolean>((get) => {
+  const isValidAtom = atom<boolean>((get) => {
     const state = get(fieldAtom);
     return !state.error && !state.asyncError && !state.validating;
-  });
+  }, `field:${name}:isValid`);
 
   const store = options.store ?? _store;
 
@@ -202,6 +202,9 @@ export function resetField<TValue>(
     touched: false,
     dirty: false,
     error: null,
+    validating: false,
+    asyncError: null,
+    validated: false,
   });
 }
 
