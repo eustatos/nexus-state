@@ -12,6 +12,11 @@
       "require": "./dist/cjs/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && tsc -p tsconfig.build.json",
     "build:esm": "tsc -p tsconfig.esm.json",
@@ -19,6 +24,7 @@
     "build:types": "tsc -p tsconfig.build.json",
     "dev": "tsc -w",
     "test": "vitest run src/__tests__ src/action-naming/__tests__",
+    "test:coverage": "vitest run src/__tests__ src/action-naming/__tests__ --coverage",
     "test:production": "vitest run src/__tests__/production-noop.test.ts",
     "test:performance": "vitest run src/__tests__/performance --reporter=verbose",
     "test:benchmark": "vitest bench src/__tests__/performance",
@@ -29,8 +35,9 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^3.0.7",
     "typescript": "^5.0.0",
-    "vitest": "^0.34.0",
+    "vitest": "^3.0.7",
     "eslint": "^8.40.0"
   }
 }
