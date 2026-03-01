@@ -11,6 +11,7 @@ import type {
   PrimitiveAtom,
   ComputedAtom,
   WritableAtom,
+  PluginHooks,
 } from './types';
 import { isPrimitiveAtom, isComputedAtom, isWritableAtom } from './types';
 import { serializeState as serializeStoreState } from './utils/serialization';
@@ -58,11 +59,60 @@ export function createStore(plugins: Plugin[] = []): Store {
   
   // Store enhancement state
   const appliedPlugins: Plugin[] = [];
+  const pluginHooks: PluginHooks[] = [];
   let isDevToolsEnabled = false;
   let isStackTraceEnabled = false;
   let pendingStateUpdates: Array<{ atom: Atom<any>, value: any }> = [];
   let debounceTimer: any | null = null;
   const debounceDelay = 100;
+
+  /**
+   * Execute onSet hooks from all plugins
+   * @param atom - The atom being set
+   * @param value - The value to set
+   * @returns The processed value after all hooks
+   */
+  const executeOnSetHooks = <T>(atom: Atom<T>, value: T): T => {
+    let processedValue = value;
+    for (const hooks of pluginHooks) {
+      if (hooks.onSet) {
+        const result = hooks.onSet(atom, processedValue);
+        if (result !== undefined) {
+          processedValue = result;
+        }
+      }
+    }
+    return processedValue;
+  };
+
+  /**
+   * Execute afterSet hooks from all plugins
+   * @param atom - The atom that was set
+   * @param value - The final value that was set
+   */
+  const executeAfterSetHooks = <T>(atom: Atom<T>, value: T): void => {
+    for (const hooks of pluginHooks) {
+      if (hooks.afterSet) {
+        hooks.afterSet(atom, value);
+      }
+    }
+  };
+
+  /**
+   * Execute onGet hooks from all plugins
+   * @param atom - The atom being read
+   * @param value - The current value
+   * @returns The processed value after all hooks
+   */
+  const executeOnGetHooks = <T>(atom: Atom<T>, value: T): T => {
+    let processedValue = value;
+    for (const hooks of pluginHooks) {
+      if (hooks.onGet) {
+        processedValue = hooks.onGet(atom, processedValue);
+      }
+    }
+    return processedValue;
+  };
 
   const get: Getter = <Value>(atom: Atom<Value>): Value => {
     // Get or create atom state
@@ -122,7 +172,9 @@ export function createStore(plugins: Plugin[] = []): Store {
       console.log('[GET] Added dependency:', (atom as any).name, '->', (currentAtom as any).name, 'size now:', atomState.dependents.size, 'was new?', added);
     }
 
-    return atomState.value as Value;
+    // Apply onGet hooks
+    const value = atomState.value as Value;
+    return executeOnGetHooks(atom, value);
   };
 
   const set: Setter = <Value>(atom: Atom<Value>, update: Value | ((prev: Value) => Value)): void => {
@@ -181,14 +233,17 @@ export function createStore(plugins: Plugin[] = []): Store {
         ? (update as (prev: Value) => Value)(atomState.value)
         : update;
 
+    // Apply onSet hooks to potentially modify the value
+    const processedValue = executeOnSetHooks(atom, newValue);
+
     // Update value
     const previousValue = atomState.value;
-    atomState.value = newValue;
-    console.log('[SET] Updated atom:', (atom as any).name, 'from:', previousValue, 'to:', newValue);
+    atomState.value = processedValue;
+    console.log('[SET] Updated atom:', (atom as any).name, 'from:', previousValue, 'to:', processedValue);
 
     // Notify subscribers
     atomState.subscribers.forEach((subscriber) => {
-      subscriber(newValue);
+      subscriber(processedValue);
     });
 
     // Notify dependents using BFS to handle nested computed atoms
@@ -246,9 +301,12 @@ export function createStore(plugins: Plugin[] = []): Store {
       }
     }
 
+    // Execute afterSet hooks after value is set and dependents are notified
+    executeAfterSetHooks(atom, processedValue);
+
     // Track state change for DevTools
     if (isDevToolsEnabled) {
-      pendingStateUpdates.push({ atom, value: newValue });
+      pendingStateUpdates.push({ atom, value: processedValue });
       scheduleStateUpdate();
     }
   };
@@ -345,7 +403,11 @@ export function createStore(plugins: Plugin[] = []): Store {
   // Enhanced methods for DevTools integration
   const applyPlugin = (plugin: Plugin) => {
     appliedPlugins.push(plugin);
-    plugin(store);
+    const hooks = plugin(store);
+    // If plugin returns hooks, register them
+    if (hooks && typeof hooks === 'object') {
+      pluginHooks.push(hooks);
+    }
   };
 
   const setWithMetadata = <Value>(
@@ -427,7 +489,13 @@ export function createStore(plugins: Plugin[] = []): Store {
   }
 
   // Apply plugins
-  plugins.forEach(plugin => plugin(store));
+  plugins.forEach(plugin => {
+    const hooks = plugin(store);
+    // If plugin returns hooks, register them
+    if (hooks && typeof hooks === 'object') {
+      pluginHooks.push(hooks);
+    }
+  });
 
   return store;
 }
