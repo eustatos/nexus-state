@@ -15,9 +15,9 @@
     "typescript": "^5.0.0",
     "vitest": "^0.34.0",
     "eslint": "^8.40.0",
-    "svelte": "^3.0.0"
+    "svelte": "^5.53.6"
   },
   "peerDependencies": {
-    "svelte": "^3.0.0"
+    "svelte": "^5.53.6"
   }
 }
