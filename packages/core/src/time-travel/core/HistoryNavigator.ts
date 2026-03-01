@@ -1,5 +1,6 @@
 import { SnapshotRestorer } from "../snapshot";
 import type { Snapshot } from "../types";
+import { storeLogger as logger } from "../../debug";
 
 // Interface that both HistoryManager and DeltaAwareHistoryManager implement
 interface HistoryProvider {
@@ -17,15 +18,15 @@ export class HistoryNavigator {
   ) {}
 
   undo(): boolean {
-    console.log(`[NAVIGATOR.undo] canUndo: ${this.historyManager.canUndo()}`);
+    logger.log(`[NAVIGATOR.undo] canUndo: ${this.historyManager.canUndo()}`);
     if (!this.historyManager.canUndo()) return false;
 
     const snapshot = this.historyManager.undo();
-    console.log(`[NAVIGATOR.undo] snapshot: ${snapshot ? 'found' : 'null'}`);
+    logger.log(`[NAVIGATOR.undo] snapshot: ${snapshot ? 'found' : 'null'}`);
     if (snapshot) {
-      console.log(`[NAVIGATOR.undo] Calling restore`);
+      logger.log(`[NAVIGATOR.undo] Calling restore`);
       const result = this.snapshotRestorer.restore(snapshot);
-      console.log(`[NAVIGATOR.undo] restore result: ${result}`);
+      logger.log(`[NAVIGATOR.undo] restore result: ${result}`);
       return result;
     }
     return false;

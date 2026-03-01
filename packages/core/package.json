@@ -3,6 +3,7 @@
   "version": "0.1.6",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
   "homepage": "https://nexus-state.website.yandexcloud.net/",
   "repository": {
     "type": "git",
@@ -13,6 +14,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.js"
+    },
+    "./debug": {
+      "types": "./dist/debug.d.ts",
+      "import": "./dist/debug.js",
+      "require": "./dist/debug.js"
+    },
+    "./batching": {
+      "types": "./dist/batching.d.ts",
+      "import": "./dist/batching.js",
+      "require": "./dist/batching.js"
     },
     "./utils": {
       "types": "./dist/utils/index.d.ts",

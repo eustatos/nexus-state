@@ -11,46 +11,46 @@ export type ActionMetadata = {
    * Unique identifier for the action
    */
   id: string;
-  
+
   /**
    * Type of action (e.g., 'SET', 'COMPUTED_UPDATE')
    */
   type: string;
-  
+
   /**
    * Source of the action (e.g., component name, user action)
    */
   source?: string;
-  
+
   /**
    * Timestamp when the action occurred
    */
   timestamp: number;
-  
+
   /**
    * Stack trace if enabled in development
    */
   stackTrace?: string;
-  
+
   /**
    * Atom that was affected by this action
    */
-  atom?: Atom<any>;
-  
+  atom?: Atom<unknown>;
+
   /**
    * Previous value of the atom
    */
-  previousValue?: any;
-  
+  previousValue?: unknown;
+
   /**
    * New value of the atom
    */
-  newValue?: any;
-  
+  newValue?: unknown;
+
   /**
    * Additional custom metadata
    */
-  custom?: Record<string, any>;
+  custom?: Record<string, unknown>;
 };
 
 /**
@@ -178,11 +178,11 @@ export class ActionTracker {
    * @returns Action metadata
    */
   createSetActionMetadata(
-    atom: Atom<any>,
-    previousValue: any,
-    newValue: any,
+    atom: Atom<unknown>,
+    previousValue: unknown,
+    newValue: unknown,
     source?: string,
-    custom?: Record<string, any>
+    custom?: Record<string, unknown>
   ): ActionMetadata {
     return {
       id: this.generateId(),
@@ -205,10 +205,10 @@ export class ActionTracker {
    * @returns Action metadata
    */
   createComputedUpdateMetadata(
-    atom: Atom<any>,
-    previousValue: any,
-    newValue: any,
-    dependencies: Atom<any>[] = []
+    atom: Atom<unknown>,
+    previousValue: unknown,
+    newValue: unknown,
+    dependencies: Atom<unknown>[] = []
   ): ActionMetadata {
     return {
       id: this.generateId(),
@@ -222,7 +222,7 @@ export class ActionTracker {
       },
     };
   }
-  
+
   /**
    * Generate a unique ID for an action
    * @returns Unique ID string
@@ -247,7 +247,7 @@ export const globalActionTracker = new ActionTracker();
 export function createActionWithStackTrace(
   type: string,
   source?: string,
-  custom?: Record<string, any>
+  custom?: Record<string, unknown>
 ): ActionMetadata {
   const metadata: ActionMetadata = {
     id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -256,9 +256,9 @@ export function createActionWithStackTrace(
     timestamp: Date.now(),
     custom,
   };
-  
+
   // Capture stack trace
   metadata.stackTrace = new Error().stack;
-  
+
   return metadata;
 }

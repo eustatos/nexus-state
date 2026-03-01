@@ -30,8 +30,9 @@ export function atomFamily<T, P extends unknown[]>(
     const cacheKey = JSON.stringify(params);
 
     // Check if we already have an atom for this parameter
-    if (atomsCache.has(cacheKey)) {
-      return atomsCache.get(cacheKey)!;
+    const existingAtom = atomsCache.get(cacheKey);
+    if (existingAtom) {
+      return existingAtom;
     }
 
     // Create a new atom for this parameter

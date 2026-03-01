@@ -17,7 +17,7 @@ import { isPrimitiveAtom, isComputedAtom, isWritableAtom } from '../types';
 export type AtomState<Value> = {
   value: Value;
   subscribers: Set<(value: Value) => void>;
-  dependents: Set<Atom<any>>;
+  dependents: Set<Atom<unknown>>;
 };
 
 /**
@@ -25,10 +25,10 @@ export type AtomState<Value> = {
  */
 export function getOrCreateAtomState<Value>(
   atom: Atom<Value>,
-  atomStates: Map<Atom<any>, AtomState<any>>,
+  atomStates: Map<Atom<unknown>, AtomState<unknown>>,
   get: Getter,
-  currentAtom: Atom<any> | null,
-  setCurrentAtom: (atom: Atom<any> | null) => void
+  currentAtom: Atom<unknown> | null,
+  setCurrentAtom: (atom: Atom<unknown> | null) => void
 ): { state: AtomState<Value>; created: boolean } {
   let atomState = atomStates.get(atom) as AtomState<Value> | undefined;
 
@@ -46,7 +46,7 @@ export function getOrCreateAtomState<Value>(
       subscribers: new Set(),
       dependents: new Set(),
     };
-    atomStates.set(atom, atomState as any);
+    atomStates.set(atom, atomState as AtomState<Value>);
 
     return { state: atomState, created: true };
   }
@@ -60,8 +60,8 @@ export function getOrCreateAtomState<Value>(
 export function getAtomInitialValue<Value>(
   atom: Atom<Value>,
   get: Getter,
-  currentAtom: Atom<any> | null,
-  setCurrentAtom: (atom: Atom<any> | null) => void
+  currentAtom: Atom<unknown> | null,
+  setCurrentAtom: (atom: Atom<unknown> | null) => void
 ): Value {
   if (isPrimitiveAtom(atom)) {
     return (atom as PrimitiveAtom<Value>).read();
@@ -84,9 +84,9 @@ export function getAtomInitialValue<Value>(
  * Register atom with store registry
  */
 export function registerAtomWithStore(
-  atom: Atom<any>,
-  store: any,
-  atomRegistry: any
+  atom: Atom<unknown>,
+  store: unknown,
+  atomRegistry: { getStoresMap(): Map<unknown, { atoms: Set<symbol> }> }
 ): void {
   const storesMap = atomRegistry.getStoresMap();
   const registry = storesMap.get(store);
@@ -98,6 +98,7 @@ export function registerAtomWithStore(
 /**
  * Check if value is a function (type guard)
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function isFunction(value: unknown): value is Function {
   return typeof value === 'function';
 }
