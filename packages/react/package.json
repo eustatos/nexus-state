@@ -21,7 +21,8 @@
   "files": [
     "dist",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "dependencies": {
     "@nexus-state/core": "workspace:*"

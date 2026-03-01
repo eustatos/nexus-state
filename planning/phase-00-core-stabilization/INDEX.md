@@ -27,6 +27,9 @@
 | STAB-004 | Add @nexus-state/family Tests | ⬜ | 4-6h | AI |
 | STAB-005 | Add @nexus-state/persist Tests | ⬜ | 4-6h | AI |
 | STAB-006 | Add @nexus-state/web-worker Tests | ⬜ | 4-6h | AI |
+| [STAB-011](STAB-011-fix-package-json-configs.md) | Fix package.json Configurations | ⬜ | 2-3h | AI |
+| [STAB-012](STAB-012-add-immer-tests.md) | Add @nexus-state/immer Tests | ⬜ | 3-4h | AI |
+| [STAB-013](STAB-013-add-middleware-tests.md) | Add @nexus-state/middleware Tests | ⬜ | 3-4h | AI |
 
 ### 🟡 Medium Priority
 
@@ -136,13 +139,13 @@ New tasks should follow the [TASK-TEMPLATE.md](TASK-TEMPLATE.md) format with the
 
 ## 📈 Progress Tracking
 
-**Phase Progress:** 4/10 tasks completed (40%)
+**Phase Progress:** 4/13 tasks completed (31%)
 
 | Week | Tasks Planned | Tasks Completed | Status |
 |------|---------------|-----------------|--------|
 | Week 1 | STAB-001 to STAB-004 | 4/4 | ✅ Completed |
-| Week 2 | STAB-005 to STAB-008 | 0/4 | ⬜ Not Started |
-| Week 3 | STAB-009 to STAB-010 | 0/2 | ⬜ Not Started |
+| Week 2 | STAB-005 to STAB-008, STAB-011 | 0/5 | ⬜ Not Started |
+| Week 3 | STAB-009, STAB-010, STAB-012, STAB-013 | 0/4 | ⬜ Not Started |
 
 ---
 

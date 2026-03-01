@@ -1,7 +1,7 @@
 // Tests for @nexus-state/family
 import { beforeEach, describe, expect, it } from 'vitest';
 import { atom, createStore } from '@nexus-state/core';
-import { atomFamily, atomWithFamily } from '../index';
+import { atomFamily, atomWithFamily } from './index';
 
 describe('atomFamily', () => {
   let store: ReturnType<typeof createStore>;

@@ -15,7 +15,14 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
       include: ["src/**/*"],
-      exclude: ["src/**/*.d.ts", "packages/**/*.d.ts"],
+      exclude: [
+        "src/**/*.d.ts",
+        "packages/**/*.d.ts",
+        "**/legacy.ts",
+        "**/*.config.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+      ],
     },
     // Настройка среды для разных типов тестов
     environmentMatchGlobs: [
