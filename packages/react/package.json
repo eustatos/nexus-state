@@ -1,0 +1,33 @@
+{
+  "name": "@nexus-state/react",
+  "version": "0.1.5",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist && mkdir dist",
+    "dev": "tsc -w",
+    "test": "vitest run index.test.ts",
+    "lint": "eslint . --ext .ts"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "dependencies": {
+    "@nexus-state/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.2.0",
+    "@testing-library/react": "^14.0.0",
+    "@types/jest": "^29.0.0",
+    "@types/react": "^18.0.0",
+    "eslint": "^8.40.0",
+    "typescript": "^5.0.0",
+    "vitest": "^0.34.0"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  }
+}

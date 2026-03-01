@@ -1,0 +1,15 @@
+{
+  "models": [
+    {
+      "title": "Qwen Coder Next",
+      "provider": "openai",
+      "model": "qwen/qwen3-coder-next",
+      "completionOptions": {
+        "temperature": 1.0,
+        "topP": 0.95,
+        "topK": 40,
+        "maxTokens": 65536
+      }
+    }
+  ]
+}

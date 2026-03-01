@@ -1,0 +1,19 @@
+{
+  "name": "@nexus-state/middleware",
+  "version": "0.1.3",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "echo \"No tests yet - TODO: add tests for middleware\"",
+    "lint": "eslint . --ext .ts"
+  },
+  "dependencies": {
+    "@nexus-state/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^0.34.0",
+    "eslint": "^8.40.0"
+  }
+}

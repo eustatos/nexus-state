@@ -1,0 +1,16 @@
+# Test files
+*.test.ts
+*.test-d.ts
+*.spec.ts
+*.tsbuildinfo
+
+# Source files
+src/
+
+# Build artifacts
+dist/*.test.*
+dist/types.backup.*
+
+# Tools
+.turbo/
+node_modules/

@@ -1,0 +1,21 @@
+{
+  "name": "demo-svelte",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@nexus-state/core": "*",
+    "@nexus-state/svelte": "*"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.5.3",
+    "@typescript-eslint/eslint-plugin": "^8.53.1",
+    "svelte": "^3.59.2",
+    "vite": "^4.4.0"
+  }
+}

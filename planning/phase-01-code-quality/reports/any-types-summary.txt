@@ -1,0 +1,16 @@
+=== ANY TYPES BY PACKAGE ===
+
+async: 0
+cli: 0
+core: 555
+devtools: 281
+family: 0
+immer: 0
+middleware: 0
+persist: 0
+react: 0
+svelte: 0
+vue: 0
+web-worker: 0
+
+TOTAL: 836

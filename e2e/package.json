@@ -1,0 +1,11 @@
+{
+  "name": "nexus-state-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.30.0"
+  }
+}

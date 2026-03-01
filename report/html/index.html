@@ -1,0 +1,297 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Copy/Paste Detector Report</title><link href="styles/tailwind.css" rel="stylesheet"><link href="styles/prism.css" rel="stylesheet"></head><body class="bg-gray-100"><header class="bg-white shadow py-4"><div class="container mx-auto px-4"><h1 class="text-3xl font-semibold text-gray-800">jscpd - copy/paste report</h1></div></header><main class="container mx-auto my-8 p-4 bg-white shadow rounded"><section class="mb-8" id="dashboard"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Dashboard</h2><div class="grid grid-cols-4 gap-4"><div class="bg-blue-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-blue-800 mb-2">Total Files</h3><span class="text-4xl font-bold text-blue-800">102</span></div><div class="bg-green-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-green-800 mb-2">Total Lines of Code</h3><span class="text-4xl font-bold text-green-800">22313</span></div><div class="bg-yellow-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-yellow-800 mb-2">Number of Clones</h3><span class="text-4xl font-bold text-yellow-800">19</span></div><div class="bg-red-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-red-800 mb-2">Duplicated Lines</h3><span class="text-4xl font-bold text-red-800">288 (1.29%)</span></div></div></section><section class="mb-8" id="formats"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Formats with Duplications</h2><table class="w-full table-auto"><thead><tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Format</th><th class="py-3 px-6 text-left">Files</th><th class="py-3 px-6 text-left">Lines</th><th class="py-3 px-6 text-left">Clones</th><th class="py-3 px-6 text-left">Duplicated Lines</th><th class="py-3 px-6 text-left">Duplicated Tokens</th></tr></thead><tbody><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#typescript-clones">typescript</a></td><td class="py-3 px-6">100</td><td class="py-3 px-6">21902</td><td class="py-3 px-6">19</td><td class="py-3 px-6">288</td><td class="py-3 px-6">2226</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#markdown-clones">markdown</a></td><td class="py-3 px-6">2</td><td class="py-3 px-6">411</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr></tbody></table></section><section class="mb-8" id="txt-clones"><a name="typescript-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">typescript</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/devtools/src/__fixtures__/command-handler-fixtures.ts (Line 294:2 - Line 303:2), D:/develop/nexus-state/packages/devtools/src/__fixtures__/command-handler-fixtures.ts (Line 210:9 - Line 220:12)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup0"><code class="language-typescript text-sm text-gray-800">;
+
+    this.pointer++;
+    if (this.pointer &lt; this.history.length) {
+      this.history = this.history.slice(0, this.pointer);
+    }
+    this.history.push(snapshot);
+    return snapshot;
+  },
+}</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/devtools/src/utils/stack-tracer.ts (Line 131:3 - Line 152:4), D:/develop/nexus-state/packages/devtools/src/utils/stack-tracer.ts (Line 101:3 - Line 124:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup1"><code class="language-typescript text-sm text-gray-800">// Parse stack frames (skip first frame which is this function)
+  const rawFrames = stack
+    .split(&quot;\n&quot;)
+    .slice(1, limit + 1)
+    .map((frame) =&gt; frame.trim())
+    .filter((frame) =&gt; frame.length &gt; 0);
+
+  const frames = filterStackTraceFrames(rawFrames, {
+    ...options,
+    maxFrames: options.maxFrames ?? limit,
+  });
+  return {
+    frames,
+    timestamp: Date.now(),
+  };
+}
+
+/**
+ * Lazy stack trace generator
+ * @param config - Stack trace configuration
+ * @returns Function that captures stack trace when called
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/devtools/src/state-serializer.ts (Line 22:1 - Line 66:4), D:/develop/nexus-state/packages/devtools/src/types.ts (Line 270:1 - Line 315:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup2"><code class="language-typescript text-sm text-gray-800">/**
+ * Serialized state format for DevTools compatibility
+ */
+export interface SerializedState {
+  /** The serialized state object */
+  state: Record&lt;string, unknown&gt;;
+  /** Timestamp when state was serialized */
+  timestamp: number;
+  /** Checksum for data integrity verification */
+  checksum: string;
+  /** Optional metadata about the state */
+  metadata?: Record&lt;string, unknown&gt;;
+}
+
+/**
+ * Result of state deserialization
+ */
+export interface DeserializeResult {
+  /** Whether deserialization was successful */
+  success: boolean;
+  /** The deserialized state if successful */
+  state?: Record&lt;string, unknown&gt;;
+  /** Error message if failed */
+  error?: string;
+  /** Checksum verification result */
+  checksumValid?: boolean;
+}
+
+/**
+ * State import format (from DevTools)
+ */
+export interface ImportStateFormat {
+  /** The state object */
+  state: Record&lt;string, unknown&gt;;
+  /** Timestamp of import */
+  timestamp: number;
+  /** Checksum for verification */
+  checksum: string;
+  /** Optional metadata */
+  metadata?: Record&lt;string, unknown&gt;;
+}
+
+/**
+ * State export format (for sharing)
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/devtools/src/command-handler.ts (Line 349:7 - Line 360:7), D:/develop/nexus-state/packages/devtools/src/devtools-plugin-refactored.ts (Line 499:7 - Line 511:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup3"><code class="language-typescript text-sm text-gray-800">return {
+        state: exported.state,
+        timestamp: exported.timestamp,
+        checksum: exported.checksum,
+        version: exported.version,
+        metadata: exported.metadata,
+      };
+    } catch (error) {
+      if (process.env.NODE_ENV !== &quot;production&quot;) {
+        console.warn(&quot;Failed to export state:&quot;, error);
+      }
+      return</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/advanced-serializer.ts (Line 326:5 - Line 338:3), D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/primitives-strategy.ts (Line 61:5 - Line 73:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup4"><code class="language-typescript text-sm text-gray-800">if (serialized.__serializedType === &quot;null&quot;) {
+      return null;
+    }
+    if (serialized.__serializedType === &quot;undefined&quot;) {
+      return undefined;
+    }
+    if (serialized.__serializedType === &quot;bigint&quot;) {
+      return BigInt(serialized.value as string);
+    }
+    if (serialized.__serializedType === &quot;symbol&quot;) {
+      return Symbol((serialized.description as string) || &quot;&quot;);
+    }
+    if</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/advanced-serializer.ts (Line 338:5 - Line 346:11), D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/builtin-objects-strategy.ts (Line 154:5 - Line 162:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup5"><code class="language-typescript text-sm text-gray-800">if (serialized.__serializedType === &quot;date&quot;) {
+      return new Date(serialized.value as string);
+    }
+    if (serialized.__serializedType === &quot;regexp&quot;) {
+      return new RegExp(serialized.source as string, serialized.flags as string);
+    }
+    if (serialized.__serializedType === &quot;map&quot;) {
+      const map = new Map();
+      if (serialized</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/strategy.ts (Line 222:5 - Line 235:4), D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/strategy.ts (Line 180:5 - Line 193:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup6"><code class="language-typescript text-sm text-gray-800">const memorySaved = chain.metadata.memoryUsage;
+    chain.deltas = [];
+    chain.metadata.memoryUsage = 0;
+    chain.metadata.updatedAt = Date.now();
+
+    this.recordMetadata(this.type, chain.deltas.length, 0, memorySaved);
+
+    return chain;
+  }
+}
+
+/**
+ * Size-based compression strategy
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/strategy.ts (Line 260:8 - Line 277:4), D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/strategy.ts (Line 218:10 - Line 193:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup7"><code class="language-typescript text-sm text-gray-800">;
+  }
+
+  compress(chain: DeltaChain): DeltaChain {
+    const memorySaved = chain.metadata.memoryUsage;
+    chain.deltas = [];
+    chain.metadata.memoryUsage = 0;
+    chain.metadata.updatedAt = Date.now();
+
+    this.recordMetadata(this.type, chain.deltas.length, 0, memorySaved);
+
+    return chain;
+  }
+}
+
+/**
+ * Significance-based compression strategy
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/deserialize.ts (Line 147:2 - Line 154:2), D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/deserialize.ts (Line 34:2 - Line 41:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup8"><code class="language-typescript text-sm text-gray-800">= [];
+            for (const key of Object.keys(obj)) {
+              const index = parseInt(key, 10);
+              if (!isNaN(index)) {
+                result[index] = deserializeSnapshot(obj[key], opts, ctx);
+              }
+            }
+          }</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/deserialize.ts (Line 197:2 - Line 210:17), D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/deserialize.ts (Line 171:2 - Line 182:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup9"><code class="language-typescript text-sm text-gray-800">;
+      const escapePrefix = DEFAULT_SERIALIZE_OPTIONS.escapePrefix;
+
+      for (const [key, value] of Object.entries(obj)) {
+        if (key === &quot;__id&quot; || key === &quot;__type&quot;) continue;
+        const originalKey = key.startsWith(escapePrefix)
+          ? key.slice(escapePrefix.length)
+          : key;
+        result[originalKey] = deserializeSnapshot(value, opts, ctx);
+      }
+      return result;
+    }
+
+    // Plain Objects</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/time-travel/delta/types.ts (Line 409:4 - Line 433:4), D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/types.ts (Line 28:25 - Line 52:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup10"><code class="language-typescript text-sm text-gray-800">;
+  /** Time-based strategy options */
+  time?: {
+    /** Maximum age in ms */
+    maxAge?: number;
+  };
+  /** Changes-based strategy options */
+  changes?: {
+    /** Maximum deltas before compression */
+    maxDeltas?: number;
+  };
+  /** Size-based strategy options */
+  size?: {
+    /** Maximum size in bytes */
+    maxSize?: number;
+  };
+  /** Minimum chain length */
+  minChainLength?: number;
+  /** Enable/disable compression */
+  enabled?: boolean;
+}
+
+/**
+ * Strategy name type
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/time-travel/comparison/ValueComparator.ts (Line 230:5 - Line 240:18), D:/develop/nexus-state/packages/core/src/time-travel/comparison/ValueComparator.ts (Line 177:5 - Line 187:68)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup11"><code class="language-typescript text-sm text-gray-800">if (typeof a === &quot;function&quot;) {
+      const equal = this.options.ignoreFunctions || a.toString() === b.toString();
+      return {
+        type: &quot;function&quot;,
+        equal,
+        oldPrimitive: a.toString(),
+        newPrimitive: b.toString(),
+      };
+    }
+
+    // Handle objects</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/time-travel/comparison/ValueComparator.ts (Line 301:7 - Line 310:6), D:/develop/nexus-state/packages/core/src/time-travel/snapshot/SnapshotCreator.ts (Line 299:2 - Line 307:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup12"><code class="language-typescript text-sm text-gray-800">): boolean {
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+
+    if (keysA.length !== keysB.length) return false;
+
+    for (const key of keysA) {
+      if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
+
+      const</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/types.ts (Line 276:1 - Line 301:4), D:/develop/nexus-state/packages/core/src/time-travel/delta/types.ts (Line 170:1 - Line 195:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup13"><code class="language-typescript text-sm text-gray-800">export interface IncrementalSnapshotConfig {
+  /** Enable incremental snapshots */
+  enabled: boolean;
+  /** Create full snapshot every N changes */
+  fullSnapshotInterval: number;
+  /** Maximum deltas before forced full snapshot */
+  maxDeltaChainLength: number;
+  /** Maximum age of delta chain (ms) */
+  maxDeltaChainAge: number;
+  /** Maximum memory for delta chain (bytes) */
+  maxDeltaChainSize: number;
+  /** Change detection strategy */
+  changeDetection: &quot;shallow&quot; | &quot;deep&quot; | &quot;reference&quot;;
+  /** Reconstruct on demand */
+  reconstructOnDemand: boolean;
+  /** Cache reconstructed snapshots */
+  cacheReconstructed: boolean;
+  /** Cache size limit */
+  maxCacheSize: number;
+  /** Compression level */
+  compressionLevel: &quot;none&quot; | &quot;light&quot; | &quot;aggressive&quot;;
+}
+
+/**
+ * Default configuration for incremental snapshots
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/types.ts (Line 302:1 - Line 315:61), D:/develop/nexus-state/packages/core/src/time-travel/delta/types.ts (Line 196:1 - Line 211:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup14"><code class="language-typescript text-sm text-gray-800">export const DEFAULT_INCREMENTAL_SNAPSHOT_CONFIG: IncrementalSnapshotConfig = {
+  enabled: true,
+  fullSnapshotInterval: 10,
+  maxDeltaChainLength: 20,
+  maxDeltaChainAge: 5 * 60 * 1000, // 5 minutes
+  maxDeltaChainSize: 1024 * 1024, // 1MB
+  changeDetection: &quot;deep&quot;,
+  reconstructOnDemand: true,
+  cacheReconstructed: true,
+  maxCacheSize: 100,
+  compressionLevel: &quot;light&quot;,
+};
+
+// === RESTORATION TYPES (for transactional restoration) ===</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/store.ts (Line 129:7 - Line 138:33), D:/develop/nexus-state/packages/core/src/store.ts (Line 71:5 - Line 80:45)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup15"><code class="language-typescript text-sm text-gray-800">);
+    // Register atom with the global registry (if not already registered)
+    // and add it to this store's atom set
+    const storesMap = atomRegistry.getStoresMap();
+    const registry = storesMap.get(store);
+    if (registry &amp;&amp; !registry.atoms.has(atom.id)) {
+      registry.atoms.add(atom.id);
+    }
+    
+    // Check if this atom can be set</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/store.ts (Line 276:5 - Line 284:28), D:/develop/nexus-state/packages/core/src/store.ts (Line 72:7 - Line 80:45)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn16" onclick="toggleCodeBlock('cloneGroup16', 'expandBtn16', 'collapseBtn16')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn16" onclick="toggleCodeBlock('cloneGroup16', 'expandBtn16', 'collapseBtn16')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup16"><code class="language-typescript text-sm text-gray-800">// Register atom with the global registry (if not already registered)
+    // and add it to this store's atom set
+    const storesMap = atomRegistry.getStoresMap();
+    const registry = storesMap.get(store);
+    if (registry &amp;&amp; !registry.atoms.has(atom.id)) {
+      registry.atoms.add(atom.id);
+    }
+    
+    // Get or create atom state</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/store.ts (Line 287:7 - Line 297:13), D:/develop/nexus-state/packages/core/src/store.ts (Line 80:7 - Line 90:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn17" onclick="toggleCodeBlock('cloneGroup17', 'expandBtn17', 'collapseBtn17')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn17" onclick="toggleCodeBlock('cloneGroup17', 'expandBtn17', 'collapseBtn17')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup17"><code class="language-typescript text-sm text-gray-800">// Determine atom type and get initial value
+      let initialValue: Value;
+      if (isPrimitiveAtom(atom)) {
+        // This is a primitive atom - read() takes no parameters
+        initialValue = (atom as PrimitiveAtom&lt;Value&gt;).read();
+      } else if (isComputedAtom(atom)) {
+        // This is a computed atom - read() takes get parameter
+        const previousAtom = currentAtom;
+        currentAtom = atom;
+        try {
+          initialValue</code></pre></div><div class="py-4"><p class="text-gray-600">D:/develop/nexus-state/packages/core/src/store.ts (Line 297:4 - Line 322:18), D:/develop/nexus-state/packages/core/src/store.ts (Line 92:13 - Line 117:63)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn18" onclick="toggleCodeBlock('cloneGroup18', 'expandBtn18', 'collapseBtn18')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn18" onclick="toggleCodeBlock('cloneGroup18', 'expandBtn18', 'collapseBtn18')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup18"><code class="language-typescript text-sm text-gray-800">);
+        } finally {
+          currentAtom = previousAtom;
+        }
+      } else if (isWritableAtom(atom)) {
+        // This is a writable atom - read() takes get parameter
+        const previousAtom = currentAtom;
+        currentAtom = atom;
+        try {
+          initialValue = (atom as WritableAtom&lt;Value&gt;).read(get);
+        } finally {
+          currentAtom = previousAtom;
+        }
+      } else {
+        throw new Error('Unknown atom type');
+      }
+      
+      atomState = {
+        value: initialValue,
+        subscribers: new Set(),
+        dependents: new Set(),
+      };
+      atomStates.set(atom, atomState as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    }
+
+    // Add subscriber</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="markdown-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">markdown</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div></section><!-- Add more sections for other formats and clone groups as needed--></main><footer class="bg-white shadow mt-8 py-4"><div class="container mx-auto px-4 text-center"><p class="text-sm text-gray-600">This report is generated by jscpd, an open-source copy/paste detector.</p><p class="text-sm text-gray-600">jscpd is licensed under the MIT License.</p><a class="text-blue-500 text-sm" href="https://github.com/kucherenko/jscpd" target="_blank" rel="noopener noreferrer">View jscpd on GitHub</a></div></footer><script src="js/prism.js"></script><script>function toggleCodeBlock(codeBlockId, expandBtnId, collapseBtnId) {
+  const codeBlock = document.getElementById(codeBlockId);
+  const expandBtn = document.getElementById(expandBtnId);
+  const collapseBtn = document.getElementById(collapseBtnId);
+
+  codeBlock.classList.toggle('hidden');
+  expandBtn.classList.toggle('hidden');
+  collapseBtn.classList.toggle('hidden');
+}</script></body></html>

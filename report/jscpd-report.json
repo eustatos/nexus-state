@@ -1,0 +1,1961 @@
+{
+  "statistics": {
+    "detectionDate": "2026-02-27T10:54:23.835Z",
+    "formats": {
+      "typescript": {
+        "sources": {
+          "D:/develop/nexus-state/packages/devtools/src/__fixtures__/state-serializer-fixtures.ts": {
+            "lines": 223,
+            "tokens": 1451,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/__fixtures__/snapshot-mapper-fixtures.ts": {
+            "lines": 151,
+            "tokens": 1174,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/__fixtures__/command-handler-fixtures.ts": {
+            "lines": 326,
+            "tokens": 2723,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 18,
+            "duplicatedTokens": 168,
+            "percentage": 5.52,
+            "percentageTokens": 6.17,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/utils/stack-tracer.ts": {
+            "lines": 171,
+            "tokens": 1121,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 42,
+            "duplicatedTokens": 304,
+            "percentage": 24.56,
+            "percentageTokens": 27.12,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/utils/action-naming.ts": {
+            "lines": 79,
+            "tokens": 387,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/utils/action-creator.ts": {
+            "lines": 85,
+            "tokens": 480,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/types/devtools-config.ts": {
+            "lines": 76,
+            "tokens": 252,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/config/devtools-config.ts": {
+            "lines": 66,
+            "tokens": 329,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/action-naming/types.ts": {
+            "lines": 146,
+            "tokens": 665,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/action-naming/strategies.ts": {
+            "lines": 217,
+            "tokens": 1664,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/action-naming/registry.ts": {
+            "lines": 303,
+            "tokens": 2146,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/action-naming/index.ts": {
+            "lines": 72,
+            "tokens": 165,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/types.ts": {
+            "lines": 430,
+            "tokens": 2487,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 44,
+            "duplicatedTokens": 230,
+            "percentage": 10.23,
+            "percentageTokens": 9.25,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/state-serializer.ts": {
+            "lines": 507,
+            "tokens": 3559,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 44,
+            "duplicatedTokens": 230,
+            "percentage": 8.68,
+            "percentageTokens": 6.46,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/stack-trace-service.ts": {
+            "lines": 310,
+            "tokens": 2136,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/snapshot-mapper.ts": {
+            "lines": 277,
+            "tokens": 1706,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/refactored-exports.ts": {
+            "lines": 60,
+            "tokens": 424,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/polling-service.ts": {
+            "lines": 324,
+            "tokens": 2286,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/message-handler.ts": {
+            "lines": 579,
+            "tokens": 3831,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/isDevToolsAvailable.ts": {
+            "lines": 12,
+            "tokens": 69,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/index.ts": {
+            "lines": 66,
+            "tokens": 316,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/getDevToolsMode.ts": {
+            "lines": 28,
+            "tokens": 166,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/devtools-plugin-refactored.ts": {
+            "lines": 623,
+            "tokens": 4600,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 11,
+            "duplicatedTokens": 108,
+            "percentage": 1.77,
+            "percentageTokens": 2.35,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/devtools-noop.ts": {
+            "lines": 272,
+            "tokens": 2003,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/devtools-connector.ts": {
+            "lines": 276,
+            "tokens": 1920,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/detectDevToolsFeatures.ts": {
+            "lines": 59,
+            "tokens": 397,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/createFallbackConnection.ts": {
+            "lines": 22,
+            "tokens": 165,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/command-handler.ts": {
+            "lines": 394,
+            "tokens": 2924,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 11,
+            "duplicatedTokens": 108,
+            "percentage": 2.79,
+            "percentageTokens": 3.69,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/batch-updater.ts": {
+            "lines": 198,
+            "tokens": 1560,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/atom-name-resolver.ts": {
+            "lines": 255,
+            "tokens": 1680,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/action-metadata.ts": {
+            "lines": 127,
+            "tokens": 852,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/devtools/src/action-grouper.ts": {
+            "lines": 178,
+            "tokens": 1491,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/primitives-strategy.ts": {
+            "lines": 74,
+            "tokens": 492,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 12,
+            "duplicatedTokens": 120,
+            "percentage": 16.22,
+            "percentageTokens": 24.39,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/index.ts": {
+            "lines": 7,
+            "tokens": 62,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/functions-strategy.ts": {
+            "lines": 91,
+            "tokens": 703,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/custom-classes-strategy.ts": {
+            "lines": 215,
+            "tokens": 1669,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/collections-strategy.ts": {
+            "lines": 145,
+            "tokens": 1280,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/circular-strategy.ts": {
+            "lines": 80,
+            "tokens": 500,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/builtin-objects-strategy.ts": {
+            "lines": 183,
+            "tokens": 1474,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 8,
+            "duplicatedTokens": 111,
+            "percentage": 4.37,
+            "percentageTokens": 7.53,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/types.ts": {
+            "lines": 523,
+            "tokens": 2287,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategy-registry.ts": {
+            "lines": 94,
+            "tokens": 545,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/index.ts": {
+            "lines": 39,
+            "tokens": 217,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/advanced-serializer.ts": {
+            "lines": 445,
+            "tokens": 3468,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 20,
+            "duplicatedTokens": 231,
+            "percentage": 4.49,
+            "percentageTokens": 6.66,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/types.ts": {
+            "lines": 105,
+            "tokens": 554,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 24,
+            "duplicatedTokens": 124,
+            "percentage": 22.86,
+            "percentageTokens": 22.38,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/strategy.ts": {
+            "lines": 327,
+            "tokens": 2346,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 60,
+            "duplicatedTokens": 454,
+            "percentage": 18.35,
+            "percentageTokens": 19.35,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/factory.ts": {
+            "lines": 107,
+            "tokens": 612,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/utils.ts": {
+            "lines": 208,
+            "tokens": 2357,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/types.ts": {
+            "lines": 93,
+            "tokens": 900,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/serialize.ts": {
+            "lines": 223,
+            "tokens": 2229,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/index.ts": {
+            "lines": 27,
+            "tokens": 178,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/deserialize.ts": {
+            "lines": 218,
+            "tokens": 2361,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 40,
+            "duplicatedTokens": 426,
+            "percentage": 18.35,
+            "percentageTokens": 18.04,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/constants.ts": {
+            "lines": 15,
+            "tokens": 141,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/tracking/types.ts": {
+            "lines": 545,
+            "tokens": 2128,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/tracking/index.ts": {
+            "lines": 190,
+            "tokens": 772,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/tracking/ComputedAtomHandler.ts": {
+            "lines": 369,
+            "tokens": 2560,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/tracking/CleanupStrategies.ts": {
+            "lines": 188,
+            "tokens": 927,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/tracking/AtomChangeDetector.ts": {
+            "lines": 352,
+            "tokens": 2411,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/snapshot/SnapshotValidator.ts": {
+            "lines": 336,
+            "tokens": 2411,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/snapshot/SnapshotSerializer.ts": {
+            "lines": 157,
+            "tokens": 860,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/snapshot/SnapshotCreator.ts": {
+            "lines": 368,
+            "tokens": 2737,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 9,
+            "duplicatedTokens": 101,
+            "percentage": 2.45,
+            "percentageTokens": 3.69,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/snapshot/index.ts": {
+            "lines": 156,
+            "tokens": 801,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/snapshot/constants.ts": {
+            "lines": 76,
+            "tokens": 551,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/history/types.ts": {
+            "lines": 101,
+            "tokens": 734,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/history/index.ts": {
+            "lines": 32,
+            "tokens": 127,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/delta/types.ts": {
+            "lines": 438,
+            "tokens": 2338,
+            "sources": 1,
+            "clones": 3,
+            "duplicatedLines": 62,
+            "duplicatedTokens": 354,
+            "percentage": 14.16,
+            "percentageTokens": 15.14,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/delta/reconstructor.ts": {
+            "lines": 371,
+            "tokens": 2399,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/delta/index.ts": {
+            "lines": 66,
+            "tokens": 393,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/delta/delta-history-manager.ts": {
+            "lines": 302,
+            "tokens": 2012,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/delta/chain-manager.ts": {
+            "lines": 298,
+            "tokens": 2032,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/delta/calculator.ts": {
+            "lines": 362,
+            "tokens": 2341,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/core/types.ts": {
+            "lines": 244,
+            "tokens": 1383,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/core/index.ts": {
+            "lines": 42,
+            "tokens": 190,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/core/HistoryNavigator.ts": {
+            "lines": 52,
+            "tokens": 444,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/core/HistoryManager.ts": {
+            "lines": 388,
+            "tokens": 3113,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/core/disposable.ts": {
+            "lines": 463,
+            "tokens": 2619,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/compression/time-based.ts": {
+            "lines": 96,
+            "tokens": 699,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/compression/strategy.ts": {
+            "lines": 144,
+            "tokens": 687,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/compression/size-based.ts": {
+            "lines": 99,
+            "tokens": 710,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/compression/significance-based.ts": {
+            "lines": 184,
+            "tokens": 1216,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/compression/index.ts": {
+            "lines": 47,
+            "tokens": 310,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/compression/factory.ts": {
+            "lines": 90,
+            "tokens": 663,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/comparison/ValueComparator.ts": {
+            "lines": 541,
+            "tokens": 4650,
+            "sources": 1,
+            "clones": 3,
+            "duplicatedLines": 29,
+            "duplicatedTokens": 283,
+            "percentage": 5.36,
+            "percentageTokens": 6.09,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/comparison/types.ts": {
+            "lines": 252,
+            "tokens": 1161,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/comparison/SnapshotComparator.ts": {
+            "lines": 332,
+            "tokens": 2549,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/comparison/index.ts": {
+            "lines": 17,
+            "tokens": 54,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/comparison/ComparisonFormatter.ts": {
+            "lines": 499,
+            "tokens": 4293,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/serialization.ts": {
+            "lines": 286,
+            "tokens": 2039,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/index.ts": {
+            "lines": 40,
+            "tokens": 168,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/atom-helpers.ts": {
+            "lines": 116,
+            "tokens": 925,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/utils/action-tracker.ts": {
+            "lines": 263,
+            "tokens": 1386,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/types.ts": {
+            "lines": 189,
+            "tokens": 1073,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/index.ts": {
+            "lines": 575,
+            "tokens": 3507,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/test-utils/index.ts": {
+            "lines": 113,
+            "tokens": 907,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/types.ts": {
+            "lines": 688,
+            "tokens": 3302,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 38,
+            "duplicatedTokens": 230,
+            "percentage": 5.52,
+            "percentageTokens": 6.97,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/types.test-d.ts": {
+            "lines": 124,
+            "tokens": 798,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/store.ts": {
+            "lines": 432,
+            "tokens": 3783,
+            "sources": 1,
+            "clones": 8,
+            "duplicatedLines": 104,
+            "duplicatedTokens": 870,
+            "percentage": 24.07,
+            "percentageTokens": 23,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/index.ts": {
+            "lines": 164,
+            "tokens": 536,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/enhanced-store.ts": {
+            "lines": 124,
+            "tokens": 683,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/atom.ts": {
+            "lines": 130,
+            "tokens": 886,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/atom-registry.ts": {
+            "lines": 330,
+            "tokens": 2034,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 21902,
+          "tokens": 146806,
+          "sources": 100,
+          "clones": 19,
+          "duplicatedLines": 288,
+          "duplicatedTokens": 2226,
+          "percentage": 1.31,
+          "percentageTokens": 1.52,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "markdown": {
+        "sources": {
+          "D:/develop/nexus-state/packages/core/src/time-travel/delta/README.md": {
+            "lines": 279,
+            "tokens": 2329,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "D:/develop/nexus-state/packages/core/src/time-travel/compression/USAGE.md": {
+            "lines": 132,
+            "tokens": 995,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 411,
+          "tokens": 3324,
+          "sources": 2,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 22313,
+      "tokens": 150130,
+      "sources": 102,
+      "clones": 19,
+      "duplicatedLines": 288,
+      "duplicatedTokens": 2226,
+      "percentage": 1.29,
+      "percentageTokens": 1.48,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "typescript",
+      "lines": 10,
+      "fragment": ";\r\n\r\n    this.pointer++;\r\n    if (this.pointer < this.history.length) {\r\n      this.history = this.history.slice(0, this.pointer);\r\n    }\r\n    this.history.push(snapshot);\r\n    return snapshot;\r\n  },\r\n}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/devtools/src/__fixtures__/command-handler-fixtures.ts",
+        "start": 294,
+        "end": 303,
+        "startLoc": {
+          "line": 294,
+          "column": 2,
+          "position": 2464
+        },
+        "endLoc": {
+          "line": 303,
+          "column": 2,
+          "position": 2548
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/devtools/src/__fixtures__/command-handler-fixtures.ts",
+        "start": 210,
+        "end": 220,
+        "startLoc": {
+          "line": 210,
+          "column": 9,
+          "position": 1789
+        },
+        "endLoc": {
+          "line": 220,
+          "column": 12,
+          "position": 1876
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 22,
+      "fragment": "// Parse stack frames (skip first frame which is this function)\r\n  const rawFrames = stack\r\n    .split(\"\\n\")\r\n    .slice(1, limit + 1)\r\n    .map((frame) => frame.trim())\r\n    .filter((frame) => frame.length > 0);\r\n\r\n  const frames = filterStackTraceFrames(rawFrames, {\r\n    ...options,\r\n    maxFrames: options.maxFrames ?? limit,\r\n  });\r\n  return {\r\n    frames,\r\n    timestamp: Date.now(),\r\n  };\r\n}\r\n\r\n/**\r\n * Lazy stack trace generator\r\n * @param config - Stack trace configuration\r\n * @returns Function that captures stack trace when called\r\n */",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/devtools/src/utils/stack-tracer.ts",
+        "start": 131,
+        "end": 152,
+        "startLoc": {
+          "line": 131,
+          "column": 3,
+          "position": 831
+        },
+        "endLoc": {
+          "line": 152,
+          "column": 4,
+          "position": 983
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/devtools/src/utils/stack-tracer.ts",
+        "start": 101,
+        "end": 124,
+        "startLoc": {
+          "line": 101,
+          "column": 3,
+          "position": 609
+        },
+        "endLoc": {
+          "line": 124,
+          "column": 4,
+          "position": 763
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 45,
+      "fragment": "/**\r\n * Serialized state format for DevTools compatibility\r\n */\r\nexport interface SerializedState {\r\n  /** The serialized state object */\r\n  state: Record<string, unknown>;\r\n  /** Timestamp when state was serialized */\r\n  timestamp: number;\r\n  /** Checksum for data integrity verification */\r\n  checksum: string;\r\n  /** Optional metadata about the state */\r\n  metadata?: Record<string, unknown>;\r\n}\r\n\r\n/**\r\n * Result of state deserialization\r\n */\r\nexport interface DeserializeResult {\r\n  /** Whether deserialization was successful */\r\n  success: boolean;\r\n  /** The deserialized state if successful */\r\n  state?: Record<string, unknown>;\r\n  /** Error message if failed */\r\n  error?: string;\r\n  /** Checksum verification result */\r\n  checksumValid?: boolean;\r\n}\r\n\r\n/**\r\n * State import format (from DevTools)\r\n */\r\nexport interface ImportStateFormat {\r\n  /** The state object */\r\n  state: Record<string, unknown>;\r\n  /** Timestamp of import */\r\n  timestamp: number;\r\n  /** Checksum for verification */\r\n  checksum: string;\r\n  /** Optional metadata */\r\n  metadata?: Record<string, unknown>;\r\n}\r\n\r\n/**\r\n * State export format (for sharing)\r\n */",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/devtools/src/state-serializer.ts",
+        "start": 22,
+        "end": 66,
+        "startLoc": {
+          "line": 22,
+          "column": 1,
+          "position": 5
+        },
+        "endLoc": {
+          "line": 66,
+          "column": 4,
+          "position": 235
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/devtools/src/types.ts",
+        "start": 270,
+        "end": 315,
+        "startLoc": {
+          "line": 270,
+          "column": 1,
+          "position": 1654
+        },
+        "endLoc": {
+          "line": 315,
+          "column": 4,
+          "position": 1884
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 12,
+      "fragment": "return {\r\n        state: exported.state,\r\n        timestamp: exported.timestamp,\r\n        checksum: exported.checksum,\r\n        version: exported.version,\r\n        metadata: exported.metadata,\r\n      };\r\n    } catch (error) {\r\n      if (process.env.NODE_ENV !== \"production\") {\r\n        console.warn(\"Failed to export state:\", error);\r\n      }\r\n      return",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/devtools/src/command-handler.ts",
+        "start": 349,
+        "end": 360,
+        "startLoc": {
+          "line": 349,
+          "column": 7,
+          "position": 2539
+        },
+        "endLoc": {
+          "line": 360,
+          "column": 7,
+          "position": 2647
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/devtools/src/devtools-plugin-refactored.ts",
+        "start": 499,
+        "end": 511,
+        "startLoc": {
+          "line": 499,
+          "column": 7,
+          "position": 3856
+        },
+        "endLoc": {
+          "line": 511,
+          "column": 6,
+          "position": 3954
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 13,
+      "fragment": "if (serialized.__serializedType === \"null\") {\n      return null;\n    }\n    if (serialized.__serializedType === \"undefined\") {\n      return undefined;\n    }\n    if (serialized.__serializedType === \"bigint\") {\n      return BigInt(serialized.value as string);\n    }\n    if (serialized.__serializedType === \"symbol\") {\n      return Symbol((serialized.description as string) || \"\");\n    }\n    if",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/advanced-serializer.ts",
+        "start": 326,
+        "end": 338,
+        "startLoc": {
+          "line": 326,
+          "column": 5,
+          "position": 2423
+        },
+        "endLoc": {
+          "line": 338,
+          "column": 3,
+          "position": 2543
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/primitives-strategy.ts",
+        "start": 61,
+        "end": 73,
+        "startLoc": {
+          "line": 61,
+          "column": 5,
+          "position": 364
+        },
+        "endLoc": {
+          "line": 73,
+          "column": 7,
+          "position": 484
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 9,
+      "fragment": "if (serialized.__serializedType === \"date\") {\n      return new Date(serialized.value as string);\n    }\n    if (serialized.__serializedType === \"regexp\") {\n      return new RegExp(serialized.source as string, serialized.flags as string);\n    }\n    if (serialized.__serializedType === \"map\") {\n      const map = new Map();\n      if (serialized",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/advanced-serializer.ts",
+        "start": 338,
+        "end": 346,
+        "startLoc": {
+          "line": 338,
+          "column": 5,
+          "position": 2543
+        },
+        "endLoc": {
+          "line": 346,
+          "column": 11,
+          "position": 2654
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/advanced/strategies/builtin-objects-strategy.ts",
+        "start": 154,
+        "end": 162,
+        "startLoc": {
+          "line": 154,
+          "column": 5,
+          "position": 1145
+        },
+        "endLoc": {
+          "line": 162,
+          "column": 8,
+          "position": 1256
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 14,
+      "fragment": "const memorySaved = chain.metadata.memoryUsage;\r\n    chain.deltas = [];\r\n    chain.metadata.memoryUsage = 0;\r\n    chain.metadata.updatedAt = Date.now();\r\n\r\n    this.recordMetadata(this.type, chain.deltas.length, 0, memorySaved);\r\n\r\n    return chain;\r\n  }\r\n}\r\n\r\n/**\r\n * Size-based compression strategy\r\n */",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/strategy.ts",
+        "start": 222,
+        "end": 235,
+        "startLoc": {
+          "line": 222,
+          "column": 5,
+          "position": 1445
+        },
+        "endLoc": {
+          "line": 235,
+          "column": 4,
+          "position": 1546
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/strategy.ts",
+        "start": 180,
+        "end": 193,
+        "startLoc": {
+          "line": 180,
+          "column": 5,
+          "position": 1116
+        },
+        "endLoc": {
+          "line": 193,
+          "column": 4,
+          "position": 1217
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 18,
+      "fragment": ";\r\n  }\r\n\r\n  compress(chain: DeltaChain): DeltaChain {\r\n    const memorySaved = chain.metadata.memoryUsage;\r\n    chain.deltas = [];\r\n    chain.metadata.memoryUsage = 0;\r\n    chain.metadata.updatedAt = Date.now();\r\n\r\n    this.recordMetadata(this.type, chain.deltas.length, 0, memorySaved);\r\n\r\n    return chain;\r\n  }\r\n}\r\n\r\n/**\r\n * Significance-based compression strategy\r\n */",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/strategy.ts",
+        "start": 260,
+        "end": 277,
+        "startLoc": {
+          "line": 260,
+          "column": 8,
+          "position": 1755
+        },
+        "endLoc": {
+          "line": 277,
+          "column": 4,
+          "position": 1881
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/strategy.ts",
+        "start": 218,
+        "end": 193,
+        "startLoc": {
+          "line": 218,
+          "column": 10,
+          "position": 1420
+        },
+        "endLoc": {
+          "line": 193,
+          "column": 4,
+          "position": 1217
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 8,
+      "fragment": "= [];\n            for (const key of Object.keys(obj)) {\n              const index = parseInt(key, 10);\n              if (!isNaN(index)) {\n                result[index] = deserializeSnapshot(obj[key], opts, ctx);\n              }\n            }\n          }",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/deserialize.ts",
+        "start": 147,
+        "end": 154,
+        "startLoc": {
+          "line": 147,
+          "column": 2,
+          "position": 1586
+        },
+        "endLoc": {
+          "line": 154,
+          "column": 2,
+          "position": 1671
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/deserialize.ts",
+        "start": 34,
+        "end": 41,
+        "startLoc": {
+          "line": 34,
+          "column": 2,
+          "position": 287
+        },
+        "endLoc": {
+          "line": 41,
+          "column": 7,
+          "position": 372
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 14,
+      "fragment": ";\n      const escapePrefix = DEFAULT_SERIALIZE_OPTIONS.escapePrefix;\n\n      for (const [key, value] of Object.entries(obj)) {\n        if (key === \"__id\" || key === \"__type\") continue;\n        const originalKey = key.startsWith(escapePrefix)\n          ? key.slice(escapePrefix.length)\n          : key;\n        result[originalKey] = deserializeSnapshot(value, opts, ctx);\n      }\n      return result;\n    }\n\n    // Plain Objects",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/deserialize.ts",
+        "start": 197,
+        "end": 210,
+        "startLoc": {
+          "line": 197,
+          "column": 2,
+          "position": 2147
+        },
+        "endLoc": {
+          "line": 210,
+          "column": 17,
+          "position": 2275
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/utils/snapshot-serialization/deserialize.ts",
+        "start": 171,
+        "end": 182,
+        "startLoc": {
+          "line": 171,
+          "column": 2,
+          "position": 1867
+        },
+        "endLoc": {
+          "line": 182,
+          "column": 7,
+          "position": 1993
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 25,
+      "fragment": ";\r\n  /** Time-based strategy options */\r\n  time?: {\r\n    /** Maximum age in ms */\r\n    maxAge?: number;\r\n  };\r\n  /** Changes-based strategy options */\r\n  changes?: {\r\n    /** Maximum deltas before compression */\r\n    maxDeltas?: number;\r\n  };\r\n  /** Size-based strategy options */\r\n  size?: {\r\n    /** Maximum size in bytes */\r\n    maxSize?: number;\r\n  };\r\n  /** Minimum chain length */\r\n  minChainLength?: number;\r\n  /** Enable/disable compression */\r\n  enabled?: boolean;\r\n}\r\n\r\n/**\r\n * Strategy name type\r\n */",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/delta/types.ts",
+        "start": 409,
+        "end": 433,
+        "startLoc": {
+          "line": 409,
+          "column": 4,
+          "position": 2174
+        },
+        "endLoc": {
+          "line": 433,
+          "column": 4,
+          "position": 2298
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/delta/compression/types.ts",
+        "start": 28,
+        "end": 52,
+        "startLoc": {
+          "line": 28,
+          "column": 25,
+          "position": 130
+        },
+        "endLoc": {
+          "line": 52,
+          "column": 4,
+          "position": 254
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 11,
+      "fragment": "if (typeof a === \"function\") {\n      const equal = this.options.ignoreFunctions || a.toString() === b.toString();\n      return {\n        type: \"function\",\n        equal,\n        oldPrimitive: a.toString(),\n        newPrimitive: b.toString(),\n      };\n    }\n\n    // Handle objects",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/comparison/ValueComparator.ts",
+        "start": 230,
+        "end": 240,
+        "startLoc": {
+          "line": 230,
+          "column": 5,
+          "position": 1833
+        },
+        "endLoc": {
+          "line": 240,
+          "column": 18,
+          "position": 1924
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/comparison/ValueComparator.ts",
+        "start": 177,
+        "end": 187,
+        "startLoc": {
+          "line": 177,
+          "column": 5,
+          "position": 1404
+        },
+        "endLoc": {
+          "line": 187,
+          "column": 68,
+          "position": 1495
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 10,
+      "fragment": "): boolean {\n    const keysA = Object.keys(a);\n    const keysB = Object.keys(b);\n\n    if (keysA.length !== keysB.length) return false;\n\n    for (const key of keysA) {\n      if (!Object.prototype.hasOwnProperty.call(b, key)) return false;\n\n      const",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/comparison/ValueComparator.ts",
+        "start": 301,
+        "end": 310,
+        "startLoc": {
+          "line": 301,
+          "column": 7,
+          "position": 2464
+        },
+        "endLoc": {
+          "line": 310,
+          "column": 6,
+          "position": 2565
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/snapshot/SnapshotCreator.ts",
+        "start": 299,
+        "end": 307,
+        "startLoc": {
+          "line": 299,
+          "column": 2,
+          "position": 2241
+        },
+        "endLoc": {
+          "line": 307,
+          "column": 3,
+          "position": 2341
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 26,
+      "fragment": "export interface IncrementalSnapshotConfig {\n  /** Enable incremental snapshots */\n  enabled: boolean;\n  /** Create full snapshot every N changes */\n  fullSnapshotInterval: number;\n  /** Maximum deltas before forced full snapshot */\n  maxDeltaChainLength: number;\n  /** Maximum age of delta chain (ms) */\n  maxDeltaChainAge: number;\n  /** Maximum memory for delta chain (bytes) */\n  maxDeltaChainSize: number;\n  /** Change detection strategy */\n  changeDetection: \"shallow\" | \"deep\" | \"reference\";\n  /** Reconstruct on demand */\n  reconstructOnDemand: boolean;\n  /** Cache reconstructed snapshots */\n  cacheReconstructed: boolean;\n  /** Cache size limit */\n  maxCacheSize: number;\n  /** Compression level */\n  compressionLevel: \"none\" | \"light\" | \"aggressive\";\n}\n\n/**\n * Default configuration for incremental snapshots\n */",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/types.ts",
+        "start": 276,
+        "end": 301,
+        "startLoc": {
+          "line": 276,
+          "column": 1,
+          "position": 1175
+        },
+        "endLoc": {
+          "line": 301,
+          "column": 4,
+          "position": 1302
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/delta/types.ts",
+        "start": 170,
+        "end": 195,
+        "startLoc": {
+          "line": 170,
+          "column": 1,
+          "position": 870
+        },
+        "endLoc": {
+          "line": 195,
+          "column": 4,
+          "position": 1020
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 14,
+      "fragment": "export const DEFAULT_INCREMENTAL_SNAPSHOT_CONFIG: IncrementalSnapshotConfig = {\n  enabled: true,\n  fullSnapshotInterval: 10,\n  maxDeltaChainLength: 20,\n  maxDeltaChainAge: 5 * 60 * 1000, // 5 minutes\n  maxDeltaChainSize: 1024 * 1024, // 1MB\n  changeDetection: \"deep\",\n  reconstructOnDemand: true,\n  cacheReconstructed: true,\n  maxCacheSize: 100,\n  compressionLevel: \"light\",\n};\n\n// === RESTORATION TYPES (for transactional restoration) ===",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/types.ts",
+        "start": 302,
+        "end": 315,
+        "startLoc": {
+          "line": 302,
+          "column": 1,
+          "position": 1304
+        },
+        "endLoc": {
+          "line": 315,
+          "column": 61,
+          "position": 1407
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/time-travel/delta/types.ts",
+        "start": 196,
+        "end": 211,
+        "startLoc": {
+          "line": 196,
+          "column": 1,
+          "position": 1023
+        },
+        "endLoc": {
+          "line": 211,
+          "column": 4,
+          "position": 1139
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 10,
+      "fragment": ");\n    // Register atom with the global registry (if not already registered)\n    // and add it to this store's atom set\n    const storesMap = atomRegistry.getStoresMap();\n    const registry = storesMap.get(store);\n    if (registry && !registry.atoms.has(atom.id)) {\n      registry.atoms.add(atom.id);\n    }\n    \n    // Check if this atom can be set",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/store.ts",
+        "start": 129,
+        "end": 138,
+        "startLoc": {
+          "line": 129,
+          "column": 7,
+          "position": 1155
+        },
+        "endLoc": {
+          "line": 138,
+          "column": 33,
+          "position": 1235
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/store.ts",
+        "start": 71,
+        "end": 80,
+        "startLoc": {
+          "line": 71,
+          "column": 5,
+          "position": 491
+        },
+        "endLoc": {
+          "line": 80,
+          "column": 45,
+          "position": 571
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 9,
+      "fragment": "// Register atom with the global registry (if not already registered)\n    // and add it to this store's atom set\n    const storesMap = atomRegistry.getStoresMap();\n    const registry = storesMap.get(store);\n    if (registry && !registry.atoms.has(atom.id)) {\n      registry.atoms.add(atom.id);\n    }\n    \n    // Get or create atom state",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/store.ts",
+        "start": 276,
+        "end": 284,
+        "startLoc": {
+          "line": 276,
+          "column": 5,
+          "position": 2587
+        },
+        "endLoc": {
+          "line": 284,
+          "column": 28,
+          "position": 2663
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/store.ts",
+        "start": 72,
+        "end": 80,
+        "startLoc": {
+          "line": 72,
+          "column": 7,
+          "position": 495
+        },
+        "endLoc": {
+          "line": 80,
+          "column": 45,
+          "position": 571
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 11,
+      "fragment": "// Determine atom type and get initial value\n      let initialValue: Value;\n      if (isPrimitiveAtom(atom)) {\n        // This is a primitive atom - read() takes no parameters\n        initialValue = (atom as PrimitiveAtom<Value>).read();\n      } else if (isComputedAtom(atom)) {\n        // This is a computed atom - read() takes get parameter\n        const previousAtom = currentAtom;\n        currentAtom = atom;\n        try {\n          initialValue",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/store.ts",
+        "start": 287,
+        "end": 297,
+        "startLoc": {
+          "line": 287,
+          "column": 7,
+          "position": 2702
+        },
+        "endLoc": {
+          "line": 297,
+          "column": 13,
+          "position": 2792
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/store.ts",
+        "start": 80,
+        "end": 90,
+        "startLoc": {
+          "line": 80,
+          "column": 7,
+          "position": 571
+        },
+        "endLoc": {
+          "line": 90,
+          "column": 8,
+          "position": 661
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 26,
+      "fragment": ");\n        } finally {\n          currentAtom = previousAtom;\n        }\n      } else if (isWritableAtom(atom)) {\n        // This is a writable atom - read() takes get parameter\n        const previousAtom = currentAtom;\n        currentAtom = atom;\n        try {\n          initialValue = (atom as WritableAtom<Value>).read(get);\n        } finally {\n          currentAtom = previousAtom;\n        }\n      } else {\n        throw new Error('Unknown atom type');\n      }\n      \n      atomState = {\n        value: initialValue,\n        subscribers: new Set(),\n        dependents: new Set(),\n      };\n      atomStates.set(atom, atomState as any); // eslint-disable-line @typescript-eslint/no-explicit-any\n    }\n\n    // Add subscriber",
+      "tokens": 0,
+      "firstFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/store.ts",
+        "start": 297,
+        "end": 322,
+        "startLoc": {
+          "line": 297,
+          "column": 4,
+          "position": 2810
+        },
+        "endLoc": {
+          "line": 322,
+          "column": 18,
+          "position": 2999
+        }
+      },
+      "secondFile": {
+        "name": "D:/develop/nexus-state/packages/core/src/store.ts",
+        "start": 92,
+        "end": 117,
+        "startLoc": {
+          "line": 92,
+          "column": 13,
+          "position": 747
+        },
+        "endLoc": {
+          "line": 117,
+          "column": 63,
+          "position": 937
+        }
+      }
+    }
+  ]
+}

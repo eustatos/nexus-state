@@ -1,0 +1,803 @@
+packages\core\src\atom-registry.ts:50: register(atom: any, name?: string): void {
+packages\core\src\atom-registry.ts:95: get(id: symbol): any | undefined {
+packages\core\src\atom-registry.ts:104: getAtom(id: symbol): any | undefined {
+packages\core\src\atom-registry.ts:113: getByName(name: string): any | undefined {
+packages\core\src\atom-registry.ts:128: getName(atom: any): string {
+packages\core\src\atom-registry.ts:153: getMetadata(atom: any): AtomMetadata | undefined {
+packages\core\src\atom-registry.ts:234: getAtomValue(atomId: symbol): any | undefined {
+packages\core\src\atom-registry.ts:298: getComputedAtom(atomId: string): any | undefined {
+packages\core\src\atom-registry.ts:50: register(atom: any, name?: string): void {
+packages\core\src\atom-registry.ts:95: get(id: symbol): any | undefined {
+packages\core\src\atom-registry.ts:104: getAtom(id: symbol): any | undefined {
+packages\core\src\atom-registry.ts:113: getByName(name: string): any | undefined {
+packages\core\src\atom-registry.ts:128: getName(atom: any): string {
+packages\core\src\atom-registry.ts:144: getAll(): Map<symbol, any> {
+packages\core\src\atom-registry.ts:153: getMetadata(atom: any): AtomMetadata | undefined {
+packages\core\src\atom-registry.ts:160: clear(): void {
+packages\core\src\atom-registry.ts:172: size(): number {
+packages\core\src\atom-registry.ts:183: attachStore(store: Store, mode: "global" | "isolated" = "global"): void {
+packages\core\src\atom-registry.ts:200: getStoreForAtom(atomId: symbol): Store | undefined {
+packages\core\src\atom-registry.ts:221: getAtomsForStore(store: Store): symbol[] {
+packages\core\src\atom-registry.ts:234: getAtomValue(atomId: symbol): any | undefined {
+packages\core\src\atom-registry.ts:258: getAllStoresForAtom(atomId: symbol): Store[] {
+packages\core\src\atom-registry.ts:272: getStoresMap(): Map<Store, StoreRegistry> {
+packages\core\src\atom-registry.ts:282: getAllComputedAtoms(): Map<string, any> {
+packages\core\src\atom-registry.ts:298: getComputedAtom(atomId: string): any | undefined {
+packages\core\src\atom-registry.ts:313: getAllAtomIds(): string[] {
+packages\core\src\atom-registry.ts:321: getAllAtoms(): Map<string, any> {
+packages\core\src\atom.ts:64: export function atom<Value>(...args: any[]): Atom<Value> {
+packages\core\src\store.ts:64: let pendingStateUpdates: Array<{ atom: Atom<any>, value: any }> = [];
+packages\core\src\store.ts:65: let debounceTimer: any | null = null;
+packages\core\src\store.ts:218: let newValue: any;
+packages\core\src\store.ts:72: console.log('[GET] Creating state for atom:', (atom as any).name || 'unnamed', 'type:', atom.type);
+packages\core\src\store.ts:91: console.log('[GET] Evaluating computed atom:', (atom as any).name, 'currentAtom:', currentAtom ? (currentAtom as any).name : 'null');
+packages\core\src\store.ts:93: console.log('[GET] Computed atom:', (atom as any).name, 'value:', initialValue);
+packages\core\src\store.ts:115: atomStates.set(atom, atomState as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+packages\core\src\store.ts:121: console.log('[GET] Adding dependency:', (atom as any).name, '->', (currentAtom as any).name);
+packages\core\src\store.ts:123: console.log('[GET] Added dependency:', (atom as any).name, '->', (currentAtom as any).name, 'size now:', atomState.dependents.size, 'was new?', added);
+packages\core\src\store.ts:130: console.log('[SET] Setting atom:', (atom as any).name, 'to:', update);
+packages\core\src\store.ts:176: atomStates.set(atom, atomState as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+packages\core\src\store.ts:188: console.log('[SET] Updated atom:', (atom as any).name, 'from:', previousValue, 'to:', newValue);
+packages\core\src\store.ts:196: console.log('[SET] Notifying dependents of:', (atom as any).name, 'count:', atomState.dependents.size);
+packages\core\src\store.ts:207: console.log('[SET] Notifying dependent:', (current as any).name, 'dependents size:', (atomStates.get(current) as any)?.dependents?.size);
+packages\core\src\store.ts:220: console.log('[SET] Recomputing:', (current as any).name);
+packages\core\src\store.ts:222: console.log('[SET] Recomputed:', (current as any).name, 'value:', newValue);
+packages\core\src\store.ts:228: console.log('[SET] Value changed, updating dependent:', (current as any).name);
+packages\core\src\store.ts:240: console.log('[SET] Value not changed, skipping update for:', (current as any).name);
+packages\core\src\store.ts:246: console.log('[SET] Dependent state not found or not computed/writable:', (current as any).name, 'found:', !!currentState, 'isComputedOrWritable:', currentState ? (isComputedAtom(current) || isWritableAtom(current)) : 'N/A');
+packages\core\src\store.ts:320: atomStates.set(atom, atomState as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+packages\core\src\store.ts:30: dependents: Set<Atom<any>>; // eslint-disable-line @typescript-eslint/no-explicit-any
+packages\core\src\store.ts:55: const atomStates = new Map<Atom<any>, AtomState<any>>();
+packages\core\src\store.ts:58: let currentAtom: Atom<any> | null = null;
+packages\core\src\store.ts:64: let pendingStateUpdates: Array<{ atom: Atom<any>, value: any }> = [];
+packages\core\src\store.ts:197: const toNotify = new Set<Atom<any>>(atomState.dependents);
+packages\core\src\store.ts:198: const notified = new Set<Atom<any>>();
+packages\core\src\store.ts:201: const current = toNotify.values().next().value as Atom<any>;
+packages\core\src\store.ts:221: newValue = (current as ComputedAtom<any>).read(get);
+packages\core\src\store.ts:224: newValue = (current as WritableAtom<any>).read(get);
+packages\core\src\time-travel\comparison\ComparisonFormatter.ts:418: private formatValueDiff(diff: any, indent: number = 0): string[] {
+packages\core\src\time-travel\comparison\ComparisonFormatter.ts:440: modified.forEach(({ index, diff: itemDiff }: { index: number; diff: any }) => {
+packages\core\src\time-travel\comparison\ComparisonFormatter.ts:471: private truncateValue(value: any, maxLength: number = 50): string {
+packages\core\src\time-travel\comparison\ComparisonFormatter.ts:37: constructor(colorize: boolean = false) {
+packages\core\src\time-travel\comparison\ComparisonFormatter.ts:47: format(comparison: SnapshotComparison, format: ComparisonFormat): string {
+packages\core\src\time-travel\comparison\ComparisonFormatter.ts:63: formatSummary(comparison: SnapshotComparison): string {
+packages\core\src\time-travel\comparison\ComparisonFormatter.ts:104: formatDetailed(comparison: SnapshotComparison): string {
+packages\core\src\time-travel\comparison\ComparisonFormatter.ts:170: visualize(comparison: SnapshotComparison, format: VisualizationFormat): string {
+packages\core\src\time-travel\comparison\ComparisonFormatter.ts:261: export(comparison: SnapshotComparison, format: ExportFormat): string {
+packages\core\src\time-travel\comparison\SnapshotComparator.ts:33: constructor(options?: Partial<ComparisonOptions>) {
+packages\core\src\time-travel\comparison\SnapshotComparator.ts:309: clearCache(): void {
+packages\core\src\time-travel\comparison\SnapshotComparator.ts:316: getCacheSize(): number {
+packages\core\src\time-travel\comparison\SnapshotComparator.ts:323: getOptions(): ComparisonOptions {
+packages\core\src\time-travel\comparison\SnapshotComparator.ts:330: updateOptions(options: Partial<ComparisonOptions>): void {
+packages\core\src\time-travel\comparison\types.ts:83: oldValue?: any;
+packages\core\src\time-travel\comparison\types.ts:85: newValue?: any;
+packages\core\src\time-travel\comparison\types.ts:104: oldValue?: any;
+packages\core\src\time-travel\comparison\types.ts:106: newValue?: any;
+packages\core\src\time-travel\comparison\types.ts:139: oldPrimitive?: any;
+packages\core\src\time-travel\comparison\types.ts:140: newPrimitive?: any;
+packages\core\src\time-travel\comparison\ValueComparator.ts:28: areEqual(a: any, b: any, currentDepth: number = 0): boolean {
+packages\core\src\time-travel\comparison\ValueComparator.ts:96: diff(a: any, b: any, path: string[] = []): ValueDiff {
+packages\core\src\time-travel\comparison\ValueComparator.ts:107: private computeDiff(a: any, b: any, path: string[], depth: number): ValueDiff {
+packages\core\src\time-travel\comparison\ValueComparator.ts:288: private areArraysEqual(a: any[], b: any[], depth: number): boolean {
+packages\core\src\time-travel\comparison\ValueComparator.ts:412: private diffArrays(a: any[], b: any[], path: string[], depth: number): ValueDiff {
+packages\core\src\time-travel\comparison\ValueComparator.ts:310: const valueA = (a as any)[key];
+packages\core\src\time-travel\comparison\ValueComparator.ts:311: const valueB = (b as any)[key];
+packages\core\src\time-travel\comparison\ValueComparator.ts:490: oldPrimitive: (a as any)[key],
+packages\core\src\time-travel\comparison\ValueComparator.ts:496: const valueA = (a as any)[key];
+packages\core\src\time-travel\comparison\ValueComparator.ts:497: const valueB = (b as any)[key];
+packages\core\src\time-travel\comparison\ValueComparator.ts:513: newPrimitive: (b as any)[key],
+packages\core\src\time-travel\comparison\ValueComparator.ts:275: private areSetsEqual(a: Set<any>, b: Set<any>, depth: number): boolean {
+packages\core\src\time-travel\comparison\ValueComparator.ts:370: private diffSets(a: Set<any>, b: Set<any>, path: string[], depth: number): ValueDiff {
+packages\core\src\time-travel\comparison\ValueComparator.ts:17: constructor(options: ComparisonOptions) {
+packages\core\src\time-travel\comparison\ValueComparator.ts:28: areEqual(a: any, b: any, currentDepth: number = 0): boolean {
+packages\core\src\time-travel\comparison\ValueComparator.ts:96: diff(a: any, b: any, path: string[] = []): ValueDiff {
+packages\core\src\time-travel\comparison\ValueComparator.ts:529: getMaxDepth(): number {
+packages\core\src\time-travel\comparison\ValueComparator.ts:536: reset(): void {
+packages\core\src\time-travel\compression\significance-based.ts:88: constructor(config: SignificanceBasedCompressionConfig = {}) {
+packages\core\src\time-travel\compression\significance-based.ts:99: shouldCompress(history: Snapshot[], currentIndex: number): boolean {
+packages\core\src\time-travel\compression\significance-based.ts:115: compress(history: Snapshot[]): Snapshot[] {
+packages\core\src\time-travel\compression\significance-based.ts:159: getMinChangeThreshold(): number {
+packages\core\src\time-travel\compression\significance-based.ts:166: getMaxConsecutiveSimilar(): number {
+packages\core\src\time-travel\compression\significance-based.ts:173: reset(): void {
+packages\core\src\time-travel\compression\significance-based.ts:182: compareSnapshots(a: Snapshot, b: Snapshot): SnapshotComparisonResult {
+packages\core\src\time-travel\compression\size-based.ts:33: constructor(config: SizeBasedCompressionConfig = {}) {
+packages\core\src\time-travel\compression\size-based.ts:44: shouldCompress(history: Snapshot[], currentIndex: number): boolean {
+packages\core\src\time-travel\compression\size-based.ts:53: compress(history: Snapshot[]): Snapshot[] {
+packages\core\src\time-travel\compression\size-based.ts:90: getMaxSnapshots(): number {
+packages\core\src\time-travel\compression\size-based.ts:97: getKeepEvery(): number {
+packages\core\src\time-travel\compression\strategy.ts:32: shouldCompress(history: Snapshot[], currentIndex: number): boolean;
+packages\core\src\time-travel\compression\strategy.ts:39: compress(history: Snapshot[]): Snapshot[];
+packages\core\src\time-travel\compression\strategy.ts:45: getMetadata(): CompressionMetadata | null;
+packages\core\src\time-travel\compression\strategy.ts:66: constructor(config: CompressionStrategyConfig = {}) {
+packages\core\src\time-travel\compression\strategy.ts:77: shouldCompress(history: Snapshot[], currentIndex: number): boolean {
+packages\core\src\time-travel\compression\strategy.ts:98: getMetadata(): CompressionMetadata | null {
+packages\core\src\time-travel\compression\strategy.ts:123: reset(): void {
+packages\core\src\time-travel\compression\strategy.ts:134: constructor(config: CompressionStrategyConfig = {}) {
+packages\core\src\time-travel\compression\strategy.ts:138: shouldCompress(): boolean {
+packages\core\src\time-travel\compression\strategy.ts:142: compress(history: Snapshot[]): Snapshot[] {
+packages\core\src\time-travel\compression\time-based.ts:33: constructor(config: TimeBasedCompressionConfig = {}) {
+packages\core\src\time-travel\compression\time-based.ts:44: shouldCompress(history: Snapshot[], currentIndex: number): boolean {
+packages\core\src\time-travel\compression\time-based.ts:56: compress(history: Snapshot[]): Snapshot[] {
+packages\core\src\time-travel\compression\time-based.ts:87: getKeepRecentForMs(): number {
+packages\core\src\time-travel\compression\time-based.ts:94: getKeepEvery(): number {
+packages\core\src\time-travel\core\disposable.ts:289: const WeakRefCtor: any = (globalThis as any).WeakRef;
+packages\core\src\time-travel\core\disposable.ts:414: private registry: any | null = null; // FinalizationRegistry wrapper
+packages\core\src\time-travel\core\disposable.ts:420: const FinalizationRegistryCtor: any = (globalThis as any).FinalizationRegistry;
+packages\core\src\time-travel\core\disposable.ts:289: const WeakRefCtor: any = (globalThis as any).WeakRef;
+packages\core\src\time-travel\core\disposable.ts:420: const FinalizationRegistryCtor: any = (globalThis as any).FinalizationRegistry;
+packages\core\src\time-travel\core\disposable.ts:14: constructor(message: string, cause?: Error) {
+packages\core\src\time-travel\core\disposable.ts:27: constructor(errors: Error[]) {
+packages\core\src\time-travel\core\disposable.ts:41: dispose(): Promise<void> | void;
+packages\core\src\time-travel\core\disposable.ts:46: isDisposed(): boolean;
+packages\core\src\time-travel\core\disposable.ts:107: constructor(config?: DisposableConfig) {
+packages\core\src\time-travel\core\disposable.ts:126: isDisposed(): boolean {
+packages\core\src\time-travel\core\disposable.ts:434: track(instance: object, id: string): void {
+packages\core\src\time-travel\core\disposable.ts:445: untrack(id: string): void {
+packages\core\src\time-travel\core\disposable.ts:462: getTrackedCount(): number {
+packages\core\src\time-travel\core\HistoryManager.ts:56: setCompressionStrategy(strategy: CompressionStrategy | null): void {
+packages\core\src\time-travel\core\HistoryManager.ts:69: add(snapshot: Snapshot): void {
+packages\core\src\time-travel\core\HistoryManager.ts:115: getCurrent(): Snapshot | null {
+packages\core\src\time-travel\core\HistoryManager.ts:119: getAll(): Snapshot[] {
+packages\core\src\time-travel\core\HistoryManager.ts:128: canUndo(): boolean {
+packages\core\src\time-travel\core\HistoryManager.ts:132: canRedo(): boolean {
+packages\core\src\time-travel\core\HistoryManager.ts:136: undo(): Snapshot | null {
+packages\core\src\time-travel\core\HistoryManager.ts:152: redo(): Snapshot | null {
+packages\core\src\time-travel\core\HistoryManager.ts:166: jumpTo(index: number): Snapshot | null {
+packages\core\src\time-travel\core\HistoryManager.ts:255: clear(): void {
+packages\core\src\time-travel\core\HistoryManager.ts:274: getStats(): HistoryStats {
+packages\core\src\time-travel\core\HistoryManager.ts:296: getById(snapshotId: string): Snapshot | null {
+packages\core\src\time-travel\core\HistoryNavigator.ts:8: canUndo(): boolean;
+packages\core\src\time-travel\core\HistoryNavigator.ts:9: canRedo(): boolean;
+packages\core\src\time-travel\core\HistoryNavigator.ts:10: undo(): Snapshot | null;
+packages\core\src\time-travel\core\HistoryNavigator.ts:11: redo(): Snapshot | null;
+packages\core\src\time-travel\core\HistoryNavigator.ts:12: jumpTo(index: number): Snapshot | null;
+packages\core\src\time-travel\core\HistoryNavigator.ts:21: undo(): boolean {
+packages\core\src\time-travel\core\HistoryNavigator.ts:36: redo(): boolean {
+packages\core\src\time-travel\core\HistoryNavigator.ts:47: jumpTo(index: number): boolean {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:571: subscribe(listener: (event: any) => void): () => void {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:228: this.registerChild(this.historyManager as any);
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:232: this.historyManager as any, // Safe cast since both implement required methods
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:635: return this.atomTracker.getCleanupStats() as any;
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:985: this.store = null as any;
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:986: this.originalSet = null as any;
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:987: this.wrappedSet = null as any;
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:108: constructor(store: Store, options: TimeTravelOptions & DisposableConfig = {}) {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:263: capture(action?: string): Snapshot | undefined {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:287: captureWithResult(action?: string) {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:312: undo(): boolean {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:327: redo(): boolean {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:341: canUndo(): boolean {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:348: canRedo(): boolean {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:357: jumpTo(index: number): boolean {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:371: clearHistory(): void {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:398: getHistory(): Snapshot[] {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:405: getHistoryStats() {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:414: importState(state: Record<string, unknown>): boolean {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:443: getCurrentSnapshot(): Snapshot | null {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:596: getAtomTracker(): AtomTracker {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:613: getStaleAtoms(): TrackedAtom[] {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:622: forgetAtom(atomName: string): boolean {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:634: getCleanupStats(): CleanupResult & { totalCleanups: number; totalAtomsRemoved: number } {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:641: getHistoryManager(): HistoryManager | DeltaAwareHistoryManager {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:648: getSnapshotCreator(): SnapshotCreator {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:655: getSnapshotRestorer(): SnapshotRestorer {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:690: getLastCheckpoint(): RestorationCheckpoint | null {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:708: getCheckpoints(): RestorationCheckpoint[] {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:769: pauseAutoCapture(): void {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:776: resumeAutoCapture(): void {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:783: isTraveling(): boolean {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:790: getVersion(): string {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:798: getDeltaChain(): DeltaSnapshot[] {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:809: forceFullSnapshot(): void {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:822: setDeltaStrategy(strategy: DeltaCompressionFactoryConfig): void {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:837: reconstructTo(index: number): Snapshot | null {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:849: getDeltaStats() {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:865: isDeltaEnabled(): boolean {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:872: getDeltaCalculator(): DeltaCalculatorImpl {
+packages\core\src\time-travel\core\SimpleTimeTravel.ts:879: getDeltaReconstructor(): SnapshotReconstructor {
+packages\core\src\time-travel\delta\calculator.ts:81: areSnapshotsEqual(a: Snapshot, b: Snapshot): boolean;
+packages\core\src\time-travel\delta\calculator.ts:88: calculateDeltaSize(changes: Map<string, DeltaChange>): number;
+packages\core\src\time-travel\delta\calculator.ts:95: calculateSnapshotSize(snapshot: Snapshot): number;
+packages\core\src\time-travel\delta\calculator.ts:104: constructor(config: DeltaCalculatorConfig = {}) {
+packages\core\src\time-travel\delta\calculator.ts:256: areSnapshotsEqual(a: Snapshot, b: Snapshot): boolean {
+packages\core\src\time-travel\delta\calculator.ts:263: calculateDeltaSize(changes: Map<string, DeltaChange>): number {
+packages\core\src\time-travel\delta\calculator.ts:278: calculateSnapshotSize(snapshot: Snapshot): number {
+packages\core\src\time-travel\delta\chain-manager.ts:51: constructor(config?: Partial<ChainManagerConfig>) {
+packages\core\src\time-travel\delta\chain-manager.ts:61: addDelta(delta: DeltaSnapshot): void {
+packages\core\src\time-travel\delta\chain-manager.ts:83: getChain(baseId: string): DeltaChain | null {
+packages\core\src\time-travel\delta\chain-manager.ts:90: getAllChains(): DeltaChain[] {
+packages\core\src\time-travel\delta\chain-manager.ts:97: getActiveChainCount(): number {
+packages\core\src\time-travel\delta\chain-manager.ts:104: reconstruct(baseId: string, targetDeltaId?: string): DeltaSnapshot | null {
+packages\core\src\time-travel\delta\chain-manager.ts:132: validateChain(chain: DeltaChain): ChainValidationResult {
+packages\core\src\time-travel\delta\chain-manager.ts:167: getStats(): DeltaStats {
+packages\core\src\time-travel\delta\chain-manager.ts:193: clear(): void {
+packages\core\src\time-travel\delta\chain-manager.ts:203: createNewBaseSnapshot(chain: DeltaChain): void {
+packages\core\src\time-travel\delta\chain-manager.ts:219: shouldCreateBaseSnapshot(chain: DeltaChain): boolean {
+packages\core\src\time-travel\delta\compression\factory.ts:27: static create(config: DeltaCompressionFactoryConfig): any {
+packages\core\src\time-travel\delta\compression\strategy.ts:27: shouldCompress(chain: DeltaChain): boolean;
+packages\core\src\time-travel\delta\compression\strategy.ts:32: compress(chain: DeltaChain): DeltaChain;
+packages\core\src\time-travel\delta\compression\strategy.ts:37: getMetadata(): DeltaCompressionMetadata | null;
+packages\core\src\time-travel\delta\compression\strategy.ts:64: constructor(config: { enabled?: boolean; minChainLength?: number } = {}) {
+packages\core\src\time-travel\delta\compression\strategy.ts:75: shouldCompress(chain: DeltaChain): boolean {
+packages\core\src\time-travel\delta\compression\strategy.ts:96: getMetadata(): DeltaCompressionMetadata | null {
+packages\core\src\time-travel\delta\compression\strategy.ts:121: reset(): void {
+packages\core\src\time-travel\delta\compression\strategy.ts:134: constructor(config: { enabled?: boolean; minChainLength?: number } = {}) {
+packages\core\src\time-travel\delta\compression\strategy.ts:138: shouldCompress(): boolean {
+packages\core\src\time-travel\delta\compression\strategy.ts:142: compress(chain: DeltaChain): DeltaChain {
+packages\core\src\time-travel\delta\compression\strategy.ts:158: constructor(config: DeltaCompressionConfig = {}) {
+packages\core\src\time-travel\delta\compression\strategy.ts:168: shouldCompress(chain: DeltaChain): boolean {
+packages\core\src\time-travel\delta\compression\strategy.ts:178: compress(chain: DeltaChain): DeltaChain {
+packages\core\src\time-travel\delta\compression\strategy.ts:202: constructor(config: DeltaCompressionConfig = {}) {
+packages\core\src\time-travel\delta\compression\strategy.ts:212: shouldCompress(chain: DeltaChain): boolean {
+packages\core\src\time-travel\delta\compression\strategy.ts:221: compress(chain: DeltaChain): DeltaChain {
+packages\core\src\time-travel\delta\compression\strategy.ts:244: constructor(config: DeltaCompressionConfig = {}) {
+packages\core\src\time-travel\delta\compression\strategy.ts:254: shouldCompress(chain: DeltaChain): boolean {
+packages\core\src\time-travel\delta\compression\strategy.ts:263: compress(chain: DeltaChain): DeltaChain {
+packages\core\src\time-travel\delta\compression\strategy.ts:283: constructor(config: DeltaCompressionConfig = {}) {
+packages\core\src\time-travel\delta\compression\strategy.ts:291: shouldCompress(chain: DeltaChain): boolean {
+packages\core\src\time-travel\delta\compression\strategy.ts:305: compress(chain: DeltaChain): DeltaChain {
+packages\core\src\time-travel\delta\compression\types.ts:64: shouldCompress(chain: { deltas: any[]; metadata: any }): boolean;
+packages\core\src\time-travel\delta\compression\types.ts:69: compress(chain: { deltas: any[]; metadata: any }): { deltas: any[]; metadata: any };
+packages\core\src\time-travel\delta\compression\types.ts:64: shouldCompress(chain: { deltas: any[]; metadata: any }): boolean;
+packages\core\src\time-travel\delta\compression\types.ts:69: compress(chain: { deltas: any[]; metadata: any }): { deltas: any[]; metadata: any };
+packages\core\src\time-travel\delta\compression\types.ts:74: getMetadata(): DeltaCompressionMetadata | null;
+packages\core\src\time-travel\delta\delta-history-manager.ts:211: getDeltaStats(): any {
+packages\core\src\time-travel\delta\delta-history-manager.ts:32: constructor(config: DeltaAwareHistoryManagerConfig = {}) {
+packages\core\src\time-travel\delta\delta-history-manager.ts:58: add(snapshot: Snapshot): void {
+packages\core\src\time-travel\delta\delta-history-manager.ts:87: getSnapshot(index: number): Snapshot | null {
+packages\core\src\time-travel\delta\delta-history-manager.ts:107: getAll(): Snapshot[] {
+packages\core\src\time-travel\delta\delta-history-manager.ts:120: getById(snapshotId: string): Snapshot | null {
+packages\core\src\time-travel\delta\delta-history-manager.ts:134: getDeltaSnapshots(): DeltaSnapshot[] {
+packages\core\src\time-travel\delta\delta-history-manager.ts:141: getStats(): DeltaHistoryStats {
+packages\core\src\time-travel\delta\delta-history-manager.ts:152: canUndo(): boolean {
+packages\core\src\time-travel\delta\delta-history-manager.ts:159: canRedo(): boolean {
+packages\core\src\time-travel\delta\delta-history-manager.ts:166: undo(): Snapshot | null {
+packages\core\src\time-travel\delta\delta-history-manager.ts:173: redo(): Snapshot | null {
+packages\core\src\time-travel\delta\delta-history-manager.ts:180: jumpTo(index: number): Snapshot | null {
+packages\core\src\time-travel\delta\delta-history-manager.ts:187: getCurrent(): Snapshot | null {
+packages\core\src\time-travel\delta\delta-history-manager.ts:194: clear(): void {
+packages\core\src\time-travel\delta\delta-history-manager.ts:211: getDeltaStats(): any {
+packages\core\src\time-travel\delta\delta-history-manager.ts:218: forceFullSnapshot(): void {
+packages\core\src\time-travel\delta\reconstructor.ts:35: get(id: string): Snapshot | null;
+packages\core\src\time-travel\delta\reconstructor.ts:37: set(id: string, snapshot: Snapshot): void;
+packages\core\src\time-travel\delta\reconstructor.ts:39: clear(): void;
+packages\core\src\time-travel\delta\reconstructor.ts:41: size(): number;
+packages\core\src\time-travel\delta\reconstructor.ts:51: constructor(maxSize: number = 100) {
+packages\core\src\time-travel\delta\reconstructor.ts:55: get(id: string): Snapshot | null {
+packages\core\src\time-travel\delta\reconstructor.ts:68: set(id: string, snapshot: Snapshot): void {
+packages\core\src\time-travel\delta\reconstructor.ts:82: clear(): void {
+packages\core\src\time-travel\delta\reconstructor.ts:86: size(): number {
+packages\core\src\time-travel\delta\reconstructor.ts:118: constructor(config: ReconstructionOptions = {}) {
+packages\core\src\time-travel\delta\reconstructor.ts:229: getFromCache(snapshotId: string): Snapshot | null {
+packages\core\src\time-travel\delta\reconstructor.ts:240: setInCache(snapshotId: string, snapshot: Snapshot): void {
+packages\core\src\time-travel\delta\reconstructor.ts:249: getCacheStats(): { size: number; maxSize: number } {
+packages\core\src\time-travel\delta\reconstructor.ts:263: clearCache(): void {
+packages\core\src\time-travel\delta\reconstructor.ts:276: constructor(config: ReconstructionOptions = {}) {
+packages\core\src\time-travel\delta\types.ts:242: standard: any;
+packages\core\src\time-travel\index.ts:355: value: any,
+packages\core\src\time-travel\snapshot\SnapshotCreator.ts:20: private workerPool: any | null = null; // WorkerPool type not available
+packages\core\src\time-travel\snapshot\SnapshotCreator.ts:351: if (this.serializer && typeof (this.serializer as any).dispose === "function") {
+packages\core\src\time-travel\snapshot\SnapshotCreator.ts:352: await (this.serializer as any).dispose();
+packages\core\src\time-travel\snapshot\SnapshotCreator.ts:67: create(action?: string, atomIds?: Set<symbol>): Snapshot | null {
+packages\core\src\time-travel\snapshot\SnapshotCreator.ts:120: createBatch(count: number, actionPattern?: string): Snapshot[] {
+packages\core\src\time-travel\snapshot\SnapshotCreator.ts:140: createWithResult(action?: string, atomIds?: Set<symbol>): CreationResult {
+packages\core\src\time-travel\snapshot\SnapshotCreator.ts:318: configure(config: Partial<SnapshotCreatorConfig>): void {
+packages\core\src\time-travel\snapshot\SnapshotCreator.ts:325: getConfig(): SnapshotCreatorConfig {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:38: private transactionLog: any | null = null; // TransactionLog type not available
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:92: restore(snapshot: Snapshot): boolean {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:135: restoreWithResult(snapshot: Snapshot): RestorationResult {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:224: restoreSequence(snapshots: Snapshot[]): RestorationResult[] {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:449: isRestoring(): boolean {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:457: configure(config: Partial<SnapshotRestorerConfig> & Partial<TransactionalRestorerConfig> & Partial<RestorationConfig>): void {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:466: getConfig(): SnapshotRestorerConfig {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:473: getTransactionalConfig(): TransactionalRestorerConfig {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:480: getRestorationConfig(): RestorationConfig {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:487: getCheckpoints(): RestorationCheckpoint[] {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:494: getLastCheckpoint(): RestorationCheckpoint | null {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:511: getCheckpoint(checkpointId: string): RestorationCheckpoint | undefined {
+packages\core\src\time-travel\snapshot\SnapshotRestorer.ts:518: clearCheckpoints(): void {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:13: constructor() {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:116: validate(snapshot: Snapshot): ValidationResult {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:162: validateMany(snapshots: Snapshot[]): ValidationResult[] {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:171: validateSequence(snapshots: Snapshot[]): ValidationResult {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:258: removeRule(name: string): void {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:266: removeCustomValidator(name: string): void {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:273: getRules(): ValidationRule[] {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:280: getCustomValidators(): Map<string, (snapshot: Snapshot) => boolean> {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:287: clearCustomValidators(): void {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:294: resetToDefault(): void {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:304: isValid(snapshot: Snapshot): boolean {
+packages\core\src\time-travel\snapshot\SnapshotValidator.ts:312: getStats(snapshots: Snapshot[]): {
+packages\core\src\time-travel\snapshot\types.ts:944: save(snapshot: Snapshot): Promise<void> | void;
+packages\core\src\time-travel\snapshot\types.ts:947: load(id: string): Promise<Snapshot | null> | Snapshot | null;
+packages\core\src\time-travel\snapshot\types.ts:950: delete(id: string): Promise<boolean> | boolean;
+packages\core\src\time-travel\snapshot\types.ts:953: list(): Promise<string[]> | string[];
+packages\core\src\time-travel\snapshot\types.ts:956: exists(id: string): Promise<boolean> | boolean;
+packages\core\src\time-travel\snapshot\types.ts:959: clear(): Promise<void> | void;
+packages\core\src\time-travel\snapshot\types.ts:984: process(snapshot: Snapshot): Promise<T> | T;
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:162: watchMany(atoms: any[], listener: ChangeListener): () => void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:292: getChangeHistory(atom: any, limit: number = 10): ChangeEvent[] {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:343: isWatched(atom: any): boolean {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:25: constructor(tracker: AtomTracker) {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:131: watch(atom: Atom<unknown>, listener: ChangeListener): () => void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:162: watchMany(atoms: any[], listener: ChangeListener): () => void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:175: watchPattern(pattern: RegExp, listener: ChangeListener): () => void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:188: addGlobalListener(listener: ChangeListener): () => void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:197: addFilter(filter: ChangeFilter): () => void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:208: startBatch(): void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:216: endBatch(): ChangeBatch {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:251: startPolling(interval: number = 100): void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:264: stopPolling(): void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:274: checkForChanges(): void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:292: getChangeHistory(atom: any, limit: number = 10): ChangeEvent[] {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:301: getMostChanged(count: number = 5): TrackedAtom[] {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:312: getRecentlyChanged(minutes: number = 5): TrackedAtom[] {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:320: clearListeners(): void {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:329: listenerCount(): number {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:343: isWatched(atom: any): boolean {
+packages\core\src\time-travel\tracking\AtomChangeDetector.ts:350: getWatchedAtoms(): symbol[] {
+packages\core\src\time-travel\tracking\AtomTracker.ts:834: private getAtomType(atom: any): string {
+packages\core\src\time-travel\tracking\AtomTracker.ts:862: private validateAtom(atom: any): boolean {
+packages\core\src\time-travel\tracking\AtomTracker.ts:870: private generateName(atom: any): string {
+packages\core\src\time-travel\tracking\AtomTracker.ts:133: if (typeof (this.cleanupTimer as any).unref === "function") {
+packages\core\src\time-travel\tracking\AtomTracker.ts:134: (this.cleanupTimer as any).unref();
+packages\core\src\time-travel\tracking\AtomTracker.ts:505: this.stats.atomsByStatus = stats as any;
+packages\core\src\time-travel\tracking\AtomTracker.ts:329: getTrackedAtom(id: symbol): TrackedAtom | undefined {
+packages\core\src\time-travel\tracking\AtomTracker.ts:337: getAtomByName(name: string): Atom<unknown> | undefined {
+packages\core\src\time-travel\tracking\AtomTracker.ts:346: getTrackedAtoms(): Atom<unknown>[] {
+packages\core\src\time-travel\tracking\AtomTracker.ts:353: getAllTracked(): TrackedAtom[] {
+packages\core\src\time-travel\tracking\AtomTracker.ts:361: getAtomsByType(type: string): TrackedAtom[] {
+packages\core\src\time-travel\tracking\AtomTracker.ts:370: recordAccess(atom: Atom<unknown>, subscriberId?: string): void {
+packages\core\src\time-travel\tracking\AtomTracker.ts:404: removeSubscriber(atom: Atom<unknown>, subscriberId: string): void {
+packages\core\src\time-travel\tracking\AtomTracker.ts:454: updateAtomStatuses(atoms?: TrackedAtom[]): void {
+packages\core\src\time-travel\tracking\AtomTracker.ts:672: markForCleanup(atomId: symbol): void {
+packages\core\src\time-travel\tracking\AtomTracker.ts:704: getCleanupStats(): CleanupStats {
+packages\core\src\time-travel\tracking\AtomTracker.ts:711: getArchivedAtoms(): TrackedAtom[] {
+packages\core\src\time-travel\tracking\AtomTracker.ts:720: restoreArchivedAtom(atomId: symbol): boolean {
+packages\core\src\time-travel\tracking\AtomTracker.ts:738: getStaleAtoms(): TrackedAtom[] {
+packages\core\src\time-travel\tracking\AtomTracker.ts:745: getStats(): TrackingStats {
+packages\core\src\time-travel\tracking\AtomTracker.ts:885: snapshot(): TrackerSnapshot {
+packages\core\src\time-travel\tracking\AtomTracker.ts:897: createRestorePoint(): TrackerRestorePoint {
+packages\core\src\time-travel\tracking\AtomTracker.ts:911: restore(point: TrackerRestorePoint): void {
+packages\core\src\time-travel\tracking\AtomTracker.ts:922: clear(): void {
+packages\core\src\time-travel\tracking\AtomTracker.ts:963: configure(config: Partial<TrackerConfig>): void {
+packages\core\src\time-travel\tracking\AtomTracker.ts:988: getConfig(): TrackerConfig {
+packages\core\src\time-travel\tracking\AtomTracker.ts:995: getTTLConfig(): TTLConfig {
+packages\core\src\time-travel\tracking\AtomTracker.ts:1002: getVersion(): number {
+packages\core\src\time-travel\tracking\AtomTracker.ts:1009: size(): number {
+packages\core\src\time-travel\tracking\CleanupStrategies.ts:23: selectCandidates(atoms: TrackedAtom[], count: number): TrackedAtom[] {
+packages\core\src\time-travel\tracking\CleanupStrategies.ts:36: getPriority(atom: TrackedAtom): number {
+packages\core\src\time-travel\tracking\CleanupStrategies.ts:54: selectCandidates(atoms: TrackedAtom[], count: number): TrackedAtom[] {
+packages\core\src\time-travel\tracking\CleanupStrategies.ts:67: getPriority(atom: TrackedAtom): number {
+packages\core\src\time-travel\tracking\CleanupStrategies.ts:85: selectCandidates(atoms: TrackedAtom[], count: number): TrackedAtom[] {
+packages\core\src\time-travel\tracking\CleanupStrategies.ts:98: getPriority(atom: TrackedAtom): number {
+packages\core\src\time-travel\tracking\CleanupStrategies.ts:125: selectCandidates(atoms: TrackedAtom[], count: number): TrackedAtom[] {
+packages\core\src\time-travel\tracking\CleanupStrategies.ts:153: getPriority(atom: TrackedAtom): number {
+packages\core\src\time-travel\tracking\CleanupStrategies.ts:162: setCurrentTime(now: number): void {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:60: atom: any,
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:101: compute(atom: any): any {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:216: getCachedValue(atomId: symbol): any {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:23: constructor(tracker: AtomTracker) {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:101: compute(atom: any): any {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:151: getDependencies(atomId: symbol): ComputedDependency[] {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:159: getDependents(atomId: symbol): symbol[] {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:179: invalidateCache(atomId: symbol): void {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:216: getCachedValue(atomId: symbol): any {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:223: clearCache(): void {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:231: clearAtomCache(atomId: symbol): void {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:238: getDependencyGraph(): Record<string, string[]> {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:256: detectCircularDependencies(): Array<symbol[]> {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:294: getStats(): {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:316: updateConfig(atomId: symbol, config: Partial<ComputedAtomConfig>): void {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:328: removeComputed(atomId: symbol): void {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:346: warmCache(atomIds?: symbol[]): void {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:361: isComputed(atomId: symbol): boolean {
+packages\core\src\time-travel\tracking\ComputedAtomHandler.ts:368: getAllComputed(): symbol[] {
+packages\core\src\time-travel\tracking\index.ts:82: store: any,
+packages\core\src\time-travel\tracking\index.ts:114: export function isTracked(tracker: AtomTracker, atom: any): boolean {
+packages\core\src\time-travel\tracking\index.ts:123: export function getTrackedAtoms(tracker: AtomTracker): any[] {
+packages\core\src\time-travel\tracking\index.ts:136: ): any | undefined {
+packages\core\src\time-travel\tracking\index.ts:149: atom: any,
+packages\core\src\time-travel\tracking\index.ts:164: atoms: any[],
+packages\core\src\time-travel\tracking\index.ts:177: atom: any,
+packages\core\src\time-travel\tracking\index.ts:178: transform?: (value: any) => any,
+packages\core\src\time-travel\tracking\types.ts:207: atom: any;
+packages\core\src\time-travel\tracking\types.ts:281: oldValue?: any;
+packages\core\src\time-travel\tracking\types.ts:284: newValue?: any;
+packages\core\src\time-travel\tracking\types.ts:290: data?: any;
+packages\core\src\time-travel\tracking\types.ts:339: atom: any;
+packages\core\src\time-travel\tracking\types.ts:348: oldValue: any;
+packages\core\src\time-travel\tracking\types.ts:351: newValue: any;
+packages\core\src\time-travel\tracking\types.ts:421: atom: any;
+packages\core\src\time-travel\tracking\types.ts:424: transform?: (value: any) => any;
+packages\core\src\time-travel\tracking\types.ts:432: value: any;
+packages\core\src\time-travel\tracking\types.ts:438: dependencies: any[];
+packages\core\src\time-travel\tracking\types.ts:116: selectCandidates(atoms: TrackedAtom[], count: number): TrackedAtom[];
+packages\core\src\time-travel\tracking\types.ts:119: getPriority(atom: TrackedAtom): number;
+packages\core\src\time-travel\__tests__\setup.ts:63: toHaveBeenCalledOnceWith(received: any, ...expected: unknown[]) {
+packages\core\src\time-travel\__tests__\setup.ts:50: toHaveBeenCalledOnceWith(...expected: unknown[]): R;
+packages\core\src\time-travel\__tests__\setup.ts:63: toHaveBeenCalledOnceWith(received: any, ...expected: unknown[]) {
+packages\core\src\types.test-d.ts:98: const anyAtom: Atom<any> = primitiveAtom;
+packages\core\src\types.ts:535: atoms?: any[]; // Add atoms property to TimeTravelOptions
+packages\core\src\types.ts:556: value: any;
+packages\core\src\types.ts:604: setDeltaStrategy?(strategy: any): void;
+packages\core\src\types.ts:608: getDeltaStats?(): any;
+packages\core\src\types.ts:689: atoms?: any[]; // Add atoms to StoreEnhancementOptions as well
+packages\core\src\types.ts:261: export type AnyAtom = Atom<any>;
+packages\core\src\types.ts:578: capture(action?: string): Snapshot | undefined;
+packages\core\src\types.ts:579: undo(): boolean;
+packages\core\src\types.ts:580: redo(): boolean;
+packages\core\src\types.ts:581: canUndo(): boolean;
+packages\core\src\types.ts:582: canRedo(): boolean;
+packages\core\src\types.ts:583: jumpTo(index: number): boolean;
+packages\core\src\types.ts:584: clearHistory(): void;
+packages\core\src\types.ts:585: getHistory(): Snapshot[];
+packages\core\src\types.ts:586: importState(state: Record<string, unknown>): boolean;
+packages\core\src\types.ts:594: getLastCheckpoint(): RestorationCheckpoint | null;
+packages\core\src\types.ts:595: rollbackToCheckpoint(checkpointId: string): Promise<RollbackResult>;
+packages\core\src\types.ts:596: getCheckpoints(): RestorationCheckpoint[];
+packages\core\src\utils\action-tracker.ts:43: previousValue?: any;
+packages\core\src\utils\action-tracker.ts:48: newValue?: any;
+packages\core\src\utils\action-tracker.ts:182: previousValue: any,
+packages\core\src\utils\action-tracker.ts:183: newValue: any,
+packages\core\src\utils\action-tracker.ts:209: previousValue: any,
+packages\core\src\utils\action-tracker.ts:210: newValue: any,
+packages\core\src\utils\action-tracker.ts:38: atom?: Atom<any>;
+packages\core\src\utils\action-tracker.ts:181: atom: Atom<any>,
+packages\core\src\utils\action-tracker.ts:208: atom: Atom<any>,
+packages\core\src\utils\action-tracker.ts:211: dependencies: Atom<any>[] = []
+packages\core\src\utils\action-tracker.ts:102: constructor(options: ActionTrackingOptions = {}) {
+packages\core\src\utils\action-tracker.ts:110: trackAction(metadata: ActionMetadata): void {
+packages\core\src\utils\action-tracker.ts:134: getRecentActions(limit: number = 10): ActionMetadata[] {
+packages\core\src\utils\action-tracker.ts:143: getActionsByType(type: string): ActionMetadata[] {
+packages\core\src\utils\action-tracker.ts:152: getActionsBySource(source: string): ActionMetadata[] {
+packages\core\src\utils\action-tracker.ts:159: clearHistory(): void {
+packages\core\src\utils\action-tracker.ts:167: getActionCount(): number {
+packages\core\src\utils\serialization.ts:19: customSerializers?: Map<string, (value: any) => any>;
+packages\core\src\utils\serialization.ts:53: serialize(value: any, options: SerializationOptions = {}): any {
+packages\core\src\utils\serialization.ts:91: serializer: (value: any) => any,
+packages\core\src\utils\serialization.ts:154: value: any,
+packages\core\src\utils\serialization.ts:158: ): any {
+packages\core\src\utils\serialization.ts:252: serializer: (value: any) => any,
+packages\core\src\utils\serialization.ts:120: serializeSet(set: Set<any>): Record<string, any> {
+packages\core\src\utils\serialization.ts:274: export function serializeSet(set: Set<any>): Record<string, any> {
+packages\core\src\utils\serialization.ts:53: serialize(value: any, options: SerializationOptions = {}): any {
+packages\core\src\utils\serialization.ts:65: serializeState(store: Store, options: SerializationOptions = {}): Record<string, any> {
+packages\core\src\utils\serialization.ts:105: serializeMap(map: Map<any, any>): Record<string, any> {
+packages\core\src\utils\serialization.ts:120: serializeSet(set: Set<any>): Record<string, any> {
+packages\core\src\utils\serialization.ts:135: serializeError(error: Error): Record<string, any> {
+packages\core\src\utils\snapshot-serialization\advanced\advanced-serializer.ts:61: const priorityA = "priority" in a ? (a as any).priority : 0;
+packages\core\src\utils\snapshot-serialization\advanced\advanced-serializer.ts:62: const priorityB = "priority" in b ? (b as any).priority : 0;
+packages\core\src\utils\snapshot-serialization\advanced\advanced-serializer.ts:198: const value = (obj as any)[key];
+packages\core\src\utils\snapshot-serialization\advanced\advanced-serializer.ts:418: const ctor = (globalThis as any)[serialized.__className];
+packages\core\src\utils\snapshot-serialization\advanced\advanced-serializer.ts:34: constructor(options: Partial<SerializationOptions> = {}) {
+packages\core\src\utils\snapshot-serialization\advanced\advanced-serializer.ts:57: registerStrategy(strategy: SerializationStrategy, priority: number = 0): void {
+packages\core\src\utils\snapshot-serialization\advanced\advanced-serializer.ts:70: serialize(value: unknown, options?: Partial<SerializationOptions>): SerializedValue {
+packages\core\src\utils\snapshot-serialization\advanced\advanced-serializer.ts:284: deserialize(serialized: SerializedValue, options?: Partial<DeserializationOptions>): unknown {
+packages\core\src\utils\snapshot-serialization\advanced\advanced-serializer.ts:435: getOptions(): SerializationOptions {
+packages\core\src\utils\snapshot-serialization\advanced\advanced-serializer.ts:442: setOptions(options: Partial<SerializationOptions>): void {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\builtin-objects-strategy.ts:137: return value as any;
+packages\core\src\utils\snapshot-serialization\advanced\strategies\builtin-objects-strategy.ts:144: return value as any;
+packages\core\src\utils\snapshot-serialization\advanced\strategies\builtin-objects-strategy.ts:20: canHandle(value: unknown): boolean {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\builtin-objects-strategy.ts:33: serialize(value: unknown, context: SerializationContext): SerializedValue {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\circular-strategy.ts:14: canHandle(value: unknown): boolean {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\circular-strategy.ts:20: serialize(value: unknown, context: SerializationContext): SerializedValue {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\collections-strategy.ts:91: return value as any;
+packages\core\src\utils\snapshot-serialization\advanced\strategies\collections-strategy.ts:98: return value as any;
+packages\core\src\utils\snapshot-serialization\advanced\strategies\collections-strategy.ts:133: const TypedArrayCtor = (globalThis as any)[className];
+packages\core\src\utils\snapshot-serialization\advanced\strategies\collections-strategy.ts:15: canHandle(value: unknown): boolean {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\collections-strategy.ts:33: serialize(value: unknown, context: SerializationContext): SerializedValue {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\custom-classes-strategy.ts:35: const ctor = (globalThis as any)[className];
+packages\core\src\utils\snapshot-serialization\advanced\strategies\custom-classes-strategy.ts:129: value = (obj as any)[key];
+packages\core\src\utils\snapshot-serialization\advanced\strategies\custom-classes-strategy.ts:207: (instance as any)[key] = prop.value;
+packages\core\src\utils\snapshot-serialization\advanced\strategies\custom-classes-strategy.ts:17: constructor() {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\custom-classes-strategy.ts:42: canHandle(value: unknown): boolean {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\custom-classes-strategy.ts:66: serialize(value: unknown, context: SerializationContext): SerializedValue {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\custom-classes-strategy.ts:182: unregisterClass(name: string): boolean {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\custom-classes-strategy.ts:186: getClass(name: string): (new (...args: unknown[]) => unknown) | undefined {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\functions-strategy.ts:13: canHandle(value: unknown): boolean {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\functions-strategy.ts:17: serialize(value: unknown, context: SerializationContext): SerializedValue {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\primitives-strategy.ts:17: canHandle(value: unknown): boolean {
+packages\core\src\utils\snapshot-serialization\advanced\strategies\primitives-strategy.ts:29: serialize(value: unknown, context: SerializationContext): SerializedValue {
+packages\core\src\utils\snapshot-serialization\advanced\strategy-registry.ts:34: registerMany(strategies: SerializationStrategy[]): void {
+packages\core\src\utils\snapshot-serialization\advanced\strategy-registry.ts:43: getStrategies(): StrategyRegistration[] {
+packages\core\src\utils\snapshot-serialization\advanced\strategy-registry.ts:53: getStrategy(name: string): StrategyRegistration | undefined {
+packages\core\src\utils\snapshot-serialization\advanced\strategy-registry.ts:61: hasStrategy(name: string): boolean {
+packages\core\src\utils\snapshot-serialization\advanced\strategy-registry.ts:69: unregister(name: string): boolean {
+packages\core\src\utils\snapshot-serialization\advanced\strategy-registry.ts:76: clear(): void {
+packages\core\src\utils\snapshot-serialization\advanced\strategy-registry.ts:83: size(): number {
+packages\core\src\utils\snapshot-serialization\advanced\types.ts:423: canHandle(value: unknown): boolean;
+packages\core\src\utils\snapshot-serialization\advanced\types.ts:427: serialize(value: unknown, context: SerializationContext): SerializedValue;
+packages\core\src\utils\snapshot-serialization\utils.ts:202: a: any,
+packages\core\src\utils\snapshot-serialization\utils.ts:203: b: any,
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:388: return typeof (obj as any).value === "string";
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:390: return typeof (obj as any).source === "string";
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:392: return Array.isArray((obj as any).entries);
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:394: return Array.isArray((obj as any).values);
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:396: return typeof (obj as any).value === "string";
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:398: return typeof (obj as any).name === "string" && typeof (obj as any).message === "string";
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:400: return typeof (obj as any).name === "string" && typeof (obj as any).source === "string";
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:402: return typeof (obj as any).__message === "string";
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:155: primitive() {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:172: date() {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:185: regex() {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:193: plainObject() {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:204: array(maxLength = 10) {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:212: map(maxEntries = 5) {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:224: set(maxValues = 5) {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:236: error() {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:249: nestedObject(depth = 3): Record<string, unknown> {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:267: circularObject() {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:279: mutualCircular() {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:440: capture() {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:446: getGrowth(): number {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:451: reset() {
+packages\core\src\utils\snapshot-serialization\__tests__\helpers.ts:458: assertNoLeaks(maxGrowthMB = 10) {
+packages\devtools\src\action-grouper.ts:71: startGroup(groupId: string): void {
+packages\devtools\src\action-grouper.ts:86: add(metadata: ActionMetadata): void {
+packages\devtools\src\action-grouper.ts:107: endGroup(groupId: string): ActionGroupResult | null {
+packages\devtools\src\action-grouper.ts:115: flushGroup(groupId: string): ActionGroupResult | null {
+packages\devtools\src\action-grouper.ts:135: flushAll(): ActionGroupResult[] {
+packages\devtools\src\action-grouper.ts:150: hasGroup(groupId: string): boolean {
+packages\devtools\src\action-grouper.ts:158: getPendingGroupIds(): string[] {
+packages\devtools\src\action-metadata.ts:27: type(value: string): this {
+packages\devtools\src\action-metadata.ts:35: timestamp(value: number): this {
+packages\devtools\src\action-metadata.ts:43: source(value: string): this {
+packages\devtools\src\action-metadata.ts:51: atomName(value: string): this {
+packages\devtools\src\action-metadata.ts:59: stackTrace(value: string): this {
+packages\devtools\src\action-metadata.ts:67: groupId(value: string): this {
+packages\devtools\src\action-metadata.ts:83: merge(custom: Record<string, unknown>): this {
+packages\devtools\src\action-metadata.ts:91: build(): ActionMetadata<T> {
+packages\devtools\src\action-naming\registry.ts:261: atom: any;
+packages\devtools\src\action-naming\registry.ts:28: constructor() {
+packages\devtools\src\action-naming\registry.ts:71: get(name: string): ActionNamingStrategy | undefined {
+packages\devtools\src\action-naming\registry.ts:78: getDefault(): ActionNamingStrategy {
+packages\devtools\src\action-naming\registry.ts:91: getAll(): ActionNamingStrategy[] {
+packages\devtools\src\action-naming\registry.ts:98: getAllRegistrations(): ActionNamingStrategyRegistration[] {
+packages\devtools\src\action-naming\registry.ts:105: has(name: string): boolean {
+packages\devtools\src\action-naming\registry.ts:112: remove(name: string): boolean {
+packages\devtools\src\action-naming\registry.ts:124: setDefault(name: string): void {
+packages\devtools\src\action-naming\registry.ts:141: clear(keepBuiltIns = true): void {
+packages\devtools\src\action-naming\registry.ts:287: getRegistry(): ActionNamingRegistry {
+packages\devtools\src\action-naming\strategies.ts:20: getName(context: ActionNamingContext): string {
+packages\devtools\src\action-naming\strategies.ts:33: getName(context: ActionNamingContext): string {
+packages\devtools\src\action-naming\strategies.ts:60: constructor(config: PatternNamingConfig) {
+packages\devtools\src\action-naming\strategies.ts:77: getName(context: ActionNamingContext): string {
+packages\devtools\src\action-naming\strategies.ts:137: getName(context: ActionNamingContext): string {
+packages\devtools\src\action-naming\strategies.ts:153: constructor(strategies: ActionNamingStrategy[], fallbackName = "unknown") {
+packages\devtools\src\action-naming\strategies.ts:159: getName(context: ActionNamingContext): string {
+packages\devtools\src\action-naming\types.ts:45: getName(context: ActionNamingContext): string;
+packages\devtools\src\atom-name-resolver.ts:109: if ((atom as any).displayName && typeof (atom as any).displayName === "string") {
+packages\devtools\src\atom-name-resolver.ts:110: return (atom as any).displayName;
+packages\devtools\src\atom-name-resolver.ts:114: if ((atom as any).name && typeof (atom as any).name === "string") {
+packages\devtools\src\atom-name-resolver.ts:115: return (atom as any).name;
+packages\devtools\src\atom-name-resolver.ts:210: if ((atom as any).read && typeof (atom as any).read === "function") {
+packages\devtools\src\atom-name-resolver.ts:213: if ((atom as any).write && typeof (atom as any).write === "function") {
+packages\devtools\src\atom-name-resolver.ts:216: if ((atom as any).subscribe && typeof (atom as any).subscribe === "function") {
+packages\devtools\src\atom-name-resolver.ts:36: constructor(options: AtomNameFormatOptions = {}) {
+packages\devtools\src\atom-name-resolver.ts:52: getName(atom: BasicAtom): string {
+packages\devtools\src\atom-name-resolver.ts:78: formatName(name: string): string {
+packages\devtools\src\atom-name-resolver.ts:166: getNameWithMetadata(atom: BasicAtom): {
+packages\devtools\src\atom-name-resolver.ts:228: updateOptions(options: AtomNameFormatOptions): void {
+packages\devtools\src\atom-name-resolver.ts:239: getOptions(): Required<AtomNameFormatOptions> {
+packages\devtools\src\batch-updater.ts:50: constructor(config: BatchUpdaterConfig) {
+packages\devtools\src\batch-updater.ts:74: schedule(store: unknown, action: string): void {
+packages\devtools\src\batch-updater.ts:89: flush(): void {
+packages\devtools\src\batch-updater.ts:97: clear(): void {
+packages\devtools\src\command-handler.ts:286: stateToImport[atomIdStr] = (atomData as any).value;
+packages\devtools\src\command-handler.ts:42: constructor(config: CommandHandlerConfig = {}) {
+packages\devtools\src\command-handler.ts:56: setTimeTravel(timeTravel: SimpleTimeTravel): void {
+packages\devtools\src\command-handler.ts:64: setSnapshotMapper(mapper: SnapshotMapper): void {
+packages\devtools\src\command-handler.ts:73: handleCommand(command: Command): boolean {
+packages\devtools\src\command-handler.ts:243: getCommandHistory(): Command[] {
+packages\devtools\src\command-handler.ts:250: clearCommandHistory(): void {
+packages\devtools\src\command-handler.ts:313: exportState(): Record<string, unknown> | null {
+packages\devtools\src\devtools-connector.ts:58: connect(config: DevToolsConnectionOptions): DevToolsConnection | null {
+packages\devtools\src\devtools-connector.ts:124: injectTestConnection(connection: DevToolsConnection): void {
+packages\devtools\src\devtools-connector.ts:134: disconnect(): void {
+packages\devtools\src\devtools-connector.ts:155: send(action: string, state: unknown): void {
+packages\devtools\src\devtools-connector.ts:173: init(state: unknown): void {
+packages\devtools\src\devtools-connector.ts:208: getMode(): DevToolsMode {
+packages\devtools\src\devtools-connector.ts:216: isConnectedToDevTools(): boolean {
+packages\devtools\src\devtools-connector.ts:224: getConnection(): DevToolsConnection | null {
+packages\devtools\src\devtools-noop.ts:63: constructor(_config: SnapshotMapperConfig = {}) {}
+packages\devtools\src\devtools-noop.ts:70: getActionIdBySnapshotId(_snapshotId: string): string | undefined {
+packages\devtools\src\devtools-noop.ts:73: getSnapshotIdByActionId(_actionId: string): string | undefined {
+packages\devtools\src\devtools-noop.ts:76: cleanup(_actionIdsToKeep?: string[]): number {
+packages\devtools\src\devtools-noop.ts:92: apply(_store: EnhancedStore): void {
+packages\devtools\src\devtools-noop.ts:95: startBatch(_groupId: string): void {}
+packages\devtools\src\devtools-noop.ts:96: endBatch(_groupId: string): void {}
+packages\devtools\src\devtools-noop.ts:110: getSnapshotMapper(): SnapshotMapper {
+packages\devtools\src\devtools-noop.ts:134: type(v: string): this {
+packages\devtools\src\devtools-noop.ts:138: timestamp(v: number): this {
+packages\devtools\src\devtools-noop.ts:142: source(v: string): this {
+packages\devtools\src\devtools-noop.ts:146: atomName(v: string): this {
+packages\devtools\src\devtools-noop.ts:150: stackTrace(_v: string): this {
+packages\devtools\src\devtools-noop.ts:153: groupId(_v: string): this {
+packages\devtools\src\devtools-noop.ts:162: merge(_custom: Record<string, unknown>): this {
+packages\devtools\src\devtools-noop.ts:165: build(): ActionMetadata<T> {
+packages\devtools\src\devtools-noop.ts:207: add(metadata: ActionMetadata): void;
+packages\devtools\src\devtools-noop.ts:208: startGroup(groupId: string): void;
+packages\devtools\src\devtools-noop.ts:209: endGroup(groupId: string): ActionGroupResult | null;
+packages\devtools\src\devtools-noop.ts:213: add(): void {},
+packages\devtools\src\devtools-noop.ts:214: startGroup(): void {},
+packages\devtools\src\devtools-noop.ts:215: endGroup(): ActionGroupResult | null {
+packages\devtools\src\devtools-noop.ts:236: schedule(store: unknown, action: string): void;
+packages\devtools\src\devtools-noop.ts:240: schedule(): void {},
+packages\devtools\src\devtools-plugin-refactored-backup.ts:159: const options: any = {
+packages\devtools\src\devtools-plugin-refactored-backup.ts:538: if (typeof (store as any).importState === "function") {
+packages\devtools\src\devtools-plugin-refactored-backup.ts:539: (store as any).importState(state);
+packages\devtools\src\devtools-plugin-refactored-backup.ts:545: if (typeof (store as any).setState === "function") {
+packages\devtools\src\devtools-plugin-refactored-backup.ts:546: (store as any).setState(state);
+packages\devtools\src\devtools-plugin-refactored-backup.ts:82: constructor(config: DevToolsConfig = {}) {
+packages\devtools\src\devtools-plugin-refactored-backup.ts:191: apply(store: EnhancedStore): void {
+packages\devtools\src\devtools-plugin-refactored-backup.ts:628: startBatch(groupId: string): void {
+packages\devtools\src\devtools-plugin-refactored-backup.ts:637: endBatch(groupId: string): void {
+packages\devtools\src\devtools-plugin-refactored-backup.ts:809: getSnapshotMapper(): SnapshotMapper {
+packages\devtools\src\devtools-plugin-refactored.ts:173: const options: any = {
+packages\devtools\src\devtools-plugin-refactored.ts:315: private getLazySerializationOptions(): any {
+packages\devtools\src\devtools-plugin-refactored.ts:165: system.getRegistry().register(actionNamingStrategy as any, true);
+packages\devtools\src\devtools-plugin-refactored.ts:583: const storeWithTimeTravel = store as any;
+packages\devtools\src\devtools-plugin-refactored.ts:69: constructor(config: DevToolsConfig = {}) {
+packages\devtools\src\devtools-plugin-refactored.ts:205: setTimeTravel(timeTravel: SimpleTimeTravel): void {
+packages\devtools\src\devtools-plugin-refactored.ts:237: apply(store: EnhancedStore): void {
+packages\devtools\src\devtools-plugin-refactored.ts:459: startBatch(groupId: string): void {
+packages\devtools\src\devtools-plugin-refactored.ts:467: endBatch(groupId: string): void {
+packages\devtools\src\devtools-plugin-refactored.ts:525: getSnapshotMapper(): SnapshotMapper {
+packages\devtools\src\devtools-plugin-refactored.ts:532: getMessageHandler(): MessageHandler {
+packages\devtools\src\devtools-plugin-refactored.ts:539: getAtomNameResolver(): AtomNameResolver {
+packages\devtools\src\devtools-plugin-refactored.ts:546: getStackTraceService(): StackTraceService {
+packages\devtools\src\devtools-plugin-refactored.ts:553: getPollingService(): PollingService {
+packages\devtools\src\devtools-plugin-refactored.ts:560: getConnector(): DevToolsConnector {
+packages\devtools\src\devtools-plugin-refactored.ts:567: dispose(): void {
+packages\devtools\src\devtools-plugin.ts:269: const options: any = {
+packages\devtools\src\devtools-plugin.ts:499: private setupConnectionListener(extension: any, store: EnhancedStore): void {
+packages\devtools\src\devtools-plugin.ts:506: extension.connect = function (options?: any) {
+packages\devtools\src\devtools-plugin.ts:606: const index = (payload as any).index;
+packages\devtools\src\devtools-plugin.ts:630: const actionName = (payload as any).action;
+packages\devtools\src\devtools-plugin.ts:741: if (typeof (store as any).importState === "function") {
+packages\devtools\src\devtools-plugin.ts:742: (store as any).importState(state);
+packages\devtools\src\devtools-plugin.ts:1030: const storeWithTimeTravel = store as any;
+packages\devtools\src\devtools-plugin.ts:185: constructor(config: DevToolsConfig = {}) {
+packages\devtools\src\devtools-plugin.ts:238: setTimeTravel(timeTravel: SimpleTimeTravel): void {
+packages\devtools\src\devtools-plugin.ts:301: apply(store: EnhancedStore): void {
+packages\devtools\src\devtools-plugin.ts:812: startBatch(groupId: string): void {
+packages\devtools\src\devtools-plugin.ts:821: endBatch(groupId: string): void {
+packages\devtools\src\devtools-plugin.ts:835: flushBatch(): void {
+packages\devtools\src\devtools-plugin.ts:1020: getSnapshotMapper(): SnapshotMapper {
+packages\devtools\src\message-handler.ts:130: setTimeTravel(timeTravel: any): void {
+packages\devtools\src\message-handler.ts:84: timeTravelType: typeof (store as any).timeTravel,
+packages\devtools\src\message-handler.ts:93: const storeWithTimeTravel = store as any;
+packages\devtools\src\message-handler.ts:387: if (typeof (store as any).importState === "function") {
+packages\devtools\src\message-handler.ts:388: (store as any).importState(state);
+packages\devtools\src\message-handler.ts:548: if (this.store && (this.store as any).timeTravel) {
+packages\devtools\src\message-handler.ts:549: this.commandHandler.setTimeTravel((this.store as any).timeTravel);
+packages\devtools\src\message-handler.ts:59: constructor(options: MessageHandlerOptions = {}) {
+packages\devtools\src\message-handler.ts:81: setStore(store: EnhancedStore): void {
+packages\devtools\src\message-handler.ts:118: setSnapshotMapper(mapper: SnapshotMapper): void {
+packages\devtools\src\message-handler.ts:130: setTimeTravel(timeTravel: any): void {
+packages\devtools\src\message-handler.ts:160: handle(message: DevToolsMessage, store?: EnhancedStore): MessageHandlerResult {
+packages\devtools\src\message-handler.ts:478: jumpToState(index: number): boolean {
+packages\devtools\src\message-handler.ts:496: importState(stateData: unknown): boolean {
+packages\devtools\src\message-handler.ts:517: isTrackingEnabled(): boolean {
+packages\devtools\src\message-handler.ts:525: getCommandHandler(): CommandHandler | null {
+packages\devtools\src\message-handler.ts:533: updateOptions(newOptions: MessageHandlerOptions): void {
+packages\devtools\src\message-handler.ts:563: getOptions(): Required<MessageHandlerOptions> {
+packages\devtools\src\polling-service.ts:60: constructor(options: PollingServiceOptions = {}) {
+packages\devtools\src\polling-service.ts:87: start(interval: number, callback: PollingCallback): void {
+packages\devtools\src\polling-service.ts:121: stop(): void {
+packages\devtools\src\polling-service.ts:194: isActive(): boolean {
+packages\devtools\src\polling-service.ts:202: getStats(): PollingStats {
+packages\devtools\src\polling-service.ts:215: updateInterval(newInterval: number): void {
+packages\devtools\src\polling-service.ts:246: resetStats(): void {
+packages\devtools\src\polling-service.ts:267: getOptions(): Required<PollingServiceOptions> {
+packages\devtools\src\polling-service.ts:275: updateOptions(newOptions: PollingServiceOptions): void {
+packages\devtools\src\polling-service.ts:297: dispose(): void {
+packages\devtools\src\snapshot-mapper.ts:57: constructor(config: SnapshotMapperConfig = {}) {
+packages\devtools\src\snapshot-mapper.ts:136: getSnapshotIdByActionId(actionId: string): string | undefined {
+packages\devtools\src\snapshot-mapper.ts:145: getActionIdBySnapshotId(snapshotId: string): string | undefined {
+packages\devtools\src\snapshot-mapper.ts:154: getSnapshotIdsByActionId(actionId: string): string[] {
+packages\devtools\src\snapshot-mapper.ts:163: getAllActionIds(): string[] {
+packages\devtools\src\snapshot-mapper.ts:171: getAllSnapshotIds(): string[] {
+packages\devtools\src\snapshot-mapper.ts:179: getMappingCount(): number {
+packages\devtools\src\snapshot-mapper.ts:188: cleanup(actionIdsToKeep?: string[]): number {
+packages\devtools\src\snapshot-mapper.ts:244: clear(): void {
+packages\devtools\src\snapshot-mapper.ts:255: hasSnapshotMapping(snapshotId: string): boolean {
+packages\devtools\src\snapshot-mapper.ts:264: hasActionMapping(actionId: string): boolean {
+packages\devtools\src\stack-trace-service.ts:68: capture(options: StackTraceCaptureOptions = {}): StackTrace | null {
+packages\devtools\src\stack-trace-service.ts:120: format(trace: StackTrace, options: StackTraceFormatOptions = {}): string {
+packages\devtools\src\stack-trace-service.ts:172: formatForDevTools(trace: StackTrace): string {
+packages\devtools\src\stack-trace-service.ts:273: getFunctionNames(trace: StackTrace): string[] {
+packages\devtools\src\stack-trace-service.ts:284: getCallerFunctionName(options: StackTraceCaptureOptions = {}): string | null {
+packages\devtools\src\state-serializer.ts:332: deserialize(serialized: unknown): DeserializeResult {
+packages\devtools\src\state-serializer.ts:401: importState(importData: unknown): DeserializeResult {
+packages\devtools\src\state-serializer.ts:458: verifyChecksum(serialized: SerializedState): ChecksumResult {
+packages\devtools\src\state-serializer.ts:492: getVersion(): string {
+packages\devtools\src\types.ts:32: getName(context: ActionNamingContext): string;
+packages\devtools\src\types.ts:184: toString(): string;
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:125: jumpTo(index: number): boolean;
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:126: getHistory(): Snapshot[];
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:127: undo(): boolean;
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:128: redo(): boolean;
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:129: canUndo(): boolean;
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:130: canRedo(): boolean;
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:131: clearHistory(): void;
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:132: capture(action?: string): Snapshot | null;
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:133: importState(state: Record<string, unknown>): boolean;
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:164: jumpTo(index: number): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:172: getHistory() {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:176: undo(): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:184: redo(): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:192: canUndo(): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:196: canRedo(): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:200: clearHistory(): void {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:205: capture(action?: string): Snapshot | null {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:220: importState(state: Record<string, unknown>): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:260: jumpTo(_index: number): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:264: getHistory() {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:268: undo(): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:272: redo(): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:276: canUndo(): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:280: canRedo(): boolean {
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:284: clearHistory(): void {},
+packages\devtools\src\__fixtures__\command-handler-fixtures.ts:285: capture(): Snapshot | null {
+packages\devtools\src\__tests__\integration\test-utils.ts:10: payload: any;
+packages\devtools\src\__tests__\integration\test-utils.ts:42: export function createMockAtom(id: string, defaultValue: any = 0) {
+packages\devtools\src\__tests__\integration\test-utils.ts:54: export function createMockAction(type: string, payload?: any) {
+packages\devtools\src\__tests__\integration\test-utils.ts:81: payload: any,
+packages\devtools\src\__tests__\integration\test-utils.ts:99: log: [] as any[],
+packages\devtools\src\__tests__\integration\test-utils.ts:100: warn: [] as any[],
+packages\devtools\src\__tests__\integration\test-utils.ts:101: error: [] as any[],
+packages\devtools\src\__tests__\integration\test-utils.ts:102: info: [] as any[],
+packages\devtools\src\__tests__\integration\test-utils.ts:162: const originalWindow = (global as any).window;
+packages\devtools\src\__tests__\integration\test-utils.ts:174: (global as any).window = {
+packages\devtools\src\__tests__\integration\test-utils.ts:184: (global as any).window = originalWindow;
+packages\devtools\src\__tests__\integration\test-utils.ts:204: }) as any;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:27: connect(options?: any): MockDevToolsConnection;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:43: private stateChanges: Array<{ state: any; action: any }> = [];
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:55: send(action: any, state: any): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:94: init(state: any): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:146: getStateChanges(): Array<{ state: any; action: any }> {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:154: simulateTimeTravel(state: any, index: number): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:173: simulateImportState(state: any): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:235: connect(options?: any): MockDevToolsConnection {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:334: export function createMockStore(initialState: any = {}) {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:336: const updates: Array<{ atom: any; value: any; metadata?: any }> = [];
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:339: get: vi.fn((atom: any) => state[atom.id?.toString()] ?? atom.defaultValue),
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:340: set: vi.fn((atom: any, value: any) => {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:344: setWithMetadata: vi.fn((atom: any, value: any, metadata?: any) => {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:281: delete (global as any).window.__REDUX_DEVTOOLS_EXTENSION__;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:286: (global as any).window.__REDUX_DEVTOOLS_EXTENSION__ = this;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:313: (global as any).window = {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:314: ...(global as any).window,
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:327: delete (global as any).window.__REDUX_DEVTOOLS_EXTENSION__;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:370: if (!(global as any).window) {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:371: (global as any).window = {};
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:27: connect(options?: any): MockDevToolsConnection;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:28: disconnectAll(): void;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:29: getConnection(index?: number): MockDevToolsConnection | null;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:30: getAllConnections(): MockDevToolsConnection[];
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:31: simulateExtensionUnload(): void;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:32: simulateExtensionLoad(): void;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:33: reset(): void;
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:55: send(action: any, state: any): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:94: init(state: any): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:127: unsubscribe(): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:132: disconnect(): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:138: isConnected(): boolean {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:142: getSentMessages(): DevToolsMessage[] {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:146: getStateChanges(): Array<{ state: any; action: any }> {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:150: wasInitCalled(): boolean {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:154: simulateTimeTravel(state: any, index: number): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:173: simulateImportState(state: any): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:221: constructor(options: MockDevToolsOptions = {}) {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:235: connect(options?: any): MockDevToolsConnection {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:263: disconnectAll(): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:270: getConnection(index: number = 0): MockDevToolsConnection | null {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:274: getAllConnections(): MockDevToolsConnection[] {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:278: simulateExtensionUnload(): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:284: simulateExtensionLoad(): void {
+packages\devtools\src\__tests__\mocks\devtools-extension-mock.ts:292: reset(): void {
+packages\devtools\src\__tests__\performance\memory-leak-detection.bench.ts:50: if (typeof global !== "undefined" && (global as any).gc) {
+packages\devtools\src\__tests__\performance\memory-leak-detection.bench.ts:51: (global as any).gc();
+packages\devtools\src\__tests__\performance\state-serializer.bench.ts:109: const obj: any = { a: 1 };

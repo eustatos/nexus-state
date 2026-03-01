@@ -1,0 +1,109 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run weekly on Monday at 9am UTC
+    - cron: '0 9 * * 1'
+
+jobs:
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pnpm audit
+        run: pnpm audit --audit-level=moderate
+        continue-on-error: false
+
+      - name: Build project
+        run: pnpm run build
+        if: success()
+
+      - name: Run tests
+        run: pnpm run test
+        if: success()
+
+  code-scan:
+    name: Code Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for secrets in code
+        run: |
+          echo "Scanning for potential secrets..."
+          if git log -p | grep -iE "password|secret|api.?key|token|credential" --color=always | grep -v "node_modules" | grep -v ".git"; then
+            echo "::warning::Potential secrets found in code history"
+          else
+            echo "No obvious secrets found in code history"
+          fi
+
+      - name: Check for dangerous patterns
+        run: |
+          echo "Scanning for dangerous code patterns..."
+
+          # Check for eval usage
+          if grep -r "eval(" packages/ --include="*.ts" --include="*.tsx" --include="*.js" 2>/dev/null; then
+            echo "::warning::eval() usage found - review for security implications"
+          fi
+
+          # Check for innerHTML usage
+          if grep -r "innerHTML" packages/ --include="*.ts" --include="*.tsx" --include="*.js" 2>/dev/null; then
+            echo "::warning::innerHTML usage found - review for XSS implications"
+          fi
+
+          # Check for Function constructor
+          if grep -r "new Function(" packages/ --include="*.ts" --include="*.tsx" --include="*.js" 2>/dev/null; then
+            echo "::warning::Function constructor usage found - review for security implications"
+          fi
+
+          echo "Code pattern scan complete"
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          deny-licenses: GPL-3.0, AGPL-3.0
