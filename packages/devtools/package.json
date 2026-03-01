@@ -28,7 +28,7 @@
     "@nexus-state/core": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "^25.3.3",
     "typescript": "^5.0.0",
     "vitest": "^0.34.0",
     "eslint": "^8.40.0"
