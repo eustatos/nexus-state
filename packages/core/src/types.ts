@@ -27,10 +27,43 @@ export type Setter = <Value>(
 export type Subscriber<Value> = (value: Value) => void;
 
 /**
- * A plugin function that can enhance a store with additional functionality
+ * Plugin hooks interface for intercepting store operations.
+ * Allows plugins to intercept and modify get/set operations.
+ */
+export interface PluginHooks {
+  /**
+   * Hook called before a value is set. Can modify the value.
+   * @template T The type of the atom's value
+   * @param atom The atom being set
+   * @param value The new value (or computed value from function update)
+   * @returns Modified value or void to keep original
+   */
+  onSet?: <T>(atom: Atom<T>, value: T) => T | void;
+
+  /**
+   * Hook called after a value is set. Side effects only.
+   * @template T The type of the atom's value
+   * @param atom The atom that was set
+   * @param value The final value that was set
+   */
+  afterSet?: <T>(atom: Atom<T>, value: T) => void;
+
+  /**
+   * Hook called when a value is read. Can modify the returned value.
+   * @template T The type of the atom's value
+   * @param atom The atom being read
+   * @param value The current value
+   * @returns Modified value or original value
+   */
+  onGet?: <T>(atom: Atom<T>, value: T) => T;
+}
+
+/**
+ * A plugin function that can enhance a store with additional functionality.
+ * Can be a simple function that receives the store, or an object with hooks.
  * @param store The store to enhance
  */
-export type Plugin = (store: Store) => void;
+export type Plugin = (store: Store) => void | PluginHooks;
 
 // Import delta types for TimeTravelAPI
 import type { DeltaSnapshot } from "./time-travel/delta/types";

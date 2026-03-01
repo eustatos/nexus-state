@@ -135,6 +135,7 @@ export type {
   WritableAtom,
   Store,
   Plugin,
+  PluginHooks,
   ActionMetadata,
   AtomValue,
   AnyAtom,
