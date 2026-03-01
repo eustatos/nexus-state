@@ -36,7 +36,8 @@
   "files": [
     "dist",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "devDependencies": {
     "@eslint/compat": "^2.0.2",

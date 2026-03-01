@@ -1,10 +1,15 @@
 /**
  * @file Legacy middleware implementation
  * @deprecated Use createMiddlewarePlugin from '../index' instead
- * 
+ *
  * This file contains the old implementation that wraps store.set method.
  * It is kept for backward compatibility but will be removed in the next major version.
+ * 
+ * @coverageignore
  */
+
+/* v8 ignore start */
+/* istanbul ignore file */
 
 import { Atom, Store } from '@nexus-state/core';
 

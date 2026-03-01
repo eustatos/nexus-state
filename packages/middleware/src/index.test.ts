@@ -1,7 +1,7 @@
 // Comprehensive tests for @nexus-state/middleware
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { atom, createStore, Store } from '@nexus-state/core';
-import { createMiddlewarePlugin, middleware, middlewarePlugin, MiddlewareConfig } from '../index';
+import { createMiddlewarePlugin, middleware, middlewarePlugin, MiddlewareConfig } from './index';
 
 // ============================================================================
 // Section 1: Basic Functionality Tests (createMiddlewarePlugin)
