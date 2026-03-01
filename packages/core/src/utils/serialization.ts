@@ -12,18 +12,18 @@ export type SerializationOptions = {
    * @default 10
    */
   maxDepth?: number;
-  
+
   /**
    * Custom serializers for specific types
    */
-  customSerializers?: Map<string, (value: any) => any>;
-  
+  customSerializers?: Map<string, (value: unknown) => unknown>;
+
   /**
    * Whether to include atom metadata in serialized state
    * @default true
    */
   includeMetadata?: boolean;
-  
+
   /**
    * Whether to handle circular references
    * @default true
@@ -50,7 +50,7 @@ export class SerializationUtils {
    * @param options - Serialization options
    * @returns Serialized value
    */
-  serialize(value: any, options: SerializationOptions = {}): any {
+  serialize(value: unknown, options: SerializationOptions = {}): unknown {
     const opts = { ...DEFAULT_OPTIONS, ...options };
     const seen = opts.handleCircularRefs ? new WeakMap() : null;
     return serializeValue(value, opts, seen, 0);
@@ -62,13 +62,13 @@ export class SerializationUtils {
    * @param options - Serialization options
    * @returns Serialized state object
    */
-  serializeState(store: Store, options: SerializationOptions = {}): Record<string, any> {
+  serializeState(store: Store, options: SerializationOptions = {}): Record<string, unknown> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
     const state = store.getState();
     const seen = opts.handleCircularRefs ? new WeakMap() : null;
-    
-    const result: Record<string, any> = {};
-    
+
+    const result: Record<string, unknown> = {};
+
     for (const [key, value] of Object.entries(state)) {
       try {
         result[key] = serializeValue(value, opts, seen, 0);
@@ -76,7 +76,7 @@ export class SerializationUtils {
         result[key] = `[Serialization Error: ${error instanceof Error ? error.message : String(error)}]`;
       }
     }
-    
+
     return result;
   }
 
@@ -88,7 +88,7 @@ export class SerializationUtils {
    */
   registerCustomSerializer(
     typeName: string,
-    serializer: (value: any) => any,
+    serializer: (value: unknown) => unknown,
     options: SerializationOptions
   ): void {
     if (!options.customSerializers) {
@@ -102,13 +102,13 @@ export class SerializationUtils {
    * @param map - The Map to serialize
    * @returns Serialized representation of the Map
    */
-  serializeMap(map: Map<any, any>): Record<string, any> {
-    const result: Record<string, any> = { __type: 'Map', entries: [] };
-    
+  serializeMap(map: Map<unknown, unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = { __type: 'Map', entries: [] };
+
     for (const [key, value] of map.entries()) {
       result.entries.push([key, value]);
     }
-    
+
     return result;
   }
 
@@ -117,13 +117,13 @@ export class SerializationUtils {
    * @param set - The Set to serialize
    * @returns Serialized representation of the Set
    */
-  serializeSet(set: Set<any>): Record<string, any> {
-    const result: Record<string, any> = { __type: 'Set', values: [] };
-    
+  serializeSet(set: Set<unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = { __type: 'Set', values: [] };
+
     for (const value of set) {
       result.values.push(value);
     }
-    
+
     return result;
   }
 
@@ -132,7 +132,7 @@ export class SerializationUtils {
    * @param error - The Error to serialize
    * @returns Serialized representation of the Error
    */
-  serializeError(error: Error): Record<string, any> {
+  serializeError(error: Error): Record<string, unknown> {
     return {
       __type: 'Error',
       name: error.name,
@@ -151,11 +151,11 @@ export class SerializationUtils {
  * @returns Serialized value
  */
 function serializeValue(
-  value: any,
+  value: unknown,
   options: SerializationOptions,
   seen: WeakMap<object, string> | null,
   depth: number
-): any {
+): unknown {
   // Handle null and undefined
   if (value === null || value === undefined) {
     return value;
@@ -213,8 +213,8 @@ function serializeValue(
   
   // Handle plain objects
   if (typeof value === 'object') {
-    const result: Record<string, any> = {};
-    
+    const result: Record<string, unknown> = {};
+
     for (const [key, val] of Object.entries(value)) {
       try {
         result[key] = serializeValue(val, options, seen, depth + 1);
@@ -222,10 +222,10 @@ function serializeValue(
         result[key] = `[Serialization Error: ${error instanceof Error ? error.message : String(error)}]`;
       }
     }
-    
+
     return result;
   }
-  
+
   // Fallback for other types
   return `[${typeof value}]`;
 }
@@ -236,7 +236,7 @@ function serializeValue(
  * @param options - Serialization options
  * @returns Serialized state object
  */
-export function serializeState(store: Store, options: SerializationOptions = {}): Record<string, any> {
+export function serializeState(store: Store, options: SerializationOptions = {}): Record<string, unknown> {
   const serializationUtils = new SerializationUtils();
   return serializationUtils.serializeState(store, options);
 }
@@ -249,7 +249,7 @@ export function serializeState(store: Store, options: SerializationOptions = {})
  */
 export function registerCustomSerializer(
   typeName: string,
-  serializer: (value: any) => any,
+  serializer: (value: unknown) => unknown,
   options: SerializationOptions
 ): void {
   const serializationUtils = new SerializationUtils();
@@ -261,7 +261,7 @@ export function registerCustomSerializer(
  * @param map - The Map to serialize
  * @returns Serialized representation of the Map
  */
-export function serializeMap(map: Map<any, any>): Record<string, any> {
+export function serializeMap(map: Map<unknown, unknown>): Record<string, unknown> {
   const serializationUtils = new SerializationUtils();
   return serializationUtils.serializeMap(map);
 }
@@ -271,7 +271,7 @@ export function serializeMap(map: Map<any, any>): Record<string, any> {
  * @param set - The Set to serialize
  * @returns Serialized representation of the Set
  */
-export function serializeSet(set: Set<any>): Record<string, any> {
+export function serializeSet(set: Set<unknown>): Record<string, unknown> {
   const serializationUtils = new SerializationUtils();
   return serializationUtils.serializeSet(set);
 }
@@ -281,7 +281,7 @@ export function serializeSet(set: Set<any>): Record<string, any> {
  * @param error - The Error to serialize
  * @returns Serialized representation of the Error
  */
-export function serializeError(error: Error): Record<string, any> {
+export function serializeError(error: Error): Record<string, unknown> {
   const serializationUtils = new SerializationUtils();
   return serializationUtils.serializeError(error);
 }

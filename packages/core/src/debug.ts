@@ -22,26 +22,26 @@ class DebugLogger {
     this.prefix = prefix;
   }
 
-  private format(level: LogLevel, ...args: any[]): void {
+  private format(level: LogLevel, ...args: unknown[]): void {
     if (!this.enabled) return;
 
     const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
     console[level](`${this.prefix}[${timestamp}]`, ...args);
   }
 
-  log(...args: any[]): void {
+  log(...args: unknown[]): void {
     this.format('log', ...args);
   }
 
-  warn(...args: any[]): void {
+  warn(...args: unknown[]): void {
     this.format('warn', ...args);
   }
 
-  error(...args: any[]): void {
+  error(...args: unknown[]): void {
     this.format('error', ...args);
   }
 
-  info(...args: any[]): void {
+  info(...args: unknown[]): void {
     this.format('info', ...args);
   }
 
