@@ -2,14 +2,17 @@
  * SnapshotCreator - Creates snapshots from store state
  */
 
-import { Atom, Store } from "../../types";
-import type { Snapshot, SnapshotStateEntry } from "../types";
-import type { SnapshotCreatorConfig, CreationResult } from "./types";
-import { atomRegistry } from "../../atom-registry";
-import { AdvancedSerializer, SerializationOptions } from "../../utils/snapshot-serialization/advanced";
+import { Atom, Store } from '../../types';
+import type { Snapshot, SnapshotStateEntry } from '../types';
+import type { SnapshotCreatorConfig, CreationResult } from './types';
+import { atomRegistry } from '../../atom-registry';
+import {
+  AdvancedSerializer,
+  SerializationOptions,
+} from '../../utils/snapshot-serialization/advanced';
 
 // Import disposal infrastructure
-import { BaseDisposable, type DisposableConfig } from "../core/disposable";
+import { BaseDisposable, type DisposableConfig } from '../core/disposable';
 
 export class SnapshotCreator extends BaseDisposable {
   private store: Store;
@@ -22,14 +25,14 @@ export class SnapshotCreator extends BaseDisposable {
   constructor(
     store: Store,
     config?: Partial<SnapshotCreatorConfig>,
-    disposalConfig?: DisposableConfig,
+    disposalConfig?: DisposableConfig
   ) {
     super(disposalConfig);
     this.store = store;
     // Extract only SnapshotCreatorConfig properties, explicitly excluding DisposableConfig
     const snapshotConfig = config as Partial<SnapshotCreatorConfig> | undefined;
     this.creatorConfig = {
-      includeTypes: ["primitive", "computed", "writable"],
+      includeTypes: ['primitive', 'computed', 'writable'],
       excludeAtoms: [],
       transform: null,
       validate: true,
@@ -41,7 +44,9 @@ export class SnapshotCreator extends BaseDisposable {
     };
     // Ensure includeTypes is string array (for backward compatibility)
     if (this.creatorConfig.includeTypes) {
-      this.creatorConfig.includeTypes = this.creatorConfig.includeTypes.map((t) => String(t));
+      this.creatorConfig.includeTypes = this.creatorConfig.includeTypes.map(
+        (t) => String(t)
+      );
     }
 
     // Initialize AdvancedSerializer with default options
@@ -51,9 +56,9 @@ export class SnapshotCreator extends BaseDisposable {
       includeGetters: false,
       includeNonEnumerable: false,
       includeSymbols: false,
-      functionHandling: "source",
-      errorHandling: "replace",
-      circularHandling: "reference",
+      functionHandling: 'source',
+      errorHandling: 'replace',
+      circularHandling: 'reference',
     };
     this.serializer = new AdvancedSerializer(serializationOptions);
   }
@@ -74,7 +79,12 @@ export class SnapshotCreator extends BaseDisposable {
 
       // Check if state has changed since last snapshot
       // Only check for state changes when auto-capturing (action is not provided)
-      if (!this.creatorConfig.skipStateCheck && this.creatorConfig.autoCapture === false && !action && this.lastSnapshotState) {
+      if (
+        !this.creatorConfig.skipStateCheck &&
+        this.creatorConfig.autoCapture === false &&
+        !action &&
+        this.lastSnapshotState
+      ) {
         if (this.statesEqual(state, this.lastSnapshotState)) {
           return null; // State hasn't changed
         }
@@ -103,10 +113,10 @@ export class SnapshotCreator extends BaseDisposable {
       // Store for next comparison
       this.lastSnapshotState = { ...state };
 
-      this.emit("create", transformed);
+      this.emit('create', transformed);
       return transformed;
     } catch (error) {
-      console.error("Failed to create snapshot:", error);
+      console.error('Failed to create snapshot:', error);
       return null;
     }
   }
@@ -148,7 +158,7 @@ export class SnapshotCreator extends BaseDisposable {
         snapshot,
         duration: Date.now() - startTime,
         timestamp: startTime,
-        error: snapshot ? undefined : "Failed to create snapshot",
+        error: snapshot ? undefined : 'Failed to create snapshot',
         atomCount: snapshot ? Object.keys(snapshot.state).length : 0,
       };
     } catch (error) {
@@ -169,15 +179,15 @@ export class SnapshotCreator extends BaseDisposable {
    * @returns Captured state
    */
   private captureState(
-    atomIds?: Set<symbol>,
+    atomIds?: Set<symbol>
   ): Record<string, SnapshotStateEntry> {
     const state: Record<string, SnapshotStateEntry> = {};
 
     if (!atomIds) {
       // Capture all registered atoms
-      const allAtoms = atomRegistry.getAll();
+      const allAtoms = atomRegistry.getAll() as Map<symbol, Atom<any>>;
       allAtoms.forEach((atom) => {
-        this.addAtomToState(atom, state);
+        this.addAtomToState(atom as Atom<any>, state);
       });
     } else {
       // Capture only specified atoms
@@ -185,7 +195,7 @@ export class SnapshotCreator extends BaseDisposable {
         try {
           const atom = this.getAtomById(atomId);
           if (atom) {
-            this.addAtomToState(atom, state);
+            this.addAtomToState(atom as Atom<any>, state);
           }
         } catch (error) {
           // Skip atoms that can't be accessed
@@ -199,7 +209,10 @@ export class SnapshotCreator extends BaseDisposable {
   /**
    * Add atom to state object
    */
-  private addAtomToState(atom: Atom<unknown>, state: Record<string, SnapshotStateEntry>): void {
+  private addAtomToState(
+    atom: Atom<any>,
+    state: Record<string, SnapshotStateEntry>
+  ): void {
     try {
       const atomType = this.getAtomType(atom);
 
@@ -213,10 +226,12 @@ export class SnapshotCreator extends BaseDisposable {
       const value = this.store.get(atom);
 
       // Cast atomType to the expected union type
-      const stateType: "primitive" | "computed" | "writable" =
-        atomType === "primitive" || atomType === "computed" || atomType === "writable"
+      const stateType: 'primitive' | 'computed' | 'writable' =
+        atomType === 'primitive' ||
+        atomType === 'computed' ||
+        atomType === 'writable'
           ? atomType
-          : "primitive";
+          : 'primitive';
 
       state[atomName] = {
         value: this.serializeValue(value),
@@ -234,8 +249,8 @@ export class SnapshotCreator extends BaseDisposable {
    * @param atomId Atom ID
    * @returns Atom or undefined
    */
-  private getAtomById(atomId: symbol): Atom<unknown> | undefined {
-    return atomRegistry.get(atomId);
+  private getAtomById(atomId: symbol): Atom<any> | undefined {
+    return atomRegistry.get(atomId) as Atom<any> | undefined;
   }
 
   /**
@@ -243,11 +258,13 @@ export class SnapshotCreator extends BaseDisposable {
    * @param atom Atom
    * @returns Atom type
    */
-  private getAtomType(atom: Atom<unknown>): "primitive" | "computed" | "writable" | string {
-    if (atom && typeof atom === "object" && "type" in atom) {
+  private getAtomType(
+    atom: Atom<any>
+  ): 'primitive' | 'computed' | 'writable' | string {
+    if (atom && typeof atom === 'object' && 'type' in atom) {
       return (atom as { type: string }).type;
     }
-    return "primitive";
+    return 'primitive';
   }
 
   /**
@@ -267,7 +284,7 @@ export class SnapshotCreator extends BaseDisposable {
   private validateSnapshot(snapshot: Snapshot): boolean {
     if (!snapshot.id) return false;
     if (!snapshot.metadata || !snapshot.metadata.timestamp) return false;
-    if (typeof snapshot.state !== "object") return false;
+    if (typeof snapshot.state !== 'object') return false;
 
     return true;
   }
@@ -287,8 +304,8 @@ export class SnapshotCreator extends BaseDisposable {
    * @param event Event type
    * @param snapshot Snapshot
    */
-  private emit(event: "create" | "error", snapshot?: Snapshot): void {
-    if (event === "create" && snapshot) {
+  private emit(event: 'create' | 'error', snapshot?: Snapshot): void {
+    if (event === 'create' && snapshot) {
       this.listeners.forEach((listener) => listener(snapshot));
     }
   }
@@ -296,7 +313,10 @@ export class SnapshotCreator extends BaseDisposable {
   /**
    * Compare two states for equality
    */
-  private statesEqual(a: Record<string, SnapshotStateEntry>, b: Record<string, SnapshotStateEntry>): boolean {
+  private statesEqual(
+    a: Record<string, SnapshotStateEntry>,
+    b: Record<string, SnapshotStateEntry>
+  ): boolean {
     const keysA = Object.keys(a);
     const keysB = Object.keys(b);
 
@@ -334,21 +354,24 @@ export class SnapshotCreator extends BaseDisposable {
       return;
     }
 
-    this.log("Disposing SnapshotCreator");
+    this.log('Disposing SnapshotCreator');
 
     // Clear listeners
     this.listeners.clear();
 
     // Dispose worker pool if exists
     if (this.workerPool) {
-      if (typeof this.workerPool.dispose === "function") {
+      if (typeof this.workerPool.dispose === 'function') {
         await this.workerPool.dispose();
       }
       this.workerPool = null;
     }
 
     // Dispose serializer if it has dispose method
-    if (this.serializer && typeof (this.serializer as any).dispose === "function") {
+    if (
+      this.serializer &&
+      typeof (this.serializer as any).dispose === 'function'
+    ) {
       await (this.serializer as any).dispose();
     }
 
@@ -364,6 +387,6 @@ export class SnapshotCreator extends BaseDisposable {
     await this.runDisposeCallbacks();
 
     this.disposed = true;
-    this.log("SnapshotCreator disposed");
+    this.log('SnapshotCreator disposed');
   }
 }

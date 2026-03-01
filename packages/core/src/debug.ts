@@ -4,9 +4,15 @@
  */
 
 // Check for multiple possible environments
-const isTest = typeof process !== 'undefined' && process.env?.NODE_ENV === 'test';
-const isBenchmark = typeof process !== 'undefined' && process.env?.BENCHMARK === 'true';
-const DEBUG = typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production' && !isTest && !isBenchmark;
+const isTest =
+  typeof process !== 'undefined' && process.env?.NODE_ENV === 'test';
+const isBenchmark =
+  typeof process !== 'undefined' && process.env?.BENCHMARK === 'true';
+const DEBUG =
+  typeof process !== 'undefined' &&
+  process.env?.NODE_ENV !== 'production' &&
+  !isTest &&
+  !isBenchmark;
 
 type LogLevel = 'log' | 'warn' | 'error' | 'info';
 

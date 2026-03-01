@@ -16,7 +16,7 @@ export type Getter = <Value>(atom: Atom<Value>) => Value;
  */
 export type Setter = <Value>(
   atom: Atom<Value>,
-  update: Value | ((prev: Value) => Value),
+  update: Value | ((prev: Value) => Value)
 ) => void;
 
 /**
@@ -66,7 +66,7 @@ export interface PluginHooks {
 export type Plugin = (store: Store) => void | PluginHooks;
 
 // Import delta types for TimeTravelAPI
-import type { DeltaSnapshot } from "./time-travel/delta/types";
+import type { DeltaSnapshot } from './time-travel/delta/types';
 
 /**
  * Metadata about an action for DevTools integration
@@ -85,7 +85,7 @@ export type ActionMetadata = {
 /**
  * Modes for store registry
  */
-export type RegistryMode = "global" | "isolated";
+export type RegistryMode = 'global' | 'isolated';
 
 /**
  * Interface for a store that holds atoms and provides methods to interact with them
@@ -107,7 +107,7 @@ export interface Store {
    */
   set: <Value>(
     atom: Atom<Value>,
-    update: Value | ((prev: Value) => Value),
+    update: Value | ((prev: Value) => Value)
   ) => void;
 
   /**
@@ -119,7 +119,7 @@ export interface Store {
    */
   subscribe: <Value>(
     atom: Atom<Value>,
-    subscriber: Subscriber<Value>,
+    subscriber: Subscriber<Value>
   ) => () => void;
 
   /**
@@ -144,7 +144,7 @@ export interface Store {
   setWithMetadata?: <Value>(
     atom: Atom<Value>,
     update: Value | ((prev: Value) => Value),
-    metadata?: ActionMetadata,
+    metadata?: ActionMetadata
   ) => void;
 
   /**
@@ -169,7 +169,7 @@ export interface Store {
    */
   setIntercepted?: <Value>(
     atom: Atom<Value>,
-    update: Value | ((prev: Value) => Value),
+    update: Value | ((prev: Value) => Value)
   ) => void;
 
   /**
@@ -189,7 +189,7 @@ export interface BaseAtom<_Value> {
   /** Unique identifier for the atom */
   readonly id: symbol;
   /** Type of the atom for runtime type checking */
-  readonly type: "primitive" | "computed" | "writable";
+  readonly type: 'primitive' | 'computed' | 'writable';
   /** Optional name for debugging and DevTools */
   readonly name?: string;
 }
@@ -200,7 +200,7 @@ export interface BaseAtom<_Value> {
  */
 export interface PrimitiveAtom<Value> extends BaseAtom<Value> {
   /** Type identifier for runtime type checking */
-  readonly type: "primitive";
+  readonly type: 'primitive';
   /** Function to read the atom's value */
   read: () => Value;
   /** Optional function to write to the atom */
@@ -213,7 +213,7 @@ export interface PrimitiveAtom<Value> extends BaseAtom<Value> {
  */
 export interface ComputedAtom<Value> extends BaseAtom<Value> {
   /** Type identifier for runtime type checking */
-  readonly type: "computed";
+  readonly type: 'computed';
   /** Function to compute the atom's value based on other atoms */
   read: (get: Getter) => Value;
   /** Computed atoms are read-only */
@@ -226,7 +226,7 @@ export interface ComputedAtom<Value> extends BaseAtom<Value> {
  */
 export interface WritableAtom<Value> extends BaseAtom<Value> {
   /** Type identifier for runtime type checking */
-  readonly type: "writable";
+  readonly type: 'writable';
   /** Function to compute the atom's value based on other atoms */
   read: (get: Getter) => Value;
   /** Function to write to the atom */
@@ -242,6 +242,12 @@ export type Atom<Value> =
   | ComputedAtom<Value>
   | WritableAtom<Value>;
 
+/**
+ * Type alias for internal usage - allows any atom type
+ * This is used internally to avoid type conflicts with unknown
+ */
+export type AnyAtomInternal = Atom<unknown>;
+
 // === TYPE GUARDS ===
 
 /**
@@ -251,9 +257,9 @@ export type Atom<Value> =
  * @returns True if the atom is a primitive atom
  */
 export function isPrimitiveAtom<Value>(
-  atom: Atom<Value>,
+  atom: Atom<Value>
 ): atom is PrimitiveAtom<Value> {
-  return atom.type === "primitive";
+  return atom.type === 'primitive';
 }
 
 /**
@@ -263,9 +269,9 @@ export function isPrimitiveAtom<Value>(
  * @returns True if the atom is a computed atom
  */
 export function isComputedAtom<Value>(
-  atom: Atom<Value>,
+  atom: Atom<Value>
 ): atom is ComputedAtom<Value> {
-  return atom.type === "computed";
+  return atom.type === 'computed';
 }
 
 /**
@@ -275,9 +281,9 @@ export function isComputedAtom<Value>(
  * @returns True if the atom is a writable atom
  */
 export function isWritableAtom<Value>(
-  atom: Atom<Value>,
+  atom: Atom<Value>
 ): atom is WritableAtom<Value> {
-  return atom.type === "writable";
+  return atom.type === 'writable';
 }
 
 // === UTILITY TYPES ===
@@ -318,7 +324,7 @@ export interface IncrementalSnapshotConfig {
   /** Maximum memory for delta chain (bytes) */
   maxDeltaChainSize: number;
   /** Change detection strategy */
-  changeDetection: "shallow" | "deep" | "reference";
+  changeDetection: 'shallow' | 'deep' | 'reference';
   /** Reconstruct on demand */
   reconstructOnDemand: boolean;
   /** Cache reconstructed snapshots */
@@ -326,7 +332,7 @@ export interface IncrementalSnapshotConfig {
   /** Cache size limit */
   maxCacheSize: number;
   /** Compression level */
-  compressionLevel: "none" | "light" | "aggressive";
+  compressionLevel: 'none' | 'light' | 'aggressive';
 }
 
 /**
@@ -338,11 +344,11 @@ export const DEFAULT_INCREMENTAL_SNAPSHOT_CONFIG: IncrementalSnapshotConfig = {
   maxDeltaChainLength: 20,
   maxDeltaChainAge: 5 * 60 * 1000, // 5 minutes
   maxDeltaChainSize: 1024 * 1024, // 1MB
-  changeDetection: "deep",
+  changeDetection: 'deep',
   reconstructOnDemand: true,
   cacheReconstructed: true,
   maxCacheSize: 100,
-  compressionLevel: "light",
+  compressionLevel: 'light',
 };
 
 // === RESTORATION TYPES (for transactional restoration) ===
@@ -387,7 +393,7 @@ export interface TransactionalRestorerConfig {
   /** Maximum time for restoration in milliseconds */
   timeout?: number;
   /** Error handling strategy */
-  onError?: "rollback" | "continue" | "throw";
+  onError?: 'rollback' | 'continue' | 'throw';
   /** Maximum number of checkpoints to keep in memory */
   maxCheckpoints?: number;
   /** Checkpoint timeout in milliseconds (auto-cleanup) */
@@ -454,10 +460,10 @@ export class RestorationError extends Error {
         atomId: symbol;
         error: string;
       }>;
-    },
+    }
   ) {
     super(message);
-    this.name = "RestorationError";
+    this.name = 'RestorationError';
   }
 }
 
@@ -474,7 +480,7 @@ export interface TransactionConfig {
   /** Maximum number of stored checkpoints */
   maxCheckpoints: number;
   /** Error handler */
-  onError: "rollback" | "continue" | "throw";
+  onError: 'rollback' | 'continue' | 'throw';
 }
 
 /**
@@ -553,12 +559,12 @@ import type {
   TrackerConfig,
   TTLConfig,
   CleanupStrategyType,
-} from "./time-travel/tracking/types";
+} from './time-travel/tracking/types';
 
 export interface TimeTravelOptions {
   maxHistory?: number;
   autoCapture?: boolean;
-  registryMode?: "global" | "isolated";
+  registryMode?: 'global' | 'isolated';
   /** Enable incremental snapshots (delta-based history) - legacy alias */
   enableIncrementalSnapshots?: boolean;
   /** Configuration for incremental snapshots - legacy alias */
@@ -587,7 +593,7 @@ export interface SnapshotMetadata {
 
 export interface SnapshotStateEntry {
   value: any;
-  type: "primitive" | "computed" | "writable";
+  type: 'primitive' | 'computed' | 'writable';
   name?: string; // Atom name for restoration lookup
   atomId?: string;
 }
@@ -604,7 +610,7 @@ import type {
   ComparisonOptions,
   VisualizationFormat,
   ExportFormat,
-} from "./time-travel/comparison/types";
+} from './time-travel/comparison/types';
 
 export interface TimeTravelAPI {
   capture(action?: string): Snapshot | undefined;
@@ -620,7 +626,7 @@ export interface TimeTravelAPI {
   // Transactional restoration methods
   restoreWithTransaction(
     snapshotId: string,
-    options?: RestorationOptions,
+    options?: RestorationOptions
   ): Promise<TransactionalRestorationResult>;
 
   getLastCheckpoint(): RestorationCheckpoint | null;
@@ -650,7 +656,7 @@ export interface TimeTravelAPI {
   compareSnapshots(
     a: Snapshot | string,
     b: Snapshot | string,
-    options?: Partial<ComparisonOptions>,
+    options?: Partial<ComparisonOptions>
   ): SnapshotComparison;
 
   /**
@@ -661,7 +667,7 @@ export interface TimeTravelAPI {
    */
   compareWithCurrent(
     snapshot: Snapshot | string,
-    options?: Partial<ComparisonOptions>,
+    options?: Partial<ComparisonOptions>
   ): SnapshotComparison;
 
   /**
@@ -672,7 +678,7 @@ export interface TimeTravelAPI {
    */
   getDiffSince(
     action?: string,
-    options?: Partial<ComparisonOptions>,
+    options?: Partial<ComparisonOptions>
   ): SnapshotComparison | null;
 
   /**
@@ -683,7 +689,7 @@ export interface TimeTravelAPI {
    */
   visualizeChanges(
     comparison: SnapshotComparison,
-    format?: VisualizationFormat,
+    format?: VisualizationFormat
   ): string;
 
   /**
@@ -694,7 +700,7 @@ export interface TimeTravelAPI {
    */
   exportComparison(
     comparison: SnapshotComparison,
-    format: ExportFormat,
+    format: ExportFormat
   ): string;
 }
 
