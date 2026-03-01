@@ -17,7 +17,7 @@ import { isPrimitiveAtom, isComputedAtom, isWritableAtom } from '../types';
 export type AtomState<Value> = {
   value: Value;
   subscribers: Set<(value: Value) => void>;
-  dependents: Set<Atom<unknown>>;
+  dependents: Set<Atom<any>>;
 };
 
 /**
@@ -25,10 +25,10 @@ export type AtomState<Value> = {
  */
 export function getOrCreateAtomState<Value>(
   atom: Atom<Value>,
-  atomStates: Map<Atom<unknown>, AtomState<unknown>>,
+  atomStates: Map<Atom<any>, AtomState<any>>,
   get: Getter,
-  currentAtom: Atom<unknown> | null,
-  setCurrentAtom: (atom: Atom<unknown> | null) => void
+  currentAtom: Atom<any> | null,
+  setCurrentAtom: (atom: Atom<any> | null) => void
 ): { state: AtomState<Value>; created: boolean } {
   let atomState = atomStates.get(atom) as AtomState<Value> | undefined;
 
@@ -60,8 +60,8 @@ export function getOrCreateAtomState<Value>(
 export function getAtomInitialValue<Value>(
   atom: Atom<Value>,
   get: Getter,
-  currentAtom: Atom<unknown> | null,
-  setCurrentAtom: (atom: Atom<unknown> | null) => void
+  currentAtom: Atom<any> | null,
+  setCurrentAtom: (atom: Atom<any> | null) => void
 ): Value {
   if (isPrimitiveAtom(atom)) {
     return (atom as PrimitiveAtom<Value>).read();

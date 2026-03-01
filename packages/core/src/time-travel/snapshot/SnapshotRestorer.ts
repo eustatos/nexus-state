@@ -2,14 +2,14 @@
  * SnapshotRestorer - Restores state from snapshots
  */
 
-import { Atom, Store, RestorationError } from "../../types";
-import type { Snapshot, SnapshotStateEntry } from "../types";
+import { Atom, Store, RestorationError } from '../../types';
+import type { Snapshot, SnapshotStateEntry } from '../types';
 import type {
   SnapshotRestorerConfig,
   RestorationResult,
   RestorationCheckpoint,
   RestorationConfig,
-} from "./types";
+} from './types';
 import type {
   TransactionalRestorerConfig,
   TransactionalRestorationResult,
@@ -17,12 +17,12 @@ import type {
   RestorationProgress,
   CheckpointResult,
   RollbackResult,
-} from "./types";
-import { atomRegistry } from "../../atom-registry";
-import { storeLogger as logger } from "../../debug";
+} from './types';
+import { atomRegistry } from '../../atom-registry';
+import { storeLogger as logger } from '../../debug';
 
 // Import disposal infrastructure
-import { BaseDisposable, type DisposableConfig } from "../core/disposable";
+import { BaseDisposable, type DisposableConfig } from '../core/disposable';
 
 export class SnapshotRestorer extends BaseDisposable {
   private store: Store;
@@ -38,20 +38,28 @@ export class SnapshotRestorer extends BaseDisposable {
 
   constructor(
     store: Store,
-    config?: Partial<SnapshotRestorerConfig> & Partial<TransactionalRestorerConfig> & Partial<RestorationConfig>,
-    disposalConfig?: DisposableConfig,
+    config?: Partial<SnapshotRestorerConfig> &
+      Partial<TransactionalRestorerConfig> &
+      Partial<RestorationConfig>,
+    disposalConfig?: DisposableConfig
   ) {
     super(disposalConfig);
     this.store = store;
     // Extract only SnapshotRestorerConfig properties, explicitly excluding DisposableConfig
-    const restorerConfig = config as Partial<SnapshotRestorerConfig> | undefined;
-    const transactionalConfigParam = config as Partial<TransactionalRestorerConfig> | undefined;
-    const restorationConfigParam = config as Partial<RestorationConfig> | undefined;
+    const restorerConfig = config as
+      | Partial<SnapshotRestorerConfig>
+      | undefined;
+    const transactionalConfigParam = config as
+      | Partial<TransactionalRestorerConfig>
+      | undefined;
+    const restorationConfigParam = config as
+      | Partial<RestorationConfig>
+      | undefined;
 
     this.restorerConfig = {
       validateBeforeRestore: true,
       strictMode: false,
-      onAtomNotFound: "skip",
+      onAtomNotFound: 'skip',
       transform: null,
       batchRestore: true,
       skipErrors: true,
@@ -61,19 +69,21 @@ export class SnapshotRestorer extends BaseDisposable {
     this.transactionalConfig = {
       enableTransactions: transactionalConfigParam?.enableTransactions ?? true,
       rollbackOnError: transactionalConfigParam?.rollbackOnError ?? true,
-      validateBeforeRestore: transactionalConfigParam?.validateBeforeRestore ?? true,
+      validateBeforeRestore:
+        transactionalConfigParam?.validateBeforeRestore ?? true,
       batchSize: transactionalConfigParam?.batchSize ?? 0,
       timeout: transactionalConfigParam?.timeout ?? 5000,
-      onError: transactionalConfigParam?.onError ?? "rollback",
+      onError: transactionalConfigParam?.onError ?? 'rollback',
       maxCheckpoints: transactionalConfigParam?.maxCheckpoints ?? 10,
       checkpointTimeout: transactionalConfigParam?.checkpointTimeout ?? 300000, // 5 minutes
       ...(transactionalConfigParam || {}),
     };
     // Extract RestorationConfig properties
     this.restorationConfig = {
-      validateBeforeRestore: restorationConfigParam?.validateBeforeRestore ?? true,
+      validateBeforeRestore:
+        restorationConfigParam?.validateBeforeRestore ?? true,
       strictMode: restorationConfigParam?.strictMode ?? false,
-      onAtomNotFound: restorationConfigParam?.onAtomNotFound ?? "warn",
+      onAtomNotFound: restorationConfigParam?.onAtomNotFound ?? 'warn',
       batchRestore: restorationConfigParam?.batchRestore ?? true,
       batchSize: restorationConfigParam?.batchSize ?? 10,
       rollbackOnError: restorationConfigParam?.rollbackOnError ?? true,
@@ -90,7 +100,7 @@ export class SnapshotRestorer extends BaseDisposable {
    */
   restore(snapshot: Snapshot): boolean {
     if (this.restoreInProgress) {
-      throw new Error("Restore already in progress");
+      throw new Error('Restore already in progress');
     }
 
     this.restoreInProgress = true;
@@ -116,10 +126,10 @@ export class SnapshotRestorer extends BaseDisposable {
         this.restoreSequential(snapshotToRestore.state);
       }
 
-      this.emit("restore", snapshotToRestore);
+      this.emit('restore', snapshotToRestore);
       return true;
     } catch (error) {
-      logger.error("Failed to restore snapshot:", error);
+      logger.error('Failed to restore snapshot:', error);
       return false;
     } finally {
       this.restoreInProgress = false;
@@ -142,7 +152,7 @@ export class SnapshotRestorer extends BaseDisposable {
         success: false,
         restoredCount: 0,
         totalAtoms: 0,
-        errors: ["Restore already in progress"],
+        errors: ['Restore already in progress'],
         warnings: [],
         duration: Date.now() - startTime,
         timestamp: startTime,
@@ -185,7 +195,7 @@ export class SnapshotRestorer extends BaseDisposable {
       const success = errors.length === 0 || !this.restorerConfig.strictMode;
 
       if (success) {
-        this.emit("restore", snapshot);
+        this.emit('restore', snapshot);
       }
 
       return {
@@ -231,11 +241,15 @@ export class SnapshotRestorer extends BaseDisposable {
    * @returns True if restored successfully
    */
   private restoreAtom(key: string, entry: SnapshotStateEntry): boolean {
-    logger.log(`[RESTORE] Restoring atom: ${key}, entry.name=${entry.name}, value=${entry.value}`);
-    
+    logger.log(
+      `[RESTORE] Restoring atom: ${key}, entry.name=${entry.name}, value=${entry.value}`
+    );
+
     // Try to find atom by name first
     let atom = this.findAtomByName(entry.name || key);
-    logger.log(`[RESTORE] Found by name? ${!!atom}, atom.id=${atom?.id?.toString()}, atom.name=${atom?.name}`);
+    logger.log(
+      `[RESTORE] Found by name? ${!!atom}, atom.id=${atom?.id?.toString()}, atom.name=${atom?.name}`
+    );
 
     // If not found, try to find by ID string (though this is unreliable for symbols)
     if (!atom && entry.atomId) {
@@ -247,12 +261,15 @@ export class SnapshotRestorer extends BaseDisposable {
     if (!atom) {
       // If still not found, try to find any atom with the same name (for unnamed atoms)
       if (entry.name) {
-        const allAtoms = atomRegistry.getAll();
+        const allAtoms = atomRegistry.getAll() as Map<symbol, Atom<any>>;
         for (const [_id, storedAtom] of allAtoms) {
-          const storedName = storedAtom.name || storedAtom.id?.description || "atom";
+          const storedName =
+            storedAtom.name || storedAtom.id?.description || 'atom';
           if (storedName === entry.name) {
-            atom = storedAtom as Atom<unknown>;
-            logger.log(`[RESTORE] Found by name (fallback): ${entry.name}, id: ${atom.id?.toString()}`);
+            atom = storedAtom;
+            logger.log(
+              `[RESTORE] Found by name (fallback): ${entry.name}, id: ${atom.id?.toString()}`
+            );
             break;
           }
         }
@@ -260,10 +277,10 @@ export class SnapshotRestorer extends BaseDisposable {
     }
 
     if (!atom) {
-      if (this.restorerConfig.onAtomNotFound === "throw") {
+      if (this.restorerConfig.onAtomNotFound === 'throw') {
         throw new Error(`Atom not found: ${key}`);
       }
-      if (this.restorerConfig.onAtomNotFound === "warn") {
+      if (this.restorerConfig.onAtomNotFound === 'warn') {
         logger.warn(`Atom not found: ${key}`);
       }
       logger.log(`[RESTORE] Atom NOT FOUND: ${key}`);
@@ -272,12 +289,18 @@ export class SnapshotRestorer extends BaseDisposable {
 
     // Deserialize value if needed
     const value = this.deserializeValue(entry.value, entry.type);
-    logger.log(`[RESTORE] Restoring ${entry.name}: ${value}, calling this.store.set(atom, ${value})`);
-    logger.log(`[RESTORE] Current value in store before set: ${this.store.get(atom)}`);
+    logger.log(
+      `[RESTORE] Restoring ${entry.name}: ${value}, calling this.store.set(atom, ${value})`
+    );
+    logger.log(
+      `[RESTORE] Current value in store before set: ${this.store.get(atom)}`
+    );
 
     // Set the value
     this.store.set(atom, value);
-    logger.log(`[RESTORE] Set complete for ${entry.name}, new value: ${this.store.get(atom)}`);
+    logger.log(
+      `[RESTORE] Set complete for ${entry.name}, new value: ${this.store.get(atom)}`
+    );
     return true;
   }
 
@@ -302,20 +325,18 @@ export class SnapshotRestorer extends BaseDisposable {
 
     // First pass: restore primitives
     entries.forEach(([key, entry]) => {
-      if (entry.type === "primitive") {
+      if (entry.type === 'primitive') {
         this.restoreAtom(key, entry);
       }
     });
 
     // Second pass: restore computed/writable
     entries.forEach(([key, entry]) => {
-      if (entry.type !== "primitive") {
+      if (entry.type !== 'primitive') {
         this.restoreAtom(key, entry);
       }
     });
   }
-
-
 
   /**
    * Find atom by name
@@ -334,16 +355,16 @@ export class SnapshotRestorer extends BaseDisposable {
    */
   private deserializeValue(value: unknown, type: string): unknown {
     // Handle special cases based on type
-    if (type === "date" && typeof value === "string") {
+    if (type === 'date' && typeof value === 'string') {
       return new Date(value);
     }
-    if (type === "regexp" && typeof value === "string") {
+    if (type === 'regexp' && typeof value === 'string') {
       return new RegExp(value);
     }
-    if (type === "map" && Array.isArray(value)) {
+    if (type === 'map' && Array.isArray(value)) {
       return new Map(value);
     }
-    if (type === "set" && Array.isArray(value)) {
+    if (type === 'set' && Array.isArray(value)) {
       return new Set(value);
     }
     return value;
@@ -359,9 +380,9 @@ export class SnapshotRestorer extends BaseDisposable {
       snapshot &&
       snapshot.id &&
       snapshot.state &&
-      typeof snapshot.state === "object" &&
+      typeof snapshot.state === 'object' &&
       snapshot.metadata &&
-      typeof snapshot.metadata.timestamp === "number"
+      typeof snapshot.metadata.timestamp === 'number'
     );
   }
 
@@ -379,23 +400,23 @@ export class SnapshotRestorer extends BaseDisposable {
     const warnings: string[] = [];
 
     if (!snapshot) {
-      errors.push("Snapshot is null or undefined");
+      errors.push('Snapshot is null or undefined');
       return { valid: false, errors, warnings };
     }
 
     if (!snapshot.id) {
-      errors.push("Snapshot missing ID");
+      errors.push('Snapshot missing ID');
     }
 
-    if (!snapshot.state || typeof snapshot.state !== "object") {
-      errors.push("Snapshot state is invalid");
+    if (!snapshot.state || typeof snapshot.state !== 'object') {
+      errors.push('Snapshot state is invalid');
     }
 
     if (!snapshot.metadata) {
-      errors.push("Snapshot missing metadata");
+      errors.push('Snapshot missing metadata');
     } else {
-      if (typeof snapshot.metadata.timestamp !== "number") {
-        errors.push("Snapshot timestamp is invalid");
+      if (typeof snapshot.metadata.timestamp !== 'number') {
+        errors.push('Snapshot timestamp is invalid');
       }
     }
 
@@ -436,8 +457,8 @@ export class SnapshotRestorer extends BaseDisposable {
    * @param event Event type
    * @param snapshot Snapshot
    */
-  private emit(event: "restore" | "error", snapshot?: Snapshot): void {
-    if (event === "restore" && snapshot) {
+  private emit(event: 'restore' | 'error', snapshot?: Snapshot): void {
+    if (event === 'restore' && snapshot) {
       this.listeners.forEach((listener) => listener(snapshot));
     }
   }
@@ -453,7 +474,11 @@ export class SnapshotRestorer extends BaseDisposable {
    * Update configuration
    * @param config New configuration
    */
-  configure(config: Partial<SnapshotRestorerConfig> & Partial<TransactionalRestorerConfig> & Partial<RestorationConfig>): void {
+  configure(
+    config: Partial<SnapshotRestorerConfig> &
+      Partial<TransactionalRestorerConfig> &
+      Partial<RestorationConfig>
+  ): void {
     this.restorerConfig = { ...this.restorerConfig, ...config };
     this.transactionalConfig = { ...this.transactionalConfig, ...config };
     this.restorationConfig = { ...this.restorationConfig, ...config };
@@ -574,10 +599,17 @@ export class SnapshotRestorer extends BaseDisposable {
     checkpoints.sort((a, b) => b[1].timestamp - a[1].timestamp);
 
     // Remove old checkpoints
-    for (let i = this.restorationConfig.maxCheckpoints; i < checkpoints.length; i++) {
+    for (
+      let i = this.restorationConfig.maxCheckpoints;
+      i < checkpoints.length;
+      i++
+    ) {
       const [id, checkpoint] = checkpoints[i];
       // Check if checkpoint has expired
-      if (now - checkpoint.timestamp > this.restorationConfig.checkpointTimeout) {
+      if (
+        now - checkpoint.timestamp >
+        this.restorationConfig.checkpointTimeout
+      ) {
         this.checkpoints.delete(id);
       }
     }
@@ -609,7 +641,11 @@ export class SnapshotRestorer extends BaseDisposable {
    */
   private capturePreviousValues(
     checkpointId: string,
-    atomsToRestore: Array<{ key: string; entry: SnapshotStateEntry; atom: Atom<unknown> }>,
+    atomsToRestore: Array<{
+      key: string;
+      entry: SnapshotStateEntry;
+      atom: Atom<unknown>;
+    }>
   ): Map<symbol, unknown> {
     const previousValues = new Map<symbol, unknown>();
 
@@ -618,7 +654,10 @@ export class SnapshotRestorer extends BaseDisposable {
         const currentValue = this.store.get(atom);
         previousValues.set(atom.id, currentValue);
       } catch (error) {
-        logger.error(`Failed to capture previous value for atom ${atom.name}:`, error);
+        logger.error(
+          `Failed to capture previous value for atom ${atom.name}:`,
+          error
+        );
       }
     }
 
@@ -640,7 +679,7 @@ export class SnapshotRestorer extends BaseDisposable {
    */
   async restoreWithTransaction(
     snapshot: Snapshot,
-    options?: RestorationOptions,
+    options?: RestorationOptions
   ): Promise<TransactionalRestorationResult> {
     const checkpointResult = this.createCheckpoint(snapshot.id);
     const checkpointId = checkpointResult.checkpointId;
@@ -653,11 +692,11 @@ export class SnapshotRestorer extends BaseDisposable {
       if (this.transactionalConfig.validateBeforeRestore) {
         const validation = this.validateSnapshotWithDetails(snapshot);
         if (!validation.valid) {
-          const error = new RestorationError("Validation failed", {
+          const error = new RestorationError('Validation failed', {
             errors: validation.errors,
           });
-          
-          if (this.transactionalConfig.onError === "throw") {
+
+          if (this.transactionalConfig.onError === 'throw') {
             throw error;
           }
 
@@ -678,18 +717,23 @@ export class SnapshotRestorer extends BaseDisposable {
       }
 
       // Phase 2: Capture previous values and prepare for restoration
-      const atomsToRestore: Array<{ key: string; entry: SnapshotStateEntry; atom: Atom<unknown> }> = [];
+      const atomsToRestore: Array<{
+        key: string;
+        entry: SnapshotStateEntry;
+        atom: Atom<any>;
+      }> = [];
 
       // First, find all atoms that will be restored
       for (const [key, entry] of Object.entries(snapshot.state)) {
         let atom = this.findAtomByName(entry.name || key);
 
         if (!atom && entry.name) {
-          const allAtoms = atomRegistry.getAll();
+          const allAtoms = atomRegistry.getAll() as Map<symbol, Atom<any>>;
           for (const [_id, storedAtom] of allAtoms) {
-            const storedName = storedAtom.name || storedAtom.id?.description || "atom";
+            const storedName =
+              storedAtom.name || storedAtom.id?.description || 'atom';
             if (storedName === entry.name) {
-              atom = storedAtom as Atom<unknown>;
+              atom = storedAtom;
               break;
             }
           }
@@ -708,7 +752,7 @@ export class SnapshotRestorer extends BaseDisposable {
         snapshot,
         atomsToRestore,
         checkpointId,
-        options,
+        options
       );
 
       // Commit checkpoint if successful
@@ -736,7 +780,8 @@ export class SnapshotRestorer extends BaseDisposable {
       // Automatic rollback on error
       await this.rollback(checkpointId);
 
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       return {
         success: false,
         restoredCount: 0,
@@ -764,15 +809,24 @@ export class SnapshotRestorer extends BaseDisposable {
    */
   private async applyChangesWithTransaction(
     _snapshot: Snapshot,
-    atomsToRestore: Array<{ key: string; entry: SnapshotStateEntry; atom: Atom<unknown> }>,
+    atomsToRestore: Array<{
+      key: string;
+      entry: SnapshotStateEntry;
+      atom: Atom<unknown>;
+    }>,
     checkpointId: string,
-    options?: RestorationOptions,
+    options?: RestorationOptions
   ): Promise<TransactionalRestorationResult> {
     const startTime = Date.now();
     const errors: string[] = [];
     const warnings: string[] = [];
     const successAtoms: Array<{ name: string; atomId: symbol }> = [];
-    const failedAtomDetails: Array<{ name: string; atomId: symbol; error: string; action: string }> = [];
+    const failedAtomDetails: Array<{
+      name: string;
+      atomId: symbol;
+      error: string;
+      action: string;
+    }> = [];
     let restoredCount = 0;
     let interrupted = false;
 
@@ -789,7 +843,7 @@ export class SnapshotRestorer extends BaseDisposable {
         const batchResult = await this.restoreBatchAtoms(
           batch,
           checkpointId,
-          options?.onProgress,
+          options?.onProgress
         );
 
         successAtoms.push(...batchResult.successAtoms);
@@ -807,7 +861,7 @@ export class SnapshotRestorer extends BaseDisposable {
           this.transactionalConfig.timeout! > 0 &&
           Date.now() - startTime > this.transactionalConfig.timeout!
         ) {
-          warnings.push("Restoration timed out");
+          warnings.push('Restoration timed out');
           interrupted = true;
           break;
         }
@@ -817,7 +871,7 @@ export class SnapshotRestorer extends BaseDisposable {
       const result = await this.restoreBatchAtoms(
         atomsToRestore,
         checkpointId,
-        options?.onProgress,
+        options?.onProgress
       );
       successAtoms.push(...result.successAtoms);
       failedAtomDetails.push(...result.failedAtomDetails);
@@ -856,13 +910,22 @@ export class SnapshotRestorer extends BaseDisposable {
    * @returns Batch restoration result
    */
   private async restoreBatchAtoms(
-    atomsToRestore: Array<{ key: string; entry: SnapshotStateEntry; atom: Atom<unknown> }>,
+    atomsToRestore: Array<{
+      key: string;
+      entry: SnapshotStateEntry;
+      atom: Atom<unknown>;
+    }>,
     _checkpointId: string,
-    onProgress?: (progress: RestorationProgress) => void,
+    onProgress?: (progress: RestorationProgress) => void
   ): Promise<{
     restoredCount: number;
     successAtoms: Array<{ name: string; atomId: symbol }>;
-    failedAtomDetails: Array<{ name: string; atomId: symbol; error: string; action: string }>;
+    failedAtomDetails: Array<{
+      name: string;
+      atomId: symbol;
+      error: string;
+      action: string;
+    }>;
     errors: string[];
     warnings: string[];
     interrupted: boolean;
@@ -915,17 +978,24 @@ export class SnapshotRestorer extends BaseDisposable {
           name: entry.name || key,
           atomId: atom.id,
           error: errorMsg,
-          action: "restore",
+          action: 'restore',
         });
 
-        if (this.transactionalConfig.onError === "throw") {
+        if (this.transactionalConfig.onError === 'throw') {
           interrupted = true;
           break;
         }
       }
     }
 
-    return { restoredCount, successAtoms, failedAtomDetails, errors, warnings, interrupted };
+    return {
+      restoredCount,
+      successAtoms,
+      failedAtomDetails,
+      errors,
+      warnings,
+      interrupted,
+    };
   }
 
   /**
@@ -957,7 +1027,9 @@ export class SnapshotRestorer extends BaseDisposable {
     let failedCount = 0;
 
     // Restore previous values in reverse order
-    const reversedAtoms = Array.from(checkpoint.previousValues.entries()).reverse();
+    const reversedAtoms = Array.from(
+      checkpoint.previousValues.entries()
+    ).reverse();
 
     for (const [atomId, previousValue] of reversedAtoms) {
       try {
@@ -965,7 +1037,7 @@ export class SnapshotRestorer extends BaseDisposable {
         // We need to look up the atom from the registry
         const allAtoms = atomRegistry.getAll();
         let atomFound: Atom<unknown> | null = null;
-        
+
         // Try to find atom by ID first
         for (const [id, atom] of allAtoms) {
           if (id === atomId) {
@@ -973,7 +1045,7 @@ export class SnapshotRestorer extends BaseDisposable {
             break;
           }
         }
-        
+
         // If not found by ID, try by description
         if (!atomFound) {
           for (const [id, atom] of allAtoms) {
@@ -992,7 +1064,7 @@ export class SnapshotRestorer extends BaseDisposable {
           failedAtoms.push({
             name: `atom-${atomId.description}`,
             atomId,
-            error: "Atom not found in registry",
+            error: 'Atom not found in registry',
           });
         }
       } catch (error) {
@@ -1021,7 +1093,8 @@ export class SnapshotRestorer extends BaseDisposable {
       failedCount,
       failedAtoms,
       timestamp: Date.now(),
-      error: failedCount > 0 ? `Failed to rollback ${failedCount} atoms` : undefined,
+      error:
+        failedCount > 0 ? `Failed to rollback ${failedCount} atoms` : undefined,
     };
   }
 
@@ -1046,7 +1119,7 @@ export class SnapshotRestorer extends BaseDisposable {
         }
       }
     } catch (error) {
-      logger.error("Failed to parse atom ID:", error);
+      logger.error('Failed to parse atom ID:', error);
     }
     return null;
   }
@@ -1078,7 +1151,7 @@ export class SnapshotRestorer extends BaseDisposable {
       return;
     }
 
-    this.log("Disposing SnapshotRestorer");
+    this.log('Disposing SnapshotRestorer');
 
     // Abort any active restoration
     if (this.activeRestoration) {
@@ -1094,7 +1167,7 @@ export class SnapshotRestorer extends BaseDisposable {
 
     // Dispose transaction log if exists
     if (this.transactionLog) {
-      if (typeof this.transactionLog.dispose === "function") {
+      if (typeof this.transactionLog.dispose === 'function') {
         await this.transactionLog.dispose();
       }
       this.transactionLog = null;
@@ -1111,6 +1184,6 @@ export class SnapshotRestorer extends BaseDisposable {
     await this.runDisposeCallbacks();
 
     this.disposed = true;
-    this.log("SnapshotRestorer disposed");
+    this.log('SnapshotRestorer disposed');
   }
 }

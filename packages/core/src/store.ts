@@ -29,7 +29,7 @@ type AtomState<Value> = {
   /** Set of subscribers to notify when the value changes */
   subscribers: Set<Subscriber<Value>>;
   /** Set of dependent atoms that depend on this atom */
-  dependents: Set<Atom<unknown>>;
+  dependents: Set<Atom<any>>;
 };
 
 /**
@@ -53,17 +53,17 @@ type StoreEnhancementOptions = {
  * const storeWithPlugins = createStore([loggerPlugin, devToolsPlugin]);
  */
 export function createStore(plugins: Plugin[] = []): Store {
-  const atomStates = new Map<Atom<unknown>, AtomState<unknown>>();
+  const atomStates = new Map<Atom<any>, AtomState<any>>();
 
   // Track the current atom being evaluated for dependency tracking
-  let currentAtom: Atom<unknown> | null = null;
+  let currentAtom: Atom<any> | null = null;
 
   // Store enhancement state
   const appliedPlugins: Plugin[] = [];
   const pluginHooks: PluginHooks[] = [];
   let isDevToolsEnabled = false;
   let isStackTraceEnabled = false;
-  let pendingStateUpdates: Array<{ atom: Atom<unknown>; value: unknown }> = [];
+  let pendingStateUpdates: Array<{ atom: Atom<any>; value: any }> = [];
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   const debounceDelay = 100;
 
@@ -73,11 +73,14 @@ export function createStore(plugins: Plugin[] = []): Store {
    * @param value - The value to set
    * @returns The processed value after all hooks
    */
-  const executeOnSetHooks = <T>(atom: Atom<T>, value: T): T => {
+  const executeOnSetHooks = <T>(atom: Atom<any>, value: T): T => {
     let processedValue = value;
     for (const hooks of pluginHooks) {
       if (hooks.onSet) {
-        const result = hooks.onSet(atom, processedValue);
+        const result = (hooks.onSet as (a: Atom<any>, v: any) => any)(
+          atom,
+          processedValue
+        );
         if (result !== undefined) {
           processedValue = result;
         }
@@ -91,10 +94,10 @@ export function createStore(plugins: Plugin[] = []): Store {
    * @param atom - The atom that was set
    * @param value - The final value that was set
    */
-  const executeAfterSetHooks = <T>(atom: Atom<T>, value: T): void => {
+  const executeAfterSetHooks = <T>(atom: Atom<any>, value: T): void => {
     for (const hooks of pluginHooks) {
       if (hooks.afterSet) {
-        hooks.afterSet(atom, value);
+        (hooks.afterSet as (a: Atom<any>, v: any) => void)(atom, value);
       }
     }
   };
@@ -105,11 +108,14 @@ export function createStore(plugins: Plugin[] = []): Store {
    * @param value - The current value
    * @returns The processed value after all hooks
    */
-  const executeOnGetHooks = <T>(atom: Atom<T>, value: T): T => {
+  const executeOnGetHooks = <T>(atom: Atom<any>, value: T): T => {
     let processedValue = value;
     for (const hooks of pluginHooks) {
       if (hooks.onGet) {
-        processedValue = hooks.onGet(atom, processedValue);
+        processedValue = (hooks.onGet as (a: Atom<any>, v: any) => any)(
+          atom,
+          processedValue
+        );
       }
     }
     return processedValue;
@@ -306,7 +312,7 @@ export function createStore(plugins: Plugin[] = []): Store {
     const notified = new Set<Atom<unknown>>();
 
     while (toNotify.size > 0) {
-      const current = toNotify.values().next().value as Atom<unknown>;
+      const current = toNotify.values().next().value as Atom<any>;
       toNotify.delete(current);
 
       if (notified.has(current)) continue;
@@ -331,7 +337,7 @@ export function createStore(plugins: Plugin[] = []): Store {
         currentAtom = current;
         try {
           // Recompute the value
-          let newValue: unknown;
+          let newValue: any;
           if (isComputedAtom(current)) {
             logger.log(
               '[SET] Recomputing:',
@@ -345,7 +351,7 @@ export function createStore(plugins: Plugin[] = []): Store {
               newValue
             );
           } else if (isWritableAtom(current)) {
-            newValue = (current as WritableAtom<unknown>).read(get);
+            newValue = (current as WritableAtom<any>).read(get);
           }
 
           if (currentState.value !== newValue) {

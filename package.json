@@ -2,6 +2,7 @@
   "name": "nexus-state",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
@@ -37,12 +38,15 @@
     "@changesets/cli": "^2.26.0",
     "@commitlint/cli": "^20.4.2",
     "@commitlint/config-conventional": "^20.4.2",
+    "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "@vitest/coverage-v8": "^3.0.7",
     "commander": "^11.0.0",
-    "eslint": "^8.57.1",
+    "eslint": "^10.0.2",
     "fs-extra": "^11.0.0",
+    "globals": "^17.3.0",
     "husky": "^9.1.7",
     "immer": "^10.0.0",
     "jscpd": "^4.0.8",
@@ -51,8 +55,7 @@
     "turbo": "^1.10.0",
     "typescript": "^5.9.3",
     "vitepress": "^1.6.4",
-    "vitest": "^3.0.7",
-    "@vitest/coverage-v8": "^3.0.7"
+    "vitest": "^3.0.7"
   },
   "pnpm": {
     "overrides": {
@@ -69,14 +72,14 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix",
-      "prettier --write"
+      "prettier --write --ignore-unknown"
     ],
     "*.{js,jsx}": [
       "eslint --fix",
-      "prettier --write"
+      "prettier --write --ignore-unknown"
     ],
     "*.{json,md,yml,yaml}": [
-      "prettier --write"
+      "prettier --write --ignore-unknown"
     ]
   },
   "simple-git-hooks": {
