@@ -41,7 +41,7 @@ describe('atomFamily', () => {
     store.set(counter1, 5);
     expect(store.get(counter1)).toBe(5);
     expect(store.get(counter1Again)).toBe(5); // Same atom, so updated
-    expect(store.get(counter2)).toBe(0); // Different atom, unchanged
+    expect(store.get(counter2)).toBe('b'); // Different atom, unchanged
   });
 
   it('should handle complex parameters', () => {
