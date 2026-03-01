@@ -97,6 +97,39 @@ export type AsyncValidator<TValue = any> = (
 ) => Promise<string | null>;
 
 /**
+ * Async validator options
+ */
+export interface AsyncValidatorOptions {
+  /**
+   * Debounce delay in ms (default: 300)
+   */
+  debounce?: number;
+
+  /**
+   * Retry attempts on failure (default: 0)
+   */
+  retry?: number;
+
+  /**
+   * Cache validation results (default: true)
+   */
+  cache?: boolean;
+
+  /**
+   * Validation timeout in ms (default: 5000)
+   */
+  timeout?: number;
+}
+
+/**
+ * Async validator with options
+ */
+export interface AsyncValidatorWithConfig<TValue = any> {
+  validate: AsyncValidator<TValue>;
+  options?: AsyncValidatorOptions;
+}
+
+/**
  * Form validator function
  */
 export type FormValidator<TValues extends FormValues = FormValues> = (
@@ -133,8 +166,14 @@ export interface SchemaValidator<TValues extends FormValues = FormValues> {
 export type ZodSchema<TValues = any> = {
   parse: (value: unknown) => TValues | Promise<TValues>;
   parseAsync: (value: unknown) => Promise<TValues>;
-  safeParse: (value: unknown) => { success: boolean; data?: TValues; error?: any };
-  safeParseAsync: (value: unknown) => Promise<{ success: boolean; data?: TValues; error?: any }>;
+  safeParse: (value: unknown) => {
+    success: boolean;
+    data?: TValues;
+    error?: any;
+  };
+  safeParseAsync: (
+    value: unknown
+  ) => Promise<{ success: boolean; data?: TValues; error?: any }>;
 };
 
 /**
@@ -155,7 +194,9 @@ export interface FieldOptions<TValue = any> {
   validate?: FieldValidator<TValue>;
   validateAsync?: AsyncFieldValidator<TValue>;
   validators?: ValidatorFn<TValue>[];
-  asyncValidators?: AsyncValidator<TValue>[];
+  asyncValidators?: Array<
+    AsyncValidator<TValue> | AsyncValidatorWithConfig<TValue>
+  >;
 
   /**
    * Validation trigger (defaults to form-level or 'onBlur')
@@ -171,6 +212,11 @@ export interface FieldOptions<TValue = any> {
    * Show errors only when touched
    */
   showErrorsOnTouched?: boolean;
+
+  /**
+   * Debounce delay for async validation (field-level override)
+   */
+  debounce?: number;
 
   /**
    * Store instance (optional, uses default store if not provided)
@@ -269,10 +315,7 @@ export interface Form<TValues extends FormValues = FormValues> {
     name: K,
     error: string | null
   ) => void;
-  setFieldTouched: <K extends keyof TValues>(
-    name: K,
-    touched: boolean
-  ) => void;
+  setFieldTouched: <K extends keyof TValues>(name: K, touched: boolean) => void;
 
   reset: () => void;
   submit: () => Promise<void>;

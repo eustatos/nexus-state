@@ -1,10 +1,13 @@
-import { atom, Store } from '@nexus-state/core';
+import { atom, computed, Store } from '@nexus-state/core';
+import { AsyncValidationManager } from './async-validation';
 import {
   FieldState,
   FieldMeta,
   FieldOptions,
   FieldValidator,
-  AsyncFieldValidator
+  AsyncFieldValidator,
+  AsyncValidator,
+  AsyncValidatorWithConfig,
 } from './types';
 
 /**
@@ -14,21 +17,120 @@ export function createField<TValue>(
   _store: Store,
   name: string,
   options: FieldOptions<TValue>
-): FieldMeta<TValue> {
+): FieldMeta<TValue> & {
+  error: ReturnType<typeof computed<string | null>>;
+  isValid: ReturnType<typeof computed<boolean>>;
+  setValue: (value: TValue, formValues?: Record<string, unknown>) => void;
+  setTouched: (touched: boolean) => void;
+  setError: (error: string | null) => void;
+  reset: () => void;
+  dispose: () => void;
+} {
   const fieldAtom = atom<FieldState<TValue>>(
     {
       value: options.initialValue,
       touched: false,
       dirty: false,
-      error: null
+      error: null,
+      validating: false,
+      asyncError: null,
+      validated: false,
     },
     `field:${name}`
   );
 
+  // Create async validation manager
+  let asyncManager: AsyncValidationManager<TValue> | null = null;
+  const asyncValidators = options.asyncValidators ?? [];
+  if (asyncValidators.length > 0) {
+    asyncManager = new AsyncValidationManager<TValue>(
+      options.store ?? _store,
+      fieldAtom,
+      asyncValidators
+    );
+  }
+
+  // Run sync validators
+  const runSyncValidation = (
+    value: TValue,
+    formValues?: Record<string, unknown>
+  ): string | null => {
+    const validators = options.validators ?? [];
+    for (const validator of validators) {
+      const error = validator(value, formValues);
+      if (error) {
+        return error;
+      }
+    }
+    return null;
+  };
+
+  // Combined error (sync + async)
+  const errorAtom = computed<string | null>((get) => {
+    const state = get(fieldAtom);
+    return state.error || state.asyncError;
+  });
+
+  // Is valid (no sync or async errors, not validating)
+  const isValidAtom = computed<boolean>((get) => {
+    const state = get(fieldAtom);
+    return !state.error && !state.asyncError && !state.validating;
+  });
+
+  const store = options.store ?? _store;
+
   return {
     atom: fieldAtom,
     name,
-    initialValue: options.initialValue
+    initialValue: options.initialValue,
+    error: errorAtom,
+    isValid: isValidAtom,
+
+    setValue(value: TValue, formValues?: Record<string, unknown>) {
+      // Run sync validation
+      const syncError = runSyncValidation(value, formValues);
+
+      // Update state
+      store.set(fieldAtom, (prev) => ({
+        ...prev,
+        value,
+        dirty: true,
+        error: syncError,
+        validated: !syncError,
+      }));
+
+      // Run async validation if sync passed
+      if (!syncError && asyncManager) {
+        asyncManager.validate(value, formValues);
+      } else if (asyncManager) {
+        asyncManager.cancel();
+      }
+    },
+
+    setTouched(touched: boolean) {
+      store.set(fieldAtom, (prev) => ({ ...prev, touched }));
+    },
+
+    setError(error: string | null) {
+      store.set(fieldAtom, (prev) => ({ ...prev, error }));
+    },
+
+    reset() {
+      asyncManager?.cancel();
+      store.set(fieldAtom, {
+        value: options.initialValue,
+        touched: false,
+        dirty: false,
+        error: null,
+        validating: false,
+        asyncError: null,
+        validated: false,
+      });
+    },
+
+    dispose() {
+      asyncManager?.dispose();
+    },
   };
 }
 
@@ -54,7 +156,7 @@ export function setFieldValue<TValue>(
   store.set(fieldMeta.atom, {
     ...currentState,
     value,
-    dirty: value !== fieldMeta.initialValue
+    dirty: value !== fieldMeta.initialValue,
   });
 }
 
@@ -69,7 +171,7 @@ export function setFieldTouched<TValue>(
   const currentState = store.get(fieldMeta.atom);
   store.set(fieldMeta.atom, {
     ...currentState,
-    touched
+    touched,
   });
 }
 
@@ -84,7 +186,7 @@ export function setFieldError<TValue>(
   const currentState = store.get(fieldMeta.atom);
   store.set(fieldMeta.atom, {
     ...currentState,
-    error
+    error,
   });
 }
 
@@ -99,7 +201,7 @@ export function resetField<TValue>(
     value: fieldMeta.initialValue,
     touched: false,
     dirty: false,
-    error: null
+    error: null,
   });
 }
 

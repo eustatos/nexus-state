@@ -1,10 +1,7 @@
 export { createForm } from './create-form';
 export { zodValidator, yupValidator } from './schema-validation';
 export type { InferSchema } from './schema-validation';
-export {
-  createFieldArray,
-  getFieldArray
-} from './field-array';
+export { createFieldArray, getFieldArray } from './field-array';
 export {
   createField,
   getFieldValue,
@@ -12,8 +9,9 @@ export {
   setFieldTouched,
   setFieldError,
   resetField,
-  validateField
+  validateField,
 } from './field';
+export { AsyncValidationManager } from './async-validation';
 export {
   required,
   email,
@@ -27,7 +25,7 @@ export {
   getFormValues,
   getFormErrors,
   areAllFieldsTouched,
-  isAnyFieldDirty
+  isAnyFieldDirty,
 } from './utils';
 export type {
   FormOptions,
@@ -47,5 +45,8 @@ export type {
   YupSchema,
   FieldArray,
   FieldArrayOperations,
-  FieldArrayMeta
+  FieldArrayMeta,
+  AsyncValidator,
+  AsyncValidatorOptions,
+  AsyncValidatorWithConfig,
 } from './types';
