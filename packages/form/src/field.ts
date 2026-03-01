@@ -1,5 +1,6 @@
 import { atom, Store, Atom } from '@nexus-state/core';
 import { AsyncValidationManager } from './async-validation';
+import { ValidationTrigger } from './validation-trigger';
 import {
   FieldState,
   FieldMeta,
@@ -8,6 +9,8 @@ import {
   AsyncFieldValidator,
   AsyncValidator,
   AsyncValidatorWithConfig,
+  ValidationMode,
+  ReValidateMode,
 } from './types';
 
 /**
@@ -25,7 +28,13 @@ export function createField<TValue>(
   setError: (error: string | null) => void;
   reset: () => void;
   dispose: () => void;
+  validateNow: (formValues?: Record<string, unknown>) => void;
 } {
+  // Default validation modes
+  const validateOn: ValidationMode = options.validateOn ?? 'onBlur';
+  const revalidateOn: ReValidateMode = options.revalidateOn ?? 'onChange';
+  const showErrorsOnTouched = options.showErrorsOnTouched ?? true;
+
   const fieldAtom = atom<FieldState<TValue>>(
     {
       value: options.initialValue,
@@ -38,6 +47,13 @@ export function createField<TValue>(
     },
     `field:${name}`
   );
+
+  // Create validation trigger manager
+  const validationTrigger = new ValidationTrigger({
+    mode: validateOn,
+    reValidateMode: revalidateOn,
+    showErrorsOnTouched,
+  });
 
   // Create async validation manager
   let asyncManager: AsyncValidationManager<TValue> | null = null;
@@ -66,10 +82,46 @@ export function createField<TValue>(
     return null;
   };
 
-  // Combined error (sync + async)
+  const store = options.store ?? _store;
+
+  // Internal validation function
+  const validate = (value: TValue, formValues?: Record<string, unknown>): void => {
+    // Run sync validation
+    const syncError = runSyncValidation(value, formValues);
+
+    // Update state
+    store.set(fieldAtom, (prev) => ({
+      ...prev,
+      error: syncError,
+      validated: true,
+    }));
+
+    // Update trigger error state
+    validationTrigger.setHasError(!!syncError);
+
+    // Run async validation if sync passed
+    if (!syncError && asyncManager) {
+      asyncManager.validate(value, formValues);
+    } else if (asyncManager) {
+      asyncManager.cancel();
+    }
+  };
+
+  // Combined error (sync + async) with display logic
   const errorAtom = atom<string | null>((get) => {
     const state = get(fieldAtom);
-    return state.error || state.asyncError;
+    const error = state.error || state.asyncError;
+
+    if (!error) {
+      return null;
+    }
+
+    // Show error if showErrorsOnTouched is false OR field is touched
+    if (showErrorsOnTouched) {
+      return state.touched ? error : null;
+    }
+
+    return error;
   }, `field:${name}:error`);
 
   // Is valid (no sync or async errors, not validating)
@@ -77,8 +129,6 @@ export function createField<TValue>(
     const state = get(fieldAtom);
     return !state.error && !state.asyncError && !state.validating;
   }, `field:${name}:isValid`);
-
-  const store = options.store ?? _store;
 
   return {
     atom: fieldAtom,
@@ -88,36 +138,45 @@ export function createField<TValue>(
     isValid: isValidAtom,
 
     setValue(value: TValue, formValues?: Record<string, unknown>) {
-      // Run sync validation
-      const syncError = runSyncValidation(value, formValues);
+      const currentState = store.get(fieldAtom);
 
-      // Update state
+      // Update value
       store.set(fieldAtom, (prev) => ({
         ...prev,
         value,
         dirty: true,
-        error: syncError,
-        validated: !syncError,
       }));
 
-      // Run async validation if sync passed
-      if (!syncError && asyncManager) {
-        asyncManager.validate(value, formValues);
-      } else if (asyncManager) {
-        asyncManager.cancel();
+      // Validate based on trigger
+      if (validationTrigger.shouldValidateOnChange(currentState)) {
+        validate(value, formValues);
       }
     },
 
-    setTouched(touched: boolean) {
+    setTouched(touched: boolean, formValues?: Record<string, unknown>) {
+      const currentState = store.get(fieldAtom);
+
       store.set(fieldAtom, (prev) => ({ ...prev, touched }));
+
+      // Validate on blur if touched
+      if (touched && validationTrigger.shouldValidateOnBlur(currentState)) {
+        const value = store.get(fieldAtom).value;
+        validate(value, formValues);
+      }
     },
 
     setError(error: string | null) {
       store.set(fieldAtom, (prev) => ({ ...prev, error }));
     },
 
+    validateNow(formValues?: Record<string, unknown>) {
+      const value = store.get(fieldAtom).value;
+      validate(value, formValues);
+    },
+
     reset() {
       asyncManager?.cancel();
+      validationTrigger.reset();
       store.set(fieldAtom, {
         value: options.initialValue,
         touched: false,

@@ -3,11 +3,13 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "lib": ["ES2020", "DOM"]
+    "lib": ["ES2020", "DOM"],
+    "jsx": "react-jsx"
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/react/**/*.ts", "src/react/**/*.tsx"],
   "exclude": [
     "src/**/*.test.ts",
+    "src/**/*.test.tsx",
     "src/**/*.spec.ts",
     "src/**/*.test-d.ts",
     "src/**/*.backup.ts",
