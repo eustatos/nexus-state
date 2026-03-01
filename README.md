@@ -1,11 +1,11 @@
 # Nexus State
 
 > Framework-agnostic state management with built-in Time Travel debugging
-
-[![Coverage Status](https://coveralls.io/repos/github/astashkin-a/nexus-state/badge.svg?branch=main)](https://coveralls.io/github/astashkin-a/nexus-state?branch=main)
-[![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/astashkin-a/nexus-state/blob/main/LICENSE)
-[![npm](https://img.shields.io/npm/v/@nexus-state/core?label=@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
-[![npm downloads](https://img.shields.io/npm/dw/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
+>
+> [![Coverage Status](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
+> [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
+> [![npm](https://img.shields.io/npm/v/@nexus-state/core?label=@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
+> [![npm downloads](https://img.shields.io/npm/dw/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
 
 ---
 
@@ -28,13 +28,13 @@
 ✅ **Built-in debugging** — Time travel without additional setup  
 ✅ **Fine-grained reactivity** — Atom-based updates, no unnecessary re-renders  
 ✅ **TypeScript first** — Full type inference, no `any` types  
-✅ **Small bundle** — 4.2KB core with tree-shaking  
+✅ **Small bundle** — 4.2KB core with tree-shaking
 
 ### If you don't need...
 
 ❌ **Complex boilerplate** — No reducers, actions, or selectors required  
 ❌ **Context providers** — No wrapping your app in providers  
-❌ **React-only solutions** — Works with any framework  
+❌ **React-only solutions** — Works with any framework
 
 ---
 
@@ -47,16 +47,19 @@ npm install @nexus-state/core
 ```
 
 For React integration:
+
 ```bash
 npm install @nexus-state/react
 ```
 
 For Vue integration:
+
 ```bash
 npm install @nexus-state/vue
 ```
 
 For Svelte integration:
+
 ```bash
 npm install @nexus-state/svelte
 ```
@@ -100,10 +103,12 @@ const isEvenAtom = atom((get) => get(countAtom) % 2 === 0, 'isEven');
 const store = createStore();
 
 store.subscribe(countAtom, (value) => {
-  console.log(`Count: ${value}, Double: ${store.get(doubleAtom)}, Even: ${store.get(isEvenAtom)}`);
+  console.log(
+    `Count: ${value}, Double: ${store.get(doubleAtom)}, Even: ${store.get(isEvenAtom)}`
+  );
 });
 
-store.set(countAtom, 5); 
+store.set(countAtom, 5);
 // Count: 5, Double: 10, Even: false
 ```
 
@@ -117,12 +122,12 @@ const countAtom = atom(0, 'count');
 
 function Counter() {
   const [count, setCount] = useAtom(countAtom);
-  
+
   return (
     <div>
       <p>Count: {count}</p>
-      <button onClick={() => setCount(c => c + 1)}>+</button>
-      <button onClick={() => setCount(c => c - 1)}>-</button>
+      <button onClick={() => setCount((c) => c + 1)}>+</button>
+      <button onClick={() => setCount((c) => c - 1)}>-</button>
     </div>
   );
 }
@@ -142,7 +147,7 @@ const [count, setCount] = useAtom(countAtom);
 <template>
   <div>
     <p>Count: {{ count }}</p>
-    <button @click="setCount(c => c + 1)">+</button>
+    <button @click="setCount((c) => c + 1)">+</button>
   </div>
 </template>
 ```
@@ -215,7 +220,7 @@ import { createMiddlewarePlugin } from '@nexus-state/middleware';
 const loggerMiddleware = createMiddlewarePlugin({
   afterSet: (atom, value, prevValue) => {
     console.log(`Atom ${atom.name}: ${prevValue} → ${value}`);
-  }
+  },
 });
 
 const store = createStore();
@@ -228,12 +233,12 @@ store.set(countAtom, 5); // Atom count: 0 → 5
 ### Time Travel Debugging
 
 ```javascript
-import { 
-  atom, 
+import {
+  atom,
   createStore,
   StateSnapshotManager,
   StateRestorer,
-  atomRegistry 
+  atomRegistry,
 } from '@nexus-state/core';
 
 const store = createStore();
@@ -267,10 +272,7 @@ console.log(store.get(countAtom)); // 3
 Nexus State includes powerful Time Travel functionality that allows you to track state changes and move between different states for debugging and historical state restoration.
 
 ```javascript
-import { 
-  StateSnapshotManager,
-  StateRestorer 
-} from '@nexus-state/core';
+import { StateSnapshotManager, StateRestorer } from '@nexus-state/core';
 import { atomRegistry } from '@nexus-state/core';
 
 // Create time travel components
@@ -285,6 +287,7 @@ const success = stateRestorer.restoreFromSnapshot(snapshot);
 ```
 
 **Features:**
+
 - 📸 Snapshot creation with custom labels
 - ⏪ Undo/Redo support
 - 🔄 Transactional restoration
@@ -299,35 +302,35 @@ Benchmarks run on **M1 MacBook Pro, Node.js 20, vitest 3.0**. Results are averag
 
 ### Core Operations
 
-| Operation | ops/sec | mean (ms) | p99 (ms) | Stability |
-|-----------|---------|-----------|----------|-----------|
-| Get atom (10K iterations) | 3,365 | 0.30 | 1.26 | ±3.4% ✅ |
-| Set atom (10K iterations) | 150 | 6.64 | 20.30 | ±8.3% ✅ |
-| Subscribe + update (1K) | 2,105 | 0.47 | 1.24 | ±2.7% ✅ |
-| Concurrent subscriptions | 21,063 | 0.048 | 0.17 | ±4.2% ✅ |
-| Function update (1K) | 2,019 | 0.50 | 2.28 | ±4.3% ✅ |
-| Rapid set/get cycles | 1,207 | 0.83 | 3.10 | ±12.5% ⚠️ |
+| Operation                 | ops/sec | mean (ms) | p99 (ms) | Stability |
+| ------------------------- | ------- | --------- | -------- | --------- |
+| Get atom (10K iterations) | 3,365   | 0.30      | 1.26     | ±3.4% ✅  |
+| Set atom (10K iterations) | 150     | 6.64      | 20.30    | ±8.3% ✅  |
+| Subscribe + update (1K)   | 2,105   | 0.47      | 1.24     | ±2.7% ✅  |
+| Concurrent subscriptions  | 21,063  | 0.048     | 0.17     | ±4.2% ✅  |
+| Function update (1K)      | 2,019   | 0.50      | 2.28     | ±4.3% ✅  |
+| Rapid set/get cycles      | 1,207   | 0.83      | 3.10     | ±12.5% ⚠️ |
 
 ### Computed Atoms
 
-| Operation | ops/sec | mean (ms) | p99 (ms) |
-|-----------|---------|-----------|----------|
-| 1 dependency | 572 | 1.75 | 4.63 |
-| 5 dependencies | 98 | 10.17 | 18.88 |
-| 10 dependencies | 25 | 39.42 | 57.28 ⚠️ |
-| Chain of 5 | 253 | 3.94 | 6.07 |
-| Chain of 10 | 139 | 7.19 | 10.82 |
-| Diamond dependency | 320 | 3.12 | 9.19 |
+| Operation          | ops/sec | mean (ms) | p99 (ms) |
+| ------------------ | ------- | --------- | -------- |
+| 1 dependency       | 572     | 1.75      | 4.63     |
+| 5 dependencies     | 98      | 10.17     | 18.88    |
+| 10 dependencies    | 25      | 39.42     | 57.28 ⚠️ |
+| Chain of 5         | 253     | 3.94      | 6.07     |
+| Chain of 10        | 139     | 7.19      | 10.82    |
+| Diamond dependency | 320     | 3.12      | 9.19     |
 
 ### Comparison with Competitors
 
-| Metric | Nexus State | Zustand | Jotai | Redux Toolkit |
-|--------|-------------|---------|-------|---------------|
-| Bundle Size (min+gzip) | 4.2KB | 1KB | 12KB | 13KB |
-| Get atom (single) | 0.03ms | 0.02ms | 0.04ms | 0.08ms |
-| Set atom (single) | 0.66ms | 0.45ms | 0.72ms | 1.2ms |
-| Computed (1 dep) | 1.75ms | 1.2ms | 2.1ms | 3.5ms |
-| Memory (1000 atoms) | 2.1MB | 1.8MB | 3.2MB | 4.5MB |
+| Metric                 | Nexus State | Zustand | Jotai  | Redux Toolkit |
+| ---------------------- | ----------- | ------- | ------ | ------------- |
+| Bundle Size (min+gzip) | 4.2KB       | 1KB     | 12KB   | 13KB          |
+| Get atom (single)      | 0.03ms      | 0.02ms  | 0.04ms | 0.08ms        |
+| Set atom (single)      | 0.66ms      | 0.45ms  | 0.72ms | 1.2ms         |
+| Computed (1 dep)       | 1.75ms      | 1.2ms   | 2.1ms  | 3.5ms         |
+| Memory (1000 atoms)    | 2.1MB       | 1.8MB   | 3.2MB  | 4.5MB         |
 
 > **Note:** Competitor benchmarks from public sources. Actual results may vary based on environment and use case.
 
@@ -344,11 +347,13 @@ MobX:          ██████████████ 14KB
 ### Performance Notes
 
 ✅ **Strengths:**
+
 - Fast concurrent subscriptions (21K ops/sec)
 - Efficient function updates (2K ops/sec)
 - Low overhead for simple operations
 
 ⚠️ **Areas for optimization:**
+
 - Computed atoms with 10+ dependencies show degradation (39ms → target: <20ms)
 - High variance in memory cleanup operations (under investigation)
 
@@ -358,64 +363,67 @@ MobX:          ██████████████ 14KB
 
 ## 📊 Comparison
 
-| Feature | Nexus State | Zustand | Jotai | Redux Toolkit | MobX |
-|---------|-------------|---------|-------|---------------|------|
+| Feature               | Nexus State | Zustand     | Jotai   | Redux Toolkit | MobX    |
+| --------------------- | ----------- | ----------- | ------- | ------------- | ------- |
 | **Framework Support** |
-| React | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Vue | ✅ | ❌ | ❌ | ❌ | ✅ |
-| Svelte | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Vanilla JS | ✅ | ✅ | ❌ | ✅ | ✅ |
-| **Architecture** |
-| Atom-based | ✅ | ❌ | ✅ | ❌ | ❌ |
-| Store-based | ✅ | ✅ | ❌ | ✅ | ✅ |
-| **Features** |
-| Time Travel | ✅ Built-in | ❌ | ❌ | ✅ Plugin | ❌ |
-| DevTools | ✅ | Plugin | Plugin | ✅ | Plugin |
-| Persistence | ✅ Plugin | ✅ Built-in | ❌ | Plugin | Plugin |
-| TypeScript | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full |
-| **Performance** |
-| Bundle Size | 4.2KB | 1KB | 12KB | 13KB | 14KB |
-| Tree-shakable | ✅ | ✅ | ✅ | ⚠️ Partial | ❌ |
-| **DX** |
-| Learning Curve | Medium | Low | Medium | High | Medium |
-| Boilerplate | Low | Low | Low | High | Medium |
+| React                 | ✅          | ✅          | ✅      | ✅            | ✅      |
+| Vue                   | ✅          | ❌          | ❌      | ❌            | ✅      |
+| Svelte                | ✅          | ❌          | ❌      | ❌            | ❌      |
+| Vanilla JS            | ✅          | ✅          | ❌      | ✅            | ✅      |
+| **Architecture**      |
+| Atom-based            | ✅          | ❌          | ✅      | ❌            | ❌      |
+| Store-based           | ✅          | ✅          | ❌      | ✅            | ✅      |
+| **Features**          |
+| Time Travel           | ✅ Built-in | ❌          | ❌      | ✅ Plugin     | ❌      |
+| DevTools              | ✅          | Plugin      | Plugin  | ✅            | Plugin  |
+| Persistence           | ✅ Plugin   | ✅ Built-in | ❌      | Plugin        | Plugin  |
+| TypeScript            | ✅ Full     | ✅ Full     | ✅ Full | ✅ Full       | ✅ Full |
+| **Performance**       |
+| Bundle Size           | 4.2KB       | 1KB         | 12KB    | 13KB          | 14KB    |
+| Tree-shakable         | ✅          | ✅          | ✅      | ⚠️ Partial    | ❌      |
+| **DX**                |
+| Learning Curve        | Medium      | Low         | Medium  | High          | Medium  |
+| Boilerplate           | Low         | Low         | Low     | High          | Medium  |
 
 ---
 
 ## 📦 Packages
 
-| Package | Description |
-|---------|-------------|
-| [@nexus-state/core](packages/core) | Core library |
-| [@nexus-state/react](packages/react) | React integration |
-| [@nexus-state/vue](packages/vue) | Vue integration |
-| [@nexus-state/svelte](packages/svelte) | Svelte integration |
-| [@nexus-state/persist](packages/persist) | Persistence plugin |
-| [@nexus-state/devtools](packages/devtools) | DevTools plugin |
-| [@nexus-state/middleware](packages/middleware) | Middleware plugin |
-| [@nexus-state/immer](packages/immer) | Immer integration |
-| [@nexus-state/web-worker](packages/web-worker) | Web Worker integration |
-| [@nexus-state/async](packages/async) | Async state management |
-| [@nexus-state/family](packages/family) | Atom family utilities |
-| [@nexus-state/cli](packages/cli) | CLI tools |
-| [@nexus-state/query](packages/query) | Data fetching & caching |
-| [@nexus-state/form](packages/form) | Form management |
+| Package                                        | Description             |
+| ---------------------------------------------- | ----------------------- |
+| [@nexus-state/core](packages/core)             | Core library            |
+| [@nexus-state/react](packages/react)           | React integration       |
+| [@nexus-state/vue](packages/vue)               | Vue integration         |
+| [@nexus-state/svelte](packages/svelte)         | Svelte integration      |
+| [@nexus-state/persist](packages/persist)       | Persistence plugin      |
+| [@nexus-state/devtools](packages/devtools)     | DevTools plugin         |
+| [@nexus-state/middleware](packages/middleware) | Middleware plugin       |
+| [@nexus-state/immer](packages/immer)           | Immer integration       |
+| [@nexus-state/web-worker](packages/web-worker) | Web Worker integration  |
+| [@nexus-state/async](packages/async)           | Async state management  |
+| [@nexus-state/family](packages/family)         | Atom family utilities   |
+| [@nexus-state/cli](packages/cli)               | CLI tools               |
+| [@nexus-state/query](packages/query)           | Data fetching & caching |
+| [@nexus-state/form](packages/form)             | Form management         |
 
 ---
 
 ## 🗺️ Roadmap
 
 ### Q2 2026
+
 - [ ] v1.0 Release
 - [ ] Query package stabilization
 - [ ] Form package stabilization
 
 ### Q3 2026
+
 - [ ] VSCode Extension
 - [ ] Performance optimization (<3KB core)
 - [ ] React Suspense integration
 
 ### Q4 2026
+
 - [ ] Angular adapter
 - [ ] Solid.js adapter
 - [ ] State visualizer tool
@@ -427,17 +435,19 @@ MobX:          ██████████████ 14KB
 We welcome contributions! See our [Contributing Guide](docs/community/contributing.md) for details.
 
 ### Good First Issues
-- [Link to good first issues](https://github.com/astashkin-a/nexus-state/contribute)
+
+- [Link to good first issues](https://github.com/eustatos/nexus-state/contribute)
 
 ### Join Our Community
-- 💬 [GitHub Discussions](https://github.com/astashkin-a/nexus-state/discussions)
+
+- 💬 [GitHub Discussions](https://github.com/eustatos/nexus-state/discussions)
 - 📖 [Documentation](https://nexus-state.website.yandexcloud.net/)
 
 ### Development Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/astashkin-a/nexus-state.git
+git clone https://github.com/eustatos/nexus-state.git
 cd nexus-state
 
 # Install dependencies

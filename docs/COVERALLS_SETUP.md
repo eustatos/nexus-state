@@ -43,7 +43,7 @@ Value: <ваш_токен_из_Coveralls>
 Бейдж покрытия уже добавлен в начало `README.md`:
 
 ```markdown
-[![Coverage Status](https://coveralls.io/repos/github/astashkin-a/nexus-state/badge.svg?branch=main)](https://coveralls.io/github/astashkin-a/nexus-state?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
 ```
 
 ## 🚀 Шаг 5: Проверка работы
@@ -115,13 +115,13 @@ coverage: {
 
 ## ⚠️ Возможные проблемы и решения
 
-| Проблема | Решение |
-|----------|---------|
-| `No coverage files found` | Проверьте, что тесты запускаются с `--coverage` |
-| `Repo not found` | Убедитесь, что репозиторий активирован на coveralls.io |
-| `Permission denied` | Проверьте `COVERALLS_REPO_TOKEN` в secrets |
-| Monorepo не работает | Workflow автоматически объединяет lcov файлы |
-| Покрытие 0% | Проверьте `include` в vitest.config.js |
+| Проблема                  | Решение                                                |
+| ------------------------- | ------------------------------------------------------ |
+| `No coverage files found` | Проверьте, что тесты запускаются с `--coverage`        |
+| `Repo not found`          | Убедитесь, что репозиторий активирован на coveralls.io |
+| `Permission denied`       | Проверьте `COVERALLS_REPO_TOKEN` в secrets             |
+| Monorepo не работает      | Workflow автоматически объединяет lcov файлы           |
+| Покрытие 0%               | Проверьте `include` в vitest.config.js                 |
 
 ## 🔗 Полезные ссылки
 
@@ -144,8 +144,9 @@ coverage: {
 ```
 
 Бейдж:
+
 ```markdown
-[![Codecov](https://codecov.io/gh/astashkin-a/nexus-state/branch/main/graph/badge.svg)](https://codecov.io/gh/astashkin-a/nexus-state)
+[![Codecov](https://codecov.io/gh/eustatos/nexus-state/branch/main/graph/badge.svg)](https://codecov.io/gh/eustatos/nexus-state)
 ```
 
 ---
