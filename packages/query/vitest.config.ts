@@ -1,11 +1,16 @@
 import { defineConfig } from 'vitest/config';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   resolve: {
     alias: {
       '@nexus-state/core': path.resolve(__dirname, '../core/src'),
       '@nexus-state/react': path.resolve(__dirname, '../react/src'),
+      // Add alias for tests to use node_modules (for pnpm symlink support)
+      '@nexus-state/react$': path.resolve(__dirname, '../react/src'),
     },
   },
   esbuild: {

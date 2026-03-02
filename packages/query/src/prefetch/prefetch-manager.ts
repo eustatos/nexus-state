@@ -23,8 +23,8 @@ export function createPrefetchManager(): PrefetchManager {
     const queryKey = serializeKey(options.queryKey);
     const staleTime = options.staleTime ?? 0;
 
-    // Check if already cached and fresh (unless force is true)
-    if (!options.force && !cache.isStale(queryKey)) {
+        // Check if already cached and fresh (unless force is true)
+    if (!options.force && !cache.isStale(queryKey, staleTime)) {
       return;
     }
 

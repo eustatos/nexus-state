@@ -97,13 +97,13 @@ export class SuspenseQueryCache {
     }
   }
 
-  /**
+    /**
    * Check if data is stale
    * @param queryKey - Unique key for the query
    * @param staleTime - Time in ms before data is considered stale
    * @returns true if data is stale or not cached
    */
-  private isStale(queryKey: string, staleTime: number): boolean {
+  public isStale(queryKey: string, staleTime: number = 0): boolean {
     const cached = this.cache.get(queryKey);
     if (!cached) return true;
 
