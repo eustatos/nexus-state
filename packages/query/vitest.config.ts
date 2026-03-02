@@ -1,9 +1,22 @@
 import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@nexus-state/core': path.resolve(__dirname, '../core/src'),
+      '@nexus-state/react': path.resolve(__dirname, '../react/src'),
+    },
+  },
+  esbuild: {
+    target: 'es2020',
+  },
   test: {
     globals: true,
     environment: 'jsdom',
+    transformMode: {
+      web: [/\.tsx?$/],
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
@@ -19,5 +32,8 @@ export default defineConfig({
         '**/coverage/**'
       ]
     }
-  }
+  },
+  ssr: {
+    noExternal: ['@nexus-state/core', '@nexus-state/react'],
+  },
 });
