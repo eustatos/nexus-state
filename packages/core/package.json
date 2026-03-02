@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/core",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
