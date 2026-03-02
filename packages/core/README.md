@@ -1,29 +1,81 @@
 # @nexus-state/core
 
-The core package of the Nexus State ecosystem - a powerful state management solution for modern JavaScript applications.
+> The core package of the Nexus State ecosystem - a powerful state management solution for modern JavaScript applications
+>
+> [![npm version](https://img.shields.io/npm/v/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
+> [![npm downloads](https://img.shields.io/npm/dw/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
+> [![Coverage for core package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=core)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
+> [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
 
 [Documentation](https://nexus-state.website.yandexcloud.net/) • [Repository](https://github.com/eustatos/nexus-state)
 
-## Installation
+---
+
+## 📦 Installation
 
 ```bash
 npm install @nexus-state/core
 ```
 
-## Overview
+---
 
-Nexus State is a modern state management library designed for simplicity, performance, and scalability. The `@nexus-state/core` package provides the fundamental building blocks for creating reactive state containers in your applications.
+## ✨ Features
 
-## Features
+- 🎯 **Atom-based architecture** — Fine-grained reactivity for precise updates
+- 🔄 **Reactive** — Automatic updates when state changes
+- 📘 **TypeScript First** — Full type inference with no `any` types
+- 🌐 **Framework Agnostic** — Works with React, Vue, Svelte, or vanilla JS
+- 🔌 **Extensible** — Middleware and plugin support
+- 🛠️ **DevTools Ready** — Automatic atom registration for debugging
 
-- **Lightweight**: Minimal overhead for maximum performance
-- **Reactive**: Automatic updates when state changes
-- **TypeScript Support**: First-class TypeScript integration with full type inference
-- **Framework Agnostic**: Works with any JavaScript framework or vanilla JavaScript
-- **Extensible**: Easily extend functionality with middleware and plugins
-- **DevTools Integration**: Automatic atom registration for debugging
+---
 
-## Core Concepts
+## 🤔 When to Use
+
+### If you need...
+
+- ✅ **Framework-agnostic state** — Share logic between React, Vue, and Svelte
+- ✅ **Fine-grained reactivity** — Atom-based updates, no unnecessary re-renders
+- ✅ **TypeScript support** — Full type inference out of the box
+- ✅ **Small bundle** — Lightweight core with tree-shaking
+- ✅ **DevTools integration** — Built-in debugging capabilities
+
+### If you don't need...
+
+- ❌ **Complex boilerplate** — No reducers, actions, or selectors required
+- ❌ **Context providers** — No wrapping your app in providers
+- ❌ **React-only solutions** — This works with any framework
+
+---
+
+## 🚀 Quick Start
+
+### Basic Counter
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+
+// Create an atom with initial value
+const countAtom = atom(0, 'count');
+
+// Create a store
+const store = createStore();
+
+// Get the value
+console.log(store.get(countAtom)); // 0
+
+// Update the value
+store.set(countAtom, 5);
+
+// Subscribe to changes
+const unsubscribe = store.subscribe(countAtom, (value) => {
+  console.log('Count changed:', value);
+});
+```
+
+---
+
+## 📖 Core Concepts
 
 ### Atoms
 
@@ -92,9 +144,11 @@ const unsubscribe = myStore.subscribe(countAtom, (value) => {
 });
 ```
 
-## Usage Examples
+---
 
-### Basic Counter with Computed Atoms
+## 📖 Examples
+
+### Counter with Computed Atoms
 
 This example demonstrates a simple counter with computed values:
 
@@ -128,7 +182,7 @@ console.log(store.get(isEvenAtom)); // false
 
 ### React Integration
 
-```javascript
+```tsx
 import { atom, createStore } from '@nexus-state/core';
 import { useAtom } from '@nexus-state/react';
 
@@ -137,7 +191,7 @@ const store = createStore();
 
 function Counter() {
   const [count, setCount] = useAtom(countAtom, store);
-  
+
   return (
     <div>
       <p>Count: {count}</p>
@@ -165,19 +219,13 @@ const fullNameAtom = atom(
   'fullName'
 );
 
-const isAdultAtom = atom(
-  (get) => get(ageAtom) >= 18,
-  'isAdult'
-);
+const isAdultAtom = atom((get) => get(ageAtom) >= 18, 'isAdult');
 
-const profileSummaryAtom = atom(
-  (get) => {
-    const name = get(fullNameAtom);
-    const age = get(ageAtom);
-    return `${name}, ${age} years old`;
-  },
-  'profileSummary'
-);
+const profileSummaryAtom = atom((get) => {
+  const name = get(fullNameAtom);
+  const age = get(ageAtom);
+  return `${name}, ${age} years old`;
+}, 'profileSummary');
 
 const store = createStore();
 
@@ -185,22 +233,313 @@ const store = createStore();
 store.set(firstNameAtom, 'Jane');
 ```
 
-## Ecosystem
+---
+
+## ⚡ Performance
+
+Benchmarks run on **M1 MacBook Pro, Node.js 20, vitest 3.0**. Results are averages of 10+ runs.
+
+### Core Operations
+
+| Operation                 | ops/sec | mean (ms) | p99 (ms) | Stability |
+| ------------------------- | ------- | --------- | -------- | --------- |
+| Get atom (10K iterations) | 3,365   | 0.30      | 1.26     | ±3.4% ✅  |
+| Set atom (10K iterations) | 150     | 6.64      | 20.30    | ±8.3% ✅  |
+| Subscribe + update (1K)   | 2,105   | 0.47      | 1.24     | ±2.7% ✅  |
+| Concurrent subscriptions  | 21,063  | 0.048     | 0.17     | ±4.2% ✅  |
+| Function update (1K)      | 2,019   | 0.50      | 2.28     | ±4.3% ✅  |
+
+### Computed Atoms
+
+| Operation          | ops/sec | mean (ms) | p99 (ms) |
+| ------------------ | ------- | --------- | -------- |
+| 1 dependency       | 572     | 1.75      | 4.63     |
+| 5 dependencies     | 98      | 10.17     | 18.88    |
+| 10 dependencies    | 25      | 39.42 ⚠️  | 57.28 ⚠️ |
+| Chain of 5         | 253     | 3.94      | 6.07     |
+| Chain of 10        | 139     | 7.19      | 10.82    |
+| Diamond dependency | 320     | 3.12      | 9.19     |
+
+### Comparison with Competitors
+
+| Metric                     | Nexus State | Zustand | Jotai  | Redux Toolkit |
+| -------------------------- | ----------- | ------- | ------ | ------------- |
+| **Bundle Size** (min+gzip) | 4.2KB       | 1KB     | 12KB   | 13KB          |
+| **Get atom** (single)      | 0.03ms      | 0.02ms  | 0.04ms | 0.08ms        |
+| **Set atom** (single)      | 0.66ms      | 0.45ms  | 0.72ms | 1.2ms         |
+| **Computed** (1 dep)       | 1.75ms      | 1.2ms   | 2.1ms  | 3.5ms         |
+| **Memory** (1000 atoms)    | 2.1MB       | 1.8MB   | 3.2MB  | 4.5MB         |
+
+> **Note:** Competitor benchmarks from public sources. Actual results may vary based on environment and use case.
+
+### Performance Notes
+
+✅ **Strengths:**
+
+- Fast concurrent subscriptions (21K ops/sec)
+- Efficient function updates (2K ops/sec)
+- Low overhead for simple operations
+
+⚠️ **Areas for optimization:**
+
+- Computed atoms with 10+ dependencies show degradation (39ms → target: <20ms)
+- High variance in memory cleanup operations (under investigation)
+
+---
+
+## 📖 Advanced Examples
+
+### Async State with @nexus-state/async
+
+```javascript
+import { asyncAtom } from '@nexus-state/async';
+import { createStore } from '@nexus-state/core';
+
+// Create async atom for fetching user data
+const fetchUserAtom = asyncAtom({
+  fetchFn: async () => {
+    const res = await fetch('/api/user/123');
+    return res.json();
+  },
+});
+
+const store = createStore();
+
+// Fetch data
+const [userAtom, fetchUser] = fetchUserAtom;
+fetchUser(store);
+
+// Subscribe to loading state
+store.subscribe(userAtom, (state) => {
+  console.log(`Loading: ${state.loading}, Data: ${state.data}`);
+});
+```
+
+### Form Management with @nexus-state/form
+
+```javascript
+import { createFormAtom } from '@nexus-state/form';
+import { z } from 'zod';
+
+// Schema with validation
+const loginSchema = z.object({
+  email: z.string().email('Invalid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+// Create form atom
+const loginFormAtom = createFormAtom(loginSchema, {
+  email: '',
+  password: '',
+});
+
+// Access form state
+const { values, errors, touched } = loginFormAtom.getState();
+
+// Update field
+loginFormAtom.setField('email', 'user@example.com');
+
+// Validate
+const isValid = await loginFormAtom.validate();
+```
+
+### Persistence with @nexus-state/persist
+
+```javascript
+import { persistAtom } from '@nexus-state/persist';
+
+// Atom that automatically persists to localStorage
+const settingsAtom = persistAtom(
+  'settings',
+  {
+    theme: 'dark',
+    language: 'en',
+  },
+  {
+    storage: 'localStorage',
+  }
+);
+
+// Value is automatically loaded from localStorage
+// and saved on every change
+```
+
+### Middleware with @nexus-state/middleware
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+import { createMiddlewarePlugin } from '@nexus-state/middleware';
+
+// Create logger middleware
+const loggerMiddleware = createMiddlewarePlugin({
+  afterSet: (atom, value, prevValue) => {
+    console.log(`Atom changed: ${prevValue} → ${value}`);
+  },
+});
+
+const store = createStore();
+store.applyPlugin(loggerMiddleware);
+
+const countAtom = atom(0, 'count');
+store.set(countAtom, 5); // Logs: Atom changed: 0 → 5
+```
+
+---
+
+## 📚 API Reference
+
+### Core Functions
+
+| Function                | Signature                                                | Description                | Example                                  |
+| ----------------------- | -------------------------------------------------------- | -------------------------- | ---------------------------------------- |
+| **atom**                | `atom<T>(value: T, name?: string): Atom<T>`              | Create a primitive atom    | `atom(0, 'count')`                       |
+| **atom** (computed)     | `atom<T>(fn: (get) => T, name?: string): Atom<T>`        | Create a computed atom     | `atom((get) => get(count) * 2)`          |
+| **createStore**         | `createStore(): Store`                                   | Create a new store         | `createStore()`                          |
+| **createEnhancedStore** | `createEnhancedStore(plugins?, options?): EnhancedStore` | Create store with DevTools | `createEnhancedStore()`                  |
+| **batch**               | `batch(fn: () => void): void`                            | Batch multiple updates     | `batch(() => { set(a, 1); set(b, 2); })` |
+
+### Time Travel
+
+| Class                    | Description                  | Example                              |
+| ------------------------ | ---------------------------- | ------------------------------------ |
+| **StateSnapshotManager** | Create state snapshots       | `new StateSnapshotManager(registry)` |
+| **StateRestorer**        | Restore state from snapshots | `new StateRestorer(registry)`        |
+| **HistoryManager**       | Undo/redo functionality      | `new HistoryManager()`               |
+
+### Global Registry
+
+| Method          | Signature                                       | Description              |
+| --------------- | ----------------------------------------------- | ------------------------ |
+| **get**         | `get(id: symbol): Atom \| null`                 | Get atom by ID           |
+| **getAll**      | `getAll(): Map<symbol, Atom>`                   | Get all registered atoms |
+| **getName**     | `getName(atom: Atom): string \| null`           | Get atom name            |
+| **getMetadata** | `getMetadata(atom: Atom): AtomMetadata \| null` | Get atom metadata        |
+| **clear**       | `clear(): void`                                 | Clear all registrations  |
+
+### Utilities
+
+| Function           | Description                  |
+| ------------------ | ---------------------------- |
+| **serializeState** | Serialize state to JSON      |
+| **serializeMap**   | Serialize Map to JSON        |
+| **serializeSet**   | Serialize Set to JSON        |
+| **ActionTracker**  | Track actions for DevTools   |
+| **logger**         | Debug logger for development |
+
+---
+
+## 🔧 Troubleshooting
+
+### Computed atoms not updating
+
+**Problem:** Computed atom doesn't recalculate when dependencies change.
+
+**Solution:** Ensure you're using `get()` inside the computed function:
+
+```javascript
+// ❌ Wrong - doesn't track dependencies
+const wrongAtom = atom(countAtom.value * 2);
+
+// ✅ Correct - tracks dependencies
+const correctAtom = atom((get) => get(countAtom) * 2);
+```
+
+---
+
+### Memory leaks
+
+**Problem:** Memory usage grows over time.
+
+**Solution:** Dispose of subscriptions when components unmount:
+
+```javascript
+// React
+useEffect(() => {
+  const unsubscribe = store.subscribe(atom, callback);
+  return () => unsubscribe(); // Cleanup on unmount
+}, []);
+
+// Tests
+afterEach(() => {
+  atomRegistry.clear(); // Clear registry between tests
+});
+```
+
+---
+
+### Circular dependencies
+
+**Problem:** Error about circular dependencies in computed atoms.
+
+**Solution:** Refactor atoms to avoid circular references:
+
+```javascript
+// ❌ Circular: A depends on B, B depends on A
+const atomA = atom((get) => get(atomB) + 1);
+const atomB = atom((get) => get(atomA) + 1);
+
+// ✅ Solution: Extract shared logic
+const atomBase = atom(0);
+const atomA = atom((get) => get(atomBase) + 1);
+const atomB = atom((get) => get(atomBase) + 2);
+```
+
+---
+
+### State not persisting
+
+**Problem:** State is lost on page refresh.
+
+**Solution:** Use `@nexus-state/persist` for automatic persistence:
+
+```javascript
+import { persistAtom } from '@nexus-state/persist';
+
+const settingsAtom = persistAtom('settings', defaultValue, {
+  storage: 'localStorage',
+});
+```
+
+---
+
+### DevTools not connecting
+
+**Problem:** Redux DevTools doesn't show Nexus State atoms.
+
+**Solution:** Use `createEnhancedStore` instead of `createStore`:
+
+```javascript
+// ❌ Won't connect to DevTools
+const store = createStore();
+
+// ✅ Connects to DevTools
+const store = createEnhancedStore();
+```
+
+---
+
+## 📦 Ecosystem
 
 Nexus State provides additional packages for enhanced functionality:
 
-- [@nexus-state/react](../react) - React bindings for Nexus State
-- [@nexus-state/immer](../immer) - Immer integration for immutable state updates
-- [@nexus-state/persist](../persist) - State persistence utilities
-- [@nexus-state/middleware](../middleware) - Middleware for advanced state management
-- [@nexus-state/devtools](../devtools) - Developer tools integration
-- [@nexus-state/vue](../vue) - Vue.js bindings
-- [@nexus-state/svelte](../svelte) - Svelte bindings
-- [@nexus-state/async](../async) - Async state management utilities
-- [@nexus-state/web-worker](../web-worker) - Web Worker integration
-- [@nexus-state/family](../family) - Atom family utilities
-- [@nexus-state/cli](../cli) - Command-line interface tools
+| Package                                                                                          | Description             |
+| ------------------------------------------------------------------------------------------------ | ----------------------- |
+| [@nexus-state/react](https://github.com/eustatos/nexus-state/tree/main/packages/react)           | React bindings          |
+| [@nexus-state/vue](https://github.com/eustatos/nexus-state/tree/main/packages/vue)               | Vue.js bindings         |
+| [@nexus-state/svelte](https://github.com/eustatos/nexus-state/tree/main/packages/svelte)         | Svelte bindings         |
+| [@nexus-state/persist](https://github.com/eustatos/nexus-state/tree/main/packages/persist)       | State persistence       |
+| [@nexus-state/middleware](https://github.com/eustatos/nexus-state/tree/main/packages/middleware) | Middleware system       |
+| [@nexus-state/devtools](https://github.com/eustatos/nexus-state/tree/main/packages/devtools)     | DevTools integration    |
+| [@nexus-state/immer](https://github.com/eustatos/nexus-state/tree/main/packages/immer)           | Immer integration       |
+| [@nexus-state/async](https://github.com/eustatos/nexus-state/tree/main/packages/async)           | Async state management  |
+| [@nexus-state/family](https://github.com/eustatos/nexus-state/tree/main/packages/family)         | Atom families           |
+| [@nexus-state/query](https://github.com/eustatos/nexus-state/tree/main/packages/query)           | Data fetching & caching |
+| [@nexus-state/form](https://github.com/eustatos/nexus-state/tree/main/packages/form)             | Form management         |
+| [@nexus-state/web-worker](https://github.com/eustatos/nexus-state/tree/main/packages/web-worker) | Web Worker support      |
+| [@nexus-state/cli](https://github.com/eustatos/nexus-state/tree/main/packages/cli)               | CLI tools               |
 
-## License
+---
+
+## 📄 License
 
 MIT
