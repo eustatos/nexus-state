@@ -24,7 +24,7 @@ jobs:
           version: 10
       
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --shamefully-hoist
       
       - name: Run tests with coverage
         run: pnpm test:coverage
