@@ -131,8 +131,9 @@ const result = await updateUser.mutateAsync({ id: 1, name: 'John' });
 - ✅ Error boundary integration
 - ✅ SSR compatible
 - ✅ React Suspense support
-- ✅ Prefetching utilities
-- ⬜ Infinite Queries (coming soon)
+- ✅ Advanced prefetching utilities
+- ✅ Infinite Queries for pagination
+- ✅ Built-in DevTools panel
 
 ## React API
 
@@ -369,7 +370,9 @@ function GlobalLoadingIndicator() {
 
 ### Prefetching
 
-Prefetch query data before component renders for optimal loading states.
+Proactively load data for improved perceived performance.
+
+#### Programmatic Prefetch
 
 ```tsx
 import { prefetchQuery, prefetchQueries, setQueryData, getQueryData, invalidateQuery } from '@nexus-state/query/react';
@@ -404,6 +407,333 @@ invalidateQuery('users');
 - `setQueryData(key, data)` - Set query data manually
 - `getQueryData(key)` - Get query data without suspending
 - `invalidateQuery(key)` - Invalidate query cache
+
+#### usePrefetch Hook
+
+```tsx
+import { usePrefetch } from '@nexus-state/query/react';
+
+function UserList() {
+  const prefetchUser = usePrefetch();
+
+  return (
+    <div>
+      {users.map(user => (
+        <div
+          key={user.id}
+          onMouseEnter={() => prefetchUser({
+            queryKey: `user-${user.id}`,
+            queryFn: () => fetchUser(user.id),
+            staleTime: 5 * 60 * 1000,
+          })}
+        >
+          {user.name}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+#### Hover Prefetch
+
+```tsx
+import { usePrefetchOnHover } from '@nexus-state/query/react';
+
+function UserLink({ userId }) {
+  const { onMouseEnter, onMouseLeave } = usePrefetchOnHover({
+    queryKey: `user-${userId}`,
+    queryFn: () => fetchUser(userId),
+    delay: 200, // Wait 200ms before prefetching
+  });
+
+  return (
+    <a href={`/users/${userId}`} {...{ onMouseEnter, onMouseLeave }}>
+      View Profile
+    </a>
+  );
+}
+```
+
+#### PrefetchLink Component
+
+```tsx
+import { PrefetchLink } from '@nexus-state/query/react';
+
+<PrefetchLink
+  href="/users/1"
+  prefetch={{
+    queryKey: 'user-1',
+    queryFn: () => fetchUser(1),
+  }}
+  prefetchDelay={150}
+>
+  View User
+</PrefetchLink>
+```
+
+#### Viewport Prefetch
+
+```tsx
+import { usePrefetchOnViewport } from '@nexus-state/query/react';
+
+function LazySection({ sectionId }) {
+  const ref = usePrefetchOnViewport({
+    queryKey: `section-${sectionId}`,
+    queryFn: () => fetchSection(sectionId),
+    threshold: 0.5, // Prefetch when 50% visible
+  });
+
+  return <div ref={ref}>...</div>;
+}
+```
+
+#### Idle Prefetch
+
+```tsx
+import { usePrefetchOnIdle } from '@nexus-state/query/react';
+
+function Page() {
+  // Prefetch when browser is idle
+  usePrefetchOnIdle([
+    {
+      queryKey: 'user',
+      queryFn: fetchUser,
+    },
+    {
+      queryKey: 'posts',
+      queryFn: fetchPosts,
+    },
+  ]);
+
+  return <div>...</div>;
+}
+```
+
+#### Focus Prefetch
+
+```tsx
+import { usePrefetchOnFocus } from '@nexus-state/query/react';
+
+function SearchInput() {
+  const { onFocus } = usePrefetchOnFocus({
+    queryKey: 'search-results',
+    queryFn: fetchSearchResults,
+    delay: 100,
+  });
+
+  return <input onFocus={onFocus} />;
+}
+```
+
+#### PrefetchManager API
+
+```tsx
+import { getPrefetchManager } from '@nexus-state/query';
+
+const manager = getPrefetchManager();
+
+// Prefetch with priority
+await manager.prefetch({
+  queryKey: 'important-data',
+  queryFn: fetchImportantData,
+  priority: 'high',
+  timeout: 5000,
+});
+
+// Cancel specific prefetch
+manager.cancel('important-data');
+
+// Cancel all prefetches
+manager.cancelAll();
+
+// Get prefetch status
+const status = manager.getPrefetchStatus('important-data');
+console.log(status?.status); // 'pending' | 'success' | 'error' | 'cancelled'
+```
+
+### Infinite Queries
+
+For infinite scrolling and pagination.
+
+#### Cursor-Based Pagination
+
+```tsx
+import { useInfiniteQuery } from '@nexus-state/query/react';
+
+interface PostsResponse {
+  posts: Post[];
+  nextCursor?: string;
+}
+
+function PostList() {
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery<PostsResponse, Error, string>({
+    queryKey: 'posts',
+    queryFn: async ({ pageParam }) => {
+      const response = await fetch(`/api/posts?cursor=${pageParam}`);
+      return response.json();
+    },
+    initialPageParam: '',
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+
+  return (
+    <div>
+      {data?.pages.map((page, i) => (
+        <div key={i}>
+          {page.posts.map((post) => (
+            <PostItem key={post.id} post={post} />
+          ))}
+        </div>
+      ))}
+
+      {hasNextPage && (
+        <button
+          onClick={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
+        >
+          {isFetchingNextPage ? 'Loading more...' : 'Load More'}
+        </button>
+      )}
+    </div>
+  );
+}
+```
+
+#### Offset-Based Pagination
+
+```tsx
+interface PostsResponse {
+  posts: Post[];
+  total: number;
+}
+
+function PostList() {
+  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
+    queryKey: 'posts',
+    queryFn: async ({ pageParam }) => {
+      const offset = pageParam as number;
+      const limit = 20;
+
+      const response = await fetch(
+        `/api/posts?offset=${offset}&limit=${limit}`
+      );
+      return response.json();
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      const loadedItems = allPages.reduce((sum, page) => sum + page.posts.length, 0);
+      return loadedItems < lastPage.total ? loadedItems : undefined;
+    },
+  });
+
+  // ... render
+}
+```
+
+#### Infinite Scroll with Intersection Observer
+
+```tsx
+import { useRef, useCallback } from 'react';
+
+function PostList() {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: 'posts',
+    queryFn: async ({ pageParam }) => {
+      const response = await fetch(`/api/posts?cursor=${pageParam}`);
+      return response.json();
+    },
+    initialPageParam: '',
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+  });
+
+  const observerRef = useRef<IntersectionObserver>();
+  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (isFetchingNextPage) return;
+
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+
+    if (node) observerRef.current.observe(node);
+  }, [isFetchingNextPage, fetchNextPage, hasNextPage]);
+
+  return (
+    <div>
+      {data?.pages.map((page, i) => (
+        <div key={i}>
+          {page.posts.map((post, j) => {
+            if (i === data.pages.length - 1 && j === page.posts.length - 1) {
+              return <div ref={lastElementRef} key={post.id}>{post.title}</div>;
+            }
+            return <div key={post.id}>{post.title}</div>;
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+#### Bi-directional Scrolling
+
+```tsx
+const {
+  data,
+  fetchNextPage,
+  fetchPreviousPage,
+  hasNextPage,
+  hasPreviousPage,
+} = useInfiniteQuery({
+  queryKey: 'messages',
+  queryFn: async ({ pageParam }) => {
+    // Fetch page
+  },
+  initialPageParam: 0,
+  getNextPageParam: (lastPage) => lastPage.nextCursor,
+  getPreviousPageParam: (firstPage) => firstPage.previousCursor,
+});
+```
+
+**Options:**
+- `queryKey` - Unique key for the infinite query
+- `queryFn` - Function to fetch data for a specific page (receives `pageParam` in context)
+- `initialPageParam` - The initial page parameter for the first page
+- `getNextPageParam` - Function to get the next page parameter from the last page
+- `getPreviousPageParam` - (Optional) Function to get the previous page parameter
+- `staleTime` - Time in ms before data is considered stale
+- `enabled` - Enable/disable the query
+- `retry` - Number of retry attempts
+- `onSuccess` - Callback on success
+- `onError` - Callback on error
+
+**Result:**
+- `data` - Object with `pages` array and `pageParams` array
+- `error` - Error if failed
+- `isLoading` - Initial loading state
+- `isSuccess` - Query succeeded
+- `isError` - Query failed
+- `isFetching` - Currently fetching any page
+- `isFetchingNextPage` - Currently fetching the next page
+- `isFetchingPreviousPage` - Currently fetching the previous page
+- `hasNextPage` - Whether there is a next page available
+- `hasPreviousPage` - Whether there is a previous page available
+- `fetchNextPage()` - Fetch the next page
+- `fetchPreviousPage()` - Fetch the previous page
+- `refetch()` - Refetch all pages
+- `remove()` - Remove the query from cache
 
 ### Error Boundaries
 
@@ -646,6 +976,84 @@ function UserComponent() {
   // data is typed as User | undefined
   // error is typed as Error | null
 }
+```
+
+## DevTools
+
+Visual debugging for queries and mutations with the built-in Query DevTools panel.
+
+### Setup
+
+```tsx
+import { QueryDevTools } from '@nexus-state/query/react';
+
+function App() {
+  return (
+    <>
+      <YourApp />
+      {process.env.NODE_ENV === 'development' && (
+        <QueryDevTools position="bottom-right" />
+      )}
+    </>
+  );
+}
+```
+
+### Features
+
+- **Query List**: See all active queries with their status
+- **State Inspection**: View data, errors, loading states
+- **Cache Control**: Invalidate, refetch, or remove queries
+- **Mutation Tracking**: Monitor mutation state and variables
+- **Network Timeline**: Track fetch timing and status
+- **Search**: Filter queries and mutations by key
+
+### Configuration
+
+```tsx
+<QueryDevTools
+  position="bottom-right" // or 'top-left', 'top-right', 'bottom-left'
+  initialIsOpen={false}
+  panelPosition="bottom" // or 'left', 'right'
+/>
+```
+
+### Programmatic API
+
+```tsx
+import {
+  getQueryDevToolsStore,
+  trackQuery,
+  trackMutation,
+} from '@nexus-state/query/devtools';
+
+// Get store instance
+const store = getQueryDevToolsStore();
+
+// Manually track a query
+trackQuery('my-query', {
+  queryKey: 'my-query',
+  status: 'success',
+  data: { foo: 'bar' },
+  error: null,
+  dataUpdatedAt: Date.now(),
+  errorUpdatedAt: 0,
+  isFetching: false,
+  isStale: false,
+  failureCount: 0,
+});
+
+// Clear cache
+store.clearCache();
+```
+
+### Production
+
+DevTools automatically excluded in production builds when using tree-shaking.
+
+```tsx
+// Only in development
+{process.env.NODE_ENV === 'development' && <QueryDevTools />}
 ```
 
 ## License

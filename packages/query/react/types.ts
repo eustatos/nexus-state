@@ -7,6 +7,9 @@ import type {
 import type { Store } from '@nexus-state/core';
 import type * as React from 'react';
 
+// Re-export DevTools types for convenience
+export type { QueryDevToolsConfig } from '../src/devtools/types';
+
 /**
  * Options for useQuery hook
  */
@@ -376,4 +379,208 @@ export interface PrefetchOptions<TData = unknown> {
   staleTime?: number;
   /** Force refetch even if cached */
   force?: boolean;
+}
+
+// ============================================================================
+// Infinite Query Types
+// ============================================================================
+
+/**
+ * Context object passed to the query function in useInfiniteQuery
+ */
+export interface InfiniteQueryPageParamContext<TPageParam = unknown> {
+  /** The page parameter for the current page */
+  pageParam: TPageParam;
+}
+
+/**
+ * Data structure returned by useInfiniteQuery
+ */
+export interface InfiniteData<TData = unknown> {
+  /** Array of pages data */
+  pages: TData[];
+  /** Array of page parameters used to fetch each page */
+  pageParams: unknown[];
+}
+
+/**
+ * Options for useInfiniteQuery hook
+ */
+export interface InfiniteQueryOptions<
+  TData = unknown,
+  TError = Error,
+  TPageParam = unknown,
+> {
+  /** Unique key for the infinite query */
+  queryKey: string | readonly unknown[];
+
+  /**
+   * Function to fetch data for a specific page
+   * @param context - Context object containing the page parameter
+   */
+  queryFn: (context: InfiniteQueryPageParamContext<TPageParam>) => Promise<TData>;
+
+  /**
+   * The initial page parameter to use for the first page
+   */
+  initialPageParam: TPageParam;
+
+  /**
+   * Function to get the next page parameter from the last page
+   * Return undefined to indicate there are no more pages
+   * @param lastPage - The last page data
+   * @param allPages - All pages data fetched so far
+   */
+  getNextPageParam: (
+    lastPage: TData,
+    allPages: TData[]
+  ) => TPageParam | undefined;
+
+  /**
+   * Function to get the previous page parameter from the first page
+   * Return undefined to indicate there are no previous pages
+   * @param firstPage - The first page data
+   * @param allPages - All pages data fetched so far
+   */
+  getPreviousPageParam?: (
+    firstPage: TData,
+    allPages: TData[]
+  ) => TPageParam | undefined;
+
+  /**
+   * Time in milliseconds before data is considered stale
+   * @default 0
+   */
+  staleTime?: number;
+
+  /**
+   * Enable/disable the query
+   * @default true
+   */
+  enabled?: boolean;
+
+  /**
+   * Number of retry attempts
+   * @default 3
+   */
+  retry?: number | boolean;
+
+  /**
+   * Callback on success
+   */
+  onSuccess?: (data: InfiniteData<TData>) => void;
+
+  /**
+   * Callback on error
+   */
+  onError?: (error: TError) => void;
+}
+
+/**
+ * Result from useInfiniteQuery hook
+ */
+export interface InfiniteQueryResult<TData = unknown, TError = Error> {
+  /**
+   * The fetched data with pages array
+   */
+  data: InfiniteData<TData> | undefined;
+
+  /**
+   * Error if failed
+   */
+  error: TError | null;
+
+  /**
+   * Initial loading state (only true on first load)
+   */
+  isLoading: boolean;
+
+  /**
+   * Query failed
+   */
+  isError: boolean;
+
+  /**
+   * Query succeeded
+   */
+  isSuccess: boolean;
+
+  /**
+   * Currently fetching any page
+   */
+  isFetching: boolean;
+
+  /**
+   * Currently fetching the next page
+   */
+  isFetchingNextPage: boolean;
+
+  /**
+   * Currently fetching the previous page
+   */
+  isFetchingPreviousPage: boolean;
+
+  /**
+   * Whether there is a next page available
+   */
+  hasNextPage: boolean;
+
+  /**
+   * Whether there is a previous page available
+   */
+  hasPreviousPage: boolean;
+
+  /**
+   * Fetch the next page
+   */
+  fetchNextPage: () => Promise<void>;
+
+  /**
+   * Fetch the previous page
+   */
+  fetchPreviousPage: () => Promise<void>;
+
+  /**
+   * Refetch all pages
+   */
+  refetch: () => Promise<void>;
+
+  /**
+   * Remove the infinite query from cache
+   */
+  remove: () => void;
+}
+
+// Re-export Prefetch types for convenience
+export type {
+  PrefetchPriority,
+  PrefetchTriggerType,
+  PrefetchTrigger,
+  PrefetchStatus,
+  PrefetchResult,
+  PrefetchManager,
+} from '../src/prefetch/types';
+
+/**
+ * Props for PrefetchLink component
+ */
+export interface PrefetchLinkProps
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  /** Prefetch options */
+  prefetch?: PrefetchOptions;
+
+  /** Delay before prefetching (ms) */
+  prefetchDelay?: number;
+}
+
+/**
+ * Props for PrefetchButton component
+ */
+export interface PrefetchButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Prefetch options */
+  prefetch?: PrefetchOptions;
+
+  /** Delay before prefetching (ms) */
+  prefetchDelay?: number;
 }
