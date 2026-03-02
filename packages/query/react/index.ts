@@ -30,6 +30,21 @@ export { useMutation } from './useMutation';
 export { useQueries } from './useQueries';
 export { useIsFetching } from './useIsFetching';
 export { useSuspenseQuery } from './useSuspenseQuery';
+export { useInfiniteQuery } from './useInfiniteQuery';
+export { QueryDevTools } from './QueryDevTools';
+
+// Prefetch hooks
+export {
+  usePrefetch,
+  usePrefetchOnHover,
+  usePrefetchOnViewport,
+  usePrefetchOnIdle,
+  usePrefetchOnFocus,
+} from './usePrefetch';
+
+// Prefetch components
+export { PrefetchLink, PrefetchButton } from './PrefetchLink';
+
 export {
   QueryClientProvider,
   createQueryClient,
@@ -60,4 +75,11 @@ export type {
   SuspenseQueryResult,
   QueryCacheEntry,
   PrefetchOptions,
+  InfiniteQueryOptions,
+  InfiniteQueryResult,
+  InfiniteData,
+  InfiniteQueryPageParamContext,
+  QueryDevToolsConfig,
+  PrefetchLinkProps,
+  PrefetchButtonProps,
 } from './types';

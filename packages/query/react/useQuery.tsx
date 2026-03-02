@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useAtomValue, useStore } from '@nexus-state/react';
 import { createQuery, executeQuery, getQueryCache } from '../src/query';
 import { useSuspenseQuery } from './useSuspenseQuery';
+import { trackQuery } from '../src/devtools/query-tracker';
 import type {
   UseQueryOptions,
   UseQueryResult,
@@ -128,6 +129,23 @@ export function useQuery<TData = unknown, TError = Error>(
       cache.set(stringQueryKey, newState.data, optionsRef.current.staleTime);
     }
   }, [store, queryAtom, stringQueryKey, cache]);
+
+  // Track in DevTools (development only)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      trackQuery(stringQueryKey, {
+        queryKey: stringQueryKey,
+        status: state.status,
+        data: state.data,
+        error: state.error,
+        dataUpdatedAt: state.dataUpdatedAt,
+        errorUpdatedAt: state.errorUpdatedAt,
+        isFetching: state.isFetching,
+        isStale,
+        failureCount: state.failureCount,
+      });
+    }
+  }, [stringQueryKey, state.status, state.data, state.error, state.dataUpdatedAt, state.errorUpdatedAt, state.isFetching, isStale, state.failureCount]);
 
   // Create result object with all required properties
   const result: UseQueryResult<TData, TError> = {

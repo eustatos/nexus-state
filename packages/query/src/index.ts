@@ -19,6 +19,31 @@ export {
   setSuspenseCache,
 } from './suspense-cache';
 
+// DevTools exports
+export {
+  createQueryDevToolsStore,
+  getQueryDevToolsStore,
+  setQueryDevToolsStore,
+  resetQueryDevToolsStore,
+} from './devtools/devtools-store';
+export {
+  trackQuery,
+  trackNetworkActivity,
+  updateNetworkActivity,
+  withDevToolsTracking,
+  trackMutation,
+  untrackQuery,
+  untrackMutation,
+} from './devtools/query-tracker';
+
+// Prefetch exports
+export {
+  createPrefetchManager,
+  getPrefetchManager,
+  setPrefetchManager,
+  resetPrefetchManager,
+} from './prefetch/prefetch-manager';
+
 export type {
   QueryOptions,
   QueryState,
@@ -37,6 +62,27 @@ export type {
   MutationResult,
   MutationStatus,
 } from './types';
+
+// Re-export DevTools types
+export type {
+  QueryDevToolsConfig,
+  QuerySnapshot,
+  MutationSnapshot,
+  NetworkActivityEntry,
+  QueryCacheSnapshot,
+  QueryDevToolsStore,
+} from './devtools/types';
+
+// Re-export Prefetch types
+export type {
+  PrefetchPriority,
+  PrefetchTriggerType,
+  PrefetchOptions as PrefetchOptionsBase,
+  PrefetchTrigger,
+  PrefetchStatus,
+  PrefetchResult,
+  PrefetchManager,
+} from './prefetch/types';
 
 // React exports
 export { useQuery as useReactQuery } from '../react/useQuery';
