@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 // Use adapter for renderHook to support React 17/18/19
 import { renderHook } from '../../src/__tests__/renderHook-adapter';
+import React from 'react';
 import {
   QueryClientProvider,
   createQueryClient,
@@ -32,11 +33,27 @@ describe('QueryClientProvider', () => {
   });
 
   it('should throw error when used outside provider', () => {
-    expect(() => {
+    let error: Error | null = null;
+    try {
       renderHook(() => useQueryClient());
-    }).toThrow(
-      'useQueryClient must be used within a QueryClientProvider'
-    );
+    } catch (e) {
+      error = e as Error;
+    }
+    
+    // React 18+: error thrown synchronously
+    if (error) {
+      expect(error.message).toContain('useQueryClient must be used within a QueryClientProvider');
+    } else {
+      // React 17: error logged to console
+      const consoleErrorSpy = vi.spyOn(console, 'error');
+      renderHook(() => useQueryClient());
+      expect(consoleErrorSpy).toHaveBeenCalled();
+      const errorMessage = consoleErrorSpy.mock.calls
+        .flat()
+        .some(call => typeof call === 'string' && call.includes('useQueryClient must be used within a QueryClientProvider'));
+      expect(errorMessage).toBe(true);
+      consoleErrorSpy.mockRestore();
+    }
   });
 
   it('should create query client with custom config', () => {
