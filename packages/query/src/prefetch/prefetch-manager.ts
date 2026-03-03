@@ -1,11 +1,11 @@
-import { getQueryCache } from '../query';
+import { getSuspenseCache } from '../suspense-cache';
 import type { PrefetchOptions, PrefetchResult, PrefetchManager } from './types';
 
 /**
  * Create a new instance of the Prefetch Manager
  */
 export function createPrefetchManager(): PrefetchManager {
-  const cache = getQueryCache();
+  const cache = getSuspenseCache();
   const abortControllers = new Map<string, AbortController>();
   const prefetchResults = new Map<string, PrefetchResult>();
 
@@ -23,8 +23,8 @@ export function createPrefetchManager(): PrefetchManager {
     const queryKey = serializeKey(options.queryKey);
     const staleTime = options.staleTime ?? 0;
 
-    // Check if already cached and fresh (unless force is true)
-    if (!options.force && !cache.isStale(queryKey)) {
+        // Check if already cached and fresh (unless force is true)
+    if (!options.force && !cache.isStale(queryKey, staleTime)) {
       return;
     }
 
@@ -65,8 +65,8 @@ export function createPrefetchManager(): PrefetchManager {
         return;
       }
 
-      // Update cache
-      cache.set(queryKey, data, staleTime);
+      // Update cache using setQueryData
+      cache.setQueryData(queryKey, data);
 
       // Update result
       result.status = 'success';

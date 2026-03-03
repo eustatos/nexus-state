@@ -5,7 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@nexus-state/core': path.resolve(__dirname, '../core/src'),
-      '@nexus-state/react': path.resolve(__dirname, '../react/src'),
+      '@nexus-state/react': path.resolve(__dirname, '../react'),
     },
   },
   esbuild: {
@@ -14,6 +14,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    testTimeout: 10000,
     transformMode: {
       web: [/\.tsx?$/],
     },
@@ -35,5 +36,8 @@ export default defineConfig({
   },
   ssr: {
     noExternal: ['@nexus-state/core', '@nexus-state/react'],
+  },
+  optimizeDeps: {
+    include: ['@nexus-state/core', '@nexus-state/react'],
   },
 });

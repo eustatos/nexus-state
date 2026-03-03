@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createPrefetchManager } from '../prefetch-manager';
-import { createQueryCache, getQueryCache } from '../../cache';
+import { createQueryCache } from '../../cache';
+import { getSuspenseCache } from '../../suspense-cache';
 
 describe('PrefetchManager', () => {
   beforeEach(() => {
-    // Reset cache before each test
-    const cache = getQueryCache();
+    // Reset suspense cache before each test
+    const cache = getSuspenseCache();
     cache.clear();
   });
 
@@ -52,8 +53,11 @@ describe('PrefetchManager', () => {
     await manager.prefetch({
       queryKey: 'test',
       queryFn,
-      staleTime: 5000,
+      staleTime: 0, // Make data immediately stale
     });
+
+    // Small delay to ensure cache is updated
+    await new Promise(resolve => setTimeout(resolve, 10));
 
     await manager.prefetch({
       queryKey: 'test',
@@ -106,15 +110,16 @@ describe('PrefetchManager', () => {
     const manager = createPrefetchManager();
     const queryFn = vi.fn(
       async () =>
-        new Promise((resolve) => setTimeout(() => resolve({ data: 'test' }), 100))
+        new Promise((resolve) => setTimeout(() => resolve({ data: 'test' }), 200))
     );
 
-    manager.prefetch({ queryKey: 'test-1', queryFn });
-    manager.prefetch({ queryKey: 'test-2', queryFn });
+    const promise1 = manager.prefetch({ queryKey: 'test-1', queryFn });
+    const promise2 = manager.prefetch({ queryKey: 'test-2', queryFn });
 
+    // Cancel immediately before they complete
     manager.cancelAll();
 
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await Promise.all([promise1, promise2]);
 
     const status1 = manager.getPrefetchStatus('test-1');
     const status2 = manager.getPrefetchStatus('test-2');
