@@ -72,47 +72,6 @@ jobs:
             pnpm add --save-dev @testing-library/react-hooks@${{ matrix.testing-library-react-hooks }}
           fi
 
-      - name: Setup React 17 compatibility
-        if: matrix.react-version == 17
-        run: |
-          # Setup for @nexus-state/react
-          cd packages/react
-          cat > vitest.config.react17.ts << 'EOF'
-          import { defineConfig } from 'vitest/config';
-
-          export default defineConfig({
-            resolve: {
-              alias: {
-                '@testing-library/react': '@testing-library/react-hooks',
-              },
-            },
-            test: {
-              globals: true,
-              environment: 'jsdom',
-            }
-          });
-          EOF
-          mv vitest.config.react17.ts vitest.config.ts
-          
-          # Setup for @nexus-state/query
-          cd ../query
-          cat > vitest.config.react17.ts << 'EOF'
-          import { defineConfig } from 'vitest/config';
-
-          export default defineConfig({
-            resolve: {
-              alias: {
-                '@testing-library/react': '@testing-library/react-hooks',
-              },
-            },
-            test: {
-              globals: true,
-              environment: 'jsdom',
-            }
-          });
-          EOF
-          mv vitest.config.react17.ts vitest.config.ts
-
       - name: Build @nexus-state/react
         run: pnpm --filter @nexus-state/react build
 
