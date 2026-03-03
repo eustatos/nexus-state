@@ -15,6 +15,13 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     testTimeout: 10000,
+    // Используем forks вместо threads для лучшей совместимости с jsdom
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        isolate: true,
+      },
+    },
     transformMode: {
       web: [/\.tsx?$/],
     },

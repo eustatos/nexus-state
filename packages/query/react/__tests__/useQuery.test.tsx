@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Use adapter for renderHook to support React 17/18/19
-import { renderHook, waitFor, act } from '../../src/__tests__/renderHook-adapter';
+import { renderHook, waitFor, act, cleanup } from '../../src/__tests__/renderHook-adapter';
 import { StoreProvider } from '@nexus-state/react';
 import { createStore } from '@nexus-state/core';
 import { useQuery } from '../useQuery';
@@ -13,6 +13,11 @@ describe('useQuery', () => {
 
   beforeEach(() => {
     clearQueryCache();
+    cleanup();
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it('should fetch data on mount', async () => {

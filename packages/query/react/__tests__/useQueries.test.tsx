@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Use adapter for renderHook to support React 17/18/19
-import { renderHook, waitFor } from '../../src/__tests__/renderHook-adapter';
+import { renderHook, waitFor, cleanup } from '../../src/__tests__/renderHook-adapter';
 import { StoreProvider } from '@nexus-state/react';
 import { createStore } from '@nexus-state/core';
 import { useQueries } from '../useQueries';
@@ -10,6 +10,14 @@ describe('useQueries', () => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <StoreProvider store={createStore()}>{children}</StoreProvider>
   );
+
+  beforeEach(() => {
+    cleanup();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
 
   it('should execute multiple queries in parallel', async () => {
     const queryFn1 = vi.fn().mockResolvedValue({ data: 'test1' });

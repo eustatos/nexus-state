@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Use adapter for renderHook to support React 17/18/19
-import { render, screen, waitFor, act } from '../../src/__tests__/renderHook-adapter';
+import { render, screen, waitFor, act, cleanup } from '../../src/__tests__/renderHook-adapter';
 import React, { Suspense } from 'react';
 import { useSuspenseQuery } from '../useSuspenseQuery';
 import {
@@ -16,6 +16,11 @@ describe('useSuspenseQuery', () => {
   beforeEach(() => {
     // Reset suspense cache before each test
     setSuspenseCache(new SuspenseQueryCache());
+    cleanup();
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it('should suspend while loading', async () => {
