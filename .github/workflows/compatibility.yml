@@ -75,8 +75,27 @@ jobs:
       - name: Setup React 17 compatibility
         if: matrix.react-version == 17
         run: |
+          # Setup for @nexus-state/react
           cd packages/react
-          # For React 17, alias @testing-library/react to @testing-library/react-hooks
+          cat > vitest.config.react17.ts << 'EOF'
+          import { defineConfig } from 'vitest/config';
+
+          export default defineConfig({
+            resolve: {
+              alias: {
+                '@testing-library/react': '@testing-library/react-hooks',
+              },
+            },
+            test: {
+              globals: true,
+              environment: 'jsdom',
+            }
+          });
+          EOF
+          mv vitest.config.react17.ts vitest.config.ts
+          
+          # Setup for @nexus-state/query
+          cd ../query
           cat > vitest.config.react17.ts << 'EOF'
           import { defineConfig } from 'vitest/config';
 

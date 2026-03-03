@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+// Use adapter for renderHook to support React 17/18/19
+import { renderHook } from '../../src/__tests__/renderHook-adapter';
 import {
   QueryClientProvider,
   createQueryClient,
