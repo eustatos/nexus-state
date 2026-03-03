@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Use adapter for renderHook to support React 17/18/19
-import { renderHook } from '../../src/__tests__/renderHook-adapter';
+import { renderHook, cleanup } from '../../src/__tests__/renderHook-adapter';
 import React from 'react';
 import {
   QueryClientProvider,
@@ -13,6 +13,14 @@ import {
 import { createStore } from '@nexus-state/core';
 
 describe('QueryClientProvider', () => {
+  beforeEach(() => {
+    cleanup();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
   const createWrapper = () => {
     const client = createQueryClient();
     const Wrapper = ({ children }: { children: React.ReactNode }) => (

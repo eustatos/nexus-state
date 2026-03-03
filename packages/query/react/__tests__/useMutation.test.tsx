@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Use adapter for renderHook to support React 17/18/19
-import { renderHook, waitFor, act } from '../../src/__tests__/renderHook-adapter';
+import { renderHook, waitFor, act, cleanup } from '../../src/__tests__/renderHook-adapter';
 import { StoreProvider } from '@nexus-state/react';
 import { createStore } from '@nexus-state/core';
 import { useMutation } from '../useMutation';
@@ -9,6 +9,14 @@ describe('useMutation', () => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <StoreProvider store={createStore()}>{children}</StoreProvider>
   );
+
+  beforeEach(() => {
+    cleanup();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
 
   it('should execute mutation', async () => {
     const mutationFn = vi.fn().mockResolvedValue({ id: 1, name: 'Test' });
