@@ -19,16 +19,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        react-version: [17, 18]
+        react-version: [17, 18, 19]
         include:
           - react-version: 17
             react-dom-version: 17
             types-react: ^17.0.0
             types-react-dom: ^17.0.0
+            testing-library-react: ^12.0.0
           - react-version: 18
             react-dom-version: 18
             types-react: ^18.0.0
             types-react-dom: ^18.0.0
+            testing-library-react: ^14.0.0
+          - react-version: 19
+            react-dom-version: 19
+            types-react: ^19.0.0
+            types-react-dom: ^19.0.0
+            testing-library-react: ^16.0.0
 
     steps:
       - uses: actions/checkout@v4
@@ -52,9 +59,9 @@ jobs:
       - name: Install React ${{ matrix.react-version }}
         run: |
           cd packages/react
-          pnpm add --save-dev react@${{ matrix.react-version }} react-dom@${{ matrix.react-version }} @types/react@${{ matrix.types-react }} @types/react-dom@${{ matrix.types-react-dom }}
+          pnpm add --save-dev react@${{ matrix.react-version }} react-dom@${{ matrix.react-version }} @types/react@${{ matrix.types-react }} @types/react-dom@${{ matrix.types-react-dom }} @testing-library/react@${{ matrix.testing-library-react }}
           cd ../query
-          pnpm add --save-dev react@${{ matrix.react-version }} react-dom@${{ matrix.react-version }} @types/react@${{ matrix.types-react }} @types/react-dom@${{ matrix.types-react-dom }}
+          pnpm add --save-dev react@${{ matrix.react-version }} react-dom@${{ matrix.react-version }} @types/react@${{ matrix.types-react }} @types/react-dom@${{ matrix.types-react-dom }} @testing-library/react@${{ matrix.testing-library-react }}
 
       - name: Build @nexus-state/react
         run: pnpm --filter @nexus-state/react build

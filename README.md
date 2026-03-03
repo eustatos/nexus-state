@@ -117,7 +117,7 @@ const countAtom = atom(0, 'count');
 
 function Counter() {
   const [count, setCount] = useAtom(countAtom);
-  
+
   return (
     <div>
       <p>Count: {count}</p>
@@ -127,6 +127,16 @@ function Counter() {
   );
 }
 ```
+
+**React Compatibility:**
+
+| React Version | Support Status |
+|---------------|----------------|
+| 17.x          | ✅ Supported   |
+| 18.x          | ✅ Supported   |
+| 19.x          | ✅ Supported   |
+
+Minimum required: React 17.0.0
 
 ### Vue Integration
 
