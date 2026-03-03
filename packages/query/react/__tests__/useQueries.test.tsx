@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+// Use adapter for renderHook to support React 17/18/19
+import { renderHook, waitFor } from '../../src/__tests__/renderHook-adapter';
 import { StoreProvider } from '@nexus-state/react';
 import { createStore } from '@nexus-state/core';
 import { useQueries } from '../useQueries';

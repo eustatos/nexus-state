@@ -35,7 +35,7 @@ export default defineConfig({
     }
   },
   ssr: {
-    noExternal: ['@nexus-state/core', '@nexus-state/react'],
+    noExternal: ['@nexus-state/core', '@nexus-state/react', '@testing-library/react-hooks'],
   },
   optimizeDeps: {
     include: ['@nexus-state/core', '@nexus-state/react'],

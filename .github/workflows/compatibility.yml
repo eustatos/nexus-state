@@ -1,0 +1,82 @@
+name: React Compatibility
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'packages/react/**'
+      - 'packages/query/**'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'packages/react/**'
+      - 'packages/query/**'
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        react-version: [17, 18, 19]
+        include:
+          - react-version: 17
+            react-dom-version: 17
+            types-react: ^17.0.0
+            types-react-dom: ^17.0.0
+            testing-library-react: ^12.0.0
+            testing-library-react-hooks: ^8.0.1
+          - react-version: 18
+            react-dom-version: 18
+            types-react: ^18.0.0
+            types-react-dom: ^18.0.0
+            testing-library-react: ^14.0.0
+            testing-library-react-hooks: null
+          - react-version: 19
+            react-dom-version: 19
+            types-react: ^19.0.0
+            types-react-dom: ^19.0.0
+            testing-library-react: ^16.0.0
+            testing-library-react-hooks: null
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build @nexus-state/core
+        run: pnpm --filter @nexus-state/core build
+
+      - name: Install React ${{ matrix.react-version }}
+        run: |
+          cd packages/react
+          pnpm add --save-dev react@${{ matrix.react-version }} react-dom@${{ matrix.react-version }} @types/react@${{ matrix.types-react }} @types/react-dom@${{ matrix.types-react-dom }} @testing-library/react@${{ matrix.testing-library-react }}
+          if [ "${{ matrix.testing-library-react-hooks }}" != "null" ]; then
+            pnpm add --save-dev @testing-library/react-hooks@${{ matrix.testing-library-react-hooks }}
+          fi
+          cd ../query
+          pnpm add --save-dev react@${{ matrix.react-version }} react-dom@${{ matrix.react-version }} @types/react@${{ matrix.types-react }} @types/react-dom@${{ matrix.types-react-dom }} @testing-library/react@${{ matrix.testing-library-react }}
+          if [ "${{ matrix.testing-library-react-hooks }}" != "null" ]; then
+            pnpm add --save-dev @testing-library/react-hooks@${{ matrix.testing-library-react-hooks }}
+          fi
+
+      - name: Build @nexus-state/react
+        run: pnpm --filter @nexus-state/react build
+
+      - name: Test @nexus-state/react with React ${{ matrix.react-version }}
+        run: pnpm --filter @nexus-state/react test
+
+      - name: Test @nexus-state/query with React ${{ matrix.react-version }}
+        run: pnpm --filter @nexus-state/query test

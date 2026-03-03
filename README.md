@@ -24,17 +24,17 @@
 
 ### If you need...
 
-✅ **Multi-framework support** — Share state logic between React, Vue, and Svelte  
-✅ **Built-in debugging** — Time travel without additional setup  
-✅ **Fine-grained reactivity** — Atom-based updates, no unnecessary re-renders  
-✅ **TypeScript first** — Full type inference, no `any` types  
-✅ **Small bundle** — 4.2KB core with tree-shaking  
+✅ **Multi-framework support** — Share state logic between React, Vue, and Svelte
+✅ **Built-in debugging** — Time travel without additional setup
+✅ **Fine-grained reactivity** — Atom-based updates, no unnecessary re-renders
+✅ **TypeScript first** — Full type inference, no `any` types
+✅ **Small bundle** — 4.2KB core with tree-shaking
 
 ### If you don't need...
 
-❌ **Complex boilerplate** — No reducers, actions, or selectors required  
-❌ **Context providers** — No wrapping your app in providers  
-❌ **React-only solutions** — Works with any framework  
+❌ **Complex boilerplate** — No reducers, actions, or selectors required
+❌ **Mandatory providers** — Optional StoreProvider for React (can pass store explicitly)
+❌ **React-only solutions** — Works with any framework
 
 ---
 
@@ -117,7 +117,7 @@ const countAtom = atom(0, 'count');
 
 function Counter() {
   const [count, setCount] = useAtom(countAtom);
-  
+
   return (
     <div>
       <p>Count: {count}</p>
@@ -127,6 +127,16 @@ function Counter() {
   );
 }
 ```
+
+**React Compatibility:**
+
+| React Version | Support Status |
+|---------------|----------------|
+| 17.x          | ✅ Supported   |
+| 18.x          | ✅ Supported   |
+| 19.x          | ✅ Supported   |
+
+Minimum required: React 17.0.0
 
 ### Vue Integration
 
