@@ -26,16 +26,19 @@ jobs:
             types-react: ^17.0.0
             types-react-dom: ^17.0.0
             testing-library-react: ^12.0.0
+            testing-library-react-hooks: ^5.3.0
           - react-version: 18
             react-dom-version: 18
             types-react: ^18.0.0
             types-react-dom: ^18.0.0
             testing-library-react: ^14.0.0
+            testing-library-react-hooks: null
           - react-version: 19
             react-dom-version: 19
             types-react: ^19.0.0
             types-react-dom: ^19.0.0
             testing-library-react: ^16.0.0
+            testing-library-react-hooks: null
 
     steps:
       - uses: actions/checkout@v4
@@ -60,8 +63,40 @@ jobs:
         run: |
           cd packages/react
           pnpm add --save-dev react@${{ matrix.react-version }} react-dom@${{ matrix.react-version }} @types/react@${{ matrix.types-react }} @types/react-dom@${{ matrix.types-react-dom }} @testing-library/react@${{ matrix.testing-library-react }}
+          if [ "${{ matrix.testing-library-react-hooks }}" != "null" ]; then
+            pnpm add --save-dev @testing-library/react-hooks@${{ matrix.testing-library-react-hooks }}
+          fi
           cd ../query
           pnpm add --save-dev react@${{ matrix.react-version }} react-dom@${{ matrix.react-version }} @types/react@${{ matrix.types-react }} @types/react-dom@${{ matrix.types-react-dom }} @testing-library/react@${{ matrix.testing-library-react }}
+          if [ "${{ matrix.testing-library-react-hooks }}" != "null" ]; then
+            pnpm add --save-dev @testing-library/react-hooks@${{ matrix.testing-library-react-hooks }}
+          fi
+
+      - name: Setup React 17 compatibility
+        if: matrix.react-version == 17
+        run: |
+          cd packages/react
+          # For React 17, alias @testing-library/react to @testing-library/react-hooks
+          cat > vitest.config.react17.ts << 'EOF'
+          import { defineConfig } from 'vitest/config';
+          import { fileURLToPath } from 'node:url';
+          import { dirname, resolve } from 'node:path';
+
+          const __dirname = dirname(fileURLToPath(import.meta.url));
+
+          export default defineConfig({
+            resolve: {
+              alias: {
+                '@testing-library/react$': '@testing-library/react-hooks',
+              },
+            },
+            test: {
+              globals: true,
+              environment: 'jsdom',
+            }
+          });
+          EOF
+          mv vitest.config.react17.ts vitest.config.ts
 
       - name: Build @nexus-state/react
         run: pnpm --filter @nexus-state/react build

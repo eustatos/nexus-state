@@ -1,8 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, renderHook, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { atom, createStore, type Getter, type Setter } from '@nexus-state/core';
 import { useAtom, useAtomValue, useSetAtom, useAtomCallback } from '../../index';
 import React from 'react';
+
+// Use adapter for renderHook to support React 17/18/19
+import { renderHook } from './renderHook-adapter';
 
 describe('React Hooks', () => {
   let store: ReturnType<typeof createStore>;

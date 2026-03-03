@@ -1,7 +1,8 @@
 // Tests for React adapter
 import { atom, createStore, Setter, ComputedAtom, Atom } from "@nexus-state/core";
 import { useAtom, useAtomValue, useSetAtom, useAtomCallback } from "./index";
-import { renderHook, act } from "@testing-library/react";
+// Use adapter for renderHook to support React 17/18/19
+import { renderHook, act } from "./src/__tests__/renderHook-adapter";
 import { describe, it, expect } from "vitest";
 
 // === HELPER FUNCTIONS ===
