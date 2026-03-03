@@ -1,7 +1,8 @@
 // Tests for React adapter
 import { atom, createStore, Setter, ComputedAtom, Atom } from "@nexus-state/core";
 import { useAtom, useAtomValue, useSetAtom, useAtomCallback } from "./index";
-import { renderHook, act } from "@testing-library/react";
+// Use adapter for renderHook to support React 17/18/19
+import { renderHook, act } from "./src/__tests__/renderHook-adapter";
 import { describe, it, expect } from "vitest";
 
 // === HELPER FUNCTIONS ===
@@ -603,13 +604,26 @@ describe("useAtomCallback", () => {
   });
 
   it("should throw error if store is not provided", () => {
-    expect(() => {
-      renderHook(() =>
+    // React 17 (@testing-library/react-hooks): error captured in result.error
+    // React 18/19 (@testing-library/react): error thrown during render
+    let caughtError: Error | undefined;
+    try {
+      const { result } = renderHook(() =>
         useAtomCallback((get, set) => {
           set(atom(0), 1);
         })
       );
-    }).toThrow(
+      // If we get here, error was captured in result.error (React 17)
+      if (result.error) {
+        caughtError = result.error as Error;
+      }
+    } catch (error) {
+      // Error thrown during render (React 18/19)
+      caughtError = error as Error;
+    }
+
+    expect(caughtError).toBeInstanceOf(Error);
+    expect((caughtError as Error).message).toContain(
       "useAtomCallback requires a store. Either provide one explicitly or wrap your component with <StoreProvider>."
     );
   });

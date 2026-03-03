@@ -18,6 +18,18 @@ npm install @nexus-state/react
 
 ---
 
+## 🔧 React Compatibility
+
+| React Version | Support Status |
+|---------------|----------------|
+| 17.x          | ✅ Supported   |
+| 18.x          | ✅ Supported   |
+| 19.x          | ✅ Supported   |
+
+**Minimum required:** React 17.0.0
+
+---
+
 ## ✨ Features
 
 - 🎯 **useAtom Hook** — Easy atom access in React components
@@ -41,7 +53,7 @@ npm install @nexus-state/react
 
 ### If you don't need...
 
-- ❌ **Context providers** — No wrapping your app in providers
+- ❌ **Mandatory providers** — StoreProvider is optional, pass store explicitly if preferred
 - ❌ **Complex setup** — Works out of the box
 - ❌ **React-only state** — Core works with vanilla JS too
 

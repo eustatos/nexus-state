@@ -225,7 +225,7 @@ export function useAtomLegacy<T>(
 
   useEffect(() => {
     // Subscribe to changes
-    const unsubscribe = resolvedStore.subscribe(atom, (newValue) => {
+    const unsubscribe = resolvedStore.subscribe(atom, (newValue: T) => {
       // Only update if value actually changed (using Object.is for NaN safety)
       if (!Object.is(valueRef.current, newValue)) {
         setValue(newValue);
@@ -277,7 +277,8 @@ function useSyncExternalStoreWithSelector<T>(
   // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
   const reactModule = (typeof window !== "undefined" && (window as any).React) || eval("require")("react");
   if (typeof reactModule.useSyncExternalStore === "function") {
-    return reactModule.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    return (reactModule.useSyncExternalStore as <U>(subscribe: (onStoreChange: () => void) => () => void, getSnapshot: () => U, getServerSnapshot?: () => U) => U)(subscribe, getSnapshot, getServerSnapshot);
   }
 
   // Fallback for React 17
