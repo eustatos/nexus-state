@@ -604,15 +604,26 @@ describe("useAtomCallback", () => {
   });
 
   it("should throw error if store is not provided", () => {
-    const { result } = renderHook(() =>
-      useAtomCallback((get, set) => {
-        set(atom(0), 1);
-      })
-    );
+    // React 17 (@testing-library/react-hooks): error captured in result.error
+    // React 18/19 (@testing-library/react): error thrown during render
+    let caughtError: Error | undefined;
+    try {
+      const { result } = renderHook(() =>
+        useAtomCallback((get, set) => {
+          set(atom(0), 1);
+        })
+      );
+      // If we get here, error was captured in result.error (React 17)
+      if (result.error) {
+        caughtError = result.error as Error;
+      }
+    } catch (error) {
+      // Error thrown during render (React 18/19)
+      caughtError = error as Error;
+    }
 
-    // In React 17 with @testing-library/react-hooks, errors are captured in result.error
-    expect(result.error).toBeInstanceOf(Error);
-    expect((result.error as Error).message).toContain(
+    expect(caughtError).toBeInstanceOf(Error);
+    expect((caughtError as Error).message).toContain(
       "useAtomCallback requires a store. Either provide one explicitly or wrap your component with <StoreProvider>."
     );
   });

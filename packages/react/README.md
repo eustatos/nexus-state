@@ -53,7 +53,7 @@ npm install @nexus-state/react
 
 ### If you don't need...
 
-- ❌ **Context providers** — No wrapping your app in providers
+- ❌ **Mandatory providers** — StoreProvider is optional, pass store explicitly if preferred
 - ❌ **Complex setup** — Works out of the box
 - ❌ **React-only state** — Core works with vanilla JS too
 
