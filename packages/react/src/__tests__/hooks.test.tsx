@@ -292,11 +292,11 @@ describe('React Hooks', () => {
             <input
               data-testid="name-input"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
             />
             <input
               data-testid="email-input"
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
             />
           </div>
         );
