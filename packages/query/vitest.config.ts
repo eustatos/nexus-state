@@ -5,8 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@nexus-state/core': path.resolve(__dirname, '../core/src'),
-      // Use node_modules for react to work with pnpm symlinks in CI
-      '@nexus-state/react': path.resolve(__dirname, '../node_modules/@nexus-state/react/src'),
+      '@nexus-state/react': path.resolve(__dirname, '../react'),
     },
   },
   esbuild: {

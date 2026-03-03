@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
+import { StoreProvider } from '@nexus-state/react';
+import { createStore } from '@nexus-state/core';
 import { useInfiniteQuery } from '../useInfiniteQuery';
+import { clearQueryCache } from '../../src/query';
 
 interface Page {
   items: string[];
@@ -9,7 +12,12 @@ interface Page {
 }
 
 describe('useInfiniteQuery', () => {
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <StoreProvider store={createStore()}>{children}</StoreProvider>
+  );
+
   beforeEach(() => {
+    clearQueryCache();
     vi.clearAllMocks();
   });
 
@@ -19,13 +27,15 @@ describe('useInfiniteQuery', () => {
       nextCursor: (pageParam as number) + 1,
     }));
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-test',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-test',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -47,13 +57,15 @@ describe('useInfiniteQuery', () => {
       nextCursor: (pageParam as number) < 2 ? (pageParam as number) + 1 : undefined,
     }));
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-next',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-next',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -82,13 +94,15 @@ describe('useInfiniteQuery', () => {
       nextCursor: undefined, // No more pages
     }));
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-end',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-end',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -107,13 +121,15 @@ describe('useInfiniteQuery', () => {
       };
     });
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-fetching',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-fetching',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -147,16 +163,18 @@ describe('useInfiniteQuery', () => {
       };
     });
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery({
-        queryKey: 'infinite-offset',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage, allPages) => {
-          if (!lastPage.hasMore) return undefined;
-          return allPages.length * 10;
-        },
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery({
+          queryKey: 'infinite-offset',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage, allPages) => {
+            if (!lastPage.hasMore) return undefined;
+            return allPages.length * 10;
+          },
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -173,13 +191,15 @@ describe('useInfiniteQuery', () => {
       nextCursor: (pageParam as number) + 1,
     }));
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-refetch',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-refetch',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -212,14 +232,16 @@ describe('useInfiniteQuery', () => {
       };
     });
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-previous',
-        queryFn,
-        initialPageParam: 1,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-        getPreviousPageParam: (firstPage) => firstPage.previousCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-previous',
+          queryFn,
+          initialPageParam: 1,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+          getPreviousPageParam: (firstPage) => firstPage.previousCursor,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -246,14 +268,16 @@ describe('useInfiniteQuery', () => {
       previousCursor: (pageParam as number) > 0 ? (pageParam as number) - 1 : undefined,
     }));
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-has-prev',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-        getPreviousPageParam: (firstPage) => firstPage.previousCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-has-prev',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+          getPreviousPageParam: (firstPage) => firstPage.previousCursor,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -268,13 +292,15 @@ describe('useInfiniteQuery', () => {
     const error = new Error('Fetch failed');
     const queryFn = vi.fn().mockRejectedValue(error);
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-error',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-error',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -290,14 +316,16 @@ describe('useInfiniteQuery', () => {
       nextCursor: 1,
     });
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-enabled',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-        enabled: false,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-enabled',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+          enabled: false,
+        }),
+      { wrapper }
     );
 
     // Should not fetch initially
@@ -314,13 +342,15 @@ describe('useInfiniteQuery', () => {
       nextCursor: 1,
     });
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-remove',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-remove',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -346,13 +376,15 @@ describe('useInfiniteQuery', () => {
       };
     });
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-is-fetching',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-is-fetching',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        }),
+      { wrapper }
     );
 
     // Should be fetching initially
@@ -371,13 +403,15 @@ describe('useInfiniteQuery', () => {
       nextCursor: 1,
     });
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: ['posts', { userId: 1, status: 'active' }],
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: ['posts', { userId: 1, status: 'active' }],
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -394,14 +428,16 @@ describe('useInfiniteQuery', () => {
       nextCursor: 1,
     });
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-success',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-        onSuccess,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-success',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+          onSuccess,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
@@ -420,14 +456,16 @@ describe('useInfiniteQuery', () => {
     const error = new Error('Fetch failed');
     const queryFn = vi.fn().mockRejectedValue(error);
 
-    const { result } = renderHook(() =>
-      useInfiniteQuery<Page, Error, number>({
-        queryKey: 'infinite-error-callback',
-        queryFn,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-        onError,
-      })
+    const { result } = renderHook(
+      () =>
+        useInfiniteQuery<Page, Error, number>({
+          queryKey: 'infinite-error-callback',
+          queryFn,
+          initialPageParam: 0,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+          onError,
+        }),
+      { wrapper }
     );
 
     await waitFor(() => {
