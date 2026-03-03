@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
+// Use adapter for renderHook to support React 17/18/19
+import { render, screen, waitFor, act } from '../../src/__tests__/renderHook-adapter';
 import React, { Suspense } from 'react';
 import { useSuspenseQuery } from '../useSuspenseQuery';
 import {

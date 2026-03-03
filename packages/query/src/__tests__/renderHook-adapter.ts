@@ -8,6 +8,14 @@
  * will be aliased to @testing-library/react-hooks via vitest.config.ts
  */
 
-// Re-export from @testing-library/react
+// Re-export all testing utilities from @testing-library/react
 // In CI for React 17, this is aliased to @testing-library/react-hooks
-export { renderHook, act, cleanup, waitFor } from '@testing-library/react';
+export {
+  renderHook,
+  render,
+  screen,
+  act,
+  cleanup,
+  waitFor,
+  fireEvent,
+} from '@testing-library/react';
