@@ -295,11 +295,24 @@ export function createStore(plugins: Plugin[] = []): Store {
     );
 
     // Schedule subscriber notifications for batching
+    // FIX for Problem 1+2: Flush immediately if not in batch to ensure synchronous notifications for useSyncExternalStore
+    const wasBatching = batcher.getIsBatching();
     batcher.schedule(() => {
       atomState.subscribers.forEach((subscriber) => {
-        subscriber(processedValue);
+        try {
+          subscriber(processedValue);
+        } catch (error) {
+          // Log error but continue notifying other subscribers
+          logger.error('Subscriber error:', error);
+        }
       });
     });
+    // If we were not batching, flush immediately to ensure synchronous notification
+    // Note: SnapshotRestorer now calls flush() explicitly after restore, so this
+    // flush is only for non-time-travel scenarios
+    if (!wasBatching) {
+      batcher.flush();
+    }
 
     // Notify dependents using BFS to handle nested computed atoms
     logger.log(
@@ -362,11 +375,17 @@ export function createStore(plugins: Plugin[] = []): Store {
             currentState.value = newValue;
 
             // Schedule subscriber notifications for batching
+            // FIX for Problem 1+2: Flush immediately if not in batch
+            const wasDependentBatching = batcher.getIsBatching();
             batcher.schedule(() => {
               currentState.subscribers.forEach((subscriber) => {
                 subscriber(newValue);
               });
             });
+            // If we were not batching, flush immediately
+            if (!wasDependentBatching) {
+              batcher.flush();
+            }
 
             // Add dependents to queue
             currentState.dependents.forEach((dep) => {

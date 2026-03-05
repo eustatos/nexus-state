@@ -49,7 +49,7 @@ class Batcher {
   /**
    * Flush all batched callbacks
    */
-  private flush(): void {
+  flush(): void {
     if (this.batch.size === 0) return;
 
     this.isFlushing = true;
@@ -89,6 +89,15 @@ class Batcher {
    */
   getDepth(): number {
     return this.batchDepth;
+  }
+
+  /**
+   * Reset batcher state (for test cleanup)
+   */
+  reset(): void {
+    this.batch.clear();
+    this.batchDepth = 0;
+    this.isFlushing = false;
   }
 }
 

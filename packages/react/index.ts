@@ -274,14 +274,17 @@ function useSyncExternalStoreWithSelector<T>(
   getServerSnapshot?: () => T
 ): T {
   // Check if useSyncExternalStore is available (React 18+)
-  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
-  const reactModule = (typeof window !== "undefined" && (window as any).React) || eval("require")("react");
-  if (typeof reactModule.useSyncExternalStore === "function") {
+  // Use globalThis.React for Vite/ESM compatibility
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const reactModule = (typeof window !== "undefined" && (window as any).React) || 
+                      (typeof globalThis !== "undefined" && (globalThis as any).React);
+  
+  if (reactModule && typeof reactModule.useSyncExternalStore === "function") {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     return (reactModule.useSyncExternalStore as <U>(subscribe: (onStoreChange: () => void) => () => void, getSnapshot: () => U, getServerSnapshot?: () => U) => U)(subscribe, getSnapshot, getServerSnapshot);
   }
 
-  // Fallback for React 17
+  // Fallback for React 17 or when useSyncExternalStore is not available
   const [state, setState] = useState(getSnapshot);
   const stateRef = useRef(state);
   stateRef.current = state;

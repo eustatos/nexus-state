@@ -84,16 +84,24 @@ describe("store - subscribe", () => {
     unsubscribe2();
   });
 
-  it("should handle subscriber that throws", () => {
+  it("should handle subscriber that throws (error is logged but not propagated)", () => {
     const store = createStore();
     const countAtom = atom(0);
 
-    store.subscribe(countAtom, () => {
+    const errorSubscriber = vi.fn(() => {
       throw new Error("Subscriber error");
     });
 
-    // Subscriber errors are propagated to the caller
-    expect(() => store.set(countAtom, 1)).toThrow("Subscriber error");
+    const normalSubscriber = vi.fn();
+
+    store.subscribe(countAtom, errorSubscriber);
+    store.subscribe(countAtom, normalSubscriber);
+
+    // Subscriber errors are logged but NOT propagated - other subscribers still notified
+    expect(() => store.set(countAtom, 1)).not.toThrow();
+    
+    // Normal subscriber should still be called
+    expect(normalSubscriber).toHaveBeenCalledWith(1);
   });
 
   it("should handle atom with complex state in subscription", () => {

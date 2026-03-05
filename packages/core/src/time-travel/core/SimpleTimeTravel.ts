@@ -29,6 +29,7 @@ import type {
 } from '../snapshot/types';
 
 import { AtomTracker } from '../tracking/AtomTracker';
+import { batcher } from '../../batching';
 import type {
   TrackerConfig,
   TrackingEvent,
@@ -768,6 +769,9 @@ export class SimpleTimeTravel extends BaseDisposable implements TimeTravelAPI {
     logger.log(`[WRAPPED_SET] Calling originalSet`);
     this.originalSet(atom, update);
     logger.log(`[WRAPPED_SET] originalSet complete`);
+
+    // FIX for Problem 3: Flush to ensure notifications are delivered during time travel
+    batcher.flush();
 
     // Get new value
     let newValue: Value | undefined;

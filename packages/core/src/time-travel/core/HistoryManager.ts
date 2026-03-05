@@ -166,24 +166,30 @@ export class HistoryManager extends BaseDisposable {
 
   jumpTo(index: number): Snapshot | null {
     const allSnapshots = this.getAll();
-    
+    logger.log(`[HISTORY.jumpTo] called with index=${index}, allSnapshots.length=${allSnapshots.length}, past.length=${this.past.length}, current=${this.current?.metadata.action || 'none'}`);
+
     // Check if index is valid
     if (index < 0 || index >= allSnapshots.length) {
+      logger.log(`[HISTORY.jumpTo] invalid index, returning null`);
       return null;
     }
 
     // If already at the target index, return current snapshot
     const currentIndex = this.past.length;
+    logger.log(`[HISTORY.jumpTo] currentIndex=${currentIndex}`);
     if (index === currentIndex) {
+      logger.log(`[HISTORY.jumpTo] already at target, returning current`);
       return this.current;
     }
 
     const targetSnapshot = allSnapshots[index];
+    logger.log(`[HISTORY.jumpTo] targetSnapshot: ${targetSnapshot.metadata.action || 'unknown'}, value: ${Object.values(targetSnapshot.state)[0]?.value}`);
 
     // Reset history
     this.past = allSnapshots.slice(0, index);
     this.future = allSnapshots.slice(index + 1);
     this.current = targetSnapshot;
+    logger.log(`[HISTORY.jumpTo] after jump: past.length=${this.past.length}, future.length=${this.future.length}`);
 
     return targetSnapshot;
   }

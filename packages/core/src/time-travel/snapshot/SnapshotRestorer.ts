@@ -20,6 +20,7 @@ import type {
 } from './types';
 import { atomRegistry } from '../../atom-registry';
 import { storeLogger as logger } from '../../debug';
+import { batcher } from '../../batching';
 
 // Import disposal infrastructure
 import { BaseDisposable, type DisposableConfig } from '../core/disposable';
@@ -126,6 +127,10 @@ export class SnapshotRestorer extends BaseDisposable {
         this.restoreSequential(snapshotToRestore.state);
       }
 
+      // FIX for Problem 3: Flush batched notifications after restore
+      // This ensures React components with useSyncExternalStore receive notifications
+      batcher.flush();
+
       this.emit('restore', snapshotToRestore);
       return true;
     } catch (error) {
@@ -197,6 +202,9 @@ export class SnapshotRestorer extends BaseDisposable {
       if (success) {
         this.emit('restore', snapshot);
       }
+
+      // FIX for Problem 3: Flush batched notifications after restore
+      batcher.flush();
 
       return {
         success,
@@ -296,8 +304,13 @@ export class SnapshotRestorer extends BaseDisposable {
       `[RESTORE] Current value in store before set: ${this.store.get(atom)}`
     );
 
-    // Set the value
+    // Set the value - use store.set which will notify subscribers
     this.store.set(atom, value);
+
+    // FIX: Flush immediately after each atom set to ensure synchronous notification
+    // This is critical for React's useSyncExternalStore during time-travel
+    batcher.flush();
+
     logger.log(
       `[RESTORE] Set complete for ${entry.name}, new value: ${this.store.get(atom)}`
     );
@@ -313,6 +326,10 @@ export class SnapshotRestorer extends BaseDisposable {
     Object.entries(state).forEach(([key, entry]) => {
       this.restoreAtom(key, entry);
     });
+    
+    // FIX: Ensure all subscribers are notified synchronously after batch restore
+    // This is critical for React's useSyncExternalStore to detect changes
+    batcher.flush();
   }
 
   /**
@@ -336,6 +353,9 @@ export class SnapshotRestorer extends BaseDisposable {
         this.restoreAtom(key, entry);
       }
     });
+    
+    // FIX: Ensure all subscribers are notified synchronously
+    batcher.flush();
   }
 
   /**
@@ -759,6 +779,9 @@ export class SnapshotRestorer extends BaseDisposable {
       if (restoreResult.success) {
         this.commitCheckpoint(checkpointId);
       }
+
+      // FIX for Problem 3: Flush batched notifications after restore
+      batcher.flush();
 
       return {
         success: restoreResult.success,
