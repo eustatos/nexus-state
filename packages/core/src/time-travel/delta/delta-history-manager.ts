@@ -363,7 +363,7 @@ export class DeltaAwareHistoryManager {
       visited.add(currentDelta.id);
       deltaChain.unshift(currentDelta);
 
-      const baseId = currentDelta.baseSnapshotId;
+      const baseId: string | null | undefined = currentDelta.baseSnapshotId;
       if (!baseId) {
         return null;
       }
@@ -373,8 +373,8 @@ export class DeltaAwareHistoryManager {
       }
 
       // Find the base snapshot in the pre-fetched history
-      const baseSnapshot = history.find((s) => s.id === baseId);
-      
+      const baseSnapshot: Snapshot | undefined = history.find((s) => s.id === baseId);
+
       if (baseSnapshot && this.isDeltaSnapshot(baseSnapshot)) {
         currentDelta = baseSnapshot;
       } else {
@@ -465,14 +465,14 @@ export class DeltaAwareHistoryManager {
       }
       visited.add(current.id);
 
-      const baseId = (current as any).baseSnapshotId;
+      const baseId: string | null | undefined = (current as any).baseSnapshotId;
       if (!baseId) {
         return null;
       }
 
       // Search in the provided history array, not current history
-      const baseSnapshot = history.find((s) => s.id === baseId);
-      
+      const baseSnapshot: Snapshot | undefined = history.find((s) => s.id === baseId);
+
       if (!baseSnapshot) {
         return null;
       }
@@ -569,13 +569,13 @@ export class DeltaAwareHistoryManager {
       visited.add(currentDelta.id);
       deltaChain.unshift(currentDelta);
 
-      const baseId = currentDelta.baseSnapshotId;
+      const baseId: string | null | undefined = currentDelta.baseSnapshotId;
       if (!baseId) {
         return null;
       }
 
       const internalHistory = this.historyManager.getAll();
-      const baseSnapshot = internalHistory.find((s) => s.id === baseId);
+      const baseSnapshot: Snapshot | undefined = internalHistory.find((s) => s.id === baseId);
 
       if (baseSnapshot && this.isDeltaSnapshot(baseSnapshot)) {
         currentDelta = baseSnapshot;

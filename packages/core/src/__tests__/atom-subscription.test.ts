@@ -1,5 +1,5 @@
 /**
- * Тесты для проверки механизма подписки и уведомлений об изменениях атомов
+ * Tests for checking the subscription mechanism and notifications about atom changes
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
@@ -45,11 +45,11 @@ describe('Atom Subscription and Notification', () => {
         notifiedValue = newValue
       })
 
-      // Подписка НЕ получает текущее значение автоматически
-      // Нужно использовать get() для получения текущего значения
+      // Subscription does NOT receive current value automatically
+      // Use get() to get the current value
       expect(notifiedValue).toBeUndefined()
       
-      // Для получения текущего значения используйте get()
+      // Use get() to get the current value
       expect(store.get(testAtom)).toBe(42)
       
       unsubscribe()
@@ -105,10 +105,10 @@ describe('Atom Subscription and Notification', () => {
         notifications.push(newValue)
       })
 
-      // Ошибка в одном подписчике не должна ломать других
+      // Error in one subscriber should not break others
       store.set(testAtom, 1)
 
-      // Второй подписчик должен получить уведомление
+      // Second subscriber should receive notification
       expect(notifications).toEqual([1])
       expect(errorThrowingCalled).toBe(true)
     })
