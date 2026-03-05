@@ -1,5 +1,5 @@
 /**
- * Test с 3 snapshot'ами как passing test, но с разными значениями
+ * Test with 3 snapshots like passing test, but with different values
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
@@ -38,7 +38,7 @@ describe('Delta 3 Snapshots Different Values', () => {
   })
 
   it('should work with 3 different values', () => {
-    // 3 snapshot'а с ПОЛНОСТЬЮ РАЗНЫМИ значениями
+    // 3 snapshots with COMPLETELY DIFFERENT values
     store.set(contentAtom, 'first')
     timeTravel.capture('first')
 
@@ -48,7 +48,7 @@ describe('Delta 3 Snapshots Different Values', () => {
     store.set(contentAtom, 'third')
     timeTravel.capture('third')
 
-    // Проверяем jump
+    // Check jump
     const r0 = timeTravel.jumpTo(0)
     expect(r0).toBe(true)
     expect(store.get(contentAtom)).toBe('first')
@@ -63,18 +63,18 @@ describe('Delta 3 Snapshots Different Values', () => {
   })
 
   it('should work with 4 different values without delta', () => {
-    // Создаём НОВЫЙ timeTravel без delta
+    // Create NEW timeTravel without delta
     const store2 = createStore()
     const contentAtom2 = atom('', 'content2')
     const tt2 = new SimpleTimeTravel(store2, {
       maxHistory: 100,
       autoCapture: false,
       deltaSnapshots: {
-        enabled: false  // Отключаем delta
+        enabled: false  // Disable delta
       }
     })
 
-    // 4 snapshot'а
+    // 4 snapshots
     store2.set(contentAtom2, 'one')
     tt2.capture('one')
 
@@ -105,7 +105,7 @@ describe('Delta 3 Snapshots Different Values', () => {
   })
 
   it('should work with 4 different values', () => {
-    // 4 snapshot'а
+    // 4 snapshots
     store.set(contentAtom, 'one')
     timeTravel.capture('one')
 

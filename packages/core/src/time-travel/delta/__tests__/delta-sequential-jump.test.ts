@@ -1,6 +1,6 @@
 /**
- * Test для проверки последовательных переходов по снапшотам с delta
- * Воспроизводит проблему: "Последовательные клики по снапшотам не восстанавливают состояние"
+ * Test for checking sequential jumps through snapshots with delta
+ * Reproduces the issue: "Sequential snapshot clicks do not restore state"
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
@@ -21,7 +21,7 @@ describe('Delta Snapshots - Sequential Jump Test', () => {
     store = createStore()
     contentAtom = atom('', 'content')
 
-    // Включаем delta snapshots как в demo-editor
+    // Enable delta snapshots like in demo-editor
     timeTravel = new SimpleTimeTravel(store, {
       maxHistory: 100,
       autoCapture: false,
@@ -40,7 +40,7 @@ describe('Delta Snapshots - Sequential Jump Test', () => {
   })
 
   it('should restore state correctly on sequential jumps (reproduces the bug)', () => {
-    // Создаём 3 снапшота
+    // Create 3 snapshots
     store.set(contentAtom, 'A')
     const snap1 = timeTravel.capture('snap1')
     expect(snap1).toBeDefined()
@@ -53,31 +53,31 @@ describe('Delta Snapshots - Sequential Jump Test', () => {
     const snap3 = timeTravel.capture('snap3')
     expect(snap3).toBeDefined()
 
-    // Проверяем, что у нас 3 снапшота в истории
+    // Check that we have 3 snapshots in history
     const history = timeTravel.getHistory()
     expect(history.length).toBe(3)
 
-    // Проверяем текущее состояние
+    // Check current state
     expect(store.get(contentAtom)).toBe('A B C')
 
-    // Прыгаем к первому снапшоту (индекс 0)
+    // Jump to first snapshot (index 0)
     const jump1Result = timeTravel.jumpTo(0)
     expect(jump1Result).toBe(true)
     expect(store.get(contentAtom)).toBe('A')
 
-    // Прыгаем ко второму снапшоту (индекс 1) - ЭТО НЕ РАБОТАЛО ДО FIX
+    // Jump to second snapshot (index 1) - THIS DIDN'T WORK BEFORE FIX
     const jump2Result = timeTravel.jumpTo(1)
     expect(jump2Result).toBe(true)
     expect(store.get(contentAtom)).toBe('A B')
 
-    // Прыгаем к третьему снапшоту (индекс 2) - ЭТО ТОЖЕ НЕ РАБОТАЛО
+    // Jump to third snapshot (index 2) - THIS ALSO DIDN'T WORK BEFORE
     const jump3Result = timeTravel.jumpTo(2)
     expect(jump3Result).toBe(true)
     expect(store.get(contentAtom)).toBe('A B C')
   })
 
   it('should handle multiple rapid jumps correctly', () => {
-    // Создаём 5 снапшотов
+    // Create 5 snapshots
     for (let i = 0; i < 5; i++) {
       store.set(contentAtom, `state${i}`)
       timeTravel.capture(`snap${i}`)
@@ -85,7 +85,7 @@ describe('Delta Snapshots - Sequential Jump Test', () => {
 
     expect(store.get(contentAtom)).toBe('state4')
 
-    // Быстрая навигация: 0 -> 2 -> 4 -> 1
+    // Quick navigation: 0 -> 2 -> 4 -> 1
     timeTravel.jumpTo(0)
     expect(store.get(contentAtom)).toBe('state0')
 
@@ -100,7 +100,7 @@ describe('Delta Snapshots - Sequential Jump Test', () => {
   })
 
   it('should work with undo/redo after jumps', () => {
-    // Создаём 3 снапшота
+    // Create 3 snapshots
     store.set(contentAtom, 'first')
     timeTravel.capture('first')
 
@@ -110,29 +110,29 @@ describe('Delta Snapshots - Sequential Jump Test', () => {
     store.set(contentAtom, 'third')
     timeTravel.capture('third')
 
-    // Прыгаем к первому
+    // Jump to first
     timeTravel.jumpTo(0)
     expect(store.get(contentAtom)).toBe('first')
 
-    // Redo к второму
+    // Redo to second
     timeTravel.redo()
     expect(store.get(contentAtom)).toBe('second')
 
-    // Redo к третьему
+    // Redo to third
     timeTravel.redo()
     expect(store.get(contentAtom)).toBe('third')
 
-    // Undo ко второму
+    // Undo to second
     timeTravel.undo()
     expect(store.get(contentAtom)).toBe('second')
 
-    // Undo к первому
+    // Undo to first
     timeTravel.undo()
     expect(store.get(contentAtom)).toBe('first')
   })
 
   it('should reconstruct delta snapshots correctly', () => {
-    // Создаём достаточно снапшотов, чтобы появились delta
+    // Create enough snapshots to generate deltas
     const snapshots = []
     for (let i = 0; i < 15; i++) {
       store.set(contentAtom, `value${i}`)
@@ -142,11 +142,11 @@ describe('Delta Snapshots - Sequential Jump Test', () => {
       }
     }
 
-    // Проверяем, что delta включены
+    // Check that delta is enabled
     const stats = timeTravel.getHistoryStats()
     console.log('History stats:', stats)
 
-    // Прыгаем к разным снапшотам и проверяем восстановление
+    // Jump to different snapshots and check restoration
     timeTravel.jumpTo(5)
     expect(store.get(contentAtom)).toBe('value5')
 
@@ -167,7 +167,7 @@ describe('Delta Snapshots - Sequential Jump Test', () => {
     store.set(contentAtom, 'modified')
     timeTravel.capture('modified')
 
-    // Прыгаем к первому снапшоту несколько раз
+    // Jump to first snapshot multiple times
     timeTravel.jumpTo(0)
     expect(store.get(contentAtom)).toBe('initial')
 
@@ -192,7 +192,7 @@ describe('Delta Snapshots - Sequential Jump Test', () => {
       }
     })
 
-    // Создаём 3 состояния
+    // Create 3 states
     store.set(countAtom, 1)
     store.set(nameAtom, 'Alice')
     tt.capture('state1')
@@ -205,21 +205,21 @@ describe('Delta Snapshots - Sequential Jump Test', () => {
     store.set(nameAtom, 'Charlie')
     tt.capture('state3')
 
-    // Проверяем текущее состояние
+    // Check current state
     expect(store.get(countAtom)).toBe(3)
     expect(store.get(nameAtom)).toBe('Charlie')
 
-    // Прыгаем к первому
+    // Jump to first
     tt.jumpTo(0)
     expect(store.get(countAtom)).toBe(1)
     expect(store.get(nameAtom)).toBe('Alice')
 
-    // Прыгаем ко второму
+    // Jump to second
     tt.jumpTo(1)
     expect(store.get(countAtom)).toBe(2)
     expect(store.get(nameAtom)).toBe('Bob')
 
-    // Прыгаем к третьему
+    // Jump to third
     tt.jumpTo(2)
     expect(store.get(countAtom)).toBe(3)
     expect(store.get(nameAtom)).toBe('Charlie')

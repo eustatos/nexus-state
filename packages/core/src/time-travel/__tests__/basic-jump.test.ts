@@ -1,5 +1,5 @@
 /**
- * Базовый тест для проверки jumpTo без delta snapshots
+ * Basic test for checking jumpTo without delta snapshots
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
@@ -16,7 +16,7 @@ describe('Basic JumpTo Test (no delta)', () => {
     store = createStore()
     contentAtom = atom('', 'content')
 
-    // Отключаем delta snapshots
+    // Disable delta snapshots
     timeTravel = new SimpleTimeTravel(store, {
       maxHistory: 100,
       autoCapture: false,
@@ -27,7 +27,7 @@ describe('Basic JumpTo Test (no delta)', () => {
   })
 
   it('should restore state correctly on sequential jumps (no delta)', () => {
-    // Создаём 3 снапшота
+    // Create 3 snapshots
     store.set(contentAtom, 'A')
     const snap1 = timeTravel.capture('snap1')
     expect(snap1).toBeDefined()
@@ -43,17 +43,17 @@ describe('Basic JumpTo Test (no delta)', () => {
     expect(snap3).toBeDefined()
     console.log('Snap3 state:', snap3?.state)
 
-    // Проверяем, что у нас 3 снапшота в истории
+    // Check that we have 3 snapshots in history
     const history = timeTravel.getHistory()
     console.log('History length:', history.length)
     console.log('History:', history.map(h => ({ id: h.id, state: h.state })))
     expect(history.length).toBe(3)
 
-    // Проверяем текущее состояние
+    // Check current state
     console.log('Current before jump:', store.get(contentAtom))
     expect(store.get(contentAtom)).toBe('A B C')
 
-    // Прыгаем к первому снапшоту (индекс 0)
+    // Jump to first snapshot (index 0)
     console.log('\n--- Jumping to index 0 ---')
     const jump1Result = timeTravel.jumpTo(0)
     console.log('Jump result:', jump1Result)
@@ -61,7 +61,7 @@ describe('Basic JumpTo Test (no delta)', () => {
     expect(jump1Result).toBe(true)
     expect(store.get(contentAtom)).toBe('A')
 
-    // Прыгаем ко второму снапшоту (индекс 1)
+    // Jump to second snapshot (index 1)
     console.log('\n--- Jumping to index 1 ---')
     const jump2Result = timeTravel.jumpTo(1)
     console.log('Jump result:', jump2Result)
@@ -69,7 +69,7 @@ describe('Basic JumpTo Test (no delta)', () => {
     expect(jump2Result).toBe(true)
     expect(store.get(contentAtom)).toBe('A B')
 
-    // Прыгаем к третьему снапшоту (индекс 2)
+    // Jump to third snapshot (index 2)
     console.log('\n--- Jumping to index 2 ---')
     const jump3Result = timeTravel.jumpTo(2)
     console.log('Jump result:', jump3Result)

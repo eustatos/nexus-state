@@ -125,7 +125,7 @@ export class HistoryManager extends BaseDisposable {
     ];
   }
 
-  // Методы для навигации
+  // Navigation methods
   canUndo(): boolean {
     return this.past.length > 0;
   }
@@ -254,7 +254,7 @@ export class HistoryManager extends BaseDisposable {
     this.compressionStrategy.reset?.();
   }
 
-  // Остальные методы...
+  // Other methods...
 
   /**
    * Clear all history

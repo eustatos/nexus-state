@@ -1,5 +1,5 @@
 /**
- * Тесты для проверки React хуков и уведомлений об изменениях атомов
+ * Tests for checking React hooks and notifications about atom changes
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
@@ -56,7 +56,7 @@ describe('React Hooks - Subscription and Notification', () => {
         store.set(testAtom, 0) // Same value
       })
 
-      // Не должно быть дополнительных рендеров
+      // Should not have additional renders
       expect(renderCount).toBe(initialRenderCount)
     })
 
@@ -302,7 +302,7 @@ describe('React Hooks - Subscription and Notification', () => {
         store.set(countAtom, 1)
       })
 
-      // Должен быть только один дополнительный рендер для каждого атома
+      // Should have only one additional render for each atom
       expect(renderCounts.count).toBe(initialCountRenders + 1)
       expect(renderCounts.double).toBe(initialDoubleRenders + 1)
     })
@@ -374,15 +374,15 @@ describe('React Hooks - Subscription and Notification', () => {
       store2.set(countAtom, 200)
 
       const { result } = renderHook(
-        () => useAtomValue(countAtom, store1), // Явно указываем store1
+        () => useAtomValue(countAtom, store1), // Explicitly specify store1
         {
           wrapper: ({ children }) => (
-            <StoreProvider store={store2}>{children}</StoreProvider> // Но в контексте store2
+            <StoreProvider store={store2}>{children}</StoreProvider> // But in context store2
           )
         }
       )
 
-      expect(result.current).toBe(100) // Должно использовать store1
+      expect(result.current).toBe(100) // Should use store1
     })
   })
 })

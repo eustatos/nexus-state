@@ -25,7 +25,7 @@ describe("SnapshotDeserializer with multiple allowed constructors", () => {
     let TestClass2: any;
 
     beforeEach(() => {
-      // Первый класс with __type field
+      // First class with __type field
       className1 = generateUniqueClassName("TestClass_multi1");
       TestClass1 = class {
         __type: string;
@@ -38,7 +38,7 @@ describe("SnapshotDeserializer with multiple allowed constructors", () => {
       };
       registerGlobalClass(className1, TestClass1);
 
-      // Второй класс with __type field
+      // Second class with __type field
       className2 = generateUniqueClassName("TestClass_multi2");
       TestClass2 = class {
         __type: string;

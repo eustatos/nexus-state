@@ -479,11 +479,11 @@ describe("createSnapshotSerializer", () => {
 // ============================================================================
 
 describe("createSnapshotDeserializer", () => {
-  // Хранилище для временных глобальных конструкторов
+  // Storage for temporary global constructors
   const tempConstructors: string[] = [];
 
   afterEach(() => {
-    // Очищаем все временные конструкторы после каждого теста
+    // Clean up all temporary constructors after each test
     for (const name of tempConstructors) {
       delete (globalThis as any)[name];
     }
@@ -538,17 +538,17 @@ describe("createSnapshotDeserializer", () => {
   });
 
   it("should work with allowedConstructors option", () => {
-    // Создаем уникальное имя класса, чтобы не пересекаться с другими тестами
+    // Create unique class name to avoid conflicts with other tests
     const uniqueClassName = `TestClass_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
 
-    // Определяем класс с уникальным именем
+    // Define class with unique name
     class TestClass {
       customMethod() {
         return "works";
       }
     }
 
-    // Регистрируем в глобальной области видимости с уникальным именем
+    // Register in global scope with unique name
     (globalThis as any)[uniqueClassName] = TestClass;
     tempConstructors.push(uniqueClassName);
 

@@ -1,7 +1,7 @@
 /**
- * Интеграционные тесты для SnapshotRestorer и React
- * Проверяют, что восстановление состояния из снапшотов правильно
- * уведомляет React компоненты
+ * Integration tests for SnapshotRestorer and React
+ * Check that state restoration from snapshots correctly
+ * notifies React components
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
@@ -27,35 +27,35 @@ describe('SnapshotRestorer + React Integration', () => {
 
   describe('Snapshot Creation and Restoration', () => {
     it('should notify React components after snapshot restoration', () => {
-      // Устанавливаем начальное значение
+      // Set initial value
       act(() => {
         store.set(contentAtom, 'initial')
       })
 
-      // Создаём снимок
+      // Create snapshot
       const snapshot1 = timeTravel.capture('initial')
       expect(snapshot1).toBeDefined()
 
-      // Изменяем значение
+      // Change value
       act(() => {
         store.set(contentAtom, 'modified')
       })
 
-      // Проверяем, что React видит изменённое значение
+      // Check that React sees the changed value
       const { result } = renderHook(() => useAtomValue(contentAtom, store))
       expect(result.current).toBe('modified')
 
-      // Восстанавливаем из снимка
+      // Restore from snapshot
       act(() => {
         timeTravel.jumpTo(0)
       })
 
-      // React должен получить уведомление об изменении
+      // React should receive notification about change
       expect(result.current).toBe('initial')
     })
 
     it('should handle multiple snapshot restorations', () => {
-      // Создаём несколько снимков
+      // Create multiple snapshots
       act(() => {
         store.set(contentAtom, 'state1')
       })
@@ -71,23 +71,23 @@ describe('SnapshotRestorer + React Integration', () => {
       })
       const snapshot3 = timeTravel.capture('state3')
 
-      // Подписываемся на значение
+      // Subscribe to value
       const { result } = renderHook(() => useAtomValue(contentAtom, store))
       expect(result.current).toBe('state3')
 
-      // Переходим к первому снимку
+      // Jump to first snapshot
       act(() => {
         timeTravel.jumpTo(0)
       })
       expect(result.current).toBe('state1')
 
-      // Переходим ко второму снимку
+      // Jump to second snapshot
       act(() => {
         timeTravel.jumpTo(1)
       })
       expect(result.current).toBe('state2')
 
-      // Переходим к третьему снимку
+      // Jump to third snapshot
       act(() => {
         timeTravel.jumpTo(2)
       })
@@ -95,7 +95,7 @@ describe('SnapshotRestorer + React Integration', () => {
     })
 
     it('should notify after undo', () => {
-      // Создаём снимки
+      // Create snapshots
       act(() => {
         store.set(contentAtom, 'first')
       })
@@ -109,7 +109,7 @@ describe('SnapshotRestorer + React Integration', () => {
       const { result } = renderHook(() => useAtomValue(contentAtom, store))
       expect(result.current).toBe('second')
 
-      // Отменяем
+      // Undo
       act(() => {
         timeTravel.undo()
       })
@@ -118,7 +118,7 @@ describe('SnapshotRestorer + React Integration', () => {
     })
 
     it('should notify after redo', () => {
-      // Создаём снимки
+      // Create snapshots
       act(() => {
         store.set(contentAtom, 'first')
       })
@@ -131,13 +131,13 @@ describe('SnapshotRestorer + React Integration', () => {
 
       const { result } = renderHook(() => useAtomValue(contentAtom, store))
 
-      // Отменяем
+      // Undo
       act(() => {
         timeTravel.undo()
       })
       expect(result.current).toBe('first')
 
-      // Повторяем
+      // Redo
       act(() => {
         timeTravel.redo()
       })
@@ -155,7 +155,7 @@ describe('SnapshotRestorer + React Integration', () => {
         autoCapture: false
       })
 
-      // Устанавливаем значения
+      // Set values
       act(() => {
         store.set(countAtom, 1)
         store.set(nameAtom, 'Alice')
@@ -168,7 +168,7 @@ describe('SnapshotRestorer + React Integration', () => {
       })
       const snapshot2 = timeTravelMulti.capture('state2')
 
-      // Подписываемся на оба атома
+      // Subscribe to both atoms
       const { result } = renderHook(() => ({
         count: useAtomValue(countAtom, store),
         name: useAtomValue(nameAtom, store)
@@ -176,7 +176,7 @@ describe('SnapshotRestorer + React Integration', () => {
 
       expect(result.current).toEqual({ count: 2, name: 'Bob' })
 
-      // Восстанавливаем первое состояние
+      // Restore first state
       act(() => {
         timeTravelMulti.jumpTo(0)
       })
@@ -193,14 +193,14 @@ describe('SnapshotRestorer + React Integration', () => {
         autoCapture: false
       })
 
-      // Устанавливаем значения
+      // Set values
       act(() => {
         store.set(countAtom, 1)
         store.set(nameAtom, 'Alice')
       })
       timeTravelMulti.capture('state1')
 
-      // Изменяем только count
+      // Change only count
       act(() => {
         store.set(countAtom, 2)
       })
@@ -211,7 +211,7 @@ describe('SnapshotRestorer + React Integration', () => {
         name: useAtomValue(nameAtom, store)
       }))
 
-      // Восстанавливаем первое состояние
+      // Restore first state
       act(() => {
         timeTravelMulti.undo()
       })
@@ -235,13 +235,13 @@ describe('SnapshotRestorer + React Integration', () => {
       const { result } = renderHook(() => useAtomValue(contentAtom, store))
       const setContent = renderHook(() => useSetAtom(contentAtom, store)).result
 
-      // Восстанавливаем
+      // Restore
       act(() => {
         timeTravel.jumpTo(0)
       })
       expect(result.current).toBe('initial')
 
-      // Обновляем после восстановления
+      // Update after restoration
       act(() => {
         setContent.current('after-restore')
       })
@@ -251,7 +251,7 @@ describe('SnapshotRestorer + React Integration', () => {
 
   describe('Concurrent Updates', () => {
     it('should handle rapid snapshot navigation', () => {
-      // Создаём несколько снимков
+      // Create multiple snapshots
       for (let i = 0; i < 5; i++) {
         act(() => {
           store.set(contentAtom, `state${i}`)
@@ -262,7 +262,7 @@ describe('SnapshotRestorer + React Integration', () => {
       const { result } = renderHook(() => useAtomValue(contentAtom, store))
       expect(result.current).toBe('state4')
 
-      // Быстрая навигация
+      // Quick navigation
       act(() => {
         timeTravel.jumpTo(0)
         timeTravel.jumpTo(2)

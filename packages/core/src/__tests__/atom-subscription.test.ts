@@ -132,7 +132,7 @@ describe('Atom Subscription and Notification', () => {
 
       store.subscribe(testAtom, (newValue) => {
         valueDuringNotification = newValue
-        // Проверяем, что store.get возвращает то же значение
+        // Check that store.get returns the same value
         expect(store.get(testAtom)).toBe(newValue)
       })
 
@@ -151,7 +151,7 @@ describe('Atom Subscription and Notification', () => {
       store.set(testAtom, 1) // Same value
       store.set(testAtom, 1) // Same value again
 
-      // Текущая реализация уведомляет всегда, без сравнения значений
+      // Current implementation always notifies, without comparing values
       expect(notifications).toEqual([1, 1, 1])
     })
 
@@ -165,7 +165,7 @@ describe('Atom Subscription and Notification', () => {
 
       store.set(nanAtom, NaN)
 
-      // Текущая реализация уведомляет всегда
+      // Current implementation always notifies
       expect(notifications).toHaveLength(1)
     })
   })
@@ -236,7 +236,7 @@ describe('Atom Subscription and Notification', () => {
       store.set(testAtom, 1)
       store.set(testAtom, 2)
 
-      // Второй подписчик добавляется во время уведомления и сразу получает текущее значение
+      // Second subscriber is added during notification and immediately receives current value
       expect(notifications).toEqual([1, 'second-1', 2, 'second-2'])
     })
 
@@ -258,7 +258,7 @@ describe('Atom Subscription and Notification', () => {
       store.set(testAtom, 1)
       store.set(testAtom, 2)
 
-      // Подписчики вызываются в порядке добавления, поэтому 'second' идёт первым для value=1
+      // Subscribers are called in order of addition, so 'second' comes first for value=1
       expect(notifications).toEqual(['second', 'first', 'first'])
     })
 
@@ -324,8 +324,8 @@ describe('Batching and Notifications', () => {
       notifications.push(newValue)
     })
 
-    // Внутренняя реализация batching может отличаться
-    // Этот тест проверяет базовое поведение
+    // Internal batching implementation may differ
+    // This test checks basic behavior
     store.set(testAtom, 1)
     store.set(testAtom, 2)
 

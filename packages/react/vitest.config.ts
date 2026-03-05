@@ -7,7 +7,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    // Используем forks вместо threads для лучшей совместимости с jsdom
+    // Use forks instead of threads for better jsdom compatibility
     pool: 'forks',
     poolOptions: {
       forks: {
