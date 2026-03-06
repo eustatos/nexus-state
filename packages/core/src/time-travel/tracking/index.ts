@@ -1,33 +1,54 @@
 /**
- * Tracking module for SimpleTimeTravel
+ * Tracking module for TimeTravelController
  *
  * @packageDocumentation
  * Provides atom tracking, change detection, and computed atom handling.
  */
 
-import { AtomChangeDetector } from "./AtomChangeDetector";
-import { AtomTracker } from "./AtomTracker";
-import { ComputedAtomHandler } from "./ComputedAtomHandler";
-import type { ComputedDependency, ChangeListener, TrackerConfig } from "./types";
+import { AtomChangeDetector } from './AtomChangeDetector';
+import { AtomTracker } from './AtomTracker';
+import { ComputedAtomHandler } from './ComputedAtomHandler';
+import type {
+  ComputedDependency,
+  ChangeListener,
+  TrackerConfig,
+} from './types';
 import {
   LRUCleanupStrategy,
   LFUCleanupStrategy,
   FIFOCleanupStrategy,
   TimeBasedCleanupStrategy,
   createCleanupStrategy,
-} from "./CleanupStrategies";
+} from './CleanupStrategies';
 
 // Re-export main classes
-export { AtomTracker } from "./AtomTracker";
-export { AtomChangeDetector } from "./AtomChangeDetector";
-export { ComputedAtomHandler } from "./ComputedAtomHandler";
+export { AtomTracker } from './AtomTracker';
+export { AtomChangeDetector } from './AtomChangeDetector';
+export { ComputedAtomHandler } from './ComputedAtomHandler';
 export {
   LRUCleanupStrategy,
   LFUCleanupStrategy,
   FIFOCleanupStrategy,
   TimeBasedCleanupStrategy,
   createCleanupStrategy,
-} from "./CleanupStrategies";
+} from './CleanupStrategies';
+
+// Re-export services (decomposed components)
+export { AtomTrackingService } from './AtomTrackingService';
+export { AtomAccessService } from './AtomAccessService';
+export { AtomCleanupService } from './AtomCleanupService';
+export { AtomStatsService } from './AtomStatsService';
+export { AtomEventService } from './AtomEventService';
+
+// Re-export refactored components
+export { TrackedAtomsRepository } from './TrackedAtomsRepository';
+export { TTLManager } from './TTLManager';
+export { CleanupScheduler } from './CleanupScheduler';
+export { CleanupEngine } from './CleanupEngine';
+export { StatisticsCollector } from './StatisticsCollector';
+export { TrackingEventManager } from './TrackingEventManager';
+export { ReferenceCounter } from './ReferenceCounter';
+export { ArchiveManager } from './ArchiveManager';
 
 // Re-export types
 export type {
@@ -58,7 +79,7 @@ export type {
   CleanupAction,
   CleanupStats,
   CleanupResult,
-} from "./types";
+} from './types';
 
 // Re-export constants - TODO: create constants.ts
 // export {
@@ -78,7 +99,7 @@ export type {
  */
 export function createAtomTracker(
   store: any,
-  config?: Partial<TrackerConfig>,
+  config?: Partial<TrackerConfig>
 ): AtomTracker {
   return new AtomTracker(store, config);
 }
@@ -98,7 +119,7 @@ export function createChangeDetector(tracker: AtomTracker): AtomChangeDetector {
  * @returns ComputedAtomHandler instance
  */
 export function createComputedHandler(
-  tracker: AtomTracker,
+  tracker: AtomTracker
 ): ComputedAtomHandler {
   return new ComputedAtomHandler(tracker);
 }
@@ -130,7 +151,7 @@ export function getTrackedAtoms(tracker: AtomTracker): any[] {
  */
 export function getAtomByName(
   tracker: AtomTracker,
-  name: string,
+  name: string
 ): any | undefined {
   return tracker.getAtomByName(name);
 }
@@ -145,7 +166,7 @@ export function getAtomByName(
 export function watchAtom(
   detector: AtomChangeDetector,
   atom: any,
-  listener: ChangeListener,
+  listener: ChangeListener
 ): () => void {
   return detector.watch(atom, listener);
 }
@@ -160,7 +181,7 @@ export function watchAtom(
 export function watchAtoms(
   detector: AtomChangeDetector,
   atoms: any[],
-  listener: ChangeListener,
+  listener: ChangeListener
 ): () => void {
   return detector.watchMany(atoms, listener);
 }
@@ -173,7 +194,7 @@ export function watchAtoms(
  */
 export function createDependency(
   atom: any,
-  transform?: (value: any) => any,
+  transform?: (value: any) => any
 ): ComputedDependency {
   return { atom, transform };
 }
@@ -185,7 +206,7 @@ export function createDependency(
  */
 export function batchChanges(
   detector: AtomChangeDetector,
-  fn: () => void,
+  fn: () => void
 ): void {
   detector.batch(fn);
 }

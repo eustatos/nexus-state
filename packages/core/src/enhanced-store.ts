@@ -6,10 +6,10 @@ import type {
   StoreEnhancementOptions as StoreEnhancementOptionsType,
   TimeTravelOptions,
   Snapshot,
-} from "./types";
-import { createStore } from "./store";
-import { atomRegistry } from "./atom-registry";
-import { SimpleTimeTravel } from "./time-travel";
+} from './types';
+import { createStore } from './store';
+import { atomRegistry } from './atom-registry';
+import { TimeTravelController } from './time-travel';
 
 /**
  * Represents an enhanced store with additional capabilities.
@@ -67,12 +67,12 @@ export type StoreEnhancementOptions = StoreEnhancementOptionsType;
  */
 export function createEnhancedStore(
   plugins: Plugin[] = [],
-  options: StoreEnhancementOptions = {},
+  options: StoreEnhancementOptions = {}
 ): EnhancedStore {
   const {
     enableDevTools = true,
-    devToolsName = "EnhancedStore",
-    registryMode = "global",
+    devToolsName = 'EnhancedStore',
+    registryMode = 'global',
     enableTimeTravel = false,
     maxHistory = 50,
     autoCapture = true,
@@ -91,14 +91,14 @@ export function createEnhancedStore(
   };
 
   // Auto-attach to registry with specified mode (CORE-001 requirement)
-  if (typeof atomRegistry.attachStore === "function") {
+  if (typeof atomRegistry.attachStore === 'function') {
     atomRegistry.attachStore(store, registryMode);
   }
 
   // Add DevTools connection if enabled
   if (enableDevTools) {
     store.connectDevTools = () => {
-      console.log("DevTools connected for store:", devToolsName);
+      console.log('DevTools connected for store:', devToolsName);
     };
   }
 
@@ -108,7 +108,7 @@ export function createEnhancedStore(
       maxHistory,
       autoCapture,
     };
-    const timeTravel = new SimpleTimeTravel(store, timeTravelOptions);
+    const timeTravel = new TimeTravelController(store, timeTravelOptions);
 
     // Add time travel methods to store
     store.captureSnapshot = (action?: string) => timeTravel.capture(action);

@@ -1,245 +1,305 @@
 /**
- * Core internal types for SimpleTimeTravel
- * These types are used internally by core components
+ * Types for TimeTravel core modules
  */
 
-import type { Snapshot } from "../types";
+import type { Snapshot, Store, TimeTravelAPI } from '../../types';
+import type {
+  TimeTravelOptions,
+  RestorationOptions,
+  TransactionalRestorationResult,
+  RollbackResult,
+  RestorationCheckpoint,
+} from '../types';
+import type { DeltaSnapshot } from '../delta/types';
+import type { TimeTravelEvent, TimeTravelEventType } from './SubscriptionManager';
+
+// ==================== EXISTING TYPES (for backward compatibility) ====================
 
 /**
- * Represents the complete history state
+ * History event types
  */
-export interface HistoryState {
-  /** Past snapshots in chronological order */
-  past: Snapshot[];
-  /** Current snapshot */
-  current: Snapshot | null;
-  /** Future snapshots in chronological order */
-  future: Snapshot[];
+export type HistoryOperation = 'add' | 'undo' | 'redo' | 'jump' | 'clear' | 'change';
+
+export interface HistoryEvent {
+  type: HistoryOperation;
+  timestamp: number;
+  snapshotId?: string;
+  data?: any;
+  operation?: HistoryOperation;
 }
 
-/**
- * Configuration for HistoryManager
- */
+export interface HistoryStats {
+  length: number;
+  currentIndex: number;
+  canUndo: boolean;
+  canRedo: boolean;
+  pastCount?: number;
+  futureCount?: number;
+  totalSnapshots?: number;
+  hasCurrent?: boolean;
+  estimatedMemoryUsage?: number;
+  oldestTimestamp?: number;
+  newestTimestamp?: number;
+}
+
 export interface HistoryManagerConfig {
-  /** Maximum number of snapshots to keep in history */
-  maxHistory: number;
-  /** Whether to validate snapshots before adding */
-  validateSnapshots?: boolean;
-  /** Custom validator function */
-  validator?: (snapshot: Snapshot) => boolean;
+  maxHistory?: number;
+  useDeltaSnapshots?: boolean;
+  compressionConfig?: any;
+}
+
+export interface NavigationResult {
+  success: boolean;
+  current?: Snapshot;
+  error?: string;
+}
+
+export interface HistoryState {
+  past: Snapshot[];
+  future: Snapshot[];
+  current: Snapshot | null;
+}
+
+// Additional history types for backward compatibility
+export interface HistoryValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+export interface HistoryIndex {
+  past: number;
+  future: number;
+  current: number | null;
+}
+
+export interface HistoryBounds {
+  min: number;
+  max: number;
+  current: number;
+}
+
+export interface HistoryServiceConfig {
+  maxHistory?: number;
+  useDeltaSnapshots?: boolean;
+}
+
+// ==================== NEW DECOMPOSED TYPES ====================
+
+/**
+ * Configuration for TimeTravelController
+ */
+export interface TimeTravelControllerConfig extends TimeTravelOptions {
+  /** TTL in milliseconds */
+  ttl?: number;
+  /** Cleanup interval in milliseconds */
+  cleanupInterval?: number;
+  /** Delta snapshots config */
+  deltaSnapshots?: {
+    enabled?: boolean;
+    fullSnapshotInterval?: number;
+    maxDeltaChainLength?: number;
+    changeDetection?: 'deep' | 'shallow' | 'reference';
+  };
 }
 
 /**
- * Result of a navigation operation
+ * Statistics for time travel history
  */
-export interface NavigationResult {
-  /** Whether the navigation was successful */
+export interface TimeTravelStats {
+  /** Total history length */
+  length: number;
+  /** Current snapshot index */
+  currentIndex: number;
+  /** Whether undo is available */
+  canUndo: boolean;
+  /** Whether redo is available */
+  canRedo: boolean;
+}
+
+/**
+ * Result of capture operation
+ */
+export interface CaptureResult {
+  /** Whether capture was successful */
   success: boolean;
-  /** The snapshot that was navigated to (if successful) */
+  /** Created snapshot (if successful) */
   snapshot?: Snapshot;
-  /** Error message (if unsuccessful) */
+  /** Error message (if failed) */
+  error?: string;
+  /** Duration in milliseconds */
+  duration?: number;
+}
+
+/**
+ * Result of jump operation
+ */
+export interface JumpResult {
+  /** Whether jump was successful */
+  success: boolean;
+  /** Current snapshot after jump */
+  current?: Snapshot;
+  /** Error message (if failed) */
   error?: string;
 }
 
 /**
- * Represents a position in history
+ * Comparison result interface
  */
-export interface HistoryIndex {
-  /** Index in the full history array */
-  index: number;
-  /** Whether this is a valid position */
-  isValid: boolean;
-  /** Total length of history */
-  totalLength: number;
-}
-
-/**
- * Bounds of the history timeline
- */
-export interface HistoryBounds {
-  /** Oldest available index */
-  minIndex: number;
-  /** Newest available index */
-  maxIndex: number;
-  /** Current position */
-  currentIndex: number;
-}
-
-/**
- * Type of history operation
- */
-export type HistoryOperation =
-  | { type: "capture"; snapshot: Snapshot }
-  | { type: "undo"; from: Snapshot; to: Snapshot }
-  | { type: "redo"; from: Snapshot; to: Snapshot }
-  | { type: "jump"; fromIndex: number; toIndex: number; snapshot: Snapshot }
-  | { type: "clear" };
-
-/**
- * Validation result for history operations
- */
-export interface HistoryValidationResult {
-  /** Whether the operation is valid */
-  isValid: boolean;
-  /** Reason if invalid */
-  reason?: string;
-  /** Suggested action */
-  suggestion?: string;
-}
-
-/**
- * Event emitted by history manager
- */
-export interface HistoryEvent {
-  /** Type of event */
-  type: "change" | "error" | "warning";
-  /** Operation that triggered the event */
-  operation: HistoryOperation;
-  /** Timestamp of the event */
-  timestamp: number;
-  /** Additional data */
-  data?: unknown;
-}
-
-/**
- * History manager event handler
- */
-export type HistoryEventHandler = (event: HistoryEvent) => void;
-
-/**
- * Options for history navigation
- */
-export interface NavigationOptions {
-  /** Whether to validate the navigation */
-  validate?: boolean;
-  /** Whether to emit events */
-  emitEvents?: boolean;
-  /** Custom context */
-  context?: Record<string, unknown>;
-}
-
-/**
- * History statistics
- */
-export interface HistoryStats {
-  /** Total number of snapshots */
-  totalSnapshots: number;
-  /** Number of past snapshots */
-  pastCount: number;
-  /** Number of future snapshots */
-  futureCount: number;
-  /** Whether there is a current snapshot */
-  hasCurrent: boolean;
-  /** Memory usage estimate (in bytes) */
-  estimatedMemoryUsage: number;
-  /** Oldest snapshot timestamp */
-  oldestTimestamp?: number;
-  /** Newest snapshot timestamp */
-  newestTimestamp?: number;
-  /** Compression metadata if compression was applied */
-  compressionMetadata?: import("../types").CompressionMetadata;
-  /** Original history size before compression */
-  originalHistorySize?: number;
-  /** Compressed history size after compression */
-  compressedHistorySize?: number;
-}
-
-/**
- * Serialized history for persistence
- */
-export interface SerializedHistory {
-  /** Version of the serialization format */
-  version: string;
-  /** Serialized past snapshots */
-  past: SerializedSnapshot[];
-  /** Serialized current snapshot */
-  current: SerializedSnapshot | null;
-  /** Serialized future snapshots */
-  future: SerializedSnapshot[];
-  /** Metadata about the serialization */
-  metadata: {
-    timestamp: number;
-    snapshotCount: number;
-    maxHistory: number;
-  };
-}
-
-/**
- * Serialized snapshot format
- */
-export interface SerializedSnapshot {
+export interface ComparisonResult {
+  /** Comparison ID */
   id: string;
-  state: Record<string, SerializedStateEntry>;
+  /** Timestamp */
+  timestamp: number;
+  /** Summary of changes */
+  summary: {
+    totalAtoms: number;
+    changedAtoms: number;
+    addedAtoms: number;
+    removedAtoms: number;
+    unchangedAtoms: number;
+    hasChanges: boolean;
+    changePercentage: number;
+  };
+  /** Atom-level changes */
+  atoms: any[];
+  /** Statistics */
+  statistics: {
+    duration: number;
+    memoryUsed: number;
+    depth: number;
+    totalComparisons: number;
+    cacheHits: number;
+    cacheMisses: number;
+  };
+  /** Metadata */
   metadata: {
-    timestamp: number;
-    action?: string;
-    atomCount: number;
+    snapshotA: { id: string; timestamp: number };
+    snapshotB: { id: string; timestamp: number };
+    timeDifference: number;
+    options: any;
   };
 }
 
 /**
- * Serialized state entry
+ * Service interface for TimeTravel API operations
  */
-export interface SerializedStateEntry {
-  value: unknown;
-  type: string;
-  name: string;
-  atomId?: string;
+export interface TimeTravelApiService {
+  /** Capture a snapshot */
+  capture(action?: string): Snapshot | undefined;
+  /** Undo last action */
+  undo(): boolean;
+  /** Redo previously undone action */
+  redo(): boolean;
+  /** Jump to specific snapshot by ID */
+  jumpTo(snapshotId: string): boolean;
+  /** Jump to specific index */
+  jumpToIndex(index: number): boolean;
+  /** Check if undo is available */
+  canUndo(): boolean;
+  /** Check if redo is available */
+  canRedo(): boolean;
+  /** Get current snapshot */
+  getCurrentSnapshot(): Snapshot | undefined;
+  /** Get history length */
+  getHistoryLength(): number;
+  /** Get all history */
+  getAllHistory(): Snapshot[];
+  /** Get history stats */
+  getHistoryStats(): TimeTravelStats;
+  /** Clear history */
+  clearHistory(): void;
+  /** Get history */
+  getHistory(): Snapshot[];
 }
 
 /**
- * History compaction options
+ * Service interface for event emission
  */
-export interface CompactionOptions {
-  /** Maximum age in milliseconds */
-  maxAge?: number;
-  /** Maximum number of snapshots to keep */
-  maxSnapshots?: number;
-  /** Strategy for compaction */
-  strategy: "oldest" | "sparse" | "custom";
-  /** Custom compaction function */
-  customFn?: (snapshots: Snapshot[]) => Snapshot[];
+export interface TimeTravelEventService {
+  /** Subscribe to events */
+  subscribe(
+    eventType: TimeTravelEventType,
+    listener: (event: TimeTravelEvent) => void
+  ): () => void;
+  /** Emit an event */
+  emit(event: TimeTravelEvent): void;
+  /** Unsubscribe all */
+  unsubscribeAll(): void;
 }
 
 /**
- * History diff result
+ * Service interface for comparison operations
  */
-export interface HistoryDiff {
-  /** Whether histories are different */
-  hasChanges: boolean;
-  /** Added snapshots */
-  added: Snapshot[];
-  /** Removed snapshots */
-  removed: Snapshot[];
-  /** Changed snapshots (by id) */
-  changed: Array<{ old: Snapshot; new: Snapshot }>;
+export interface TimeTravelComparisonService {
+  /** Compare two snapshots */
+  compareSnapshots(
+    a: Snapshot | string,
+    b: Snapshot | string,
+    options?: any
+  ): ComparisonResult;
+  /** Compare snapshot with current state */
+  compareWithCurrent(
+    snapshot: Snapshot | string,
+    options?: any
+  ): ComparisonResult | null;
+  /** Get diff since action */
+  getDiffSince(action?: string, options?: any): ComparisonResult | null;
+  /** Visualize changes */
+  visualizeChanges(comparison: ComparisonResult, format?: string): string;
+  /** Export comparison */
+  exportComparison(comparison: ComparisonResult, format: string): string;
 }
 
 /**
- * History search options
+ * Service interface for transactional operations
  */
-export interface HistorySearchOptions {
-  /** Search by action name */
-  action?: string | RegExp;
-  /** Search by time range */
-  timeRange?: { from: number; to: number };
-  /** Search by atom value */
-  atomValue?: { atomName: string; value: unknown };
-  /** Maximum number of results */
-  limit?: number;
+export interface TimeTravelTransactionalService {
+  /** Restore with transaction */
+  restoreWithTransaction(
+    snapshotId: string,
+    options?: RestorationOptions
+  ): Promise<TransactionalRestorationResult>;
+  /** Get last checkpoint */
+  getLastCheckpoint(): RestorationCheckpoint | null;
+  /** Rollback to checkpoint */
+  rollbackToCheckpoint(checkpointId: string): Promise<RollbackResult>;
+  /** Get all checkpoints */
+  getCheckpoints(): RestorationCheckpoint[];
+  /** Import state */
+  importState(state: Record<string, unknown>): boolean;
 }
 
 /**
- * History search result
+ * Service interface for metrics
  */
-export interface HistorySearchResult {
-  /** Found snapshots */
-  snapshots: Snapshot[];
-  /** Total matches found */
-  total: number;
-  /** Search metadata */
-  metadata: {
-    searchTime: number;
-    criteria: HistorySearchOptions;
-  };
+export interface TimeTravelMetricsService {
+  /** Get delta stats */
+  getDeltaStats(): any;
+  /** Get cleanup stats */
+  getCleanupStats(): any;
+}
+
+/**
+ * Service interface for lifecycle management
+ */
+export interface TimeTravelLifecycleService {
+  /** Check if time traveling */
+  isTraveling(): boolean;
+  /** Start time travel */
+  startTimeTravel(): void;
+  /** End time travel */
+  endTimeTravel(): void;
+  /** Dispose */
+  dispose(): Promise<void>;
+}
+
+/**
+ * Service interface for configuration
+ */
+export interface TimeTravelConfigService {
+  /** Get current config */
+  getConfig(): TimeTravelControllerConfig;
+  /** Update config */
+  configure(config: Partial<TimeTravelControllerConfig>): void;
 }

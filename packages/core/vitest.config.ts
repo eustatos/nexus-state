@@ -20,7 +20,6 @@ export default defineConfig({
         '**/coverage/**',
         '**/__benchmarks__/**',
         '**/__fixtures__/**',
-        '**/__tests__/**',
         'src/test-utils/**'
       ]
     }

@@ -10,13 +10,65 @@ interface HistoryProvider {
   undo(): Snapshot | null;
   redo(): Snapshot | null;
   jumpTo(index: number): Snapshot | null;
+  getAll(): Snapshot[];
+  getLength(): number;
+  getById(id: string): Snapshot | null;
 }
 
 export class HistoryNavigator {
+  private currentIndex: number = -1;
+
   constructor(
     private historyManager: HistoryProvider,
     private snapshotRestorer: SnapshotRestorer,
-  ) {}
+  ) {
+    // Initialize current index to last snapshot
+    const all = this.historyManager.getAll();
+    this.currentIndex = all.length > 0 ? all.length - 1 : -1;
+  }
+
+  /**
+   * Get current snapshot
+   */
+  getCurrent(): Snapshot | undefined {
+    if (this.currentIndex < 0 || this.currentIndex >= this.historyManager.getLength()) {
+      return undefined;
+    }
+    const all = this.historyManager.getAll();
+    return all[this.currentIndex];
+  }
+
+  /**
+   * Get current index
+   */
+  getCurrentIndex(): number {
+    return this.currentIndex;
+  }
+
+  /**
+   * Check if undo is available
+   */
+  canUndo(): boolean {
+    return this.currentIndex > 0;
+  }
+
+  /**
+   * Check if redo is available
+   */
+  canRedo(): boolean {
+    return this.currentIndex < this.historyManager.getLength() - 1;
+  }
+
+  /**
+   * Jump to specific index
+   */
+  jumpToIndex(index: number): boolean {
+    if (index < 0 || index >= this.historyManager.getLength()) {
+      return false;
+    }
+    this.currentIndex = index;
+    return this.jumpTo(index);
+  }
 
   undo(): boolean {
     logger.log(`[NAVIGATOR.undo] canUndo: ${this.historyManager.canUndo()}`);
@@ -30,6 +82,7 @@ export class HistoryNavigator {
       logger.log(`[NAVIGATOR.undo] restore result: ${result}`);
       // FIX for Problem 3: Flush to ensure notifications are delivered
       batcher.flush();
+      this.currentIndex = Math.max(0, this.currentIndex - 1);
       return result;
     }
     return false;
@@ -43,6 +96,7 @@ export class HistoryNavigator {
       const result = this.snapshotRestorer.restore(snapshot);
       // FIX for Problem 3: Flush to ensure notifications are delivered
       batcher.flush();
+      this.currentIndex = Math.min(this.historyManager.getLength() - 1, this.currentIndex + 1);
       return result;
     }
     return false;
@@ -61,6 +115,7 @@ export class HistoryNavigator {
       logger.log(`[NAVIGATOR.jumpTo] index=${index}, restore result=${result}`);
       // FIX for Problem 3: Flush to ensure notifications are delivered
       batcher.flush();
+      this.currentIndex = index;
       return result;
     }
     return false;

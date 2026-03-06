@@ -125,6 +125,10 @@ export class HistoryManager extends BaseDisposable {
     ];
   }
 
+  getLength(): number {
+    return this.past.length + (this.current ? 1 : 0) + this.future.length;
+  }
+
   // Navigation methods
   canUndo(): boolean {
     return this.past.length > 0;

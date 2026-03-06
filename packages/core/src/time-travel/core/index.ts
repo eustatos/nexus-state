@@ -1,10 +1,7 @@
 /**
- * Core module for SimpleTimeTravel
+ * Core module for TimeTravel
  * Provides the main implementation and core components
  */
-
-// Re-export main class
-export { SimpleTimeTravel } from "./SimpleTimeTravel";
 
 // Re-export types
 export type {
@@ -13,21 +10,25 @@ export type {
   Snapshot,
   SnapshotMetadata,
   SnapshotStateEntry,
-} from "../types";
+} from '../types';
 
 // Re-export core components (for advanced use cases or testing)
-export { HistoryManager } from "./HistoryManager";
-export { HistoryNavigator } from "./HistoryNavigator";
-export type { HistoryManagerConfig, NavigationResult } from "./types";
+export { HistoryManager } from './HistoryManager';
+export { HistoryNavigator } from './HistoryNavigator';
+export { TimeTravelFactory } from './TimeTravelFactory';
+export type { HistoryManagerConfig, NavigationResult } from './types';
 
 // Re-export internal types (useful for extensions)
 export type {
   HistoryState,
   HistoryOperation,
+  HistoryEvent,
+  HistoryStats,
   HistoryValidationResult,
   HistoryIndex,
   HistoryBounds,
-} from "./types";
+  HistoryServiceConfig,
+} from './types';
 
 // Re-export disposal infrastructure
 export {
@@ -36,8 +37,5 @@ export {
   FinalizationHelper,
   DisposalError,
   AggregateDisposalError,
-} from "./disposable";
-export type {
-  Disposable,
-  DisposableConfig,
-} from "./disposable";
+} from './disposable';
+export type { Disposable, DisposableConfig } from './disposable';
