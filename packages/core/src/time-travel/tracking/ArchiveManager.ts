@@ -4,7 +4,7 @@
  * Handles archiving tracked atoms for potential restoration later.
  */
 
-import type { TrackedAtom } from './types';
+import type { TrackedAtom, AtomStatus } from './types';
 
 export interface ArchivedAtom extends TrackedAtom {
   /** Archive timestamp */
@@ -12,7 +12,7 @@ export interface ArchivedAtom extends TrackedAtom {
   /** Archive reason */
   reason?: string;
   /** Original status before archiving */
-  originalStatus: string;
+  originalStatus: AtomStatus;
 }
 
 export interface ArchiveStats {
@@ -160,7 +160,8 @@ export class ArchiveManager {
     let removed = 0;
 
     // Remove expired archives
-    for (const [id, atom] of this.archivedAtoms.entries()) {
+    const entries = Array.from(this.archivedAtoms.entries());
+    for (const [id, atom] of entries) {
       if (now - atom.archivedAt > this.config.archiveTTL) {
         this.archivedAtoms.delete(id);
         removed++;
@@ -176,7 +177,8 @@ export class ArchiveManager {
       let oldestId: symbol | null = null;
       let oldestTime = Infinity;
 
-      for (const [id, atom] of this.archivedAtoms.entries()) {
+      const entries2 = Array.from(this.archivedAtoms.entries());
+      for (const [id, atom] of entries2) {
         if (atom.archivedAt < oldestTime) {
           oldestTime = atom.archivedAt;
           oldestId = id;

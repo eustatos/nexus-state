@@ -5,7 +5,7 @@
  * applying cleanup strategies, and removing/archiving atoms.
  */
 
-import type { TrackedAtom } from './types';
+import type { TrackedAtom, CleanupResult } from './types';
 import type { TrackedAtomsRepository } from './TrackedAtomsRepository';
 import type { TTLManager } from './TTLManager';
 
@@ -22,24 +22,11 @@ export interface CleanupEngineConfig {
   dryRun: boolean;
 }
 
-export interface CleanupResult {
-  /** Number of atoms cleaned up */
-  cleanedCount: number;
-  /** Number of atoms that failed cleanup */
-  failedCount: number;
-  /** Atoms that were cleaned up */
-  cleanedAtoms: string[];
-  /** Error messages */
-  errors: string[];
-  /** Cleanup strategy used */
-  strategy: CleanupStrategy;
-}
-
 export interface CleanupCandidate {
   /** Atom to clean up */
   atom: TrackedAtom;
   /** Reason for cleanup */
-  reason: 'expired' | 'stale' | 'idle' | 'no-subscribers';
+  reason: 'stale' | 'idle' | 'no-subscribers';
   /** Recommended action */
   action: 'remove' | 'archive' | 'mark-stale';
 }
@@ -112,22 +99,12 @@ export class CleanupEngine {
       // Update status
       this.ttlManager.updateStatus(atom);
 
-      // Check for expired atoms
-      if (this.config.removeExpired && atom.status === 'expired') {
-        candidates.push({
-          atom,
-          reason: 'expired',
-          action: 'remove',
-        });
-        continue;
-      }
-
-      // Check for stale atoms
-      if (this.config.archiveStale && atom.status === 'stale') {
+      // Check for stale atoms (treated as expired)
+      if (this.config.removeExpired && atom.status === 'stale') {
         candidates.push({
           atom,
           reason: 'stale',
-          action: 'archive',
+          action: 'remove',
         });
         continue;
       }

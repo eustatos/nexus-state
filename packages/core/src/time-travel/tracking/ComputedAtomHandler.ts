@@ -28,8 +28,8 @@ export class ComputedAtomHandler {
    * Setup change tracking for dependencies
    */
   private setupChangeTracking(): void {
-    this.tracker.subscribe((event) => {
-      if (event.type === "change" && event.atom) {
+    this.tracker.subscribe('atom-changed', (event) => {
+      if (event.atom) {
         this.handleDependencyChange(event.atom);
       }
     });
@@ -61,7 +61,7 @@ export class ComputedAtomHandler {
     config?: Partial<ComputedAtomConfig>,
   ): void {
     if (!this.tracker.isTracked(atom)) {
-      this.tracker.track(atom, atom.name);
+      this.tracker.track(atom);
     }
 
     const atomId = atom.id;

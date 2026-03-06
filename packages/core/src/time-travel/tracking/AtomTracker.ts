@@ -25,7 +25,10 @@ import { TTLManager } from './TTLManager';
 import { CleanupScheduler } from './CleanupScheduler';
 import { CleanupEngine } from './CleanupEngine';
 import { StatisticsCollector } from './StatisticsCollector';
-import { TrackingEventManager, type TrackingEventType } from './TrackingEventManager';
+import {
+  TrackingEventManager,
+  type TrackingEventType,
+} from './TrackingEventManager';
 import { ReferenceCounter } from './ReferenceCounter';
 import { ArchiveManager } from './ArchiveManager';
 
@@ -46,6 +49,10 @@ const DEFAULT_CONFIG: TrackerConfig = {
   maxAtoms: 1000,
   trackComputed: true,
   trackWritable: true,
+  trackPrimitive: true,
+  validateOnTrack: false,
+  trackAccess: false,
+  trackChanges: false,
   logChanges: false,
   enableCleanup: true,
   archiveOnCleanup: false,
@@ -53,13 +60,23 @@ const DEFAULT_CONFIG: TrackerConfig = {
 
 const DEFAULT_TTL_CONFIG: TTLConfig = {
   defaultTTL: 5 * 60 * 1000,
-  idleTimeout: 60 * 1000,
-  staleTimeout: 2 * 60 * 1000,
+  maxTTL: 24 * 60 * 60 * 1000,
+  minTTL: 1000,
   ttlByType: {
     primitive: 5 * 60 * 1000,
     computed: 3 * 60 * 1000,
     writable: 5 * 60 * 1000,
   },
+  idleTimeout: 60 * 1000,
+  staleTimeout: 2 * 60 * 1000,
+  gcInterval: 30000,
+  batchSize: 10,
+  enableRefCounting: false,
+  autoUntrackWhenRefZero: false,
+  cleanupStrategy: 'lru',
+  onCleanup: 'archive',
+  logCleanups: false,
+  detailedStats: false,
 };
 
 /**
@@ -67,7 +84,7 @@ const DEFAULT_TTL_CONFIG: TTLConfig = {
  */
 export class AtomTracker extends BaseDisposable {
   private store: Store;
-  private config: TrackerConfig;
+  private trackerConfig: TrackerConfig;
   private ttlConfig: TTLConfig;
 
   // Core components
@@ -95,7 +112,7 @@ export class AtomTracker extends BaseDisposable {
     super(disposalConfig);
 
     this.store = store;
-    this.config = { ...DEFAULT_CONFIG, ...config };
+    this.trackerConfig = { ...DEFAULT_CONFIG, ...config };
     this.ttlConfig = { ...DEFAULT_TTL_CONFIG, ...config };
 
     // Initialize components
@@ -105,28 +122,23 @@ export class AtomTracker extends BaseDisposable {
     this.refCounter = new ReferenceCounter();
     this.statsCollector = new StatisticsCollector();
     this.archiveManager = new ArchiveManager({
-      enabled: this.config.archiveOnCleanup ?? false,
+      enabled: this.trackerConfig.archiveOnCleanup ?? false,
     });
 
     // Initialize cleanup engine and scheduler
-    this.cleanupEngine = new CleanupEngine(
-      this.repository,
-      this.ttlManager,
-      {
-        defaultStrategy: this.config.archiveOnCleanup ? 'archive' : 'remove',
-        removeExpired: true,
-        archiveStale: this.config.archiveOnCleanup ?? false,
-      }
-    );
+    this.cleanupEngine = new CleanupEngine(this.repository, this.ttlManager, {
+      defaultStrategy: this.trackerConfig.archiveOnCleanup
+        ? 'archive'
+        : 'remove',
+      removeExpired: true,
+      archiveStale: this.trackerConfig.archiveOnCleanup ?? false,
+    });
 
-    this.scheduler = new CleanupScheduler(
-      () => this.performCleanup(),
-      {
-        enabled: this.config.enableCleanup ?? true,
-        cleanupInterval: this.ttlConfig.gcInterval ?? 30000,
-        initialDelay: 100,
-      }
-    );
+    this.scheduler = new CleanupScheduler(() => this.performCleanup(), {
+      enabled: this.trackerConfig.enableCleanup ?? true,
+      cleanupInterval: this.ttlConfig.gcInterval ?? 30000,
+      initialDelay: 100,
+    });
 
     // Initialize services
     this.trackingService = new AtomTrackingService(
@@ -156,7 +168,7 @@ export class AtomTracker extends BaseDisposable {
     this.eventService = new AtomEventService(this.eventManager);
 
     // Start scheduler if enabled
-    if (this.config.enableCleanup) {
+    if (this.trackerConfig.enableCleanup) {
       this.scheduler.start();
     }
 
@@ -167,15 +179,32 @@ export class AtomTracker extends BaseDisposable {
    * Track an atom
    */
   track<Value>(atom: Atom<Value>): boolean {
+    const now = Date.now();
     const trackedAtom: TrackedAtom = {
       id: atom.id,
+      atom: atom,
       name: atom.name || atom.id.description || 'atom',
       type: 'primitive',
       status: 'active',
-      createdTimestamp: Date.now(),
-      lastAccessTimestamp: Date.now(),
+      createdAt: now,
+      lastAccessed: now,
+      lastChanged: now,
+      accessCount: 0,
+      idleTime: 0,
+      ttl: this.ttlConfig.defaultTTL,
+      gcEligible: false,
+      firstSeen: now,
+      lastSeen: now,
+      changeCount: 0,
+      metadata: {
+        createdAt: now,
+        updatedAt: now,
+        accessCount: 0,
+        changeCount: 0,
+        tags: [],
+        custom: {},
+      },
       subscribers: new Set(),
-      ttl: this.ttlManager.getTTLForAtom({} as TrackedAtom),
     };
 
     const result = this.trackingService.track(atom, trackedAtom);
@@ -215,7 +244,11 @@ export class AtomTracker extends BaseDisposable {
   /**
    * Record atom change (legacy method for backward compatibility)
    */
-  recordChange(atom: Atom<unknown>, oldValue: unknown, newValue: unknown): void {
+  recordChange(
+    atom: Atom<unknown>,
+    oldValue: unknown,
+    newValue: unknown
+  ): void {
     const trackedAtom = this.trackingService.getTrackedAtom(atom.id);
     if (!trackedAtom) {
       return;
@@ -371,7 +404,7 @@ export class AtomTracker extends BaseDisposable {
    * Get configuration
    */
   getConfig(): TrackerConfig {
-    return { ...this.config };
+    return { ...this.trackerConfig };
   }
 
   /**
@@ -385,7 +418,7 @@ export class AtomTracker extends BaseDisposable {
    * Update configuration
    */
   configure(config: Partial<TrackerConfig> & Partial<TTLConfig>): void {
-    this.config = { ...this.config, ...config };
+    this.trackerConfig = { ...this.trackerConfig, ...config };
     this.ttlConfig = { ...this.ttlConfig, ...config };
 
     this.ttlManager.configure(this.ttlConfig);

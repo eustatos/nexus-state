@@ -129,23 +129,41 @@ export class DeltaProcessor {
       return deltas[0];
     }
 
-    // Compute merged delta from first base to last target
+    // Merge changes: later deltas override earlier ones
+    const mergedChanges = new Map<string, import('./types').DeltaChange>();
+    for (const delta of deltas) {
+      for (const [atomName, change] of delta.changes.entries()) {
+        mergedChanges.set(atomName, change);
+      }
+    }
+
     const firstDelta = deltas[0];
     const lastDelta = deltas[deltas.length - 1];
 
-    // Create a synthetic delta from first base to last state
-    return {
+    // Compute compressed size (approximate)
+    const compressedSize = JSON.stringify(
+      Array.from(mergedChanges.entries())
+    ).length;
+    const originalSize = compressedSize; // placeholder
+
+    const mergedDelta: DeltaSnapshot = {
       id: `merged-${Date.now()}`,
       type: 'delta',
       baseSnapshotId: firstDelta.baseSnapshotId,
-      previousSnapshotId: lastDelta.previousSnapshotId,
-      delta: lastDelta.delta,
+      state: {}, // Delta snapshots don't store full state
+      changes: mergedChanges,
       metadata: {
         timestamp: Date.now(),
-        atomCount: lastDelta.metadata.atomCount,
         action: 'merged',
+        atomCount: mergedChanges.size,
+        baseTimestamp: firstDelta.metadata.baseTimestamp,
+        changeCount: mergedChanges.size,
+        compressedSize,
+        originalSize,
       },
     };
+
+    return mergedDelta;
   }
 
   /**
@@ -154,26 +172,7 @@ export class DeltaProcessor {
    * @returns Number of changes
    */
   private countChanges(delta: DeltaSnapshot): number {
-    let count = 0;
-
-    if (delta.delta) {
-      // Count added atoms
-      if (delta.delta.added) {
-        count += Object.keys(delta.delta.added).length;
-      }
-
-      // Count modified atoms
-      if (delta.delta.modified) {
-        count += Object.keys(delta.delta.modified).length;
-      }
-
-      // Count removed atoms
-      if (delta.delta.removed) {
-        count += Object.keys(delta.delta.removed).length;
-      }
-    }
-
-    return count;
+    return delta.changes.size;
   }
 
   /**

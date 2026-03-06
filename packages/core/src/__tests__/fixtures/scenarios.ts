@@ -137,8 +137,7 @@ export const dependencyGraphs = {
     const a4 = atom(4, 'a4');
     const a5 = atom(5, 'a5');
     const sum = atom(
-      (get: Getter) =>
-        get(a1) + get(a2) + get(a3) + get(a4) + get(a5),
+      (get: Getter) => get(a1) + get(a2) + get(a3) + get(a4) + get(a5),
       'sum'
     );
     return { store, a1, a2, a3, a4, a5, sum };
@@ -166,20 +165,20 @@ export const dependencyGraphs = {
    */
   circular: () => {
     const store = createStore();
-    let atom1Value = 1;
-    let atom2Value = 2;
+    const atom1Value = 1;
+    const atom2Value = 2;
 
-    const atom1 = atom((get: Getter) => {
+    const atom1: Atom<number> = atom((get: Getter) => {
       try {
-        return get(atom2) + 1;
+        return get(atom2 as Atom<number>) + 1;
       } catch {
         return atom1Value;
       }
     }, 'atom1');
 
-    const atom2 = atom((get: Getter) => {
+    const atom2: Atom<number> = atom((get: Getter) => {
       try {
-        return get(atom1) + 1;
+        return get(atom1 as Atom<number>) + 1;
       } catch {
         return atom2Value;
       }
@@ -239,9 +238,7 @@ export const edgeCases = {
       const atoms: Atom<number>[] = [atom(0, 'level-0')];
       for (let i = 1; i < length; i++) {
         const prev = atoms[i - 1];
-        atoms.push(
-          atom((get: Getter) => get(prev) + 1, `level-${i}`)
-        );
+        atoms.push(atom((get: Getter) => get(prev) + 1, `level-${i}`));
       }
       return atoms;
     };
@@ -279,7 +276,7 @@ export const errorScenarios = {
    */
   readError: () => {
     const store = createStore();
-    const errorAtom = atom((get: Getter) => {
+    const errorAtom = atom((_get: Getter) => {
       throw new Error('Read error');
     }, 'error-atom');
 
@@ -309,7 +306,7 @@ export const errorScenarios = {
     const store = createStore();
     const validatedAtom = atom(
       () => 0,
-      (get, set, value: number) => {
+      (_get, set, value: number) => {
         if (value < 0) {
           throw new Error('Value must be non-negative');
         }
@@ -326,7 +323,7 @@ export const errorScenarios = {
    */
   dependencyError: () => {
     const store = createStore();
-    const errorAtom = atom((get: Getter) => {
+    const errorAtom = atom((_get: Getter) => {
       throw new Error('Dependency error');
     }, 'error');
 

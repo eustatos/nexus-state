@@ -4,7 +4,7 @@
  * Handles cleanup scheduling, execution, and wait operations.
  */
 
-import type { CleanupResult } from './CleanupEngine';
+import type { CleanupResult } from './types';
 import type { CleanupScheduler } from './CleanupScheduler';
 import type { CleanupEngine } from './CleanupEngine';
 import type { TrackingEventManager } from './TrackingEventManager';
@@ -82,8 +82,8 @@ export class AtomCleanupService {
     return new Promise((resolve) => {
       const unsubscribe = this.eventManager.subscribe('cleanup-completed', (event) => {
         unsubscribe();
-        if (event.data) {
-          cleanupResult = { removed: event.data.cleanedCount || 0 };
+        if (event.data && typeof event.data.cleanedCount === 'number') {
+          cleanupResult = { removed: event.data.cleanedCount };
         }
         resolve(cleanupResult);
       });

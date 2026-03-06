@@ -35,11 +35,11 @@ export class AtomTrackingService {
 
   /**
    * Track an atom
-   * @param atom Atom to track
+   * @param _atom Atom to track
    * @param trackedAtom Tracked atom data
    * @returns Tracking result
    */
-  track<Value>(atom: Atom<Value>, trackedAtom: TrackedAtom): TrackingResult {
+  track<Value>(_atom: Atom<Value>, trackedAtom: TrackedAtom): TrackingResult {
     try {
       const success = this.repository.track(trackedAtom);
 
@@ -53,7 +53,8 @@ export class AtomTrackingService {
         error: 'Atom already tracked',
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       return {
         success: false,
         error: errorMessage,
@@ -88,7 +89,8 @@ export class AtomTrackingService {
         error: 'Failed to untrack atom',
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       return {
         success: false,
         error: errorMessage,

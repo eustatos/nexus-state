@@ -5,17 +5,17 @@
 /**
  * Atom lifecycle status
  */
-export type AtomStatus = "active" | "idle" | "stale" | "archived" | "deleted";
+export type AtomStatus = 'active' | 'idle' | 'stale' | 'archived' | 'deleted';
 
 /**
  * Cleanup strategy type
  */
-export type CleanupStrategyType = "lru" | "lfu" | "fifo" | "time-based";
+export type CleanupStrategyType = 'lru' | 'lfu' | 'fifo' | 'time-based';
 
 /**
  * Cleanup action type
  */
-export type CleanupAction = "archive" | "delete" | "notify";
+export type CleanupAction = 'archive' | 'delete' | 'notify';
 
 /**
  * Atom lifecycle information
@@ -60,18 +60,13 @@ export interface TTLConfig {
   minTTL: number;
 
   /** Per-type TTL overrides */
-  typeTTL: {
-    primitive?: number;
-    computed?: number;
-    writable?: number;
-    [key: string]: number | undefined;
-  };
+  ttlByType: Record<string, number>;
 
   /** Time before atom considered idle */
-  idleThreshold: number;
+  idleTimeout: number;
 
   /** Time before atom considered stale */
-  staleThreshold: number;
+  staleTimeout: number;
 
   /** How often to check for cleanup in ms */
   gcInterval: number;
@@ -126,39 +121,34 @@ export interface CleanupStats {
   /** Total number of cleanup operations */
   totalCleanups: number;
 
-  /** Total atoms removed */
-  totalAtomsRemoved: number;
+  /** Total atoms cleaned */
+  totalAtomsCleaned: number;
 
-  /** Total memory freed in bytes */
-  totalMemoryFreed: number;
+  /** Total atoms failed to clean */
+  totalAtomsFailed: number;
 
-  /** Timestamp of last cleanup */
-  lastCleanup: number | null;
-
-  /** Average cleanup time in ms */
-  averageCleanupTime?: number;
-
-  /** Atoms count by status */
-  atomsByStatus?: {
-    active: number;
-    idle: number;
-    stale: number;
-    archived: number;
-  };
+  /** Last cleanup result */
+  lastCleanup?: CleanupResult;
 }
 
 /**
  * Cleanup result
  */
 export interface CleanupResult {
-  /** Number of atoms removed */
-  removed: number;
+  /** Number of atoms cleaned up */
+  cleanedCount: number;
 
-  /** Memory freed in bytes */
-  freed: number;
+  /** Number of atoms that failed cleanup */
+  failedCount: number;
 
-  /** Duration in ms */
-  duration: number;
+  /** Atoms that were cleaned up */
+  cleanedAtoms: string[];
+
+  /** Error messages */
+  errors: string[];
+
+  /** Cleanup strategy used */
+  strategy: string;
 }
 
 /**
@@ -194,6 +184,15 @@ export interface TrackerConfig {
 
   /** TTL configuration */
   ttl?: Partial<TTLConfig>;
+
+  /** Log changes */
+  logChanges?: boolean;
+
+  /** Enable cleanup */
+  enableCleanup?: boolean;
+
+  /** Archive on cleanup */
+  archiveOnCleanup?: boolean;
 }
 
 /**
@@ -260,16 +259,24 @@ export interface AtomMetadata {
 export interface TrackingEvent {
   /** Event type */
   type:
-    | "track"
-    | "untrack"
-    | "change"
-    | "access"
-    | "error"
-    | "clear"
-    | "restore"
-    | "cleanup"
-    | "beforeCleanup"
-    | "afterCleanup";
+    | 'track'
+    | 'untrack'
+    | 'change'
+    | 'access'
+    | 'error'
+    | 'clear'
+    | 'restore'
+    | 'cleanup'
+    | 'beforeCleanup'
+    | 'afterCleanup'
+    | 'atom-tracked'
+    | 'atom-untracked'
+    | 'atom-accessed'
+    | 'atom-changed'
+    | 'cleanup-started'
+    | 'cleanup-completed'
+    | 'atom-expired'
+    | 'atom-archived';
 
   /** Event timestamp */
   timestamp: number;
@@ -287,7 +294,7 @@ export interface TrackingEvent {
   message?: string;
 
   /** Additional data */
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 /**
@@ -354,7 +361,7 @@ export interface ChangeEvent {
   timestamp: number;
 
   /** Change type */
-  type: "created" | "deleted" | "value" | "type" | "unknown";
+  type: 'created' | 'deleted' | 'value' | 'type' | 'unknown';
 }
 
 /**
@@ -404,7 +411,7 @@ export interface ComputedAtomConfig {
   invalidateOnChange: boolean;
 
   /** Recompute strategy */
-  strategy?: "eager" | "lazy" | "debounced";
+  strategy?: 'eager' | 'lazy' | 'debounced';
 
   /** Debounce wait time in ms */
   debounceWait?: number;
@@ -442,10 +449,10 @@ export interface ComputedCache {
  * Computed invalidation strategy
  */
 export type ComputedInvalidationStrategy =
-  | "immediate"
-  | "debounced"
-  | "throttled"
-  | "manual";
+  | 'immediate'
+  | 'debounced'
+  | 'throttled'
+  | 'manual';
 
 /**
  * Atom group
@@ -479,7 +486,7 @@ export interface AtomRelationship {
   to: symbol;
 
   /** Relationship type */
-  type: "depends" | "derives" | "updates" | "subscribes";
+  type: 'depends' | 'derives' | 'updates' | 'subscribes';
 
   /** Relationship strength (0-1) */
   strength?: number;
@@ -496,7 +503,7 @@ export interface AtomSubscription {
   atomId: symbol;
 
   /** Subscription type */
-  type: "value" | "change" | "access";
+  type: 'value' | 'change' | 'access';
 
   /** Created timestamp */
   createdAt: number;

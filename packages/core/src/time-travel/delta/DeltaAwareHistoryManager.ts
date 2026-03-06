@@ -368,13 +368,16 @@ export class DeltaAwareHistoryManager {
       }
       visited.add(current.id);
 
-      const baseId: string | null | undefined = (current as DeltaSnapshot).baseSnapshotId;
+      const baseId: string | null | undefined = (current as DeltaSnapshot)
+        .baseSnapshotId;
       if (!baseId) {
         return null;
       }
 
       const allSnapshots = this.historyManager.getAll();
-      const baseSnapshot = allSnapshots.find((s) => s.id === baseId);
+      const baseSnapshot: Snapshot | undefined = allSnapshots.find(
+        (s) => s.id === baseId
+      );
 
       if (!baseSnapshot) {
         return null;

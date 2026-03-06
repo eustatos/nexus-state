@@ -150,18 +150,8 @@ export const writableAtoms = {
   counter: () => {
     const counterAtom = atom(
       () => 0,
-      (get, set, action: 'inc' | 'dec' | 'reset') => {
-        switch (action) {
-          case 'inc':
-            set(counterAtom, get(counterAtom) + 1);
-            break;
-          case 'dec':
-            set(counterAtom, get(counterAtom) - 1);
-            break;
-          case 'reset':
-            set(counterAtom, 0);
-            break;
-        }
+      (_get, set, value: number) => {
+        set(counterAtom, value);
       },
       'counter'
     );
@@ -169,44 +159,50 @@ export const writableAtoms = {
   },
 
   /** Clamped value between min and max */
-  clamped: (min: number, max: number) =>
-    atom(
+  clamped: (min: number, max: number) => {
+    const clampedAtom = atom(
       () => 0,
-      (get, set, value: number) => {
+      (_get, set, value: number) => {
         const clamped = Math.max(min, Math.min(max, value));
-        set(clamped, clamped);
+        set(clampedAtom, clamped);
       },
       'clamped'
-    ),
+    );
+    return clampedAtom;
+  },
 
   /** Positive-only value */
-  positiveOnly: () =>
-    atom(
+  positiveOnly: () => {
+    const positiveOnlyAtom = atom(
       () => 0,
-      (get, set, value: number) => {
+      (_get, set, value: number) => {
         if (value < 0) {
           throw new Error('Value must be positive');
         }
-        set(positiveOnly, value);
+        set(positiveOnlyAtom, value);
       },
       'positive-only'
-    ),
+    );
+    return positiveOnlyAtom;
+  },
 
   /** Doubled write - stores value * 2 */
-  doubled: () =>
-    atom(
+  doubled: () => {
+    const doubledAtom = atom(
       () => 0,
-      (get, set, value: number) => {
-        set(doubled, value * 2);
+      (_get, set, value: number) => {
+        set(doubledAtom, value * 2);
       },
       'doubled'
-    ),
+    );
+    return doubledAtom;
+  },
 
   /** Sync atom - updates multiple atoms */
   sync: (masterAtom: Atom<number>, slaves: Atom<number>[]) =>
     atom(
       (get: Getter) => get(masterAtom),
-      (get, set, value: number) => {
+      (_get, set, value: number) => {
         set(masterAtom, value);
         slaves.forEach((slave) => set(slave, value));
       },
@@ -214,17 +210,19 @@ export const writableAtoms = {
     ),
 
   /** Validated string - must be non-empty */
-  validatedString: () =>
-    atom(
+  validatedString: () => {
+    const validatedStringAtom = atom(
       () => '',
-      (get, set, value: string) => {
+      (_get, set, value: string) => {
         if (!value.trim()) {
           throw new Error('String cannot be empty');
         }
-        set(validatedString, value);
+        set(validatedStringAtom, value);
       },
       'validated-string'
-    ),
+    );
+    return validatedStringAtom;
+  },
 };
 
 /**
@@ -272,50 +270,28 @@ export const edgeCaseAtoms = {
 
   /** Map atom */
   map: (entries?: [string, unknown][]) =>
-    atom(
-      new Map(entries || [['key', 'value']]),
-      'map'
-    ),
+    atom(new Map(entries || [['key', 'value']]), 'map'),
 
   /** Set atom */
-  set: (values?: unknown[]) =>
-    atom(
-      new Set(values || [1, 2, 3]),
-      'set'
-    ),
+  set: (values?: unknown[]) => atom(new Set(values || [1, 2, 3]), 'set'),
 
   /** Date atom */
   date: (dateString?: string) =>
-    atom(
-      new Date(dateString || '2024-01-01'),
-      'date'
-    ),
+    atom(new Date(dateString || '2024-01-01'), 'date'),
 
   /** RegExp atom */
   regex: (pattern?: string, flags?: string) =>
-    atom(
-      new RegExp(pattern || 'test', flags || 'gi'),
-      'regex'
-    ),
+    atom(new RegExp(pattern || 'test', flags || 'gi'), 'regex'),
 
   /** Symbol atom */
   symbol: (description?: string) =>
-    atom(
-      Symbol(description || 'test'),
-      'symbol'
-    ),
+    atom(Symbol(description || 'test'), 'symbol'),
 
   /** BigInt atom */
   bigInt: (value?: string | bigint) =>
-    atom(
-      BigInt(value || '9007199254740991'),
-      'bigint'
-    ),
+    atom(BigInt(value || '9007199254740991'), 'bigint'),
 
   /** Function atom */
   fn: (fn?: (...args: any[]) => any) =>
-    atom(
-      fn || ((x: number) => x * 2),
-      'function'
-    ),
+    atom(fn || ((x: number) => x * 2), 'function'),
 };

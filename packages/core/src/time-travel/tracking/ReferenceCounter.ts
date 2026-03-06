@@ -42,7 +42,7 @@ export class ReferenceCounter {
    */
   recordAccess(atom: TrackedAtom): void {
     // Update atom's last access timestamp
-    atom.lastAccessTimestamp = Date.now();
+    atom.lastAccessed = Date.now();
 
     // Increment access count
     const count = this.accessCounts.get(atom.id) || 0;

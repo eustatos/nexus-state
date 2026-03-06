@@ -3,6 +3,7 @@
  */
 
 import type { Plugin, Store } from '../../../types';
+import { vi } from 'vitest';
 
 /**
  * Creates a mock store for tests
@@ -11,10 +12,10 @@ export function createMockStore(): Store & Record<string, any> {
   const atoms = new Map();
 
   return {
-    get: vi.fn((atom) => {
+    get: vi.fn((atom: any) => {
       return atoms.get(atom.id);
     }),
-    set: vi.fn((atom, update) => {
+    set: vi.fn((atom: any, update: any) => {
       const value = typeof update === 'function' ? update(atoms.get(atom.id)) : update;
       atoms.set(atom.id, value);
     }),

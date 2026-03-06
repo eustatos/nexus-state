@@ -4,6 +4,8 @@
  * Manages automatic cleanup execution based on configured intervals.
  */
 
+import type { CleanupResult } from './types';
+
 export interface CleanupSchedulerConfig {
   /** Enable automatic cleanup */
   enabled: boolean;
@@ -24,7 +26,7 @@ export interface SchedulerStats {
   nextCleanupTimestamp?: number;
 }
 
-export type CleanupTask = () => Promise<{ cleanedCount: number; failedCount: number }>;
+export type CleanupTask = () => Promise<CleanupResult>;
 
 /**
  * CleanupScheduler provides automatic cleanup scheduling
@@ -113,7 +115,7 @@ export class CleanupScheduler {
    * Trigger immediate cleanup
    * @returns Cleanup result
    */
-  async triggerCleanup(): Promise<{ cleanedCount: number; failedCount: number }> {
+  async triggerCleanup(): Promise<CleanupResult> {
     try {
       const result = await this.cleanupTask();
       this.cleanupsPerformed++;
@@ -121,7 +123,7 @@ export class CleanupScheduler {
       return result;
     } catch (error) {
       console.error('[CleanupScheduler] Manual cleanup failed:', error);
-      return { cleanedCount: 0, failedCount: 0 };
+      return { cleanedCount: 0, failedCount: 0, cleanedAtoms: [], errors: [], strategy: 'default' };
     }
   }
 

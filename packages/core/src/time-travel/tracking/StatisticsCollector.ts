@@ -5,28 +5,8 @@
  * and tracking system performance.
  */
 
-import type { TrackedAtom } from './types';
-import type { CleanupResult } from './CleanupEngine';
+import type { TrackedAtom, TrackingStats, CleanupResult } from './types';
 import type { RepositoryStats } from './TrackedAtomsRepository';
-
-export interface TrackingStats {
-  /** Total tracked atoms */
-  totalAtoms: number;
-  /** Active atoms */
-  activeAtoms: number;
-  /** Idle atoms */
-  idleAtoms: number;
-  /** Stale atoms */
-  staleAtoms: number;
-  /** Expired atoms */
-  expiredAtoms: number;
-  /** Atoms by type */
-  atomsByType: Record<string, number>;
-  /** Average subscribers per atom */
-  averageSubscribers: number;
-  /** Atoms with no subscribers */
-  atomsWithNoSubscribers: number;
-}
 
 export interface CleanupStats {
   /** Total cleanups performed */
@@ -71,12 +51,11 @@ export class StatisticsCollector {
    */
   collectTrackingStats(
     atoms: TrackedAtom[],
-    repositoryStats?: RepositoryStats
+    _repositoryStats?: RepositoryStats
   ): TrackingStats {
     const activeAtoms = atoms.filter((a) => a.status === 'active').length;
     const idleAtoms = atoms.filter((a) => a.status === 'idle').length;
     const staleAtoms = atoms.filter((a) => a.status === 'stale').length;
-    const expiredAtoms = atoms.filter((a) => a.status === 'expired').length;
 
     // Count by type
     const atomsByType: Record<string, number> = {};
@@ -98,13 +77,16 @@ export class StatisticsCollector {
 
     return {
       totalAtoms: atoms.length,
-      activeAtoms,
-      idleAtoms,
-      staleAtoms,
-      expiredAtoms,
-      atomsByType,
-      averageSubscribers: atoms.length > 0 ? totalSubscribers / atoms.length : 0,
-      atomsWithNoSubscribers,
+      byType: atomsByType,
+      accessCount: 0,
+      changeCount: 0,
+      averageAccesses: 0,
+      mostAccessed: null,
+      mostChanged: null,
+      oldestAtom: null,
+      newestAtom: null,
+      version: 1,
+      uptime: 0,
     };
   }
 

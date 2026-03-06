@@ -89,13 +89,15 @@ export function createTestStore(atoms: Record<string, Atom<any>> = {}): Store {
  * expect(store.get(counter)).toBe(1);
  * ```
  */
-export function createTestCounter(options: {
-  initial?: number;
-  min?: number;
-  max?: number;
-  step?: number;
-  name?: string;
-} = {}): Atom<undefined, 'increment' | 'decrement' | 'reset'> {
+export function createTestCounter(
+  options: {
+    initial?: number;
+    min?: number;
+    max?: number;
+    step?: number;
+    name?: string;
+  } = {}
+): Atom<number> {
   const {
     initial = 0,
     min = -Infinity,
@@ -108,7 +110,7 @@ export function createTestCounter(options: {
 
   return atom(
     () => count,
-    (get, set, action) => {
+    (_get, _set, action: any) => {
       switch (action) {
         case 'increment':
           count = Math.min(max, count + step);
@@ -135,17 +137,19 @@ export function createTestCounter(options: {
  * expect(store.get(toggle)).toBe(true);
  * ```
  */
-export function createTestToggle(options: {
-  initial?: boolean;
-  name?: string;
-} = {}): Atom<boolean, boolean | 'toggle'> {
+export function createTestToggle(
+  options: {
+    initial?: boolean;
+    name?: string;
+  } = {}
+): Atom<boolean> {
   const { initial = false, name = 'test-toggle' } = options;
 
   let value = initial;
 
   return atom(
     () => value,
-    (get, set, newValue) => {
+    (_get, _set, newValue: any) => {
       if (newValue === 'toggle') {
         value = !value;
       } else {
@@ -174,7 +178,7 @@ export function createTestValidatedAtom<T>(options: {
   validator: (value: T) => boolean;
   default?: T;
   name?: string;
-}): Atom<T, T> {
+}): Atom<T> {
   const {
     initial,
     validator,
@@ -186,7 +190,7 @@ export function createTestValidatedAtom<T>(options: {
 
   return atom(
     () => currentValue,
-    (get, set, newValue) => {
+    (_get, _set, newValue: T) => {
       if (validator(newValue)) {
         currentValue = newValue;
       }

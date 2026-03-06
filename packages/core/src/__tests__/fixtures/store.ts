@@ -11,7 +11,7 @@
  * ```
  */
 
-import { atom, createStore } from '../../index';
+import { atom, createStore, atomRegistry } from '../../index';
 import type { Atom, Store, Getter } from '../../types';
 
 /**
@@ -50,13 +50,15 @@ export const testStores = {
     };
 
     // Initialize all atoms
-    Object.values(atoms).forEach((a) => store.get(a));
+    Object.values(atoms).forEach((a) => store.get(a as Atom<unknown>));
 
     return {
       store,
       atoms,
-      getAtom: <T>(name: keyof typeof atoms) => atoms[name] as Atom<T>,
-      getValue: <T>(name: keyof typeof atoms) => store.get(atoms[name]) as T,
+      getAtom: <T>(name: keyof typeof atoms) =>
+        atoms[name] as unknown as Atom<T>,
+      getValue: <T>(name: keyof typeof atoms) =>
+        store.get(atoms[name] as Atom<unknown>) as T,
     };
   },
 
@@ -92,27 +94,17 @@ export const testStores = {
 
     const counter = atom(
       () => 0,
-      (get, set, action: 'inc' | 'dec' | 'reset') => {
-        switch (action) {
-          case 'inc':
-            set(counter, get(counter) + 1);
-            break;
-          case 'dec':
-            set(counter, get(counter) - 1);
-            break;
-          case 'reset':
-            set(counter, 0);
-            break;
-        }
+      (_get, set, value: number) => {
+        set(counter, value);
       },
       'counter'
     );
 
     const clamped = atom(
       () => 0,
-      (get, set, value: number) => {
-        const clamped = Math.max(0, Math.min(100, value));
-        set(clamped, clamped);
+      (_get, set, value: number) => {
+        const clampedValue = Math.max(0, Math.min(100, value));
+        set(clamped, clampedValue);
       },
       'clamped'
     );
@@ -137,10 +129,7 @@ export const testStores = {
     const b = atom(20, 'b');
     const sum = atom((get: Getter) => get(a) + get(b), 'sum');
     const product = atom((get: Getter) => get(a) * get(b), 'product');
-    const result = atom(
-      (get: Getter) => get(sum) + get(product),
-      'result'
-    );
+    const result = atom((get: Getter) => get(sum) + get(product), 'result');
 
     store.get(a);
     store.get(b);
@@ -168,7 +157,7 @@ export const testStores = {
     const computed = atom((get: Getter) => get(primitive) * 2, 'computed');
     const writable = atom(
       () => 0,
-      (get, set, value: number) => set(writable, value),
+      (_get, set, value: number) => set(writable, value),
       'writable'
     );
 
@@ -208,10 +197,7 @@ export const testStores = {
       'completed-count'
     );
 
-    const userName = atom(
-      (get: Getter) => get(user).name,
-      'user-name'
-    );
+    const userName = atom((get: Getter) => get(user).name, 'user-name');
 
     store.get(user);
     store.get(todos);
@@ -262,19 +248,16 @@ export class StoreBuilder {
    * Add a computed atom
    */
   computed<T>(name: string, fn: (get: (key: string) => any) => T): this {
-    const a = atom(
-      (get: Getter) => {
-        const getter = (key: string) => {
-          const atom = this.atoms.get(key);
-          if (!atom) {
-            throw new Error(`Atom '${key}' not found`);
-          }
-          return get(atom);
-        };
-        return fn(getter);
-      },
-      name
-    );
+    const a = atom((get: Getter) => {
+      const getter = (key: string) => {
+        const atom = this.atoms.get(key);
+        if (!atom) {
+          throw new Error(`Atom '${key}' not found`);
+        }
+        return get(atom);
+      };
+      return fn(getter);
+    }, name);
     this.atoms.set(name, a);
     this.store.get(a);
     return this;
@@ -283,12 +266,8 @@ export class StoreBuilder {
   /**
    * Add a writable atom
    */
-  writable<T>(
-    name: string,
-    read: () => T,
-    write: (value: T) => void
-  ): this {
-    const a = atom(read, (get, set, value: T) => write(value), name);
+  writable<T>(name: string, read: () => T, write: (value: T) => void): this {
+    const a = atom(read, (_get, _set, value: T) => write(value), name);
     this.atoms.set(name, a);
     this.store.get(a);
     return this;
@@ -322,14 +301,14 @@ export function createTestStore(
  * Create a store snapshot (all current values)
  */
 export function createSnapshot(store: Store): Record<string, any> {
-  const { atomRegistry } = require('../../index');
   const allAtoms = atomRegistry.getAll();
   const snapshot: Record<string, any> = {};
 
   for (const [id, atom] of allAtoms.entries()) {
+    const a = atom as any;
     try {
-      const name = atom.name || `atom-${id.toString()}`;
-      snapshot[name] = store.get(atom);
+      const name = a.name || `atom-${id.toString()}`;
+      snapshot[name] = store.get(a as Atom<any>);
     } catch {
       // Skip atoms that throw
     }

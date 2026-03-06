@@ -46,7 +46,7 @@ export class AtomAccessService {
    * @param subscriberId Optional subscriber ID
    */
   recordAccess<Value>(
-    atom: Atom<Value>,
+    _atom: Atom<Value>,
     trackedAtom: TrackedAtom,
     subscriberId?: string
   ): void {
@@ -73,7 +73,7 @@ export class AtomAccessService {
    * @returns True if removed successfully
    */
   removeSubscriber<Value>(
-    atom: Atom<Value>,
+    _atom: Atom<Value>,
     trackedAtom: TrackedAtom,
     subscriberId: string
   ): boolean {

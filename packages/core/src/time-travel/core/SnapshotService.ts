@@ -64,10 +64,7 @@ export class SnapshotService {
     };
 
     this.creator = new SnapshotCreator(store, restorerConfig);
-    this.restorer = new SnapshotRestorer(store, {
-      ...restorerConfig,
-      ...config?.restoration,
-    });
+    this.restorer = new SnapshotRestorer(store, restorerConfig);
   }
 
   /**

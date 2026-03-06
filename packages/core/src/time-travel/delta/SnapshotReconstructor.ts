@@ -75,10 +75,11 @@ export class SnapshotReconstructor {
     let result = this.cloneService.cloneSnapshot(rootSnapshot);
 
     // Apply deltas
-    result = this.deltaProcessor.applyDeltas(result, deltaChain);
-    if (!result) {
+    const applied = this.deltaProcessor.applyDeltas(result, deltaChain);
+    if (!applied) {
       return null;
     }
+    result = applied;
 
     // Update metadata
     result.id = delta.id;
@@ -139,10 +140,11 @@ export class SnapshotReconstructor {
     };
 
     // Apply deltas
-    result = this.deltaProcessor.applyDeltas(result, deltaChain);
-    if (!result) {
+    const applied = this.deltaProcessor.applyDeltas(result, deltaChain);
+    if (!applied) {
       return null;
     }
+    result = applied;
 
     // Update metadata
     result.id = delta.id;
@@ -182,7 +184,7 @@ export class SnapshotReconstructor {
       visited.add(currentDelta.id);
       deltaChain.unshift(currentDelta);
 
-      const baseId = currentDelta.baseSnapshotId;
+      const baseId: string | null = currentDelta.baseSnapshotId;
       if (!baseId) {
         return null;
       }
@@ -222,7 +224,7 @@ export class SnapshotReconstructor {
       visited.add(currentDelta.id);
       deltaChain.unshift(currentDelta);
 
-      const baseId = currentDelta.baseSnapshotId;
+      const baseId: string | null = currentDelta.baseSnapshotId;
       if (!baseId) {
         return null;
       }
@@ -232,7 +234,9 @@ export class SnapshotReconstructor {
       }
 
       // Find base in history
-      const baseSnapshot = history.find((s) => s.id === baseId);
+      const baseSnapshot: Snapshot | undefined = history.find(
+        (s) => s.id === baseId
+      );
       if (baseSnapshot && this.isDelta(baseSnapshot)) {
         currentDelta = baseSnapshot;
       } else {
@@ -296,8 +300,7 @@ export class SnapshotReconstructor {
     const entries = Array.from(this.cache.entries());
     entries.sort(
       (a, b) =>
-        a[1].accessCount - b[1].accessCount ||
-        a[1].timestamp - b[1].timestamp
+        a[1].accessCount - b[1].accessCount || a[1].timestamp - b[1].timestamp
     );
 
     // Remove half of cache

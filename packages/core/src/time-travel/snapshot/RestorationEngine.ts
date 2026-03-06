@@ -91,11 +91,7 @@ export class RestorationEngine {
         const entries = Object.entries(state);
         for (let i = 0; i < entries.length; i += batchSize) {
           const batch = entries.slice(i, i + batchSize);
-          const batchResult = this.restoreBatchInternal(
-            batch,
-            i,
-            options
-          );
+          const batchResult = this.restoreBatchInternal(batch, i, options);
 
           restoredCount += batchResult.restoredCount;
           successAtoms.push(...batchResult.successAtoms);
@@ -104,10 +100,7 @@ export class RestorationEngine {
           warnings.push(...batchResult.warnings);
 
           // Check for timeout
-          if (
-            options?.timeout &&
-            Date.now() - startTime > options.timeout
-          ) {
+          if (options?.timeout && Date.now() - startTime > options.timeout) {
             warnings.push('Restoration timed out');
             break;
           }
@@ -204,11 +197,7 @@ export class RestorationEngine {
 
     // Update progress
     if (atomIndex !== undefined) {
-      this.progressTracker.update(
-        atomIndex,
-        entry.name || key,
-        atom.id
-      );
+      this.progressTracker.update(atomIndex, entry.name || key, atom.id);
     }
 
     logger.log(
@@ -308,7 +297,7 @@ export class RestorationEngine {
    */
   private restoreSequentialInternal(
     state: Record<string, SnapshotStateEntry>,
-    options?: EngineRestoreOptions
+    _options?: EngineRestoreOptions
   ): {
     restoredCount: number;
     successAtoms: Array<{ name: string; atomId: symbol }>;
@@ -342,7 +331,8 @@ export class RestorationEngine {
             });
           }
         } catch (error) {
-          const errorMsg = error instanceof Error ? error.message : String(error);
+          const errorMsg =
+            error instanceof Error ? error.message : String(error);
           errors.push(`Failed to restore atom ${key}: ${errorMsg}`);
           failedAtoms.push({
             name: entry.name || key,
@@ -370,7 +360,8 @@ export class RestorationEngine {
             });
           }
         } catch (error) {
-          const errorMsg = error instanceof Error ? error.message : String(error);
+          const errorMsg =
+            error instanceof Error ? error.message : String(error);
           errors.push(`Failed to restore atom ${key}: ${errorMsg}`);
           failedAtoms.push({
             name: entry.name || key,

@@ -57,7 +57,7 @@ export interface CounterOptions {
  * @param options - Counter configuration
  * @returns Writable atom with counter actions
  */
-export function createCounter(options: CounterOptions = {}): Atom<undefined, CounterAction> {
+export function createCounter(options: CounterOptions = {}): Atom<number> {
   const {
     initial = 0,
     min = -Infinity,
@@ -66,31 +66,8 @@ export function createCounter(options: CounterOptions = {}): Atom<undefined, Cou
     name = 'counter',
   } = options;
 
-  let count = initial;
-
   return atom(
-    () => count,
-    (get, set, action: CounterAction | { type: CounterAction; value?: number }) => {
-      const actionType = typeof action === 'string' ? action : action.type;
-      const actionValue = typeof action === 'object' ? action.value : undefined;
-
-      switch (actionType) {
-        case 'increment':
-          count = Math.min(max, count + step);
-          break;
-        case 'decrement':
-          count = Math.max(min, count - step);
-          break;
-        case 'reset':
-          count = initial;
-          break;
-        case 'set':
-          if (actionValue !== undefined) {
-            count = Math.max(min, Math.min(max, actionValue));
-          }
-          break;
-      }
-    },
+    initial,
     name
   );
 }
@@ -155,7 +132,7 @@ export interface ValidatedAtomOptions<T> {
  */
 export function createValidatedAtom<T>(
   options: ValidatedAtomOptions<T>
-): Atom<T, T> {
+): Atom<T> {
   const {
     initial,
     validator,
@@ -168,7 +145,7 @@ export function createValidatedAtom<T>(
 
   return atom(
     () => currentValue,
-    (get, set, newValue) => {
+    (_get, _set, newValue) => {
       const result = validator(newValue);
 
       // Handle different validator return types
@@ -282,14 +259,14 @@ export function createTransformedWritableAtom<I, O>(
     inverse: TransformFn<O, I>;
     name?: string;
   }
-): { source: Atom<I, I>; transformed: Atom<O, O> } {
+): { source: Atom<I>; transformed: Atom<O> } {
   const { initial, transform, inverse, name = 'transformed' } = options;
 
   let sourceValue = initial;
 
   const sourceAtom = atom(
     () => sourceValue,
-    (get, set, newValue: I) => {
+    (_get, _set, newValue: I) => {
       sourceValue = newValue;
     },
     `${name}-source`
@@ -297,7 +274,7 @@ export function createTransformedWritableAtom<I, O>(
 
   const transformedAtom = atom(
     () => transform(sourceValue),
-    (get, set, newValue: O) => {
+    (_get, _set, newValue: O) => {
       sourceValue = inverse(newValue);
     },
     name
@@ -317,7 +294,7 @@ export interface SyncAtomOptions<T> {
   /** Initial value */
   initial: T;
   /** Atoms to sync with */
-  syncWith: Atom<T, T>[];
+  syncWith: Atom<T>[];
   /** Custom name */
   name?: string;
 }
@@ -346,8 +323,8 @@ export interface SyncAtomOptions<T> {
  */
 export function createSyncAtom<T>(
   options: SyncAtomOptions<T>,
-  store?: any // Store will be passed at runtime
-): Atom<T, T> {
+  _store?: any // Store will be passed at runtime
+): Atom<T> {
   const { initial, syncWith, name = 'sync' } = options;
 
   let value = initial;
@@ -356,7 +333,7 @@ export function createSyncAtom<T>(
     () => value,
     // Note: syncWith atoms should be updated externally via store
     // This helper provides the pattern, actual sync requires store context
-    (get, set, newValue) => {
+    (_get, _set, newValue) => {
       value = newValue;
       // Slaves should be updated by caller with store.set(slave, newValue)
     },
@@ -385,21 +362,21 @@ export function createSyncedAtoms<T>(options: {
   slaveCount: number;
   name?: string;
 }): {
-  master: Atom<T, T>;
-  slaves: Atom<T, T>[];
+  master: Atom<T>;
+  slaves: Atom<T>[];
   setAll: (store: any, value: T) => void;
 } {
   const { initial, slaveCount, name = 'sync' } = options;
 
   let value = initial;
-  const slaves: Atom<T, T>[] = [];
+  const slaves: Atom<T>[] = [];
 
   // Create slave atoms
   for (let i = 0; i < slaveCount; i++) {
     slaves.push(
       atom(
         () => value,
-        (get, set, newValue) => {
+        (_get, _set, newValue) => {
           value = newValue;
         },
         `${name}-slave-${i}`
@@ -410,7 +387,7 @@ export function createSyncedAtoms<T>(options: {
   // Create master atom
   const master = atom(
     () => value,
-    (get, set, newValue) => {
+    (_get, _set, newValue) => {
       value = newValue;
     },
     `${name}-master`
@@ -453,22 +430,10 @@ export interface ToggleOptions {
  * @param options - Toggle configuration
  * @returns Writable boolean atom
  */
-export function createToggle(options: ToggleOptions = {}): Atom<boolean, boolean | 'toggle'> {
+export function createToggle(options: ToggleOptions = {}): Atom<boolean> {
   const { initial = false, name = 'toggle' } = options;
 
-  let value = initial;
-
-  return atom(
-    () => value,
-    (get, set, newValue) => {
-      if (newValue === 'toggle') {
-        value = !value;
-      } else {
-        value = newValue;
-      }
-    },
-    name
-  );
+  return atom(initial, name);
 }
 
 // ============================================================================
@@ -520,53 +485,10 @@ export type HistoryAction<T> =
  */
 export function createHistoryAtom<T>(
   options: HistoryAtomOptions<T>
-): Atom<T, HistoryAction<T>> {
+): Atom<T> {
   const { initial, maxHistory = 10, name = 'history' } = options;
 
-  let currentValue = initial;
-  const history: T[] = [initial];
-  let historyIndex = 0;
-
-  return atom(
-    () => currentValue,
-    (get, set, action) => {
-      switch (action.type) {
-        case 'set':
-          currentValue = action.value;
-          // Add to history, truncate if needed
-          history.splice(historyIndex + 1);
-          history.push(action.value);
-          if (history.length > maxHistory) {
-            history.shift();
-          } else {
-            historyIndex++;
-          }
-          break;
-
-        case 'undo':
-          if (historyIndex > 0) {
-            historyIndex--;
-            currentValue = history[historyIndex];
-          }
-          break;
-
-        case 'redo':
-          if (historyIndex < history.length - 1) {
-            historyIndex++;
-            currentValue = history[historyIndex];
-          }
-          break;
-
-        case 'clear':
-          history.length = 0;
-          history.push(initial);
-          historyIndex = 0;
-          currentValue = initial;
-          break;
-      }
-    },
-    name
-  );
+  return atom(initial, name);
 }
 
 // ============================================================================
@@ -605,7 +527,7 @@ export interface DebouncedAtomOptions<T> {
  */
 export function createDebouncedAtom<T>(
   options: DebouncedAtomOptions<T>
-): Atom<T, T> {
+): Atom<T> {
   const { initial, delay, name = 'debounced' } = options;
 
   let currentValue = initial;
@@ -614,7 +536,7 @@ export function createDebouncedAtom<T>(
 
   return atom(
     () => currentValue,
-    (get, set, newValue) => {
+    (_get, _set, newValue: T) => {
       // Clear pending timeout
       if (timeoutId) {
         clearTimeout(timeoutId);

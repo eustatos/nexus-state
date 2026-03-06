@@ -138,10 +138,11 @@ export class SnapshotStrategy {
     }
 
     // Current is delta, need to find root
+    const baseId = (currentSnapshot as DeltaSnapshot).baseSnapshotId;
     return {
       shouldCreateDelta: true,
       reason: 'Current snapshot is delta',
-      baseSnapshotId: (currentSnapshot as DeltaSnapshot).baseSnapshotId,
+      baseSnapshotId: baseId ?? undefined,
     };
   }
 

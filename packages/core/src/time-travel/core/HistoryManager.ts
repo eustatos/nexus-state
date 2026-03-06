@@ -271,10 +271,9 @@ export class HistoryManager extends BaseDisposable {
     // Reset compression tracking
     this.originalHistorySize = 0;
     this.compressedHistorySize = 0;
-    
+
     this.emit({
       type: "change",
-      operation: { type: "clear" },
       timestamp: Date.now(),
     });
   }
@@ -285,6 +284,10 @@ export class HistoryManager extends BaseDisposable {
   getStats(): HistoryStats {
     const all = this.getAll();
     return {
+      length: all.length,
+      currentIndex: this.past.length,
+      canUndo: this.past.length > 0,
+      canRedo: this.future.length > 0,
       totalSnapshots: all.length,
       pastCount: this.past.length,
       futureCount: this.future.length,

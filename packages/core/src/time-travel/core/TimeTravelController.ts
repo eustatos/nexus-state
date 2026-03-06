@@ -300,7 +300,7 @@ export class TimeTravelController extends BaseDisposable implements TimeTravelAP
   /**
    * Compare snapshot with current state
    */
-  compareWithCurrent(snapshot: Snapshot | string, options?: any): ComparisonResult | null {
+  compareWithCurrent(snapshot: Snapshot | string, options?: any): any {
     return this.comparisonFacade.compareWithCurrent(snapshot, options);
   }
 

@@ -37,7 +37,7 @@ export function createComputedAtom<T>(
  * Creates a test writable atom
  */
 export function createWritableAtom<T>(
-  value: T,
+  _value: T,
   readFn: (get: any) => T,
   writeFn: (get: any, set: any, val: T) => void,
   name?: string

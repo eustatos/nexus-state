@@ -4,9 +4,7 @@
  * Handles TTL configuration, status updates, and expiration checking.
  */
 
-import type { TrackedAtom } from './types';
-
-export type AtomStatus = 'active' | 'idle' | 'stale' | 'expired';
+import type { TrackedAtom, AtomStatus } from './types';
 
 export interface TTLConfig {
   /** Default TTL in milliseconds */
@@ -77,7 +75,7 @@ export class TTLManager {
    */
   isExpired(atom: TrackedAtom): boolean {
     const now = Date.now();
-    const lastAccess = atom.lastAccessTimestamp || atom.createdTimestamp || 0;
+    const lastAccess = atom.lastAccessed || atom.createdAt || 0;
     const ttl = this.getTTLForAtom(atom);
 
     return now - lastAccess > ttl;
@@ -90,7 +88,7 @@ export class TTLManager {
    */
   isIdle(atom: TrackedAtom): boolean {
     const now = Date.now();
-    const lastAccess = atom.lastAccessTimestamp || atom.createdTimestamp || 0;
+    const lastAccess = atom.lastAccessed || atom.createdAt || 0;
 
     return now - lastAccess > this.config.idleTimeout;
   }
@@ -102,7 +100,7 @@ export class TTLManager {
    */
   isStale(atom: TrackedAtom): boolean {
     const now = Date.now();
-    const lastAccess = atom.lastAccessTimestamp || atom.createdTimestamp || 0;
+    const lastAccess = atom.lastAccessed || atom.createdAt || 0;
 
     return now - lastAccess > this.config.staleTimeout;
   }
@@ -113,9 +111,6 @@ export class TTLManager {
    * @returns Atom status
    */
   getStatus(atom: TrackedAtom): AtomStatus {
-    if (this.isExpired(atom)) {
-      return 'expired';
-    }
     if (this.isStale(atom)) {
       return 'stale';
     }
@@ -159,7 +154,7 @@ export class TTLManager {
    */
   getTTLResult(atom: TrackedAtom): TTLResult {
     const now = Date.now();
-    const lastAccess = atom.lastAccessTimestamp || atom.createdTimestamp || 0;
+    const lastAccess = atom.lastAccessed || atom.createdAt || 0;
     const ttl = this.getTTLForAtom(atom);
     const status = this.getStatus(atom);
 
@@ -169,7 +164,7 @@ export class TTLManager {
       status,
       timeSinceAccess: now - lastAccess,
       ttl,
-      isExpired: status === 'expired',
+      isExpired: status === 'stale',
     };
   }
 
@@ -220,7 +215,7 @@ export class TTLManager {
    * @param atom Atom to reset
    */
   resetAccessTime(atom: TrackedAtom): void {
-    atom.lastAccessTimestamp = Date.now();
+    atom.lastAccessed = Date.now();
     atom.status = 'active';
   }
 }

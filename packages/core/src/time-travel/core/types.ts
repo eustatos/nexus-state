@@ -11,14 +11,23 @@ import type {
   RestorationCheckpoint,
 } from '../types';
 import type { DeltaSnapshot } from '../delta/types';
-import type { TimeTravelEvent, TimeTravelEventType } from './SubscriptionManager';
+import type {
+  TimeTravelEvent,
+  TimeTravelEventType,
+} from './SubscriptionManager';
 
 // ==================== EXISTING TYPES (for backward compatibility) ====================
 
 /**
  * History event types
  */
-export type HistoryOperation = 'add' | 'undo' | 'redo' | 'jump' | 'clear' | 'change';
+export type HistoryOperation =
+  | 'add'
+  | 'undo'
+  | 'redo'
+  | 'jump'
+  | 'clear'
+  | 'change';
 
 export interface HistoryEvent {
   type: HistoryOperation;
@@ -303,3 +312,14 @@ export interface TimeTravelConfigService {
   /** Update config */
   configure(config: Partial<TimeTravelControllerConfig>): void;
 }
+
+// Missing types for backward compatibility
+export type HistoryDiff = Record<string, unknown>;
+
+export type HistorySearchResult = Record<string, unknown>;
+
+export type HistorySearchOptions = Record<string, unknown>;
+
+export type CompactionOptions = Record<string, unknown>;
+
+export type SerializedHistory = Record<string, unknown>;
