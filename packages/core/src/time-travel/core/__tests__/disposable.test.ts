@@ -94,11 +94,11 @@ describe('BaseDisposable', () => {
   });
 
   describe('onDispose', () => {
-    it('should register callback', () => {
+    it('should register callback', async () => {
       const callback = vi.fn();
       disposable.onDispose(callback);
 
-      disposable.dispose();
+      await disposable.dispose();
 
       expect(callback).toHaveBeenCalled();
     });
@@ -154,7 +154,9 @@ describe('BaseDisposable', () => {
 
       (parent as any).registerChild(child);
 
-      await expect(parent.dispose()).rejects.toThrow();
+      await expect(async () => {
+        await parent.dispose();
+      }).rejects.toThrow();
     });
   });
 

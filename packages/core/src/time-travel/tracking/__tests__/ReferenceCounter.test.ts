@@ -45,7 +45,7 @@ describe('ReferenceCounter', () => {
       counter.recordAccess(atom);
 
       expect(counter.getAccessCount(atom)).toBe(1);
-      expect(atom.lastAccessTimestamp).toBeDefined();
+      expect(atom.lastAccessed).toBeDefined();
     });
 
     it('should increment access count on multiple accesses', () => {
@@ -70,7 +70,7 @@ describe('ReferenceCounter', () => {
       expect(counter.getAccessCount(atom2)).toBe(1);
     });
 
-    it('should update lastAccessTimestamp', () => {
+    it('should update lastAccessed', () => {
       const atom = createMockAtom('atom1');
       const beforeAccess = Date.now();
 
@@ -78,8 +78,8 @@ describe('ReferenceCounter', () => {
 
       const afterAccess = Date.now();
 
-      expect(atom.lastAccessTimestamp).toBeGreaterThanOrEqual(beforeAccess);
-      expect(atom.lastAccessTimestamp).toBeLessThanOrEqual(afterAccess);
+      expect(atom.lastAccessed).toBeGreaterThanOrEqual(beforeAccess);
+      expect(atom.lastAccessed).toBeLessThanOrEqual(afterAccess);
     });
   });
 

@@ -69,7 +69,7 @@ export class HistoryManager extends BaseDisposable {
 
   add(snapshot: Snapshot): void {
     logger.log(`[HISTORY.add] Adding snapshot: ${snapshot.metadata.action || 'unknown'}, past.length: ${this.past.length}, current: ${this.current?.metadata.action || 'none'}`);
-    
+
     // If maxHistory is 0, don't save any history
     if (this.maxHistory <= 0) {
       logger.log(`[HISTORY.add] maxHistory is ${this.maxHistory}, skipping history save`);
@@ -77,40 +77,42 @@ export class HistoryManager extends BaseDisposable {
       this.past = [];
       this.future = [];
       logger.log(`[HISTORY.add] Added. Total: ${this.getAll().length} (past: ${this.past.length}, current: ${this.current ? 1 : 0}, future: ${this.future.length})`);
+      this.emit({ type: 'change', timestamp: Date.now() });
       return;
     }
-    
+
     // First, push current to past if it exists
     if (this.current) {
       this.past.push(this.current);
       logger.log(`[HISTORY.add] Pushed current to past, past.length now: ${this.past.length}`);
     }
-    
+
     // Update current and clear future
     this.current = snapshot;
     this.future = [];
-    
+
     // Enforce maxHistory limit: past + current <= maxHistory
     // We need to keep at most (maxHistory - 1) items in past
     // because current counts as one slot
     const maxPastSize = this.maxHistory - 1;
-    
+
     if (this.past.length > maxPastSize) {
       // Calculate how many items to remove from the beginning
       const itemsToRemove = this.past.length - maxPastSize;
-      
+
       // Keep only the most recent (maxPastSize) items
       this.past = this.past.slice(itemsToRemove);
       logger.log(`[HISTORY.add] Trimmed past from ${this.past.length + itemsToRemove} to ${this.past.length} items (maxPastSize: ${maxPastSize})`);
     }
-    
+
     // Apply compression if strategy is configured and should compress
     if (this.compressionStrategy && this.compressionStrategy.shouldCompress(this.getAll(), this.past.length)) {
       logger.log(`[HISTORY.add] Applying compression`);
       this.applyCompression();
     }
-    
+
     logger.log(`[HISTORY.add] Added. Total: ${this.getAll().length} (past: ${this.past.length}, current: ${this.current ? 1 : 0}, future: ${this.future.length})`);
+    this.emit({ type: 'change', timestamp: Date.now() });
   }
 
   getCurrent(): Snapshot | null {

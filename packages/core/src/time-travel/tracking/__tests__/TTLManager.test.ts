@@ -28,8 +28,6 @@ function createMockAtom(name: string, overrides?: Partial<TrackedAtom>): Tracked
       createdAt: now,
       type: 'primitive',
     },
-    lastAccessTimestamp: now,
-    createdTimestamp: now,
     ...overrides,
   };
 }
@@ -97,15 +95,15 @@ describe('TTLManager', () => {
   describe('isExpired', () => {
     it('should return false for recently accessed atom', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now(),
+        lastAccessed: Date.now(),
       });
 
       expect(ttlManager.isExpired(atom)).toBe(false);
     });
 
-    it('should return true for expired atom', () => {
+    it('should return true for stale atom', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 400000, // Older than default TTL
+        lastAccessed: Date.now() - 400000, // Older than default TTL
       });
 
       expect(ttlManager.isExpired(atom)).toBe(true);
@@ -114,16 +112,16 @@ describe('TTLManager', () => {
     it('should use atom-specific TTL', () => {
       const atom = createMockAtom('atom1', {
         ttl: 10000,
-        lastAccessTimestamp: Date.now() - 20000,
+        lastAccessed: Date.now() - 20000,
       });
 
       expect(ttlManager.isExpired(atom)).toBe(true);
     });
 
-    it('should use createdTimestamp when lastAccessTimestamp is missing', () => {
+    it('should use createdAt when lastAccessed is missing', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: undefined,
-        createdTimestamp: Date.now() - 400000,
+        lastAccessed: undefined as any,
+        createdAt: Date.now() - 400000,
       });
 
       expect(ttlManager.isExpired(atom)).toBe(true);
@@ -133,7 +131,7 @@ describe('TTLManager', () => {
   describe('isIdle', () => {
     it('should return false for recently accessed atom', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now(),
+        lastAccessed: Date.now(),
       });
 
       expect(ttlManager.isIdle(atom)).toBe(false);
@@ -141,7 +139,7 @@ describe('TTLManager', () => {
 
     it('should return true for idle atom', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 120000, // Older than default idleTimeout
+        lastAccessed: Date.now() - 120000, // Older than default idleTimeout
       });
 
       expect(ttlManager.isIdle(atom)).toBe(true);
@@ -150,7 +148,7 @@ describe('TTLManager', () => {
     it('should use custom idleTimeout', () => {
       const manager = new TTLManager({ idleTimeout: 5000 });
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 10000,
+        lastAccessed: Date.now() - 10000,
       });
 
       expect(manager.isIdle(atom)).toBe(true);
@@ -160,7 +158,7 @@ describe('TTLManager', () => {
   describe('isStale', () => {
     it('should return false for recently accessed atom', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now(),
+        lastAccessed: Date.now(),
       });
 
       expect(ttlManager.isStale(atom)).toBe(false);
@@ -168,7 +166,7 @@ describe('TTLManager', () => {
 
     it('should return true for stale atom', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 200000, // Older than default staleTimeout
+        lastAccessed: Date.now() - 200000, // Older than default staleTimeout
       });
 
       expect(ttlManager.isStale(atom)).toBe(true);
@@ -177,7 +175,7 @@ describe('TTLManager', () => {
     it('should use custom staleTimeout', () => {
       const manager = new TTLManager({ staleTimeout: 5000 });
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 10000,
+        lastAccessed: Date.now() - 10000,
       });
 
       expect(manager.isStale(atom)).toBe(true);
@@ -187,7 +185,7 @@ describe('TTLManager', () => {
   describe('getStatus', () => {
     it('should return active for recently accessed atom', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now(),
+        lastAccessed: Date.now(),
       });
 
       expect(ttlManager.getStatus(atom)).toBe('active');
@@ -195,7 +193,7 @@ describe('TTLManager', () => {
 
     it('should return idle for idle atom', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 120000,
+        lastAccessed: Date.now() - 120000,
       });
 
       expect(ttlManager.getStatus(atom)).toBe('idle');
@@ -203,31 +201,15 @@ describe('TTLManager', () => {
 
     it('should return stale for stale atom', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 200000,
+        lastAccessed: Date.now() - 200000,
       });
 
       expect(ttlManager.getStatus(atom)).toBe('stale');
     });
 
-    it('should return expired for expired atom', () => {
-      const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 400000,
-      });
-
-      expect(ttlManager.getStatus(atom)).toBe('expired');
-    });
-
-    it('should prioritize expired over stale', () => {
-      const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 400000,
-      });
-
-      expect(ttlManager.getStatus(atom)).toBe('expired');
-    });
-
     it('should prioritize stale over idle', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 200000,
+        lastAccessed: Date.now() - 200000,
       });
 
       expect(ttlManager.getStatus(atom)).toBe('stale');
@@ -237,7 +219,7 @@ describe('TTLManager', () => {
   describe('updateStatus', () => {
     it('should update atom status', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 200000,
+        lastAccessed: Date.now() - 200000,
       });
 
       const status = ttlManager.updateStatus(atom);
@@ -248,7 +230,7 @@ describe('TTLManager', () => {
 
     it('should return updated status', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now(),
+        lastAccessed: Date.now(),
       });
 
       const status = ttlManager.updateStatus(atom);
@@ -259,9 +241,9 @@ describe('TTLManager', () => {
 
   describe('updateStatuses', () => {
     it('should update statuses for multiple atoms', () => {
-      const atom1 = createMockAtom('atom1', { lastAccessTimestamp: Date.now() });
+      const atom1 = createMockAtom('atom1', { lastAccessed: Date.now() });
       const atom2 = createMockAtom('atom2', {
-        lastAccessTimestamp: Date.now() - 200000,
+        lastAccessed: Date.now() - 200000,
       });
 
       const statuses = ttlManager.updateStatuses([atom1, atom2]);
@@ -281,12 +263,12 @@ describe('TTLManager', () => {
   });
 
   describe('getExpiredAtoms', () => {
-    it('should return expired atoms', () => {
+    it('should return stale atoms', () => {
       const atom1 = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 400000,
+        lastAccessed: Date.now() - 400000,
       });
       const atom2 = createMockAtom('atom2', {
-        lastAccessTimestamp: Date.now(),
+        lastAccessed: Date.now(),
       });
 
       const expired = ttlManager.getExpiredAtoms([atom1, atom2]);
@@ -295,12 +277,12 @@ describe('TTLManager', () => {
       expect(expired[0]?.name).toBe('atom1');
     });
 
-    it('should return empty array when no expired atoms', () => {
+    it('should return empty array when no stale atoms', () => {
       const atom1 = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now(),
+        lastAccessed: Date.now(),
       });
       const atom2 = createMockAtom('atom2', {
-        lastAccessTimestamp: Date.now(),
+        lastAccessed: Date.now(),
       });
 
       const expired = ttlManager.getExpiredAtoms([atom1, atom2]);
@@ -312,10 +294,10 @@ describe('TTLManager', () => {
   describe('getIdleAtoms', () => {
     it('should return idle atoms', () => {
       const atom1 = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 120000,
+        lastAccessed: Date.now() - 120000,
       });
       const atom2 = createMockAtom('atom2', {
-        lastAccessTimestamp: Date.now(),
+        lastAccessed: Date.now(),
       });
 
       const idle = ttlManager.getIdleAtoms([atom1, atom2]);
@@ -328,10 +310,10 @@ describe('TTLManager', () => {
   describe('getStaleAtoms', () => {
     it('should return stale atoms', () => {
       const atom1 = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 200000,
+        lastAccessed: Date.now() - 200000,
       });
       const atom2 = createMockAtom('atom2', {
-        lastAccessTimestamp: Date.now(),
+        lastAccessed: Date.now(),
       });
 
       const stale = ttlManager.getStaleAtoms([atom1, atom2]);
@@ -344,7 +326,7 @@ describe('TTLManager', () => {
   describe('getTTLResult', () => {
     it('should return TTL result', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 200000,
+        lastAccessed: Date.now() - 200000,
       });
 
       const result = ttlManager.getTTLResult(atom);
@@ -354,18 +336,18 @@ describe('TTLManager', () => {
       expect(result.status).toBe('stale');
       expect(result.timeSinceAccess).toBeGreaterThan(0);
       expect(result.ttl).toBe(300000);
-      expect(result.isExpired).toBe(false);
+      expect(result.isExpired).toBe(true);
     });
 
-    it('should return isExpired true for expired atom', () => {
+    it('should return isExpired true for stale atom', () => {
       const atom = createMockAtom('atom1', {
-        lastAccessTimestamp: Date.now() - 400000,
+        lastAccessed: Date.now() - 400000,
       });
 
       const result = ttlManager.getTTLResult(atom);
 
       expect(result.isExpired).toBe(true);
-      expect(result.status).toBe('expired');
+      expect(result.status).toBe('stale');
     });
   });
 

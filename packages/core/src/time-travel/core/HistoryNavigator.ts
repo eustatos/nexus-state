@@ -46,6 +46,13 @@ export class HistoryNavigator {
   }
 
   /**
+   * Set current index
+   */
+  setCurrentIndex(index: number): void {
+    this.currentIndex = index;
+  }
+
+  /**
    * Check if undo is available
    */
   canUndo(): boolean {

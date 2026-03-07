@@ -60,6 +60,9 @@ export class TimeTravelFactory {
 
     // Create services with proper dependencies
     const snapshotService = new SnapshotService(store, {
+      creator: {
+        skipStateCheck: true,
+      },
       restorer: {
         validateBeforeRestore: true,
         batchRestore: true,

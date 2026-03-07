@@ -61,6 +61,9 @@ export class HistoryService {
   add(snapshot: Snapshot): HistoryResult {
     try {
       this.historyManager.add(snapshot);
+      // Update navigator's current index to point to the new snapshot
+      const all = this.historyManager.getAll();
+      this.navigator.setCurrentIndex(all.length - 1);
       return {
         success: true,
         snapshotId: snapshot.id,
@@ -123,16 +126,23 @@ export class HistoryService {
       // Find index by snapshot ID
       const history = this.historyManager.getAll();
       const index = history.findIndex((s) => s.id === snapshotId);
-      
+
       if (index === -1) {
         return {
           success: false,
           error: `Snapshot with ID ${snapshotId} not found`,
         };
       }
-      
-      this.navigator.jumpTo(index);
+
+      const jumped = this.navigator.jumpTo(index);
       const current = this.navigator.getCurrent();
+
+      if (!jumped || !current) {
+        return {
+          success: false,
+          error: 'Failed to jump to snapshot',
+        };
+      }
 
       return {
         success: true,
@@ -156,13 +166,27 @@ export class HistoryService {
    */
   jumpToIndex(index: number): JumpResult {
     try {
+      if (index < 0 || index >= this.historyManager.getLength()) {
+        return {
+          success: false,
+          error: `Invalid index: ${index}`,
+        };
+      }
+
       const previous = this.navigator.getCurrent();
-      this.navigator.jumpToIndex(index);
+      const jumped = this.navigator.jumpToIndex(index);
       const current = this.navigator.getCurrent();
+
+      if (!jumped || !current) {
+        return {
+          success: false,
+          error: 'Failed to jump to index',
+        };
+      }
 
       return {
         success: true,
-        snapshotId: current?.id,
+        snapshotId: current.id,
         previous,
         current,
       };

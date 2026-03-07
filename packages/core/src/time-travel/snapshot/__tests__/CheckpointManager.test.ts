@@ -116,6 +116,9 @@ describe('CheckpointManager', () => {
   describe('getLast', () => {
     it('should return last checkpoint', () => {
       checkpointManager.create('snapshot-1');
+      // Add small delay to ensure different timestamps
+      const start = Date.now();
+      while (Date.now() === start) { /* wait */ }
       const result2 = checkpointManager.create('snapshot-2');
 
       const lastCheckpoint = checkpointManager.getLast();
