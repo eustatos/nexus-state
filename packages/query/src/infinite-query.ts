@@ -75,9 +75,9 @@ export function createInfiniteQuery<
       : JSON.stringify(options.queryKey);
 
   const stateAtom = atom<InfiniteQueryState<TData, TError>>(
-    createInitialState(),
+    createInitialState<TData, TError>(),
     `infinite-query:${queryKey}`
-  );
+  ) as PrimitiveAtom<InfiniteQueryState<TData, TError>>;
 
   /**
    * Update state with partial updates
