@@ -225,7 +225,10 @@ describe('SnapshotList - Editor Content Integration', () => {
 
       render(<SnapshotList />)
 
-      const currentItem = screen.getByTestId('snapshot-item-4')
+      // currentIndex: 4 means the 5th snapshot in history (oldest)
+      // In UI, snapshots are displayed in reverse order (newest first)
+      // So the current snapshot should be at uiIndex 0 (the first in the list)
+      const currentItem = screen.getByTestId('snapshot-item-0')
       expect(currentItem).toHaveAttribute('data-is-current', 'true')
     })
 
