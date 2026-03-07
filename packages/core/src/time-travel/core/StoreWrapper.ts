@@ -35,7 +35,7 @@ export class StoreWrapper {
   private store: Store;
   private snapshotService: SnapshotService;
   private config: StoreWrapperConfig;
-  private originalSet: Store['set'];
+  private originalSet: (atom: Atom<unknown>, update: unknown) => void;
   private isWrapped: boolean = false;
   private captureTimeout: ReturnType<typeof setTimeout> | null = null;
   private pendingCaptures: Set<string> = new Set();
@@ -53,7 +53,7 @@ export class StoreWrapper {
       ignoreAtoms: config?.ignoreAtoms ?? [],
     };
     // Store reference to original set before any binding
-    this.originalSet = store.set;
+    this.originalSet = store.set as (atom: Atom<unknown>, update: unknown) => void;
   }
 
   /**
@@ -69,15 +69,16 @@ export class StoreWrapper {
     const originalSet = this.originalSet;
 
     this.store.set = function <Value>(
+      this: Store,
       atom: Atom<Value>,
       update: Value | ((prev: Value) => Value)
     ): void {
       // Call original set with proper context
-      originalSet.call(this, atom, update);
+      (originalSet as any).call(this, atom, update);
 
       // Auto-capture if enabled
       if (self.config.autoCapture) {
-        self.scheduleCapture(atom as Atom<unknown>);
+        self.scheduleCapture(atom.name || atom.id.toString());
       }
     } as typeof this.store.set;
 
@@ -94,7 +95,7 @@ export class StoreWrapper {
       return;
     }
 
-    this.store.set = this.originalSet;
+    this.store.set = this.originalSet as typeof this.store.set;
     this.isWrapped = false;
 
     // Clear pending captures
@@ -109,16 +110,16 @@ export class StoreWrapper {
 
   /**
    * Schedule a capture for an atom change
-   * @param atom Atom that changed
+   * @param atomName Name or ID of atom that changed
    */
-  private scheduleCapture(atom: Atom<unknown>): void {
+  private scheduleCapture(atomName: string): void {
     // Ignore atoms in ignore list
-    if (this.config.ignoreAtoms.includes(atom.name || '')) {
+    if (this.config.ignoreAtoms.includes(atomName)) {
       return;
     }
 
     // Add to pending captures
-    this.pendingCaptures.add(atom.name || atom.id.toString());
+    this.pendingCaptures.add(atomName);
 
     // Clear existing timeout
     if (this.captureTimeout) {
