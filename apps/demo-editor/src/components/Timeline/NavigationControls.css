@@ -1,0 +1,157 @@
+/* Navigation Controls Styles */
+/* Design System: Editor Demo Specification */
+
+.navigation-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.navigation-controls__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #334155; /* Slate 700 - Border */
+  border: 1px solid #475569; /* Slate 600 */
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: #F1F5F9; /* Slate 100 - Foreground */
+  padding: 8px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.navigation-controls__button:hover:not(:disabled) {
+  background-color: #475569; /* Slate 600 */
+  border-color: #6366F1; /* Indigo - Primary */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+}
+
+.navigation-controls__button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+}
+
+.navigation-controls__button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: #1E293B; /* Slate 800 - Surface */
+  border-color: #334155; /* Slate 700 - Border */
+}
+
+.navigation-controls__button:focus-visible {
+  outline: 2px solid #6366F1; /* Indigo - Primary */
+  outline-offset: 2px;
+}
+
+/* Size variants */
+.navigation-controls__button--small {
+  min-width: 32px;
+  min-height: 32px;
+  padding: 6px;
+}
+
+.navigation-controls__button--small .navigation-controls__icon {
+  width: 16px;
+  height: 16px;
+}
+
+.navigation-controls__button--medium {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 8px;
+}
+
+.navigation-controls__button--medium .navigation-controls__icon {
+  width: 20px;
+  height: 20px;
+}
+
+.navigation-controls__button--large {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 10px;
+}
+
+.navigation-controls__button--large .navigation-controls__icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Icon */
+.navigation-controls__icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Button type specific styles */
+.navigation-controls__button--undo:hover:not(:disabled) {
+  background-color: rgba(99, 102, 241, 0.2); /* Indigo tint */
+}
+
+.navigation-controls__button--redo:hover:not(:disabled) {
+  background-color: rgba(139, 92, 246, 0.2); /* Violet tint */
+}
+
+.navigation-controls__button--first:hover:not(:disabled) {
+  background-color: rgba(34, 197, 94, 0.2); /* Green tint */
+}
+
+.navigation-controls__button--last:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.2); /* Red tint */
+}
+
+/* Tooltip */
+.navigation-controls__button[title] {
+  position: relative;
+}
+
+.navigation-controls__button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #0F172A; /* Slate 900 */
+  color: #F1F5F9; /* Slate 100 */
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Animation on click */
+@keyframes button-press {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.navigation-controls__button:active:not(:disabled) {
+  animation: button-press 0.15s ease;
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  .navigation-controls {
+    background-color: transparent;
+  }
+}
