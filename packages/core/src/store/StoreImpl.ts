@@ -173,10 +173,7 @@ export class StoreImpl implements Store {
         atom,
         (a) => this.stateManager.getState(a)!,
         (a) => this.stateManager.getValue(a),
-        (a) => this.evaluator.recompute(a, get),
-        (_value) => {
-          // Subscriber notification is handled by DependencyTracker
-        }
+        (a) => this.evaluator.recompute(a, get)
       );
 
       // Execute afterSet hooks

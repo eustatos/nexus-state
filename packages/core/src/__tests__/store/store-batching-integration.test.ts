@@ -154,8 +154,10 @@ describe('store with batch', () => {
       });
 
       expect(baseSub).toHaveBeenCalledTimes(1);
-      // Derived atom subscriber not called until value is retrieved
-      expect(derivedSub).not.toHaveBeenCalled();
+      expect(baseSub).toHaveBeenCalledWith(5);
+      // Derived atom subscriber is called because computed atoms notify subscribers
+      expect(derivedSub).toHaveBeenCalledTimes(1);
+      expect(derivedSub).toHaveBeenCalledWith(10);
     });
   });
 

@@ -54,15 +54,13 @@ export class DependencyTracker {
    * @param getState Function to get atom state
    * @param _getValue Function to get atom value
    * @param recompute Function to recompute computed atom
-   * @param notifySubscriber Function to notify subscriber
    * @returns Notification result
    */
   notifyDependents(
     atom: Atom<any>,
     getState: AtomStateGetter,
     _getValue: ValueGetter,
-    recompute: (atom: Atom<any>) => any,
-    notifySubscriber: (value: any) => void
+    recompute: (atom: Atom<any>) => any
   ): DependencyNotificationResult {
     const atomState = getState(atom);
     if (!atomState) {
@@ -115,9 +113,9 @@ export class DependencyTracker {
           recomputedAtoms.push(current.name || 'unnamed');
 
           // Notify subscribers
-          currentState.subscribers.forEach((_subscriber) => {
+          currentState.subscribers.forEach((subscriber) => {
             try {
-              notifySubscriber(newValue);
+              subscriber(newValue);
             } catch (error) {
               logger.error('Subscriber error:', error);
             }
