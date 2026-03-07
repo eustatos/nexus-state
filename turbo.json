@@ -1,4 +1,6 @@
 {
+    "globalDependencies": ["**/.env.*local"],
+    "globalEnv": ["CI", "NODE_ENV"],
     "pipeline": {
         "build": {
             "dependsOn": [
@@ -6,7 +8,8 @@
             ],
             "outputs": [
                 "dist/**"
-            ]
+            ],
+            "env": ["NODE_ENV"]
         },
         "dev": {
             "cache": false
@@ -15,7 +18,8 @@
             "dependsOn": [
                 "^build"
             ],
-            "outputs": []
+            "outputs": [],
+            "timeout": 600
         },
         "test:coverage": {
             "dependsOn": [
@@ -23,8 +27,11 @@
             ],
             "outputs": [
                 "coverage/**"
-            ]
+            ],
+            "timeout": 900
         },
-        "lint": {}
+        "lint": {
+            "timeout": 300
+        }
     }
 }

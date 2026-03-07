@@ -36,6 +36,8 @@ const countAtom = atom(0);
 // Create and apply middleware plugin
 const plugin = createMiddlewarePlugin(countAtom, {
   beforeSet: (atom, value) => {
+>
+> [![Coverage for middleware package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=middleware)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
     console.log('Before set:', value);
     // Ensure non-negative values
     return Math.max(0, value);

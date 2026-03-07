@@ -54,6 +54,8 @@ const userAtom = immerAtom(
 
 // Update state using Immer-style draft mutations
 setImmer(userAtom, (draft) => {
+>
+> [![Coverage for immer package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=immer)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
   draft.profile.name = "Jane";
   draft.profile.contacts.email = "jane@example.com";
   draft.posts.push({ id: 2, title: "Second Post" });

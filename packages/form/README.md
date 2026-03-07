@@ -3,6 +3,7 @@
 > **Forms for complex applications** — with DevTools, atomic architecture, and full type safety
 
 [![npm version](https://img.shields.io/npm/v/@nexus-state/form.svg)](https://www.npmjs.com/package/@nexus-state/form)
+> [![Coverage for form package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=form)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-17+-61dafb.svg)](https://react.dev/)
 

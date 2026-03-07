@@ -12,16 +12,30 @@ export default defineConfig({
         'index.ts'
       ],
       exclude: [
+        'apps/**',
+        // Тестовые файлы и директории
+        '**/__tests__/**',
+        '**/__fixtures__/**',
+        '**/__mocks__/**',
+        '**/__benchmarks__/**',
+        '**/test-utils/**',
+        '**/test-utils.ts',
         '**/*.test.ts',
         '**/*.spec.ts',
-        '**/*.config.ts',
+        '**/*.bench.ts',
+        '**/*.test-d.ts',
+        // Файлы деклараций и конфигурации
         '**/*.d.ts',
+        '**/*.config.ts',
+        '**/*.config.js',
+        // Скомпилированные файлы и зависимости
         '**/node_modules/**',
         '**/dist/**',
+        '**/build/**',
         '**/coverage/**',
-        '**/__benchmarks__/**',
-        '**/__fixtures__/**',
-        'src/test-utils/**'
+        // Прочее
+        '**/*.md',
+        '**/*.json',
       ]
     }
   }
