@@ -37,23 +37,7 @@ export class AtomFinder {
       searchedByFallback: false,
     };
 
-    // Try to find atom by name first
-    if (entry.name) {
-      searchDetails.searchedByName = true;
-      const atom = this.findByName(entry.name);
-      if (atom) {
-        logger.log(
-          `[AtomFinder] Found by name: ${entry.name}, id=${atom.id?.toString()}`
-        );
-        return {
-          atom,
-          foundBy: 'name',
-          searchDetails,
-        };
-      }
-    }
-
-    // If not found, try to find by ID string
+    // Try to find atom by ID first (more reliable than name)
     if (entry.atomId) {
       searchDetails.searchedById = true;
       const atom = this.findById(entry.atomId);
@@ -64,6 +48,22 @@ export class AtomFinder {
         return {
           atom,
           foundBy: 'id',
+          searchDetails,
+        };
+      }
+    }
+
+    // If not found by ID, try to find by name
+    if (entry.name) {
+      searchDetails.searchedByName = true;
+      const atom = this.findByName(entry.name);
+      if (atom) {
+        logger.log(
+          `[AtomFinder] Found by name: ${entry.name}, id=${atom.id?.toString()}`
+        );
+        return {
+          atom,
+          foundBy: 'name',
           searchDetails,
         };
       }
@@ -121,10 +121,26 @@ export class AtomFinder {
       const match = atomId.match(/Symbol\((.*)\)$/);
       if (match) {
         const description = match[1] || undefined;
+        // Find ALL atoms with matching description
+        const matchingAtoms: Array<[symbol, Atom<unknown>]> = [];
         for (const [id, atom] of allAtoms) {
           if (id.description === description) {
-            return atom;
+            matchingAtoms.push([id, atom]);
           }
+        }
+        
+        // If only one match, return it
+        if (matchingAtoms.length === 1) {
+          return matchingAtoms[0][1];
+        }
+        
+        // If multiple matches, log warning and return first
+        if (matchingAtoms.length > 1) {
+          logger.warn(
+            `[AtomFinder] Multiple atoms with same description "${description}": ${matchingAtoms.length} found`
+          );
+          // Return the most recently registered (last in map)
+          return matchingAtoms[matchingAtoms.length - 1][1];
         }
       }
 

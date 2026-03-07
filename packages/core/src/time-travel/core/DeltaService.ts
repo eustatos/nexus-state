@@ -115,14 +115,21 @@ export class DeltaService {
     delta: DeltaSnapshot
   ): DeltaResult {
     try {
-      const reconstructed = this.reconstructor.reconstruct(
+      const result = this.reconstructor.reconstruct(
         baseSnapshot,
         [delta]
       );
 
+      if (!result.success) {
+        return {
+          success: false,
+          error: result.error,
+        };
+      }
+
       return {
         success: true,
-        reconstructed: reconstructed.snapshot ?? undefined,
+        reconstructed: result.snapshot ?? undefined,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -153,8 +160,15 @@ export class DeltaService {
 
       const baseSnapshot = snapshots[0] as Snapshot;
       const deltas = snapshots.slice(1, targetIndex + 1) as DeltaSnapshot[];
-      
+
       const result = this.reconstructor.reconstruct(baseSnapshot, deltas);
+
+      if (!result.success) {
+        return {
+          success: false,
+          error: result.error,
+        };
+      }
 
       return {
         success: true,

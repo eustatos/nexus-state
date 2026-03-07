@@ -272,6 +272,8 @@ export class HistoryService {
    */
   clear(): void {
     this.historyManager.clear();
+    // Reset navigator to initial state
+    this.navigator.setCurrentIndex(0);
   }
 
   /**

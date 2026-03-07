@@ -108,6 +108,21 @@ export class TransactionalRestorer {
     const startTime = Date.now();
 
     try {
+      // Validate snapshot is not null
+      if (!snapshot) {
+        return {
+          success: false,
+          restoredCount: 0,
+          totalAtoms: 0,
+          errors: ['Snapshot is null'],
+          warnings: [],
+          duration: Date.now() - startTime,
+          timestamp: startTime,
+          checkpointId: undefined,
+          rollbackPerformed: false,
+        };
+      }
+
       // Phase 1: Validate
       if (this.config.validateBeforeRestore) {
         const validation = this.validator.validate(snapshot);
@@ -142,6 +157,12 @@ export class TransactionalRestorer {
       const checkpointId = checkpointResult.checkpointId;
 
       const atomsToRestore = this.findAndCaptureAtoms(snapshot.state);
+      const totalAtoms = Object.keys(snapshot.state).length;
+
+      // Log warning if no atoms were found
+      if (atomsToRestore.length === 0 && totalAtoms > 0) {
+        logger.warn('[TransactionalRestorer] No atoms were found for restoration');
+      }
 
       // Create transaction context
       const transaction = new TransactionContext(
@@ -184,6 +205,12 @@ export class TransactionalRestorer {
       // Clean up transaction
       this.activeTransactions.delete(transaction.getId());
 
+      // Build restored object from snapshot state
+      const restored: Record<string, unknown> = {};
+      for (const [key, entry] of Object.entries(snapshot.state)) {
+        restored[key] = entry.value;
+      }
+
       return {
         success: applyResult.success,
         restoredCount: applyResult.restoredCount,
@@ -199,6 +226,7 @@ export class TransactionalRestorer {
         failedAtoms: applyResult.failedAtoms,
         rolledBackCount: 0,
         interrupted: applyResult.interrupted,
+        restored,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);

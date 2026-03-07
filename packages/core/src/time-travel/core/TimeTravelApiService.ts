@@ -75,16 +75,18 @@ export class TimeTravelApiService {
     const currentSnapshot = this.historyService.getCurrent();
 
     if (result.success && currentSnapshot) {
-      this.snapshotService.restore(currentSnapshot);
+      const restoreResult = this.snapshotService.restore(currentSnapshot);
 
-      this.eventService.emit({
-        type: 'undo',
-        timestamp: Date.now(),
-        snapshotId: currentSnapshot.id,
-      });
+      if (restoreResult) {
+        this.eventService.emit({
+          type: 'undo',
+          timestamp: Date.now(),
+          snapshotId: currentSnapshot.id,
+        });
 
-      logger.log(`[TimeTravelApiService] Undone to snapshot: ${currentSnapshot.id}`);
-      return true;
+        logger.log(`[TimeTravelApiService] Undone to snapshot: ${currentSnapshot.id}`);
+        return true;
+      }
     }
 
     return false;
@@ -103,16 +105,18 @@ export class TimeTravelApiService {
     const currentSnapshot = this.historyService.getCurrent();
 
     if (result.success && currentSnapshot) {
-      this.snapshotService.restore(currentSnapshot);
+      const restoreResult = this.snapshotService.restore(currentSnapshot);
 
-      this.eventService.emit({
-        type: 'redo',
-        timestamp: Date.now(),
-        snapshotId: currentSnapshot.id,
-      });
+      if (restoreResult) {
+        this.eventService.emit({
+          type: 'redo',
+          timestamp: Date.now(),
+          snapshotId: currentSnapshot.id,
+        });
 
-      logger.log(`[TimeTravelApiService] Redone to snapshot: ${currentSnapshot.id}`);
-      return true;
+        logger.log(`[TimeTravelApiService] Redone to snapshot: ${currentSnapshot.id}`);
+        return true;
+      }
     }
 
     return false;
@@ -125,16 +129,18 @@ export class TimeTravelApiService {
     const result = this.historyService.jumpTo(snapshotId);
 
     if (result.success && result.current) {
-      this.snapshotService.restore(result.current);
+      const restoreResult = this.snapshotService.restore(result.current);
 
-      this.eventService.emit({
-        type: 'jump',
-        timestamp: Date.now(),
-        snapshotId: result.current.id,
-      });
+      if (restoreResult) {
+        this.eventService.emit({
+          type: 'jump',
+          timestamp: Date.now(),
+          snapshotId: result.current.id,
+        });
 
-      logger.log(`[TimeTravelApiService] Jumped to snapshot: ${snapshotId}`);
-      return true;
+        logger.log(`[TimeTravelApiService] Jumped to snapshot: ${snapshotId}`);
+        return true;
+      }
     }
 
     logger.warn(`[TimeTravelApiService] Failed to jump to snapshot: ${snapshotId}`);
@@ -148,16 +154,18 @@ export class TimeTravelApiService {
     const result = this.historyService.jumpToIndex(index);
 
     if (result.success && result.current) {
-      this.snapshotService.restore(result.current);
+      const restoreResult = this.snapshotService.restore(result.current);
 
-      this.eventService.emit({
-        type: 'jump',
-        timestamp: Date.now(),
-        snapshotId: result.current.id,
-      });
+      if (restoreResult) {
+        this.eventService.emit({
+          type: 'jump',
+          timestamp: Date.now(),
+          snapshotId: result.current.id,
+        });
 
-      logger.log(`[TimeTravelApiService] Jumped to index: ${index}`);
-      return true;
+        logger.log(`[TimeTravelApiService] Jumped to index: ${index}`);
+        return true;
+      }
     }
 
     return false;

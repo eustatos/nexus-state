@@ -5,6 +5,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TimeTravelFactory } from '../TimeTravelFactory';
 import type { Store } from '../../types';
+import { createStore } from '../../../store';
+import { atom } from '../../../atom';
 
 function createMockStore(): Store {
   return {
@@ -23,6 +25,11 @@ describe('TimeTravelFactory', () => {
 
   beforeEach(() => {
     store = createMockStore();
+  });
+
+  afterEach(() => {
+    // Clean up atom registry after each test
+    vi.clearAllMocks();
   });
 
   describe('createServices', () => {
@@ -138,7 +145,13 @@ describe('TimeTravelFactory', () => {
 
   describe('integration', () => {
     it('should work with real store operations', () => {
-      const services = TimeTravelFactory.createServices(store);
+      // Use real store for integration test
+      const realStore = createStore();
+      const services = TimeTravelFactory.createServices(realStore);
+
+      // Create a test atom to ensure there's something to capture
+      const testAtom = atom(0);
+      realStore.set(testAtom, 42);
 
       // Capture initial state
       const captureResult = services.snapshotService.capture('initial');

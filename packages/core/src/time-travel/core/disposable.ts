@@ -150,13 +150,16 @@ export abstract class BaseDisposable implements Disposable {
    * Register a child resource for automatic disposal
    * @param child Child resource to dispose
    */
-  protected registerChild(child: Disposable): void {
+  protected async registerChild(child: Disposable): Promise<void> {
     if (this.disposed) {
       // Already disposed, dispose child immediately
       try {
-        child.dispose();
+        await child.dispose();
       } catch (error) {
         this.handleError(error);
+        if (this.config.throwOnError) {
+          throw error;
+        }
       }
       return;
     }
@@ -184,11 +187,15 @@ export abstract class BaseDisposable implements Disposable {
         }
       } catch (error) {
         errors.push(error as Error);
-        this.handleError(error);
       }
     }
 
     this.children.clear();
+
+    // Handle all errors
+    for (const error of errors) {
+      this.handleError(error);
+    }
 
     if (errors.length > 0 && this.config.throwOnError) {
       throw new AggregateDisposalError(errors);

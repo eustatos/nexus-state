@@ -5,7 +5,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { StoreWrapper } from '../StoreWrapper';
 import { SnapshotService } from '../SnapshotService';
-import type { Store, Atom } from '../../types';
+import type { Store, Atom } from '../../../types';
+import { storeLogger } from '../../../debug';
 
 describe('StoreWrapper', () => {
   let storeWrapper: StoreWrapper;
@@ -29,6 +30,7 @@ describe('StoreWrapper', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   describe('constructor', () => {
@@ -90,18 +92,18 @@ describe('StoreWrapper', () => {
     });
 
     it('should not wrap twice', () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(storeLogger, 'warn').mockImplementation(() => {});
 
       storeWrapper.wrap();
       const firstSet = mockStore.set;
       storeWrapper.wrap();
 
       expect(mockStore.set).toBe(firstSet);
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         expect.stringContaining('Already wrapped')
       );
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
 
     it('should call original set and schedule capture when autoCapture is enabled', () => {
@@ -135,15 +137,15 @@ describe('StoreWrapper', () => {
     });
 
     it('should warn if not wrapped', () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(storeLogger, 'warn').mockImplementation(() => {});
 
       storeWrapper.unwrap();
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         expect.stringContaining('Not wrapped')
       );
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
 
     it('should clear pending captures', () => {
@@ -168,30 +170,56 @@ describe('StoreWrapper', () => {
 
   describe('capture', () => {
     it('should capture snapshot manually', () => {
+      const mockSnapshot = {
+        id: 'test-snapshot-id',
+        state: {},
+        metadata: { timestamp: Date.now(), action: 'manual-action', atomCount: 0 },
+      };
+      const captureSpy = vi.spyOn(snapshotService, 'capture').mockReturnValue({
+        success: true,
+        snapshot: mockSnapshot,
+        duration: 10,
+      });
+
       const snapshotId = storeWrapper.capture('manual-action');
 
-      expect(snapshotId).toBeDefined();
+      expect(snapshotId).toBe('test-snapshot-id');
+      expect(captureSpy).toHaveBeenCalledWith('manual-action');
+
+      captureSpy.mockRestore();
     });
 
     it('should capture without action', () => {
+      const mockSnapshot = {
+        id: 'test-snapshot-id',
+        state: {},
+        metadata: { timestamp: Date.now(), action: undefined, atomCount: 0 },
+      };
+      const captureSpy = vi.spyOn(snapshotService, 'capture').mockReturnValue({
+        success: true,
+        snapshot: mockSnapshot,
+        duration: 10,
+      });
+
       const snapshotId = storeWrapper.capture();
 
-      expect(snapshotId).toBeDefined();
+      expect(snapshotId).toBe('test-snapshot-id');
+      expect(captureSpy).toHaveBeenCalledWith(undefined);
+
+      captureSpy.mockRestore();
     });
 
     it('should return undefined on capture failure', () => {
-      const errorStore = {
-        get: vi.fn(() => {
-          throw new Error('Get error');
-        }),
-      } as unknown as Store;
+      const captureSpy = vi.spyOn(snapshotService, 'capture').mockReturnValue({
+        success: false,
+        error: 'Capture failed',
+      });
 
-      const errorService = new SnapshotService(errorStore);
-      const wrapper = new StoreWrapper(errorStore, errorService);
-
-      const snapshotId = wrapper.capture('test');
+      const snapshotId = storeWrapper.capture('test');
 
       expect(snapshotId).toBeUndefined();
+
+      captureSpy.mockRestore();
     });
   });
 
@@ -263,7 +291,7 @@ describe('StoreWrapper', () => {
     it('should handle capture errors', () => {
       vi.useFakeTimers();
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(storeLogger, 'error').mockImplementation(() => {});
 
       const errorStore = {
         get: vi.fn(() => {
@@ -285,9 +313,9 @@ describe('StoreWrapper', () => {
 
       vi.advanceTimersByTime(10);
 
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(loggerSpy).toHaveBeenCalled();
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
       wrapper.unwrap();
       vi.useRealTimers();
     });

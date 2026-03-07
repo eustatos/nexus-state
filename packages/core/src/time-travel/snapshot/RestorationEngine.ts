@@ -28,6 +28,8 @@ export interface EngineRestorationResult {
   successAtoms: Array<{ name: string; atomId: symbol }>;
   /** List of failed atoms */
   failedAtoms: Array<{ name: string; error: string }>;
+  /** Restored values (atom name -> value) */
+  restoredValues?: Record<string, unknown>;
 }
 
 export interface EngineRestoreOptions {

@@ -44,8 +44,10 @@ describe('BaseDisposable', () => {
   class TestDisposable extends BaseDisposable {
     disposeCallCount = 0;
 
-    dispose(): void {
+    async dispose(): Promise<void> {
       this.disposeCallCount++;
+      await this.disposeChildren();
+      this.runDisposeCallbacks();
       this.disposed = true;
     }
   }
@@ -80,15 +82,15 @@ describe('BaseDisposable', () => {
       expect(disposable.isDisposed()).toBe(false);
     });
 
-    it('should return true after disposal', () => {
-      disposable.dispose();
+    it('should return true after disposal', async () => {
+      await disposable.dispose();
       expect(disposable.isDisposed()).toBe(true);
     });
   });
 
   describe('dispose', () => {
-    it('should increment dispose call count', () => {
-      disposable.dispose();
+    it('should increment dispose call count', async () => {
+      await disposable.dispose();
       expect(disposable.disposeCallCount).toBe(1);
     });
   });
@@ -103,9 +105,9 @@ describe('BaseDisposable', () => {
       expect(callback).toHaveBeenCalled();
     });
 
-    it('should call callback immediately if already disposed', () => {
+    it('should call callback immediately if already disposed', async () => {
       const callback = vi.fn();
-      disposable.dispose();
+      await disposable.dispose();
 
       disposable.onDispose(callback);
 
@@ -134,12 +136,12 @@ describe('BaseDisposable', () => {
   });
 
   describe('registerChild', () => {
-    it('should dispose child immediately if parent already disposed', () => {
+    it('should dispose child immediately if parent already disposed', async () => {
       const child = new TestDisposable();
       const parent = new TestDisposable();
 
-      parent.dispose();
-      (parent as any).registerChild(child);
+      await parent.dispose();
+      await (parent as any).registerChild(child);
 
       expect(child.isDisposed()).toBe(true);
     });
@@ -148,11 +150,11 @@ describe('BaseDisposable', () => {
       const child = new TestDisposable();
       const parent = new TestDisposable({ throwOnError: true });
 
-      child.dispose = () => {
+      child.dispose = async () => {
         throw new Error('Child disposal error');
       };
 
-      (parent as any).registerChild(child);
+      await (parent as any).registerChild(child);
 
       await expect(async () => {
         await parent.dispose();
@@ -165,7 +167,7 @@ describe('BaseDisposable', () => {
       const child = new TestDisposable();
       const parent = new TestDisposable();
 
-      (parent as any).registerChild(child);
+      await (parent as any).registerChild(child);
       (parent as any).unregisterChild(child);
 
       await parent.dispose();
@@ -180,8 +182,8 @@ describe('BaseDisposable', () => {
       const child2 = new TestDisposable();
       const parent = new TestDisposable();
 
-      (parent as any).registerChild(child1);
-      (parent as any).registerChild(child2);
+      await (parent as any).registerChild(child1);
+      await (parent as any).registerChild(child2);
 
       await (parent as any).disposeChildren();
 
@@ -193,8 +195,8 @@ describe('BaseDisposable', () => {
       const child = new TestDisposable();
       const parent = new TestDisposable();
 
-      child.dispose();
-      (parent as any).registerChild(child);
+      await child.dispose();
+      await (parent as any).registerChild(child);
 
       await (parent as any).disposeChildren();
 

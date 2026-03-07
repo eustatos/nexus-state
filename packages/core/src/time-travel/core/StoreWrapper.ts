@@ -52,7 +52,8 @@ export class StoreWrapper {
       captureDebounceTime: config?.captureDebounceTime ?? 100,
       ignoreAtoms: config?.ignoreAtoms ?? [],
     };
-    this.originalSet = store.set.bind(store);
+    // Store reference to original set before any binding
+    this.originalSet = store.set;
   }
 
   /**
@@ -71,8 +72,8 @@ export class StoreWrapper {
       atom: Atom<Value>,
       update: Value | ((prev: Value) => Value)
     ): void {
-      // Call original set
-      originalSet(atom, update);
+      // Call original set with proper context
+      originalSet.call(this, atom, update);
 
       // Auto-capture if enabled
       if (self.config.autoCapture) {

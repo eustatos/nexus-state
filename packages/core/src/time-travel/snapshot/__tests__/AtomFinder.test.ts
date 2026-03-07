@@ -34,9 +34,9 @@ describe('AtomFinder', () => {
 
   describe('find', () => {
     it('should find atom by name', () => {
+      // When atomId is not provided, should find by name
       const result = atomFinder.find('testAtom', {
         name: 'testAtom',
-        atomId: mockAtom.id.toString(),
       });
 
       expect(result.atom).toBe(mockAtom);

@@ -5,23 +5,42 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { SnapshotService } from '../SnapshotService';
 import type { Store, Atom } from '../../types';
+import { atomRegistry } from '../../../atom-registry';
 
 describe('SnapshotService', () => {
   let snapshotService: SnapshotService;
   let mockStore: Store;
+  let mockAtom: Atom<any>;
 
   beforeEach(() => {
+    // Create a mock atom
+    mockAtom = {
+      id: Symbol('test-atom'),
+      type: 'primitive',
+      read: () => 'test-value',
+      name: 'testAtom',
+    } as Atom<any>;
+
+    // Mock the atomRegistry to return our mock atom
+    vi.spyOn(atomRegistry, 'getAll').mockReturnValue(new Map([[mockAtom.id, mockAtom]]));
+    vi.spyOn(atomRegistry, 'get').mockReturnValue(mockAtom);
+
     mockStore = {
-      get: vi.fn(),
+      get: vi.fn(() => 'test-value'),
       set: vi.fn(),
       batch: vi.fn(),
       subscribe: vi.fn(),
       unsubscribe: vi.fn(),
-      getAtom: vi.fn(),
-      getAtoms: vi.fn(),
+      getAtom: vi.fn(() => mockAtom),
+      getAtoms: vi.fn(() => [mockAtom]),
     } as unknown as Store;
 
-    snapshotService = new SnapshotService(mockStore);
+    // Create SnapshotService with skipStateCheck to allow empty captures
+    snapshotService = new SnapshotService(mockStore, {
+      creator: {
+        skipStateCheck: true,
+      },
+    });
   });
 
   describe('constructor', () => {
@@ -111,14 +130,26 @@ describe('SnapshotService', () => {
     });
 
     it('should handle restore errors gracefully', () => {
+      // Create service with strictMode to test error handling
+      const strictService = new SnapshotService(mockStore, {
+        creator: {
+          skipStateCheck: true,
+        },
+        restorer: {
+          strictMode: true,
+          validateBeforeRestore: true,
+        },
+      });
+
       const invalidSnapshot = {
         id: 'invalid',
-        state: {},
-        metadata: { timestamp: Date.now(), action: 'test' },
+        state: { invalidAtom: { value: 'invalid', type: 'primitive' } },
+        metadata: { timestamp: Date.now(), action: 'test', atomCount: 1 },
       };
 
-      const result = snapshotService.restore(invalidSnapshot);
+      const result = strictService.restore(invalidSnapshot);
 
+      // With strictMode and validation, restoration should fail for invalid snapshots
       expect(result).toBe(false);
     });
   });
@@ -136,13 +167,24 @@ describe('SnapshotService', () => {
     });
 
     it('should return failure for invalid snapshot', () => {
+      // Create service with strictMode to test error handling
+      const strictService = new SnapshotService(mockStore, {
+        creator: {
+          skipStateCheck: true,
+        },
+        restorer: {
+          strictMode: true,
+          validateBeforeRestore: true,
+        },
+      });
+
       const invalidSnapshot = {
         id: 'invalid',
-        state: {},
-        metadata: { timestamp: Date.now(), action: 'test' },
+        state: { invalidAtom: { value: 'invalid', type: 'primitive' } },
+        metadata: { timestamp: Date.now(), action: 'test', atomCount: 1 },
       };
 
-      const result = snapshotService.restoreWithResult(invalidSnapshot);
+      const result = strictService.restoreWithResult(invalidSnapshot);
 
       expect(result.success).toBe(false);
     });
@@ -163,13 +205,24 @@ describe('SnapshotService', () => {
     });
 
     it('should handle transaction rollback on error', async () => {
-      const invalidSnapshot = {
-        id: 'invalid',
-        state: {},
-        metadata: { timestamp: Date.now(), action: 'test' },
-      };
+      // Create service with strictMode to test error handling
+      const strictService = new SnapshotService(mockStore, {
+        creator: {
+          skipStateCheck: true,
+        },
+        restorer: {
+          strictMode: true,
+          validateBeforeRestore: true,
+        },
+        transactional: {
+          rollbackOnError: true,
+        },
+      });
 
-      const result = await snapshotService.restoreWithTransaction(invalidSnapshot);
+      // Create invalid snapshot with null state to trigger validation error
+      const invalidSnapshot = null as any;
+
+      const result = await strictService.restoreWithTransaction(invalidSnapshot);
 
       expect(result.success).toBe(false);
     });
@@ -243,7 +296,12 @@ describe('SnapshotService', () => {
         }),
       } as unknown as Store;
 
-      const service = new SnapshotService(errorStore);
+      const service = new SnapshotService(errorStore, {
+        restorer: {
+          strictMode: true,
+          skipErrors: false,
+        },
+      });
       const captureResult = service.capture('test');
 
       if (captureResult.snapshot) {

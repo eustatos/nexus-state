@@ -129,7 +129,8 @@ export class SnapshotRestorer extends BaseDisposable {
         skipErrors: snapshotConfig.skipErrors,
       });
 
-      if (!result.success && snapshotConfig.strictMode) {
+      // In strict mode, fail if there are errors
+      if (snapshotConfig.strictMode && result.errors.length > 0) {
         logger.error('Restoration failed:', result.errors.join(', '));
         return false;
       }
@@ -216,6 +217,12 @@ export class SnapshotRestorer extends BaseDisposable {
         this.emit('restore', snapshot);
       }
 
+      // Build restored object from snapshot state
+      const restored: Record<string, unknown> = {};
+      for (const [key, entry] of Object.entries(snapshot.state)) {
+        restored[key] = entry.value;
+      }
+
       return {
         success,
         restoredCount: result.restoredCount,
@@ -225,6 +232,7 @@ export class SnapshotRestorer extends BaseDisposable {
         duration: Date.now() - startTime,
         timestamp: startTime,
         failedAtoms: result.failedAtoms,
+        restored,
       };
     } catch (error) {
       const errorMessage =

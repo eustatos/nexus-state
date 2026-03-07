@@ -208,6 +208,9 @@ export interface RestorationResult {
 
   /** Whether operation timed out */
   timedOut?: boolean;
+
+  /** Atoms that were restored (atom name -> value) */
+  restored?: Record<string, unknown>;
 }
 
 /**

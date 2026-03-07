@@ -1,12 +1,18 @@
 /**
  * Tests for createEnhancedStore: Time Travel functionality
+ * 
+ * @vitest-environment-options: {"isolate": true}
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createEnhancedStore } from '../../enhanced-store';
 import { atom } from '../../atom';
 
 describe('createEnhancedStore: Time Travel', () => {
+  beforeEach(() => {
+    // Clear mocks before each test
+    vi.clearAllMocks();
+  });
   describe('enableTimeTravel option', () => {
     it('should add time travel methods when enableTimeTravel: true', () => {
       const store = createEnhancedStore([], { enableTimeTravel: true });
@@ -140,7 +146,7 @@ describe('createEnhancedStore: Time Travel', () => {
         autoCapture: false,
       });
 
-      const countAtom = atom(0);
+      const countAtom = atom(0, 'undo-test-count');
 
       store.set(countAtom, 10);
       store.captureSnapshot?.('step1');
@@ -166,7 +172,7 @@ describe('createEnhancedStore: Time Travel', () => {
         autoCapture: false,
       });
 
-      const countAtom = atom(0);
+      const countAtom = atom(0, 'redo-test-count');
 
       store.set(countAtom, 10);
       store.captureSnapshot?.('step1');
@@ -175,7 +181,7 @@ describe('createEnhancedStore: Time Travel', () => {
       store.captureSnapshot?.('step2');
 
       const undoResult = store.undo?.();
-      
+
       if (undoResult === true) {
         expect(store.get(countAtom)).toBe(10);
 

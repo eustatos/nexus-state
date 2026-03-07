@@ -112,6 +112,8 @@ export {
 
 // Time travel functionality
 export { TimeTravelController } from './time-travel';
+export { SimpleTimeTravel } from './time-travel/SimpleTimeTravel';
+export type { SimpleTimeTravelOptions } from './time-travel/SimpleTimeTravel';
 
 // Export utility functions
 export {
