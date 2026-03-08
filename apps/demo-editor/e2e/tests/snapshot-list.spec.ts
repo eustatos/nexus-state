@@ -322,4 +322,165 @@ test.describe("Snapshot List", () => {
     const firstItemBadge = snapshotItems.first().getByTestId("snapshot-current-badge");
     await expect(firstItemBadge).toBeVisible();
   });
+
+  test("should have vertical scroll in snapshot list when many snapshots", async ({ page }) => {
+    const editor = page.locator("textarea");
+
+    // Create multiple snapshots with proper delays (> debounce time)
+    await editor.click();
+    
+    // Type first snapshot and wait
+    await editor.type("First snapshot line");
+    await page.waitForTimeout(1500);
+    
+    // Type more snapshots with delay > debounce time (1000ms)
+    for (let i = 1; i < 25; i++) {
+      await editor.type(`\nLine ${i} with longer text content for more height`);
+      await page.waitForTimeout(1100);
+    }
+
+    // Final wait for all snapshots
+    await page.waitForTimeout(2000);
+
+    // Check snapshot count
+    const snapshotCountEl = page.getByTestId("snapshot-count");
+    const countText = await snapshotCountEl.textContent();
+
+    // Get snapshot list container
+    const snapshotList = page.getByTestId("snapshot-list");
+    await expect(snapshotList).toBeVisible();
+
+    // Get snapshot items container
+    const itemsContainer = page.getByTestId("snapshot-items-container");
+    await expect(itemsContainer).toBeVisible();
+
+    // Check overflow-y on items container
+    const overflowY = await itemsContainer.evaluate((el) => 
+      window.getComputedStyle(el).overflowY
+    );
+    expect(overflowY).toBe("auto");
+
+    // Check height and max-height on items container
+    const containerStyles = await itemsContainer.evaluate((el) => {
+      const styles = window.getComputedStyle(el);
+      return {
+        height: styles.height,
+        maxHeight: styles.maxHeight,
+        overflowY: styles.overflowY,
+        scrollHeight: el.scrollHeight,
+        clientHeight: el.clientHeight,
+        offsetHeight: el.offsetHeight
+      };
+    });
+
+    console.log("Container styles:", containerStyles);
+
+    // Check that scrollHeight is greater than clientHeight (content overflows)
+    const hasScroll = await itemsContainer.evaluate((el) => 
+      el.scrollHeight > el.clientHeight
+    );
+    expect(hasScroll).toBeTruthy();
+  });
+
+  test("should allow scrolling through snapshot list", async ({ page }) => {
+    test.setTimeout(90000);
+    
+    const editor = page.locator("textarea");
+
+    // Create many snapshots
+    await editor.click();
+    for (let i = 0; i < 20; i++) {
+      await editor.type(`Snapshot ${i}\n`);
+      await page.waitForTimeout(1100);
+    }
+
+    // Wait for all snapshots
+    await page.waitForTimeout(2000);
+
+    const itemsContainer = page.getByTestId("snapshot-items-container");
+
+    // Get initial scroll position
+    const initialScrollTop = await itemsContainer.evaluate((el) => el.scrollTop);
+    expect(initialScrollTop).toBe(0);
+
+    // Scroll to bottom
+    await itemsContainer.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+
+    // Wait for scroll to complete
+    await page.waitForTimeout(300);
+
+    // Check scroll position changed
+    const finalScrollTop = await itemsContainer.evaluate((el) => el.scrollTop);
+    expect(finalScrollTop).toBeGreaterThan(0);
+
+    // Scroll should be near the bottom
+    const scrollHeight = await itemsContainer.evaluate((el) => el.scrollHeight);
+    const clientHeight = await itemsContainer.evaluate((el) => el.clientHeight);
+    expect(finalScrollTop).toBeGreaterThanOrEqual(scrollHeight - clientHeight - 10);
+  });
+
+  test("should keep timeline and playback controls visible when scrolling snapshots", async ({ page }) => {
+    const editor = page.locator("textarea");
+
+    // Create many snapshots
+    await editor.click();
+    for (let i = 0; i < 30; i++) {
+      await editor.type(`Test ${i}\n`);
+      await page.waitForTimeout(600);
+    }
+
+    // Wait for all snapshots
+    await page.waitForTimeout(1500);
+
+    // Scroll snapshot list to bottom
+    const itemsContainer = page.getByTestId("snapshot-items-container");
+    await itemsContainer.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+    await page.waitForTimeout(300);
+
+    // Timeline slider should still be visible
+    const timelineSlider = page.locator('[data-testid="timeline-slider"]');
+    await expect(timelineSlider).toBeInViewport();
+
+    // Navigation controls should still be visible
+    const navControls = page.getByTestId("navigation-controls");
+    await expect(navControls).toBeInViewport();
+
+    // Playback controls should still be visible
+    const playbackControls = page.getByTestId("playback-controls-compact");
+    await expect(playbackControls).toBeInViewport();
+  });
+
+  test("should not push footer below viewport when many snapshots", async ({ page }) => {
+    test.setTimeout(90000);
+    
+    const editor = page.locator("textarea");
+
+    // Create many snapshots
+    await editor.click();
+    for (let i = 0; i < 25; i++) {
+      await editor.type(`Line ${i}\n`);
+      await page.waitForTimeout(1100);
+    }
+
+    // Wait for all snapshots
+    await page.waitForTimeout(2000);
+
+    // Get viewport height
+    const viewportHeight = page.viewportSize()?.height || 800;
+
+    // Get footer position
+    const footer = page.locator("footer");
+    const footerBox = await footer.boundingBox();
+    
+    expect(footerBox).toBeTruthy();
+    
+    // Footer should be within viewport
+    if (footerBox) {
+      expect(footerBox.y + footerBox.height).toBeLessThanOrEqual(viewportHeight);
+    }
+  });
 });

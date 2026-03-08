@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react'
 import { editorTimeTravel } from '@/store/timeTravel'
 import type { Snapshot } from '@nexus-state/core'
-import type { SnapshotComparison, ComparisonOptions } from '@nexus-state/core'
+import type { SnapshotComparison, ComparisonOptions } from '@nexus-state/core/time-travel/comparison/types'
 
 export type DiffMode = 'inline' | 'split' | 'unified'
 

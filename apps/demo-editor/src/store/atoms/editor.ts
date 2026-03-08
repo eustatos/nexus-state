@@ -2,7 +2,7 @@ import { atom } from '@nexus-state/core'
 
 /**
  * Содержимое редактора
- * 
+ *
  * Основной атом для хранения текста документа.
  */
 export const contentAtom = atom('', 'editor.content')

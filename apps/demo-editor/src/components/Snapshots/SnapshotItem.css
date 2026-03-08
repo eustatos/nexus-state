@@ -12,6 +12,8 @@
   font-size: 13px;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
+  min-height: fit-content;
 }
 
 .snapshot-item:hover {

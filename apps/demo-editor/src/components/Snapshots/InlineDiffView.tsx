@@ -1,4 +1,4 @@
-import type { SnapshotComparison, AtomComparison } from '@nexus-state/core'
+import type { SnapshotComparison, AtomComparison } from '@nexus-state/core/time-travel/comparison/types'
 import './SnapshotDiff.css'
 
 export interface InlineDiffViewProps {

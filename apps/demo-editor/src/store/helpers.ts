@@ -1,4 +1,6 @@
 import { editorTimeTravel } from './timeTravel'
+import { editorStore } from './store'
+import { contentAtom } from './atoms/editor'
 import type { Snapshot } from '@nexus-state/core'
 
 /**
@@ -129,6 +131,7 @@ export function jumpToSnapshot(
   index: number,
   options: { skipConfirmation?: boolean } = {}
 ): boolean {
+  console.log('[jumpToSnapshot] called with index:', index)
   const history = getHistory()
 
   if (index < 0 || index >= history.length) {
@@ -137,6 +140,8 @@ export function jumpToSnapshot(
   }
 
   const snapshot = history[index] as ExtendedSnapshot
+  console.log('[jumpToSnapshot] snapshot state:', snapshot.state)
+  console.log('[jumpToSnapshot] snapshot state editor.content:', snapshot.state['editor.content'])
 
   // Проверяем delta для больших изменений
   if (!options.skipConfirmation) {
@@ -152,7 +157,15 @@ export function jumpToSnapshot(
     }
   }
 
-  return editorTimeTravel.jumpTo(index)
+  console.log('[jumpToSnapshot] calling editorTimeTravel.jumpTo')
+  const result = editorTimeTravel.jumpTo(index)
+  console.log('[jumpToSnapshot] editorTimeTravel.jumpTo result:', result)
+  
+  // Проверяем content сразу после jumpTo
+  const currentValue = editorStore.get(contentAtom)
+  console.log('[jumpToSnapshot] content after jumpTo:', currentValue)
+  
+  return result
 }
 
 /**

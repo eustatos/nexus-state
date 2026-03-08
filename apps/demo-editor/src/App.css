@@ -4,3 +4,24 @@
   flex-direction: column;
   height: 100vh;
 }
+
+/* Main content fills available space */
+main {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  min-height: 0;
+}
+
+/* Editor area should fill available space */
+main > div {
+  min-height: 0;
+}
+
+/* Footer with timeline - integrated into main layout */
+footer {
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+}

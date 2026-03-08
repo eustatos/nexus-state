@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useAtomValue, useSetAtom } from '@nexus-state/react'
 import { contentAtom, cursorAtom, isSavingAtom } from '@/store/atoms/editor'
 import { editorStore } from '@/store/store'
@@ -31,17 +30,8 @@ export function SimpleEditor({
     enabled: true
   })
 
-  // Логирование изменений content
-  console.log('[SimpleEditor] Render - content:', content?.substring(0, 50))
-
-  // Инициализация предыдущего контента
-  if (content && !readOnly) {
-    resetPreviousContent(content)
-  }
-
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value
-    console.log('[SimpleEditor] handleChange - newContent:', newContent.substring(0, 50))
     setContent(newContent)
 
     const textarea = e.target

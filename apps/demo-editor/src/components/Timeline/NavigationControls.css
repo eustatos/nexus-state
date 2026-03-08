@@ -50,25 +50,25 @@
 
 /* Size variants */
 .navigation-controls__button--small {
-  min-width: 32px;
-  min-height: 32px;
-  padding: 6px;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 5px;
 }
 
 .navigation-controls__button--small .navigation-controls__icon {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 .navigation-controls__button--medium {
-  min-width: 40px;
-  min-height: 40px;
-  padding: 8px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 7px;
 }
 
 .navigation-controls__button--medium .navigation-controls__icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .navigation-controls__button--large {

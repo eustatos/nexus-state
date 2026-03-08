@@ -3,7 +3,9 @@ import type { Snapshot } from '@nexus-state/core'
 import type { SnapshotMetadata } from '@/store/helpers'
 import { useSnapshots } from '@/hooks/useSnapshots'
 import { SnapshotItem } from './SnapshotItem'
-import { Search, Filter, Undo2, Redo2, ChevronRight, GitCompare, X } from 'lucide-react'
+import { Search, Filter, Undo2, Redo2, ChevronRight, GitCompare, X, Download, Upload } from 'lucide-react'
+import { ExportModal } from '@/components/Export/ExportModal'
+import { ImportModal } from '@/components/Export/ImportModal'
 import './SnapshotList.css'
 
 export interface SnapshotListProps {
@@ -23,6 +25,8 @@ export interface SnapshotListProps {
   showCompare?: boolean
   /** Обработчик включения режима сравнения */
   onCompareModeChange?: (isCompareMode: boolean) => void
+  /** Показывать кнопки экспорта/импорта */
+  showExportImport?: boolean
 }
 
 type ExtendedSnapshot = Snapshot & { metadata: SnapshotMetadata & { timestamp: number; atomCount: number } }
@@ -51,12 +55,15 @@ export function SnapshotList({
   showSearch = true,
   showFilter = true,
   showCompare = true,
+  showExportImport = true,
   onSnapshotSelect,
   onCompareModeChange
 }: SnapshotListProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [compareMode, setCompareMode] = useState(false)
   const [selectedForCompare, setSelectedForCompare] = useState<number[]>([])
+  const [showExportModal, setShowExportModal] = useState(false)
+  const [showImportModal, setShowImportModal] = useState(false)
 
   const {
     filteredSnapshots,
@@ -138,6 +145,30 @@ export function SnapshotList({
         </span>
 
         <div className="snapshot-list__actions" data-testid="snapshot-undo-redo">
+          {/* Export/Import buttons */}
+          {showExportImport && (
+            <>
+              <button
+                className="snapshot-list__action-button"
+                onClick={() => setShowExportModal(true)}
+                title="Export state"
+                type="button"
+                data-testid="snapshot-export-button"
+              >
+                <Download size={16} />
+              </button>
+              <button
+                className="snapshot-list__action-button"
+                onClick={() => setShowImportModal(true)}
+                title="Import state"
+                type="button"
+                data-testid="snapshot-import-button"
+              >
+                <Upload size={16} />
+              </button>
+            </>
+          )}
+
           {/* Compare mode button */}
           {showCompare && (
             <button
@@ -240,7 +271,6 @@ export function SnapshotList({
       <div
         className="snapshot-list__items"
         data-testid="snapshot-items-container"
-        style={maxHeight ? { maxHeight } : {}}
         role="list"
         aria-label="Snapshot history"
       >
@@ -294,6 +324,23 @@ export function SnapshotList({
             Snapshot #{hoveredIndex + 1} of {totalCount}
           </span>
         </div>
+      )}
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <ExportModal onClose={() => setShowExportModal(false)} />
+      )}
+
+      {/* Import Modal */}
+      {showImportModal && (
+        <ImportModal
+          onClose={() => setShowImportModal(false)}
+          onImportSuccess={({ importedCount }) => {
+            setShowImportModal(false)
+            // Можно показать уведомление об успехе
+            console.log(`Imported ${importedCount} snapshots`)
+          }}
+        />
       )}
     </div>
   )

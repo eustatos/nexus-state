@@ -135,9 +135,7 @@ export function useSnapshots(
     // historyIndex - это индекс в истории (0 = самый старый)
     // Преобразование: historyIndex = totalCount - 1 - uiIndex
     const historyIndex = totalCount - 1 - uiIndex
-    console.log('[useSnapshots.jumpTo] UI index:', uiIndex, '-> history index:', historyIndex, 'totalCount:', totalCount)
     const result = jumpToSnapshot(historyIndex)
-    console.log('[useSnapshots.jumpTo] result:', result)
     refresh()
     return result
   }, [refresh, totalCount])
@@ -165,14 +163,24 @@ export function useSnapshots(
       refresh()
     })
 
-    // Подписка на события навигации (undo/redo/jumpTo)
-    const unsubscribeNav = editorTimeTravel.subscribe('undo', () => {
+    // Подписка на события навигации (undo/redo/jump)
+    const unsubscribeUndo = editorTimeTravel.subscribe('undo', () => {
+      refresh()
+    })
+
+    const unsubscribeRedo = editorTimeTravel.subscribe('redo', () => {
+      refresh()
+    })
+
+    const unsubscribeJump = editorTimeTravel.subscribe('jump', () => {
       refresh()
     })
 
     return () => {
       unsubscribeSnapshots()
-      unsubscribeNav()
+      unsubscribeUndo()
+      unsubscribeRedo()
+      unsubscribeJump()
     }
   }, [autoRefresh, refresh])
 

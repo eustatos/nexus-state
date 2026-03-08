@@ -3,8 +3,11 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  gap: 12px;
-  padding: 12px;
+  padding: 8px;
+  overflow: hidden;
+  box-sizing: border-box;
+  min-height: 0;
+  position: relative;
 }
 
 .snapshot-list__header {
@@ -12,7 +15,47 @@
   align-items: center;
   justify-content: space-between;
   padding-bottom: 8px;
+  margin-bottom: 8px;
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.snapshot-list__compare-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.snapshot-list__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.snapshot-list__items {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: block;
+  padding-right: 4px;
+  min-height: 0;
+  position: relative;
+  z-index: 0;
 }
 
 .snapshot-list__count {
@@ -76,6 +119,7 @@
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 8px;
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .snapshot-list__compare-info-text {
@@ -104,12 +148,15 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .snapshot-list__search {
   position: relative;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .snapshot-list__search-icon {
@@ -146,6 +193,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .snapshot-list__filter-icon {
@@ -186,13 +234,14 @@
 }
 
 .snapshot-list__items {
-  flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding-right: 4px;
   min-height: 0;
+  flex: 1;
 }
 
 /* Custom scrollbar */

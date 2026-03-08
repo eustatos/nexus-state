@@ -1,7 +1,7 @@
 import { useTimeTravel } from '@/hooks/useTimeTravel'
-import { SimpleEditor, EditorToolbar, EditorStats } from './components/Editor'
+import { SimpleEditor, EditorToolbar } from './components/Editor'
 import { SnapshotList } from './components/Snapshots'
-import { TimelineSlider, NavigationControls } from './components/Timeline'
+import { TimelineSlider, NavigationControls, PlaybackControls } from './components/Timeline'
 import { useSetAtom } from '@nexus-state/react'
 import { contentAtom, isDirtyAtom } from '@/store/atoms/editor'
 import { editorStore } from '@/store/store'
@@ -23,7 +23,7 @@ function App() {
 
   const handleSnapshotSelect = (index: number) => {
     console.log('Snapshot selected:', index)
-    jumpTo(index)
+    // jumpTo уже вызван в SnapshotList, здесь просто логирование
   }
 
   const handleTimelinePositionChange = (position: number) => {
@@ -32,49 +32,71 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="h-screen overflow-hidden bg-background text-foreground flex flex-col">
       {/* Header */}
-      <header className="h-16 border-b border-border flex items-center px-6 bg-surface">
+      <header className="h-14 border-b border-border flex items-center px-6 bg-surface shrink-0">
         <div className="flex items-center gap-3">
           <span className="text-2xl">📝</span>
-          <h1 className="text-xl font-bold">Editor Demo</h1>
+          <h1 className="text-lg font-bold">Editor Demo</h1>
         </div>
         <div className="ml-auto flex items-center gap-4">
-          <span className="text-sm text-muted" data-testid="header-snapshot-count">
+          <span className="text-xs text-muted" data-testid="header-snapshot-count">
             Snapshots: {snapshotsCount}
           </span>
-          <span className="text-sm text-muted">Time-Travel Enabled</span>
+          <span className="text-xs text-muted">Time-Travel Enabled</span>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex h-[calc(100vh-4rem)]">
+      <main className="flex flex-1 overflow-hidden min-h-0">
         {/* Editor Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Editor Stats */}
-          <EditorStats />
-
-          {/* Editor Toolbar */}
-          <EditorToolbar onClear={handleClear} onCopy={handleCopy} />
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
+          {/* Editor Toolbar with Stats */}
+          <EditorToolbar onClear={handleClear} onCopy={handleCopy} showStats={true} />
 
           {/* Editor Content */}
-          <div className="flex-1 p-4 overflow-hidden">
+          <div className="flex-1 p-3 overflow-auto">
             <SimpleEditor
               placeholder="Start typing or paste your text here..."
               className="h-full"
             />
           </div>
+
+          {/* Timeline Bar */}
+          <footer className="h-14 border-t border-border bg-surface/30 shrink-0">
+            <div className="flex items-center justify-between h-full px-3">
+              <div className="flex items-center gap-2">
+                <NavigationControls
+                  showTooltip={true}
+                  size="small"
+                />
+                <PlaybackControls
+                  size="compact"
+                  showExtended={true}
+                />
+              </div>
+              <div className="flex-1 mx-3">
+                <TimelineSlider
+                  height={56}
+                  showCurrentIndicator={true}
+                  showLabels={false}
+                  animationDuration={300}
+                  onPositionChange={handleTimelinePositionChange}
+                />
+              </div>
+            </div>
+          </footer>
         </div>
 
         {/* Sidebar - Snapshots */}
-        <aside className="w-80 border-l border-border bg-surface/30 flex flex-col">
-          <div className="h-12 border-b border-border flex items-center px-4">
-            <h2 className="font-semibold">Snapshots</h2>
+        <aside className="w-80 border-l border-border bg-surface/30 flex flex-col shrink-0 h-full min-h-0">
+          <div className="h-10 border-b border-border flex items-center px-4 shrink-0">
+            <h2 className="font-semibold text-sm">Snapshots</h2>
             <span className="ml-auto text-xs text-muted">{snapshotsCount}</span>
           </div>
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden min-h-0 flex flex-col">
             <SnapshotList
-              maxHeight="calc(100% - 48px)"
+              style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
               showUndoRedo={true}
               showSearch={true}
               showFilter={true}
@@ -83,25 +105,6 @@ function App() {
           </div>
         </aside>
       </main>
-
-      {/* Timeline Bar */}
-      <footer className="h-20 border-t border-border bg-surface/30">
-        <div className="flex items-center justify-between h-full px-4">
-          <NavigationControls
-            showTooltip={true}
-            size="medium"
-          />
-          <div className="flex-1 mx-4">
-            <TimelineSlider
-              height={80}
-              showCurrentIndicator={true}
-              showLabels={false}
-              animationDuration={300}
-              onPositionChange={handleTimelinePositionChange}
-            />
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

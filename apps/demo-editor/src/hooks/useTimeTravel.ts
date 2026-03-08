@@ -42,21 +42,22 @@ export function useTimeTravel(): UseTimeTravelReturn {
   // Получаем текущую позицию из time-travel
   const canUndo = editorTimeTravel.canUndo()
   const canRedo = editorTimeTravel.canRedo()
+  const stats = editorTimeTravel.getHistoryStats()
 
-  // Вычисляем текущую позицию на основе canUndo/canRedo
-  // canUndo = true означает, что есть прошлые состояния (past.length > 0)
-  // canRedo = true означает, что есть будущие состояния (future.length > 0)
+  // Используем currentIndex из stats если доступен, иначе вычисляем
   const currentPosition = useMemo(() => {
+    // stats.currentIndex может быть доступен в некоторых реализациях
+    if (stats && 'currentIndex' in stats && typeof stats.currentIndex === 'number') {
+      return stats.currentIndex
+    }
+    
+    // Fallback: вычисляем на основе canUndo/canRedo
     if (snapshotsCount === 0) return 0
-    // past.length = количество состояний до текущего
-    // Если canUndo = false, значит past.length = 0, мы на первом (index 0)
-    // Если canRedo = false, значит future.length = 0, мы на последнем
     if (!canUndo) return 0
     if (!canRedo) return snapshotsCount - 1
-    // Мы где-то посередине - позиция = past.length
-    // Но у нас нет доступа к past.length напрямую, используем эвристику
+    // Мы где-то посередине - предполагаем, что мы на последнем
     return snapshotsCount - 1
-  }, [snapshotsCount, canUndo, canRedo])
+  }, [snapshotsCount, canUndo, canRedo, stats])
 
   /**
    * Переход к конкретному снимку по индексу
@@ -120,8 +121,16 @@ export function useTimeTravel(): UseTimeTravelReturn {
 
   // Подписка на изменения в time-travel для авто-обновления
   useEffect(() => {
-    // Подписка на события навигации (undo/redo/jumpTo)
-    const unsubscribeNav = editorTimeTravel.subscribe('undo', () => {
+    // Подписка на события навигации (undo/redo/jump)
+    const unsubscribeUndo = editorTimeTravel.subscribe('undo', () => {
+      setVersion(v => v + 1)
+    })
+
+    const unsubscribeRedo = editorTimeTravel.subscribe('redo', () => {
+      setVersion(v => v + 1)
+    })
+
+    const unsubscribeJump = editorTimeTravel.subscribe('jump', () => {
       setVersion(v => v + 1)
     })
 
@@ -131,7 +140,9 @@ export function useTimeTravel(): UseTimeTravelReturn {
     })
 
     return () => {
-      unsubscribeNav?.()
+      unsubscribeUndo?.()
+      unsubscribeRedo?.()
+      unsubscribeJump?.()
       unsubscribeSnapshots?.()
     }
   }, [])
