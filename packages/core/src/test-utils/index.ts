@@ -21,7 +21,7 @@
 
 import { atom, createStore, atomRegistry } from '../index';
 import { batcher } from '../batching';
-import type { Atom, Store } from '../types';
+import type { Atom, Store, Setter } from '../types';
 
 // ============================================================================
 // Test Isolation
@@ -65,6 +65,23 @@ export function createTestAtom<T>(value: T, name?: string): Atom<T> {
 }
 
 /**
+ * Create a mock atom (simple object with id and name)
+ */
+export function createMockAtom<T = any>(name: string, initialValue: T): Atom<T> {
+  const id = Symbol(name);
+  let value: T = initialValue;
+  return {
+    id,
+    name,
+    type: 'primitive' as const,
+    read: () => value,
+    write: (_set: Setter, newValue: T) => {
+      value = newValue;
+    },
+  };
+}
+
+/**
  * Create a test store with predefined atoms
  */
 export function createTestStore(atoms: Record<string, Atom<any>> = {}): Store {
@@ -73,6 +90,36 @@ export function createTestStore(atoms: Record<string, Atom<any>> = {}): Store {
     store.get(a); // Initialize
   });
   return store;
+}
+
+/**
+ * Create a mock store with basic functionality
+ */
+export function createMockStore(): Store {
+  const atoms = new Map<symbol, any>();
+  return {
+    get: <T>(atom: Atom<T>): T => {
+      if (!atoms.has(atom.id)) {
+        if (atom.type === 'primitive') {
+          atoms.set(atom.id, atom.read());
+        } else {
+          atoms.set(atom.id, atom.read((() => {}) as any));
+        }
+      }
+      return atoms.get(atom.id) as T;
+    },
+    set: <T>(atom: Atom<T>, value: T | ((prev: T) => T)): void => {
+      const currentValue = atoms.get(atom.id);
+      const newValue = typeof value === 'function' ? (value as (prev: T) => T)(currentValue) : value;
+      atoms.set(atom.id, newValue);
+      if (atom.type === 'primitive' && atom.write) {
+        atom.write((() => {}) as any, newValue);
+      }
+    },
+    subscribe: () => () => {},
+    batch: <T>(fn: () => T) => fn(),
+    getState: () => ({}) as any,
+  } as Store;
 }
 
 // ============================================================================

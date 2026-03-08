@@ -304,7 +304,7 @@ describe('SnapshotRestorer + React Integration', () => {
 
     it('should handle special characters in content', () => {
       const specialContent = 'Special: \n\t"quotes"\'apostrophes'
-      
+
       act(() => {
         store.set(contentAtom, specialContent)
       })

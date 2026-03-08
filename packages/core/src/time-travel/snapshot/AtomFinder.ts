@@ -37,23 +37,8 @@ export class AtomFinder {
       searchedByFallback: false,
     };
 
-    // Try to find atom by ID first (more reliable than name)
-    if (entry.atomId) {
-      searchDetails.searchedById = true;
-      const atom = this.findById(entry.atomId);
-      if (atom) {
-        logger.log(
-          `[AtomFinder] Found by id: ${String(entry.atomId)}, atom.name=${atom.name}`
-        );
-        return {
-          atom,
-          foundBy: 'id',
-          searchDetails,
-        };
-      }
-    }
-
-    // If not found by ID, try to find by name
+    // Try to find atom by name FIRST (more reliable than ID for serialized snapshots)
+    // ID can be ambiguous when multiple atoms have the same Symbol description
     if (entry.name) {
       searchDetails.searchedByName = true;
       const atom = this.findByName(entry.name);
@@ -64,6 +49,22 @@ export class AtomFinder {
         return {
           atom,
           foundBy: 'name',
+          searchDetails,
+        };
+      }
+    }
+
+    // Try to find atom by ID if name didn't work
+    if (entry.atomId) {
+      searchDetails.searchedById = true;
+      const atom = this.findById(entry.atomId);
+      if (atom) {
+        logger.log(
+          `[AtomFinder] Found by id: ${String(entry.atomId)}, atom.name=${atom.name}`
+        );
+        return {
+          atom,
+          foundBy: 'id',
           searchDetails,
         };
       }

@@ -24,7 +24,7 @@ function createMockAtom(
     type: 'primitive',
     status: 'active',
     createdAt: now,
-    lastAccessed: now,
+    lastAccessedAt: now,
     lastChanged: now,
     accessCount: 0,
     idleTime: 0,
@@ -58,9 +58,9 @@ describe('LRUCleanupStrategy', () => {
     it('should select least recently used atoms', () => {
       const now = Date.now();
       const atoms: TrackedAtom[] = [
-        createMockAtom('atom1', { lastAccessed: now - 1000 }),
-        createMockAtom('atom2', { lastAccessed: now - 3000 }),
-        createMockAtom('atom3', { lastAccessed: now - 2000 }),
+        createMockAtom('atom1', { lastAccessedAt: now - 1000 }),
+        createMockAtom('atom2', { lastAccessedAt: now - 3000 }),
+        createMockAtom('atom3', { lastAccessedAt: now - 2000 }),
       ];
 
       const candidates = strategy.selectCandidates(atoms, 2);
@@ -73,8 +73,8 @@ describe('LRUCleanupStrategy', () => {
     it('should filter out non-eligible atoms', () => {
       const now = Date.now();
       const atoms: TrackedAtom[] = [
-        createMockAtom('atom1', { lastAccessed: now - 1000, gcEligible: false }),
-        createMockAtom('atom2', { lastAccessed: now - 2000, gcEligible: true }),
+        createMockAtom('atom1', { lastAccessedAt: now - 1000, gcEligible: false }),
+        createMockAtom('atom2', { lastAccessedAt: now - 2000, gcEligible: true }),
       ];
 
       const candidates = strategy.selectCandidates(atoms, 5);
@@ -86,9 +86,9 @@ describe('LRUCleanupStrategy', () => {
     it('should respect count limit', () => {
       const now = Date.now();
       const atoms: TrackedAtom[] = [
-        createMockAtom('atom1', { lastAccessed: now - 1000 }),
-        createMockAtom('atom2', { lastAccessed: now - 2000 }),
-        createMockAtom('atom3', { lastAccessed: now - 3000 }),
+        createMockAtom('atom1', { lastAccessedAt: now - 1000 }),
+        createMockAtom('atom2', { lastAccessedAt: now - 2000 }),
+        createMockAtom('atom3', { lastAccessedAt: now - 3000 }),
       ];
 
       const candidates = strategy.selectCandidates(atoms, 1);
@@ -117,7 +117,7 @@ describe('LRUCleanupStrategy', () => {
 
   describe('getPriority', () => {
     it('should return numeric priority', () => {
-      const atom = createMockAtom('atom1', { lastAccessed: 1000 });
+      const atom = createMockAtom('atom1', { lastAccessedAt: 1000 });
 
       const priority = strategy.getPriority(atom);
 
@@ -307,9 +307,9 @@ describe('TimeBasedCleanupStrategy', () => {
       const now = Date.now();
       strategy.setCurrentTime(now + 400000); // Future time to make atoms expired
       const atoms: TrackedAtom[] = [
-        createMockAtom('atom1', { lastChanged: now - 1000, lastAccessed: now - 1000, ttl: 300000 }),
-        createMockAtom('atom2', { lastChanged: now - 3000, lastAccessed: now - 3000, ttl: 300000 }),
-        createMockAtom('atom3', { lastChanged: now - 2000, lastAccessed: now - 2000, ttl: 300000 }),
+        createMockAtom('atom1', { lastChanged: now - 1000, lastAccessedAt: now - 1000, ttl: 300000 }),
+        createMockAtom('atom2', { lastChanged: now - 3000, lastAccessedAt: now - 3000, ttl: 300000 }),
+        createMockAtom('atom3', { lastChanged: now - 2000, lastAccessedAt: now - 2000, ttl: 300000 }),
       ];
 
       const candidates = strategy.selectCandidates(atoms, 2);
@@ -321,8 +321,8 @@ describe('TimeBasedCleanupStrategy', () => {
       const now = Date.now();
       strategy.setCurrentTime(now + 400000);
       const atoms: TrackedAtom[] = [
-        createMockAtom('atom1', { lastChanged: now - 1000, lastAccessed: now - 1000, gcEligible: false, ttl: 300000 }),
-        createMockAtom('atom2', { lastChanged: now - 2000, lastAccessed: now - 2000, gcEligible: true, ttl: 300000 }),
+        createMockAtom('atom1', { lastChanged: now - 1000, lastAccessedAt: now - 1000, gcEligible: false, ttl: 300000 }),
+        createMockAtom('atom2', { lastChanged: now - 2000, lastAccessedAt: now - 2000, gcEligible: true, ttl: 300000 }),
       ];
 
       const candidates = strategy.selectCandidates(atoms, 5);
@@ -335,9 +335,9 @@ describe('TimeBasedCleanupStrategy', () => {
       const now = Date.now();
       strategy.setCurrentTime(now + 400000);
       const atoms: TrackedAtom[] = [
-        createMockAtom('atom1', { lastChanged: now - 1000, lastAccessed: now - 1000, ttl: 300000 }),
-        createMockAtom('atom2', { lastChanged: now - 2000, lastAccessed: now - 2000, ttl: 300000 }),
-        createMockAtom('atom3', { lastChanged: now - 3000, lastAccessed: now - 3000, ttl: 300000 }),
+        createMockAtom('atom1', { lastChanged: now - 1000, lastAccessedAt: now - 1000, ttl: 300000 }),
+        createMockAtom('atom2', { lastChanged: now - 2000, lastAccessedAt: now - 2000, ttl: 300000 }),
+        createMockAtom('atom3', { lastChanged: now - 3000, lastAccessedAt: now - 3000, ttl: 300000 }),
       ];
 
       const candidates = strategy.selectCandidates(atoms, 1);
@@ -350,8 +350,8 @@ describe('TimeBasedCleanupStrategy', () => {
     it('should return priority based on expiration', () => {
       const now = Date.now();
       strategy.setCurrentTime(now + 400000);
-      const oldAtom = createMockAtom('old', { lastChanged: 1000, lastAccessed: 1000, ttl: 300000 });
-      const newAtom = createMockAtom('new', { lastChanged: 5000, lastAccessed: 5000, ttl: 300000 });
+      const oldAtom = createMockAtom('old', { lastChanged: 1000, lastAccessedAt: 1000, ttl: 300000 });
+      const newAtom = createMockAtom('new', { lastChanged: 5000, lastAccessedAt: 5000, ttl: 300000 });
 
       const oldPriority = strategy.getPriority(oldAtom);
       const newPriority = strategy.getPriority(newAtom);

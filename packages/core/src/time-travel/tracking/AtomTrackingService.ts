@@ -8,6 +8,7 @@ import type { Atom } from '../../types';
 import type { TrackedAtom } from './types';
 import type { TrackedAtomsRepository } from './TrackedAtomsRepository';
 import type { TrackingEventManager } from './TrackingEventManager';
+import type { ITrackingOperations, TrackResult, UntrackResult } from './types/interfaces';
 
 export interface TrackingResult {
   /** Whether operation was successful */
@@ -21,7 +22,7 @@ export interface TrackingResult {
 /**
  * AtomTrackingService provides atom tracking operations
  */
-export class AtomTrackingService {
+export class AtomTrackingService implements ITrackingOperations {
   private repository: TrackedAtomsRepository;
   private eventManager: TrackingEventManager;
 
@@ -39,13 +40,13 @@ export class AtomTrackingService {
    * @param trackedAtom Tracked atom data
    * @returns Tracking result
    */
-  track<Value>(_atom: Atom<Value>, trackedAtom: TrackedAtom): TrackingResult {
+  track<Value>(_atom: Atom<Value>, trackedAtom: TrackedAtom): TrackResult {
     try {
       const success = this.repository.track(trackedAtom);
 
       if (success) {
         this.eventManager.emitAtomTracked(trackedAtom);
-        return { success: true, atom: trackedAtom };
+        return { success: true };
       }
 
       return {
@@ -64,29 +65,20 @@ export class AtomTrackingService {
 
   /**
    * Untrack an atom
-   * @param atomId Atom ID
-   * @returns Tracking result
+   * @param atomId Atom ID to untrack
+   * @returns Untrack result
    */
-  untrack(atomId: symbol): TrackingResult {
+  untrack(atomId: symbol): UntrackResult {
     try {
-      const atom = this.repository.get(atomId);
-      if (!atom) {
-        return {
-          success: false,
-          error: 'Atom not found',
-        };
-      }
-
       const success = this.repository.untrack(atomId);
 
       if (success) {
-        this.eventManager.emitAtomUntracked(atom);
-        return { success: true, atom };
+        return { success: true };
       }
 
       return {
         success: false,
-        error: 'Failed to untrack atom',
+        error: 'Atom not found',
       };
     } catch (error) {
       const errorMessage =
@@ -110,10 +102,10 @@ export class AtomTrackingService {
   /**
    * Get tracked atom by ID
    * @param atomId Atom ID
-   * @returns Tracked atom or undefined
+   * @returns Tracked atom or null
    */
-  getTrackedAtom(atomId: symbol): TrackedAtom | undefined {
-    return this.repository.get(atomId);
+  getTrackedAtom(atomId: symbol): TrackedAtom | null {
+    return this.repository.get(atomId) ?? null;
   }
 
   /**

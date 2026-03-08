@@ -4,18 +4,17 @@
 
 import type {
   ChangeEvent,
-  ChangeListener,
   ChangeFilter,
   ChangeBatch,
   TrackedAtom,
 } from "./types";
-import { AtomTracker } from "./AtomTracker";
+import type { AtomTracker } from "./AtomTracker.di";
 import { Atom } from "../../types";
 
 export class AtomChangeDetector {
   private tracker: AtomTracker;
-  private listeners: Map<symbol, Set<ChangeListener>> = new Map();
-  private globalListeners: Set<ChangeListener> = new Set();
+  private listeners: Map<symbol, Set<(event: ChangeEvent) => void>> = new Map();
+  private globalListeners: Set<(event: ChangeEvent) => void> = new Set();
   private filters: ChangeFilter[] = [];
   private batchMode: boolean = false;
   private batchQueue: ChangeEvent[] = [];
@@ -34,7 +33,12 @@ export class AtomChangeDetector {
     // Subscribe to tracker events
     this.tracker.subscribe('atom-changed', (event) => {
       if (event.atom) {
-        this.handleAtomChange(event.atom, undefined, undefined);
+        const trackedAtom = event.atom as TrackedAtom;
+        this.handleAtomChange(
+          trackedAtom,
+          event.data?.oldValue,
+          event.data?.newValue
+        );
       }
     });
   }
@@ -57,7 +61,7 @@ export class AtomChangeDetector {
       oldValue,
       newValue,
       timestamp: Date.now(),
-      type: this.detectChangeType(oldValue, newValue),
+      type: 'change',
     };
 
     // Apply filters
@@ -128,7 +132,7 @@ export class AtomChangeDetector {
    * @param atom Atom to watch
    * @param listener Change listener
    */
-  watch(atom: Atom<unknown>, listener: ChangeListener): () => void {
+  watch(atom: Atom<unknown>, listener: (event: ChangeEvent) => void): () => void {
     if (!this.tracker.isTracked(atom.id)) {
       this.tracker.track(atom);
     }
@@ -159,7 +163,7 @@ export class AtomChangeDetector {
    * @param atoms Atoms to watch
    * @param listener Change listener
    */
-  watchMany(atoms: any[], listener: ChangeListener): () => void {
+  watchMany(atoms: any[], listener: (event: ChangeEvent) => void): () => void {
     const unwatchFns = atoms.map((atom) => this.watch(atom, listener));
 
     return () => {
@@ -172,7 +176,7 @@ export class AtomChangeDetector {
    * @param pattern Atom name pattern
    * @param listener Change listener
    */
-  watchPattern(pattern: RegExp, listener: ChangeListener): () => void {
+  watchPattern(pattern: RegExp, listener: (event: ChangeEvent) => void): () => void {
     const atoms = this.tracker
       .getTrackedAtoms()
       .filter((t) => pattern.test(t.name))
@@ -185,7 +189,7 @@ export class AtomChangeDetector {
    * Add global listener
    * @param listener Change listener
    */
-  addGlobalListener(listener: ChangeListener): () => void {
+  addGlobalListener(listener: (event: ChangeEvent) => void): () => void {
     this.globalListeners.add(listener);
     return () => this.globalListeners.delete(listener);
   }

@@ -13,6 +13,7 @@ import type { TimeTravelStats, CaptureResult, JumpResult } from './types';
 import type { HistoryService } from './HistoryService';
 import type { SnapshotService } from './SnapshotService';
 import type { TimeTravelEventService } from './types';
+import { batcher } from '../../batching';
 import { storeLogger as logger } from '../../debug';
 
 export interface TimeTravelApiServiceConfig {
@@ -42,6 +43,10 @@ export class TimeTravelApiService {
    * Capture a snapshot of current state
    */
   capture(action?: string): Snapshot | undefined {
+    // Flush any pending batched notifications before capturing
+    // This ensures all store.set updates are complete before snapshot
+    batcher.flush();
+
     const result: CaptureResult = this.snapshotService.capture(action);
 
     if (result.success && result.snapshot) {
@@ -168,6 +173,7 @@ export class TimeTravelApiService {
       }
     }
 
+    logger.warn(`[TimeTravelApiService] Failed to jump to index: ${index}`);
     return false;
   }
 

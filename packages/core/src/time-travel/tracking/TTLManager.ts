@@ -75,7 +75,7 @@ export class TTLManager {
    */
   isExpired(atom: TrackedAtom): boolean {
     const now = Date.now();
-    const lastAccess = atom.lastAccessed || atom.createdAt || 0;
+    const lastAccess = atom.lastAccessedAt || atom.createdAt || 0;
     const ttl = this.getTTLForAtom(atom);
 
     return now - lastAccess > ttl;
@@ -88,7 +88,7 @@ export class TTLManager {
    */
   isIdle(atom: TrackedAtom): boolean {
     const now = Date.now();
-    const lastAccess = atom.lastAccessed || atom.createdAt || 0;
+    const lastAccess = atom.lastAccessedAt || atom.createdAt || 0;
 
     return now - lastAccess > this.config.idleTimeout;
   }
@@ -100,7 +100,7 @@ export class TTLManager {
    */
   isStale(atom: TrackedAtom): boolean {
     const now = Date.now();
-    const lastAccess = atom.lastAccessed || atom.createdAt || 0;
+    const lastAccess = atom.lastAccessedAt || atom.createdAt || 0;
 
     return now - lastAccess > this.config.staleTimeout;
   }
@@ -154,7 +154,7 @@ export class TTLManager {
    */
   getTTLResult(atom: TrackedAtom): TTLResult {
     const now = Date.now();
-    const lastAccess = atom.lastAccessed || atom.createdAt || 0;
+    const lastAccess = atom.lastAccessedAt || atom.createdAt || 0;
     const ttl = this.getTTLForAtom(atom);
     const status = this.getStatus(atom);
 
@@ -215,7 +215,7 @@ export class TTLManager {
    * @param atom Atom to reset
    */
   resetAccessTime(atom: TrackedAtom): void {
-    atom.lastAccessed = Date.now();
+    atom.lastAccessedAt = Date.now();
     atom.status = 'active';
   }
 }

@@ -170,11 +170,7 @@ export class RestorationEngine {
     entry: SnapshotStateEntry,
     atomIndex?: number
   ): boolean {
-    logger.log(
-      `[RestorationEngine] Restoring atom: ${key}, entry.name=${entry.name}`
-    );
-
-    // Find atom
+    // Find atom first
     const findResult = this.atomFinder.find(key, {
       name: entry.name,
       atomId: entry.atomId,

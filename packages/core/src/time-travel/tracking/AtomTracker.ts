@@ -187,15 +187,21 @@ export class AtomTracker extends BaseDisposable {
       type: 'primitive',
       status: 'active',
       createdAt: now,
-      lastAccessed: now,
-      lastChanged: now,
-      accessCount: 0,
-      idleTime: 0,
-      ttl: this.ttlConfig.defaultTTL,
-      gcEligible: false,
       firstSeen: now,
       lastSeen: now,
+      trackedAt: now,
+      lastAccessedAt: now,
+      lastChanged: now,
+      accessCount: 0,
       changeCount: 0,
+      refCount: 0,
+      idleTime: 0,
+      ttl: this.ttlConfig.defaultTTL ?? 300000,
+      gcEligible: false,
+      lifecycle: {
+        createdAt: now,
+        lastAccessedAt: now,
+      },
       metadata: {
         createdAt: now,
         updatedAt: now,
@@ -310,7 +316,7 @@ export class AtomTracker extends BaseDisposable {
   /**
    * Get tracked atom by ID
    */
-  getTrackedAtom(atomId: symbol): TrackedAtom | undefined {
+  getTrackedAtom(atomId: symbol): TrackedAtom | null {
     return this.trackingService.getTrackedAtom(atomId);
   }
 
@@ -369,9 +375,9 @@ export class AtomTracker extends BaseDisposable {
    */
   subscribe(
     eventType: TrackingEventType,
-    listener: (event: TrackingEvent) => void
+    listener: (event: import('./TrackingEventManager').TrackingEvent) => void
   ): () => void {
-    return this.eventService.subscribe(eventType, listener);
+    return this.eventService.subscribe(eventType, listener as any);
   }
 
   /**

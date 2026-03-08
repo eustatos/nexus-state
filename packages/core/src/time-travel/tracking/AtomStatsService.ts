@@ -4,8 +4,7 @@
  * Handles collection and retrieval of tracking statistics.
  */
 
-import type { TrackedAtom } from './types';
-import type { TrackingStats } from './types';
+import type { TrackedAtom, TrackingStats, CleanupStats } from './types';
 import type { StatisticsCollector } from './StatisticsCollector';
 import type { TrackedAtomsRepository } from './TrackedAtomsRepository';
 import type { ArchiveManager } from './ArchiveManager';
@@ -74,17 +73,14 @@ export class AtomStatsService {
    * Get cleanup statistics
    * @returns Cleanup stats
    */
-  getCleanupStats(): {
-    totalCleanups: number;
-    totalAtomsCleaned: number;
-    totalAtomsFailed: number;
-  } {
+  getCleanupStats(): CleanupStats {
     if (this.cleanupService) {
       const stats = this.cleanupService.getCleanupStats();
       return {
         totalCleanups: stats.totalCleanups,
         totalAtomsCleaned: stats.totalAtomsCleaned,
         totalAtomsFailed: stats.totalAtomsFailed,
+        lastCleanup: stats.lastCleanup ?? null,
       };
     }
 
@@ -92,6 +88,7 @@ export class AtomStatsService {
       totalCleanups: 0,
       totalAtomsCleaned: 0,
       totalAtomsFailed: 0,
+      lastCleanup: null,
     };
   }
 

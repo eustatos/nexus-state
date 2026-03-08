@@ -6,23 +6,17 @@
  */
 
 import { AtomChangeDetector } from './AtomChangeDetector';
-import { AtomTracker } from './AtomTracker';
 import { ComputedAtomHandler } from './ComputedAtomHandler';
 import type {
   ComputedDependency,
-  ChangeListener,
   TrackerConfig,
 } from './types';
-import {
-  LRUCleanupStrategy,
-  LFUCleanupStrategy,
-  FIFOCleanupStrategy,
-  TimeBasedCleanupStrategy,
-  createCleanupStrategy,
-} from './CleanupStrategies';
+import type { AtomTracker as DIAtomTracker } from './AtomTracker.di';
 
 // Re-export main classes
-export { AtomTracker } from './AtomTracker';
+export { AtomTracker as LegacyAtomTracker } from './AtomTracker';
+export { AtomTracker } from './AtomTracker.di';
+export { createAtomTracker } from './AtomTrackerFactory';
 export { AtomChangeDetector } from './AtomChangeDetector';
 export { ComputedAtomHandler } from './ComputedAtomHandler';
 export {
@@ -81,6 +75,15 @@ export type {
   CleanupResult,
 } from './types';
 
+// Re-export DI types
+export type {
+  ITrackingOperations,
+  IAccessTracking,
+  ICleanupOperations,
+  IStatsProvider,
+  AtomTrackerDeps,
+} from './types/interfaces';
+
 // Re-export constants - TODO: create constants.ts
 // export {
 //   DEFAULT_TRACKER_CONFIG,
@@ -92,24 +95,11 @@ export type {
 // } from "./constants";
 
 /**
- * Create a new atom tracker
- * @param store Store instance
- * @param config Configuration options
- * @returns AtomTracker instance
- */
-export function createAtomTracker(
-  store: any,
-  config?: Partial<TrackerConfig>
-): AtomTracker {
-  return new AtomTracker(store, config);
-}
-
-/**
  * Create a new change detector
  * @param tracker Atom tracker instance
  * @returns AtomChangeDetector instance
  */
-export function createChangeDetector(tracker: AtomTracker): AtomChangeDetector {
+export function createChangeDetector(tracker: DIAtomTracker): AtomChangeDetector {
   return new AtomChangeDetector(tracker);
 }
 
@@ -119,7 +109,7 @@ export function createChangeDetector(tracker: AtomTracker): AtomChangeDetector {
  * @returns ComputedAtomHandler instance
  */
 export function createComputedHandler(
-  tracker: AtomTracker
+  tracker: DIAtomTracker
 ): ComputedAtomHandler {
   return new ComputedAtomHandler(tracker);
 }
@@ -130,7 +120,7 @@ export function createComputedHandler(
  * @param atom Atom to check
  * @returns True if tracked
  */
-export function isTracked(tracker: AtomTracker, atom: any): boolean {
+export function isTracked(tracker: DIAtomTracker, atom: any): boolean {
   return tracker.isTracked(atom);
 }
 
@@ -139,7 +129,7 @@ export function isTracked(tracker: AtomTracker, atom: any): boolean {
  * @param tracker Atom tracker
  * @returns Array of tracked atoms
  */
-export function getTrackedAtoms(tracker: AtomTracker): any[] {
+export function getTrackedAtoms(tracker: DIAtomTracker): any[] {
   return tracker.getTrackedAtoms();
 }
 
@@ -150,7 +140,7 @@ export function getTrackedAtoms(tracker: AtomTracker): any[] {
  * @returns Atom or undefined
  */
 export function getAtomByName(
-  tracker: AtomTracker,
+  tracker: DIAtomTracker,
   name: string
 ): any | undefined {
   return tracker.getAtomByName(name);
@@ -166,7 +156,7 @@ export function getAtomByName(
 export function watchAtom(
   detector: AtomChangeDetector,
   atom: any,
-  listener: ChangeListener
+  listener: (event: import('./types/types').ChangeEvent) => void
 ): () => void {
   return detector.watch(atom, listener);
 }
@@ -181,7 +171,7 @@ export function watchAtom(
 export function watchAtoms(
   detector: AtomChangeDetector,
   atoms: any[],
-  listener: ChangeListener
+  listener: (event: import('./types/types').ChangeEvent) => void
 ): () => void {
   return detector.watchMany(atoms, listener);
 }

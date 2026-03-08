@@ -2,7 +2,7 @@
  * Public types for TimeTravelController
  */
 
-import type { Store, Snapshot, SnapshotStateEntry } from '../types';
+import type { Store, Snapshot, SnapshotStateEntry, Atom } from '../types';
 
 // Re-export core types that are used by TimeTravelController
 export type {
@@ -11,6 +11,8 @@ export type {
   Snapshot,
   SnapshotMetadata,
   SnapshotStateEntry,
+  Atom,
+  Store,
 } from '../types';
 
 // Re-export snapshot module types

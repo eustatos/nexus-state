@@ -56,37 +56,24 @@ export class StatisticsCollector {
     const activeAtoms = atoms.filter((a) => a.status === 'active').length;
     const idleAtoms = atoms.filter((a) => a.status === 'idle').length;
     const staleAtoms = atoms.filter((a) => a.status === 'stale').length;
+    const expiredAtoms = atoms.filter((a) => a.status === 'expired').length;
 
-    // Count by type
-    const atomsByType: Record<string, number> = {};
-    for (const atom of atoms) {
-      const type = atom.type || 'unknown';
-      atomsByType[type] = (atomsByType[type] || 0) + 1;
-    }
-
-    // Calculate average subscribers
-    let totalSubscribers = 0;
-    let atomsWithNoSubscribers = 0;
-    for (const atom of atoms) {
-      const subscriberCount = atom.subscribers?.size || 0;
-      totalSubscribers += subscriberCount;
-      if (subscriberCount === 0) {
-        atomsWithNoSubscribers++;
-      }
-    }
+    // Count atoms by type
+    const byType: Record<string, number> = {};
+    atoms.forEach((atom) => {
+      const type = atom.atom.type || 'unknown';
+      byType[type] = (byType[type] || 0) + 1;
+    });
 
     return {
       totalAtoms: atoms.length,
-      byType: atomsByType,
-      accessCount: 0,
-      changeCount: 0,
-      averageAccesses: 0,
-      mostAccessed: null,
-      mostChanged: null,
-      oldestAtom: null,
-      newestAtom: null,
-      version: 1,
-      uptime: 0,
+      activeAtoms,
+      idleAtoms,
+      staleAtoms,
+      expiredAtoms,
+      totalAccesses: 0,
+      totalChanges: 0,
+      byType,
     };
   }
 
