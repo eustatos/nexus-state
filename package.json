@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --filter=@nexus-state/*",
     "dev": "turbo run dev --parallel",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
@@ -59,6 +59,8 @@
   },
   "pnpm": {
     "overrides": {
+      "@nexus-state/core": "workspace:*",
+      "@nexus-state/react": "workspace:*",
       "minimatch": "^10.2.3",
       "basic-ftp": "^5.2.0",
       "rollup": "^4.59.0",

@@ -18,8 +18,7 @@
             "dependsOn": [
                 "^build"
             ],
-            "outputs": [],
-            "timeout": 600
+            "outputs": []
         },
         "test:coverage": {
             "dependsOn": [
@@ -27,11 +26,8 @@
             ],
             "outputs": [
                 "coverage/**"
-            ],
-            "timeout": 900
+            ]
         },
-        "lint": {
-            "timeout": 300
-        }
+        "lint": {}
     }
 }
