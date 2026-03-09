@@ -8,7 +8,7 @@ type BatchCallback = () => void;
 /**
  * Batcher class that collects and flushes batched callbacks
  */
-class Batcher {
+export class Batcher {
   private batch: Set<BatchCallback> = new Set();
   private batchDepth = 0;
   private isFlushing = false;
@@ -27,7 +27,7 @@ class Batcher {
     if (this.batchDepth > 0) {
       this.batchDepth--;
     }
-    
+
     // Only flush when we exit the outermost batch
     if (this.batchDepth === 0 && !this.isFlushing) {
       this.flush();

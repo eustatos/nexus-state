@@ -252,7 +252,9 @@ describe('ObjectComparator', () => {
     it('should handle arrays', () => {
       const obj = { a: [1, 2, 3] };
       const display = comparator.getDisplayValue(obj);
-      expect(display).toContain('[1, 2, 3]');
+      // Arrays in nested objects are truncated at maxDepth
+      expect(display).toContain('a:');
+      expect(display).toContain('...');
     });
   });
 

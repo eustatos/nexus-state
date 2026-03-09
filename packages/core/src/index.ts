@@ -170,4 +170,4 @@ export type {
 export { logger, storeLogger, atomLogger, reactLogger } from './debug';
 
 // Batching utility
-export { batch, batcher, isBatching } from './batching';
+export { batch, batcher, isBatching, type Batcher } from './batching';
