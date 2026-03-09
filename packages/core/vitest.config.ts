@@ -28,6 +28,9 @@ export default defineConfig({
         '**/*.d.ts',
         '**/*.config.ts',
         '**/*.config.js',
+        // Файлы типов (только объявления типов и константы)
+        '**/types.ts',
+        '**/types/index.ts',
         // Скомпилированные файлы и зависимости
         '**/node_modules/**',
         '**/dist/**',
