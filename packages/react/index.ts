@@ -6,12 +6,21 @@ import {
   useMemo,
   useRef,
   useState,
+  version as ReactVersion,
+  // @ts-ignore - useSyncExternalStore available in React 18+
+  useSyncExternalStore as useSyncExternalStore$18
 } from "react";
 import { useStore } from "./context";
 
-// Import useSyncExternalStore if available (React 18+)
-const reactExports = require("react") as any;
-const useSyncExternalStoreNative = reactExports.useSyncExternalStore as Function | undefined;
+// Определяем версию React
+const isReact18OrLater = (() => {
+  try {
+    const majorVersion = parseInt(ReactVersion.split('.')[0], 10);
+    return majorVersion >= 18;
+  } catch {
+    return false;
+  }
+})();
 
 /**
  * Hook to read an atom value (read-only).
@@ -45,24 +54,45 @@ export function useAtomValue<T>(
     );
   }
 
-  // Use useSyncExternalStore for better React 18 integration
-  const value = useSyncExternalStoreWithSelector(
-    useCallback(
-      (onStoreChange) => {
-        // Subscribe to atom changes
-        return resolvedStore.subscribe(atom, onStoreChange);
-      },
+  // React 18+ with useSyncExternalStore
+  if (isReact18OrLater) {
+    const subscribe = useCallback(
+      (onStoreChange: () => void) => resolvedStore.subscribe(atom, onStoreChange),
       [atom, resolvedStore]
-    ),
-    // Get current snapshot
-    useCallback(() => resolvedStore.get(atom), [atom, resolvedStore]),
-    // Get server snapshot (SSR)
-    useCallback(() => resolvedStore.get(atom), [atom, resolvedStore])
-  );
+    );
 
-  // Display in React DevTools
+    const getSnapshot = useCallback(
+      () => resolvedStore.get(atom),
+      [atom, resolvedStore]
+    );
+
+    const value = useSyncExternalStore$18(subscribe, getSnapshot, getSnapshot);
+    useDebugValue(value);
+    return value;
+  }
+
+  // React 17 fallback
+  const [value, setValue] = useState(() => resolvedStore.get(atom));
+  const valueRef = useRef(value);
+  valueRef.current = value;
+
+  useEffect(() => {
+    const handleChange = (newValue: T) => {
+      if (!Object.is(valueRef.current, newValue)) {
+        setValue(newValue);
+      }
+    };
+
+    const unsubscribe = resolvedStore.subscribe(atom, handleChange);
+
+    // Проверяем актуальное значение после подписки
+    const currentValue = resolvedStore.get(atom);
+    handleChange(currentValue);
+
+    return unsubscribe;
+  }, [atom, resolvedStore]);
+
   useDebugValue(value);
-
   return value;
 }
 
@@ -198,63 +228,8 @@ export function useAtomCallback<Args extends unknown[], Result>(
       return callback(get, set, ...args);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resolvedStore]
+    [resolvedStore, callback]
   );
-}
-
-/**
- * Legacy useAtom for React 17 compatibility.
- * Uses useEffect and useState instead of useSyncExternalStore.
- *
- * @deprecated Use useAtom instead for React 18+
- */
-export function useAtomLegacy<T>(
-  atom: Atom<T>,
-  store?: Store
-): [T, (value: T | ((prev: T) => T)) => void] {
-  // Get store from context if not provided
-  const contextStore = useStoreSafe();
-  const resolvedStore: Store | undefined = store || contextStore;
-
-  if (!resolvedStore) {
-    throw new Error(
-      "useAtomLegacy requires a store. Either provide one explicitly or wrap your component with <StoreProvider>."
-    );
-  }
-
-  // Single get call - avoid double get
-  const [value, setValue] = useState(() => resolvedStore.get(atom));
-  const valueRef = useRef(value);
-  valueRef.current = value;
-
-  useEffect(() => {
-    // Subscribe to changes
-    const unsubscribe = resolvedStore.subscribe(atom, (newValue: T) => {
-      // Only update if value actually changed (using Object.is for NaN safety)
-      if (!Object.is(valueRef.current, newValue)) {
-        setValue(newValue);
-      }
-    });
-
-    // Sync value immediately (but only once, and only if it changed)
-    const currentValue = resolvedStore.get(atom);
-    if (!Object.is(valueRef.current, currentValue)) {
-      setValue(currentValue);
-    }
-
-    return unsubscribe;
-  }, [atom, resolvedStore]);
-
-  const setAtom = useCallback(
-    (update: T | ((prev: T) => T)) => {
-      resolvedStore.set(atom, update);
-    },
-    [atom, resolvedStore]
-  );
-
-  useDebugValue(value);
-
-  return [value, setAtom];
 }
 
 /**
@@ -266,44 +241,6 @@ function useStoreSafe(): Store | undefined {
   } catch {
     return undefined;
   }
-}
-
-/**
- * Shim for useSyncExternalStore for React 17 compatibility.
- * This is a simplified implementation that falls back to useEffect.
- */
-function useSyncExternalStoreWithSelector<T>(
-  subscribe: (onStoreChange: () => void) => () => void,
-  getSnapshot: () => T,
-  getServerSnapshot?: () => T
-): T {
-  // Check if useSyncExternalStore is available (React 18+)
-  if (typeof useSyncExternalStoreNative === "function") {
-    return useSyncExternalStoreNative(subscribe, getSnapshot, getServerSnapshot);
-  }
-
-  // Fallback for React 17 or when useSyncExternalStore is not available
-  const [state, setState] = useState(getSnapshot);
-  const stateRef = useRef(state);
-  stateRef.current = state;
-
-  useEffect(() => {
-    const handleChange = () => {
-      const newValue = getSnapshot();
-      if (!Object.is(stateRef.current, newValue)) {
-        setState(newValue);
-      }
-    };
-
-    const unsubscribe = subscribe(handleChange);
-
-    // Sync value after subscription
-    handleChange();
-
-    return unsubscribe;
-  }, [subscribe, getSnapshot]);
-
-  return state;
 }
 
 // Re-export context and provider
