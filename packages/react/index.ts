@@ -213,10 +213,14 @@ export function useAtomCallback<Args extends unknown[], Result>(
     );
   }
 
-  // Use useMemo to memoize the callback wrapper, ensuring stable reference
-  // The callback itself should be stable (useCallback in component)
-  return useMemo(
-    () => (...args: Args) => {
+  // Use ref to store the callback, ensuring stable reference
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
+
+  // Use useCallback with only resolvedStore as dependency
+  // This ensures stable function reference even if callback changes
+  return useCallback(
+    (...args: Args) => {
       const get: Getter = <T>(atom: Atom<T>) => resolvedStore.get(atom);
       const set: Setter = <T>(
         atom: Atom<T>,
@@ -225,10 +229,9 @@ export function useAtomCallback<Args extends unknown[], Result>(
         resolvedStore.set(atom, value);
       };
 
-      return callback(get, set, ...args);
+      return callbackRef.current(get, set, ...args);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resolvedStore, callback]
+    [resolvedStore]
   );
 }
 
