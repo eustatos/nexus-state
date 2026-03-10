@@ -7,7 +7,7 @@ export interface InlineDiffViewProps {
 }
 
 /**
- * Get text из atom состояния
+ * Get text from atom state
  */
 function getAtomText(atom: AtomComparison): string {
   if (atom.status === 'added' && atom.newValue !== undefined) {
@@ -25,7 +25,7 @@ function getAtomText(atom: AtomComparison): string {
   }
 
   if (atom.status === 'modified') {
-    // Для modified atoms показываем разницу
+    // For modified atoms show difference
     if (atom.valueDiff) {
       return formatValueDiff(atom)
     }

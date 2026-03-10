@@ -31,6 +31,8 @@ import type { Store, Snapshot } from '../types';
 import type { TimeTravelOptions } from './types';
 import type { TimeTravelEventType, TimeTravelEvent, TimeTravelEventListener } from './core/SubscriptionManager';
 import { TimeTravelController, type TimeTravelControllerConfig } from './core/TimeTravelController';
+import { ComparisonService } from './core/ComparisonService';
+import type { SnapshotComparison, ComparisonOptions } from './comparison';
 
 export interface SimpleTimeTravelOptions extends TimeTravelOptions {
   /** Maximum number of snapshots to keep in history */
@@ -41,6 +43,7 @@ export interface SimpleTimeTravelOptions extends TimeTravelOptions {
 
 export class SimpleTimeTravel {
   private controller: TimeTravelController;
+  private comparisonService: ComparisonService;
 
   constructor(store: Store, options?: SimpleTimeTravelOptions) {
     const config: TimeTravelControllerConfig = {
@@ -54,6 +57,7 @@ export class SimpleTimeTravel {
     };
 
     this.controller = new TimeTravelController(store, config);
+    this.comparisonService = new ComparisonService();
   }
 
   /**
@@ -166,6 +170,21 @@ export class SimpleTimeTravel {
    */
   subscribeToSnapshots(listener: () => void): () => void {
     return this.controller.subscribe('snapshot-captured', () => listener());
+  }
+
+  /**
+   * Compare two snapshots
+   * @param snapshot1 - First snapshot
+   * @param snapshot2 - Second snapshot
+   * @param options - Comparison options
+   * @returns Comparison result
+   */
+  compareSnapshots(
+    snapshot1: Snapshot,
+    snapshot2: Snapshot,
+    options?: ComparisonOptions
+  ): SnapshotComparison {
+    return this.comparisonService.compare(snapshot1, snapshot2, options).comparison;
   }
 
   /**

@@ -2,6 +2,7 @@ import { useTimeTravel } from '@/hooks/useTimeTravel'
 import { useStressTest } from '@/hooks/useStressTest'
 import { SimpleEditor, EditorToolbar } from './components/Editor'
 import { SnapshotList } from './components/Snapshots'
+import { SnapshotDiff } from './components/Snapshots/SnapshotDiff'
 import { TimelineSlider, NavigationControls, PlaybackControls } from './components/Timeline'
 import { StressTestControls } from './components/StressTest'
 import { ChevronUp, ChevronDown, Zap } from 'lucide-react'
@@ -14,9 +15,11 @@ import './App.css'
 function App() {
   const setContent = useSetAtom(contentAtom, editorStore)
   const setIsDirty = useSetAtom(isDirtyAtom, editorStore)
-  const { snapshotsCount, jumpTo } = useTimeTravel()
+  const { snapshotsCount, jumpTo, getHistory } = useTimeTravel()
   const stressTest = useStressTest()
   const [showStressTest, setShowStressTest] = useState(false)
+  const [showDiff, setShowDiff] = useState(false)
+  const [selectedForCompare, setSelectedForCompare] = useState<number[]>([])
 
   const handleClear = () => {
     setContent('')
@@ -29,6 +32,32 @@ function App() {
 
   const handleSnapshotSelect = (index: number) => {
     console.log('Snapshot selected:', index)
+  }
+
+  const handleCompareModeChange = (isCompareMode: boolean) => {
+    console.log('Compare mode changed:', isCompareMode)
+    if (!isCompareMode) {
+      setShowDiff(false) // Close diff when exiting compare mode
+      setSelectedForCompare([]) // Clear selection
+    }
+  }
+
+  const handleSnapshotSelectWithCompare = (index: number) => {
+    console.log('Snapshot selected:', index)
+    handleSnapshotSelect(index)
+    
+    // Track selected snapshots for compare
+    setSelectedForCompare(prev => {
+      if (prev.includes(index)) {
+        return prev.filter(i => i !== index) // Deselect
+      } else {
+        const newSelection = [...prev, index].slice(-2) // Select max 2
+        if (newSelection.length === 2) {
+          setShowDiff(true) // Open diff when 2 selected
+        }
+        return newSelection
+      }
+    })
   }
 
   const handleTimelinePositionChange = (position: number) => {
@@ -129,12 +158,90 @@ function App() {
               showUndoRedo={true}
               showSearch={true}
               showFilter={true}
-              onSnapshotSelect={handleSnapshotSelect}
+              showCompare={true}
+              onSnapshotSelect={handleSnapshotSelectWithCompare}
+              onCompareModeChange={handleCompareModeChange}
+              onDiffOpen={(selectedIndices) => {
+                // Save selected indices and open diff
+                setSelectedForCompare(selectedIndices)
+                setShowDiff(true)
+                console.log('[App] Opening diff with indices:', selectedIndices)
+              }}
             />
           </div>
         </aside>
       </main>
+
+      {/* Snapshot Diff Modal */}
+      {showDiff && selectedForCompare.length === 2 && (
+        <SnapshotDiffWithSnapshots
+          baselineIndex={selectedForCompare[0]}
+          comparisonIndex={selectedForCompare[1]}
+          getHistory={getHistory}
+          onClose={() => {
+            setShowDiff(false)
+            setSelectedForCompare([])
+          }}
+          showStats={true}
+          showModeSwitch={true}
+          showSnapshotInfo={true}
+        />
+      )}
     </div>
+  )
+}
+
+// Wrapper component to pass snapshots to SnapshotDiff
+function SnapshotDiffWithSnapshots({
+  baselineIndex,
+  comparisonIndex,
+  getHistory,
+  onClose,
+  showStats,
+  showModeSwitch,
+  showSnapshotInfo
+}: {
+  baselineIndex: number
+  comparisonIndex: number
+  getHistory: () => any[]
+  onClose: () => void
+  showStats?: boolean
+  showModeSwitch?: boolean
+  showSnapshotInfo?: boolean
+}) {
+  const history = getHistory()
+  console.log('[SnapshotDiffWithSnapshots] History length:', history.length)
+  console.log('[SnapshotDiffWithSnapshots] Indices:', baselineIndex, comparisonIndex)
+  
+  const baseline = history[history.length - 1 - baselineIndex]
+  const comparison = history[history.length - 1 - comparisonIndex]
+  
+  console.log('[SnapshotDiffWithSnapshots] Baseline:', baseline)
+  console.log('[SnapshotDiffWithSnapshots] Comparison:', comparison)
+
+  if (!baseline || !comparison) {
+    return (
+      <div style={{ padding: 20, color: 'red' }}>
+        <h3>Error: Snapshots not found</h3>
+        <p>History length: {history.length}</p>
+        <p>Baseline index: {baselineIndex}</p>
+        <p>Comparison index: {comparisonIndex}</p>
+        <p>Baseline: {baseline ? 'OK' : 'NOT FOUND'}</p>
+        <p>Comparison: {comparison ? 'OK' : 'NOT FOUND'}</p>
+        <button onClick={onClose}>Close</button>
+      </div>
+    )
+  }
+
+  return (
+    <SnapshotDiff
+      onClose={onClose}
+      showStats={showStats}
+      showModeSwitch={showModeSwitch}
+      showSnapshotInfo={showSnapshotInfo}
+      baseline={baseline}
+      comparison={comparison}
+    />
   )
 }
 

@@ -7,7 +7,7 @@ export interface UnifiedDiffViewProps {
 }
 
 /**
- * Get text из atom
+ * Get text from atom
  */
 function getAtomText(atom: AtomComparison): string {
   const value = atom.status === 'added' ? atom.newValue : atom.oldValue
@@ -26,9 +26,9 @@ function getAtomText(atom: AtomComparison): string {
 }
 
 /**
- * Component для unified display diff
+ * Component for unified display diff
  *
- * Unified view с removed и added lines
+ * Shows changes in a single stream with +/- indicators
  */
 export function UnifiedDiffView({ result }: UnifiedDiffViewProps) {
   if (!result || !result.atoms.length) {
@@ -39,7 +39,7 @@ export function UnifiedDiffView({ result }: UnifiedDiffViewProps) {
     )
   }
 
-  // Фильтруем только измененные atoms
+  // Filter only changed atoms
   const changedAtoms = result.atoms.filter(a => a.status !== 'unchanged')
 
   return (

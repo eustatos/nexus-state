@@ -1,8 +1,10 @@
+import { useEffect } from 'react'
 import { useSnapshotComparison } from '@/hooks/useSnapshotComparison'
 import { InlineDiffView } from './InlineDiffView'
 import { SplitDiffView } from './SplitDiffView'
 import { UnifiedDiffView } from './UnifiedDiffView'
 import { X, GitCompare, ChevronLeft, ChevronRight } from 'lucide-react'
+import type { Snapshot } from '@nexus-state/core'
 import './SnapshotDiff.css'
 
 export interface SnapshotDiffProps {
@@ -16,6 +18,10 @@ export interface SnapshotDiffProps {
   showModeSwitch?: boolean
   /** Show snapshot information */
   showSnapshotInfo?: boolean
+  /** Baseline snapshot (optional, will use hook if not provided) */
+  baseline?: Snapshot | null
+  /** Comparison snapshot (optional, will use hook if not provided) */
+  comparison?: Snapshot | null
 }
 
 /**
@@ -63,19 +69,34 @@ export function SnapshotDiff({
   onClose,
   showStats = true,
   showModeSwitch = true,
-  showSnapshotInfo = true
+  showSnapshotInfo = true,
+  baseline: propBaseline,
+  comparison: propComparison
 }: SnapshotDiffProps) {
   const {
-    baseline,
-    comparison,
     mode,
-    result,
     setMode,
-    reset
+    result,
+    selectBaseline,
+    selectComparison
   } = useSnapshotComparison()
 
-  // If no comparison result, show empty state
-  if (!result) {
+  // Initialize comparison with provided snapshots
+  useEffect(() => {
+    if (propBaseline) {
+      selectBaseline(propBaseline)
+    }
+    if (propComparison) {
+      selectComparison(propComparison)
+    }
+  }, [propBaseline, propComparison, selectBaseline, selectComparison])
+
+  // Use props if provided
+  const baseline = propBaseline
+  const comparison = propComparison
+
+  // If no snapshots provided, show empty state
+  if (!baseline || !comparison) {
     return (
       <div className={`snapshot-diff ${className}`} data-testid="snapshot-diff">
         <div className="snapshot-diff__empty">
@@ -222,23 +243,13 @@ export function SnapshotDiff({
       <div className="snapshot-diff__footer">
         <button
           className="snapshot-diff__action-button"
-          onClick={reset}
+          onClick={onClose}
           type="button"
-          data-testid="snapshot-diff-reset"
+          data-testid="snapshot-diff-close"
         >
-          <ChevronLeft size={16} />
-          Back to list
+          <X size={16} />
+          Close
         </button>
-        {onClose && (
-          <button
-            className="snapshot-diff__action-button snapshot-diff__action-button--primary"
-            onClick={onClose}
-            type="button"
-            data-testid="snapshot-diff-done"
-          >
-            Done
-          </button>
-        )}
       </div>
     </div>
   )
