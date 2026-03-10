@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type { Snapshot } from '@nexus-state/core'
 import type { SnapshotMetadata } from '@/store/helpers'
 import { useSnapshots } from '@/hooks/useSnapshots'
@@ -25,6 +25,8 @@ export interface SnapshotListProps {
   showCompare?: boolean
   /** Compare mode change handler */
   onCompareModeChange?: (isCompareMode: boolean) => void
+  /** Diff open handler (called when 2 snapshots selected) */
+  onDiffOpen?: (selectedIndices: number[]) => void
   /** Show export/import buttons */
   showExportImport?: boolean
 }
@@ -57,7 +59,8 @@ export function SnapshotList({
   showCompare = true,
   showExportImport = true,
   onSnapshotSelect,
-  onCompareModeChange
+  onCompareModeChange,
+  onDiffOpen
 }: SnapshotListProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [compareMode, setCompareMode] = useState(false)
@@ -96,14 +99,17 @@ export function SnapshotList({
     if (compareMode) {
       // In compare mode - select snapshots for comparison
       setSelectedForCompare(prev => {
-        if (prev.includes(uiIndex)) {
-          // Already selected - remove selection
-          return prev.filter(i => i !== uiIndex)
-        } else {
-          // Select no more than 2 snapshots
-          const newSelection = [...prev, uiIndex].slice(-2)
-          return newSelection
+        const newSelection = prev.includes(uiIndex)
+          ? prev.filter(i => i !== uiIndex) // Already selected - remove selection
+          : [...prev, uiIndex].slice(-2) // Select no more than 2 snapshots
+        
+        // Open diff when 2 snapshots selected
+        if (newSelection.length === 2) {
+          // Note: Parent component should handle opening diff
+          // This is handled in App.tsx via onCompareModeChange
         }
+        
+        return newSelection
       })
     } else {
       // Normal mode - jump to snapshot
@@ -135,6 +141,15 @@ export function SnapshotList({
   const handleMouseLeave = useCallback(() => {
     setHoveredIndex(null)
   }, [])
+
+  // Auto-open diff when 2 snapshots selected
+  useEffect(() => {
+    if (selectedForCompare.length === 2 && compareMode) {
+      // Notify parent to open diff with selected indices
+      onDiffOpen?.(selectedForCompare)
+      console.log('[SnapshotList] 2 snapshots selected - diff opened', selectedForCompare)
+    }
+  }, [selectedForCompare.length, compareMode, onDiffOpen, selectedForCompare])
 
   return (
     <div className={`snapshot-list ${className}`} data-testid="snapshot-list">

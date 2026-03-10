@@ -8,7 +8,7 @@ export interface SplitDiffViewProps {
 }
 
 /**
- * Get text из atom для старой версии
+ * Get text from atom for old version
  */
 function getOldText(atom: AtomComparison): string {
   if (atom.status === 'removed' && atom.oldValue !== undefined) {

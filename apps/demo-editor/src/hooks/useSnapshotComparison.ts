@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react'
 import { editorTimeTravel } from '@/store/timeTravel'
 import type { Snapshot } from '@nexus-state/core'
-import type { SnapshotComparison, ComparisonOptions } from '@nexus-state/core/time-travel/comparison/types'
+import type { SnapshotComparison, ComparisonOptions } from '@nexus-state/core/time-travel/comparison'
 
 export type DiffMode = 'inline' | 'split' | 'unified'
 
@@ -55,7 +55,7 @@ export function useSnapshotComparison(
   const [cachedResult, setCachedResult] = useState<SnapshotComparison | null>(null)
 
   /**
-   * Выполнить comparison двух снимков
+   * Perform comparison of two snapshots
    */
   const compare = useCallback((): SnapshotComparison | null => {
     if (!baseline || !comparison) {
@@ -83,7 +83,7 @@ export function useSnapshotComparison(
   }, [baseline, comparison, comparisonOptions])
 
   /**
-   * Выбрать базовый snapshot
+   * Select baseline snapshot
    */
   const selectBaseline = useCallback((snapshot: Snapshot) => {
     setBaseline(snapshot)
@@ -118,35 +118,37 @@ export function useSnapshotComparison(
   }, [])
 
   /**
-   * Result comparison - computed automatically
+   * Check if comparison is active
+   */
+  const isComparing = useMemo(() => {
+    return baseline !== null && comparison !== null
+  }, [baseline, comparison])
+
+  /**
+   * Comparison result - computed automatically
    */
   const result = useMemo(() => {
     if (cachedResult) {
       return cachedResult
     }
 
-    if (baseline && comparison && autoCompare) {
+    if (baseline && comparison) {
       return compare()
     }
 
     return null
-  }, [cachedResult, baseline, comparison, autoCompare, compare])
-
-  /**
-   * Check if comparison is active
-   */
-  const isComparing = baseline !== null && comparison !== null
+  }, [cachedResult, baseline, comparison, compare])
 
   return {
     baseline,
     comparison,
     mode,
-    result,
     setMode,
     selectBaseline,
     selectComparison,
     reset,
     isComparing,
-    compare
+    compare,
+    result
   }
 }
