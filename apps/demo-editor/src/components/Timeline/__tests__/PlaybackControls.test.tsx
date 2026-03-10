@@ -1,12 +1,12 @@
 /**
- * Тесты для компонента PlaybackControls
+ * Tests for componentа PlaybackControls
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { PlaybackControls } from '../PlaybackControls'
 
-// Мокаем usePlayback внутри компонента
+// Mock usePlayback внутри componentа
 const mockUsePlayback = vi.fn()
 vi.mock('@/hooks/usePlayback', () => ({
   usePlayback: () => mockUsePlayback()
@@ -37,7 +37,7 @@ describe('PlaybackControls', () => {
     jumpTo: vi.fn()
   }
 
-  it('должен рендерить контролы воспроизведения', () => {
+  it('should рендерить контролы воспроизведения', () => {
     mockUsePlayback.mockReturnValue(defaultProps)
 
     render(<PlaybackControls />)
@@ -46,7 +46,7 @@ describe('PlaybackControls', () => {
     expect(screen.getByTestId('playback-buttons')).toBeInTheDocument()
   })
 
-  it('должен показывать кнопку Play в начальном состоянии', () => {
+  it('should show кнопку Play в начальном состоянии', () => {
     mockUsePlayback.mockReturnValue(defaultProps)
 
     render(<PlaybackControls />)
@@ -55,7 +55,7 @@ describe('PlaybackControls', () => {
     expect(playButton).toBeInTheDocument()
   })
 
-  it('должен показывать кнопку Pause во время воспроизведения', () => {
+  it('should show кнопку Pause во время воспроизведения', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       isPlaying: true
@@ -67,7 +67,7 @@ describe('PlaybackControls', () => {
     expect(playButton).toBeInTheDocument()
   })
 
-  it('должен вызывать togglePlayPause при клике на Play/Pause', () => {
+  it('should вызывать togglePlayPause при клике на Play/Pause', () => {
     mockUsePlayback.mockReturnValue(defaultProps)
 
     render(<PlaybackControls />)
@@ -77,7 +77,7 @@ describe('PlaybackControls', () => {
     expect(defaultProps.togglePlayPause).toHaveBeenCalled()
   })
 
-  it('должен вызывать stop при клике на Stop', () => {
+  it('should вызывать stop при клике на Stop', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       position: 1 // Не на начале, чтобы кнопка была активна
@@ -90,7 +90,7 @@ describe('PlaybackControls', () => {
     expect(defaultProps.stop).toHaveBeenCalled()
   })
 
-  it('должен вызывать toggleLoop при клике на Loop', () => {
+  it('should вызывать toggleLoop при клике на Loop', () => {
     mockUsePlayback.mockReturnValue(defaultProps)
 
     render(<PlaybackControls />)
@@ -100,7 +100,7 @@ describe('PlaybackControls', () => {
     expect(defaultProps.toggleLoop).toHaveBeenCalled()
   })
 
-  it('должен показывать активный класс для loop кнопки когда loop включен', () => {
+  it('should show активный class for loop кнопки когда loop включен', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       isLooping: true
@@ -112,7 +112,7 @@ describe('PlaybackControls', () => {
     expect(loopButton).toHaveClass('playback-controls__button--active')
   })
 
-  it('должен отображать скорость', () => {
+  it('should отображать скорость', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       speed: 1500
@@ -123,7 +123,7 @@ describe('PlaybackControls', () => {
     expect(screen.getByTestId('playback-speed-value')).toHaveTextContent('1500ms')
   })
 
-  it('должен отображать метку скорости', () => {
+  it('should отображать метку скорости', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       speed: 1000
@@ -134,7 +134,7 @@ describe('PlaybackControls', () => {
     expect(screen.getByTestId('playback-speed-label')).toHaveTextContent('(Normal)')
   })
 
-  it('должен показывать Fast для скорости <= 500ms', () => {
+  it('should show Fast for скорости <= 500ms', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       speed: 400
@@ -145,7 +145,7 @@ describe('PlaybackControls', () => {
     expect(screen.getByTestId('playback-speed-label')).toHaveTextContent('(Fast)')
   })
 
-  it('должен показывать Slow для скорости > 1500ms', () => {
+  it('should show Slow for скорости > 1500ms', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       speed: 2000
@@ -156,7 +156,7 @@ describe('PlaybackControls', () => {
     expect(screen.getByTestId('playback-speed-label')).toHaveTextContent('(Slow)')
   })
 
-  it('должен вызывать setSpeed при изменении slider', () => {
+  it('should вызывать setSpeed при изменении slider', () => {
     mockUsePlayback.mockReturnValue(defaultProps)
 
     render(<PlaybackControls />)
@@ -167,7 +167,7 @@ describe('PlaybackControls', () => {
     expect(defaultProps.setSpeed).toHaveBeenCalledWith(500)
   })
 
-  it('должен отображать прогресс', () => {
+  it('should отображать прогресс', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       position: 4,
@@ -182,7 +182,7 @@ describe('PlaybackControls', () => {
     expect(screen.getByTestId('playback-progress-percent')).toHaveTextContent('50%')
   })
 
-  it('должен отображать статус Playing', () => {
+  it('should отображать статус Playing', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       isPlaying: true
@@ -195,7 +195,7 @@ describe('PlaybackControls', () => {
     )
   })
 
-  it('должен отображать статус Paused', () => {
+  it('should отображать статус Paused', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       isPaused: true
@@ -208,7 +208,7 @@ describe('PlaybackControls', () => {
     )
   })
 
-  it('должен отображать статус Ready', () => {
+  it('should отображать статус Ready', () => {
     mockUsePlayback.mockReturnValue(defaultProps)
 
     render(<PlaybackControls />)
@@ -218,7 +218,7 @@ describe('PlaybackControls', () => {
     )
   })
 
-  it('должен скрывать расширенные контролы при showExtended=false', () => {
+  it('should скрывать расширенные контролы при showExtended=false', () => {
     mockUsePlayback.mockReturnValue(defaultProps)
 
     render(<PlaybackControls showExtended={false} />)
@@ -227,7 +227,7 @@ describe('PlaybackControls', () => {
     expect(screen.queryByTestId('playback-progress')).not.toBeInTheDocument()
   })
 
-  it('должен отключать кнопки когда total=0', () => {
+  it('should отключать кнопки когда total=0', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       total: 0
@@ -239,7 +239,7 @@ describe('PlaybackControls', () => {
     expect(screen.getByTestId('playback-loop')).toBeDisabled()
   })
 
-  it('должен отключать skip back когда position=0', () => {
+  it('should отключать skip back когда position=0', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       position: 0
@@ -250,7 +250,7 @@ describe('PlaybackControls', () => {
     expect(screen.getByTestId('playback-skip-back')).toBeDisabled()
   })
 
-  it('должен отключать skip forward когда position=total-1', () => {
+  it('should отключать skip forward когда position=total-1', () => {
     mockUsePlayback.mockReturnValue({
       ...defaultProps,
       position: 9,
@@ -262,7 +262,7 @@ describe('PlaybackControls', () => {
     expect(screen.getByTestId('playback-skip-forward')).toBeDisabled()
   })
 
-  it('должен вызывать onSpeedChange при изменении скорости', () => {
+  it('should вызывать onSpeedChange при изменении скорости', () => {
     const onSpeedChange = vi.fn()
     mockUsePlayback.mockReturnValue(defaultProps)
 

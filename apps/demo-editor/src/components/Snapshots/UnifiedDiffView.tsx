@@ -2,12 +2,12 @@ import type { SnapshotComparison, AtomComparison } from '@nexus-state/core/time-
 import './SnapshotDiff.css'
 
 export interface UnifiedDiffViewProps {
-  /** Результат сравнения */
+  /** Result comparison */
   result: SnapshotComparison
 }
 
 /**
- * Получить текст из атома
+ * Get text из atom
  */
 function getAtomText(atom: AtomComparison): string {
   const value = atom.status === 'added' ? atom.newValue : atom.oldValue
@@ -26,9 +26,9 @@ function getAtomText(atom: AtomComparison): string {
 }
 
 /**
- * Компонент для unified отображения diff
+ * Component для unified display diff
  *
- * Объединенный вид с удаленными и добавленными строками
+ * Unified view с removed и added lines
  */
 export function UnifiedDiffView({ result }: UnifiedDiffViewProps) {
   if (!result || !result.atoms.length) {
@@ -39,7 +39,7 @@ export function UnifiedDiffView({ result }: UnifiedDiffViewProps) {
     )
   }
 
-  // Фильтруем только измененные атомы
+  // Фильтруем только измененные atoms
   const changedAtoms = result.atoms.filter(a => a.status !== 'unchanged')
 
   return (
@@ -87,7 +87,7 @@ export function UnifiedDiffView({ result }: UnifiedDiffViewProps) {
                 className="unified-diff__atom"
                 data-testid={`unified-diff-atom-${index}`}
               >
-                {/* Имя атома */}
+                {/* Name atom */}
                 <div className="unified-diff__atom-header">
                   <span className="unified-diff__atom-name">{atom.atomName}</span>
                   <span className={`diff-badge diff-badge--${atom.status}`}>
@@ -97,7 +97,7 @@ export function UnifiedDiffView({ result }: UnifiedDiffViewProps) {
                   </span>
                 </div>
 
-                {/* Старое значение */}
+                {/* Old value */}
                 {oldText && (
                   <div className="unified-diff__line unified-diff__line--removed">
                     <span className="unified-diff__line-marker">-</span>
@@ -105,7 +105,7 @@ export function UnifiedDiffView({ result }: UnifiedDiffViewProps) {
                   </div>
                 )}
 
-                {/* Новое значение */}
+                {/* New value */}
                 {newText && (
                   <div className="unified-diff__line unified-diff__line--added">
                     <span className="unified-diff__line-marker">+</span>
@@ -118,7 +118,7 @@ export function UnifiedDiffView({ result }: UnifiedDiffViewProps) {
         )}
       </div>
 
-      {/* Статистика */}
+      {/* Statistics */}
       <div className="unified-diff__stats">
         <span className="unified-diff__stat unified-diff__stat--added">
           +{result.summary.addedAtoms} added

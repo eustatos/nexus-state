@@ -2,56 +2,56 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTimeTravel } from '@/hooks/useTimeTravel'
 
 export interface UsePlaybackOptions {
-  /** Скорость по умолчанию (мс между снимками) */
+  /** Default speed (ms between snapshots) */
   defaultSpeed?: number
-  /** Минимальная скорость (мс) */
+  /** Minimum speed (ms) */
   minSpeed?: number
-  /** Максимальная скорость (мс) */
+  /** Maximum speed (ms) */
   maxSpeed?: number
 }
 
 export interface UsePlaybackReturn {
-  /** Проигрывается ли сейчас */
+  /** Is playing now */
   isPlaying: boolean
-  /** Находится ли на паузе */
+  /** Is paused */
   isPaused: boolean
-  /** Режим зацикливания */
+  /** Loop mode enabled */
   isLooping: boolean
-  /** Текущая скорость (мс) */
+  /** Current speed (ms) */
   speed: number
-  /** Направление воспроизведения */
+  /** Playback direction */
   direction: 'forward' | 'backward'
-  /** Текущая позиция */
+  /** Current position */
   position: number
-  /** Общее количество снимков */
+  /** Total number of snapshots */
   total: number
-  /** Процент прогресса */
+  /** Progress percentage */
   progress: number
-  /** Начать воспроизведение */
+  /** Start playback */
   play: () => void
-  /** Поставить на паузу */
+  /** Pause playback */
   pause: () => void
-  /** Возобновить после паузы */
+  /** Resume after pause */
   resume: () => void
-  /** Остановить и сбросить к началу */
+  /** Stop and reset to beginning */
   stop: () => void
-  /** Переключить play/pause */
+  /** Toggle play/pause */
   togglePlayPause: () => void
-  /** Переключить режим loop */
+  /** Toggle loop mode */
   toggleLoop: () => void
-  /** Установить скорость */
+  /** Set speed */
   setSpeed: (speed: number) => void
-  /** Установить направление */
+  /** Set direction */
   setDirection: (direction: 'forward' | 'backward') => void
-  /** Перейти к позиции */
+  /** Jump to position */
   jumpTo: (index: number) => boolean
 }
 
 /**
- * Хук для управления автоматическим воспроизведением истории снимков
+ * Hook for managing automatic snapshot history playback
  *
- * @param options - Опции воспроизведения
- * @returns Объект с состоянием и методами управления
+ * @param options - Playback options
+ * @returns Object with state and control methods
  */
 export function usePlayback(
   options: UsePlaybackOptions = {}
@@ -77,13 +77,13 @@ export function usePlayback(
   const intervalRef = useRef<number | null>(null)
   const positionRef = useRef(currentPosition)
 
-  // Синхронизация ref с currentPosition
+  // Sync ref with currentPosition
   useEffect(() => {
     positionRef.current = currentPosition
   }, [currentPosition])
 
   /**
-   * Перейти к позиции
+   * Jump to position
    */
   const jumpTo = useCallback((index: number): boolean => {
     if (index < 0 || index >= snapshotsCount) {
@@ -98,7 +98,7 @@ export function usePlayback(
   }, [snapshotsCount, timeTravelJumpTo, isPlaying])
 
   /**
-   * Шаг воспроизведения
+   * Playback step
    */
   const step = useCallback(() => {
     const currentPos = positionRef.current
@@ -108,13 +108,13 @@ export function usePlayback(
 
     if (direction === 'forward') {
       if (currentPos >= total - 1) {
-        // Достигли конца
+        // Reached end
         if (isLooping) {
           jumpTo(0)
           positionRef.current = 0
           return
         } else {
-          // Остановить воспроизведение
+          // Stop playback
           setIsPlaying(false)
           setIsPaused(false)
           return
@@ -124,7 +124,7 @@ export function usePlayback(
       jumpTo(newPos)
       positionRef.current = newPos
     } else {
-      // Обратное направление
+      // Reverse direction
       if (currentPos <= 0) {
         if (isLooping) {
           const lastPos = total - 1
@@ -144,7 +144,7 @@ export function usePlayback(
   }, [direction, isLooping, snapshotsCount, jumpTo])
 
   /**
-   * Начать воспроизведение
+   * Start playback
    */
   const play = useCallback(() => {
     if (isPlaying || snapshotsCount === 0) return
@@ -153,7 +153,7 @@ export function usePlayback(
   }, [isPlaying, snapshotsCount])
 
   /**
-   * Поставить на паузу
+   * Pause playback
    */
   const pause = useCallback(() => {
     if (!isPlaying) return
@@ -162,7 +162,7 @@ export function usePlayback(
   }, [isPlaying])
 
   /**
-   * Возобновить после паузы
+   * Resume after pause
    */
   const resume = useCallback(() => {
     if (!isPaused) return
@@ -171,7 +171,7 @@ export function usePlayback(
   }, [isPaused])
 
   /**
-   * Остановить и сбросить к началу
+   * Stop and reset to beginning
    */
   const stop = useCallback(() => {
     setIsPlaying(false)
@@ -180,7 +180,7 @@ export function usePlayback(
   }, [jumpTo])
 
   /**
-   * Переключить play/pause
+   * Toggle play/pause
    */
   const togglePlayPause = useCallback(() => {
     if (isPlaying) {
@@ -193,14 +193,14 @@ export function usePlayback(
   }, [isPlaying, isPaused, play, pause, resume])
 
   /**
-   * Переключить режим loop
+   * Toggle loop mode
    */
   const toggleLoop = useCallback(() => {
     setIsLooping(prev => !prev)
   }, [])
 
   /**
-   * Установить скорость
+   * Set playback speed
    */
   const setPlaybackSpeed = useCallback((newSpeed: number) => {
     const clamped = Math.max(minSpeed, Math.min(maxSpeed, newSpeed))
@@ -208,13 +208,13 @@ export function usePlayback(
   }, [minSpeed, maxSpeed])
 
   /**
-   * Установить направление
+   * Set playback direction
    */
   const setPlaybackDirection = useCallback((newDirection: 'forward' | 'backward') => {
     setDirection(newDirection)
   }, [])
 
-  // Интервал воспроизведения
+  // Playback interval
   useEffect(() => {
     if (isPlaying && !isPaused) {
       intervalRef.current = window.setInterval(() => {
@@ -230,7 +230,7 @@ export function usePlayback(
     }
   }, [isPlaying, isPaused, speed, step])
 
-  // Очистка при размонтировании
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (intervalRef.current) {
@@ -239,7 +239,7 @@ export function usePlayback(
     }
   }, [])
 
-  // Вычисляем прогресс
+  // Calculate progress
   const progress = snapshotsCount > 0
     ? ((positionRef.current + 1) / snapshotsCount) * 100
     : 0

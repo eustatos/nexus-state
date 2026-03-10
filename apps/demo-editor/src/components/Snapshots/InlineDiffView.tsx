@@ -2,12 +2,12 @@ import type { SnapshotComparison, AtomComparison } from '@nexus-state/core/time-
 import './SnapshotDiff.css'
 
 export interface InlineDiffViewProps {
-  /** Результат сравнения */
+  /** Result comparison */
   result: SnapshotComparison
 }
 
 /**
- * Получить текст из атома состояния
+ * Get text из atom состояния
  */
 function getAtomText(atom: AtomComparison): string {
   if (atom.status === 'added' && atom.newValue !== undefined) {
@@ -25,7 +25,7 @@ function getAtomText(atom: AtomComparison): string {
   }
 
   if (atom.status === 'modified') {
-    // Для измененных атомов показываем разницу
+    // Для modified atoms показываем разницу
     if (atom.valueDiff) {
       return formatValueDiff(atom)
     }
@@ -45,24 +45,24 @@ function getAtomText(atom: AtomComparison): string {
 }
 
 /**
- * Форматировать diff значения
+ * Format diff value
  */
 function formatValueDiff(atom: AtomComparison): string {
   if (!atom.valueDiff) return ''
 
-  // Для простых изменений
+  // Для простых changes
   if (atom.valueDiff.type === 'primitive') {
     return `${atom.valueDiff.oldPrimitive} → ${atom.valueDiff.newPrimitive}`
   }
 
-  // Для объектов и массивов - рекурсивно
+  // Для объектов и массивов - recursively
   return JSON.stringify(atom.newValue || atom.oldValue)
 }
 
 /**
- * Компонент для inline отображения diff
+ * Component для inline display diff
  *
- * Показывает изменения в одном потоке текста
+ * Показывает changes в одном потоке textа
  */
 export function InlineDiffView({ result }: InlineDiffViewProps) {
   if (!result || !result.atoms.length) {
@@ -79,7 +79,7 @@ export function InlineDiffView({ result }: InlineDiffViewProps) {
         const text = getAtomText(atom)
 
         if (atom.status === 'unchanged') {
-          return null // Не показываем неизмененные атомы в inline режиме
+          return null // Не показываем unchanged atoms в inline modeе
         }
 
         return (

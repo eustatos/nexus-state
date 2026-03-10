@@ -32,3 +32,13 @@ dist-ssr
 # Build
 build
 .eslintcache
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+*.mp4
+*.webm
+*.avi
+*.mov

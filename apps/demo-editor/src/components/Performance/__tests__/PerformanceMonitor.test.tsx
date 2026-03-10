@@ -1,5 +1,5 @@
 /**
- * Тесты для компонента PerformanceMonitor
+ * Tests for componentа PerformanceMonitor
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -7,7 +7,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { PerformanceMonitor } from '../PerformanceMonitor'
 import { usePerformanceMetrics } from '@/hooks/usePerformanceMetrics'
 
-// Моки для хука
+// Mocks for hookа
 vi.mock('@/hooks/usePerformanceMetrics', () => ({
   usePerformanceMetrics: vi.fn()
 }))
@@ -40,7 +40,7 @@ describe('PerformanceMonitor', () => {
     performanceScore: 95
   }
 
-  it('должен рендерить компонент монитора', () => {
+  it('should рендерить component монитора', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor />)
@@ -49,7 +49,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByText('Performance Monitor')).toBeInTheDocument()
   })
 
-  it('должен отображать текущий FPS', () => {
+  it('should отображать current FPS', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor />)
@@ -57,7 +57,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByTestId('performance-fps-current')).toHaveTextContent('60')
   })
 
-  it('должен отображать средний FPS', () => {
+  it('should отображать средний FPS', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor />)
@@ -65,7 +65,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByTestId('performance-fps-avg')).toHaveTextContent('58')
   })
 
-  it('должен отображать минимальный FPS', () => {
+  it('should отображать минимальный FPS', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor />)
@@ -73,7 +73,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByTestId('performance-fps-min')).toHaveTextContent('45')
   })
 
-  it('должен отображать максимальный FPS', () => {
+  it('should отображать максимальный FPS', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor />)
@@ -81,7 +81,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByTestId('performance-fps-max')).toHaveTextContent('60')
   })
 
-  it('должен отображать performance score', () => {
+  it('should отображать performance score', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor />)
@@ -90,7 +90,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByText('95')).toBeInTheDocument()
   })
 
-  it('должен отображать метку Excellent для score >= 90', () => {
+  it('should отображать метку Excellent for score >= 90', () => {
     mockUsePerformanceMetrics.mockReturnValue({
       ...defaultProps,
       performanceScore: 95
@@ -101,7 +101,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByText('Excellent')).toBeInTheDocument()
   })
 
-  it('должен отображать метку Good для score >= 70', () => {
+  it('should отображать метку Good for score >= 70', () => {
     mockUsePerformanceMetrics.mockReturnValue({
       ...defaultProps,
       performanceScore: 75
@@ -112,7 +112,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByText('Good')).toBeInTheDocument()
   })
 
-  it('должен отображать метку Fair для score >= 50', () => {
+  it('should отображать метку Fair for score >= 50', () => {
     mockUsePerformanceMetrics.mockReturnValue({
       ...defaultProps,
       performanceScore: 55
@@ -123,7 +123,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByText('Fair')).toBeInTheDocument()
   })
 
-  it('должен отображать метку Poor для score < 50', () => {
+  it('should отображать метку Poor for score < 50', () => {
     mockUsePerformanceMetrics.mockReturnValue({
       ...defaultProps,
       performanceScore: 40
@@ -134,7 +134,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByText('Poor')).toBeInTheDocument()
   })
 
-  it('должен отображать метрики памяти', () => {
+  it('should отображать метрики памяти', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor />)
@@ -145,7 +145,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByTestId('performance-memory-percent')).toHaveTextContent('25%')
   })
 
-  it('должен отображать метрики снимков', () => {
+  it('should отображать метрики снимков', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor />)
@@ -156,7 +156,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByTestId('performance-snapshots-capture-time')).toHaveTextContent('25 ms')
   })
 
-  it('должен скрывать подробные метрики при showDetailed=false', () => {
+  it('should скрывать подробные метрики при showDetailed=false', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor showDetailed={false} />)
@@ -165,7 +165,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.queryByTestId('performance-snapshots-section')).not.toBeInTheDocument()
   })
 
-  it('должен скрывать графики при showCharts=false', () => {
+  it('should скрывать графики при showCharts=false', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor showCharts={false} />)
@@ -174,7 +174,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.queryByTestId('performance-memory-chart')).not.toBeInTheDocument()
   })
 
-  it('должен показывать warning при высоком потреблении памяти', () => {
+  it('should show warning при высоком потреблении памяти', () => {
     mockUsePerformanceMetrics.mockReturnValue({
       ...defaultProps,
       memory: {
@@ -189,7 +189,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByText('High memory usage detected!')).toBeInTheDocument()
   })
 
-  it('должен показывать warning в footer при низком score', () => {
+  it('should show warning в footer при низком score', () => {
     mockUsePerformanceMetrics.mockReturnValue({
       ...defaultProps,
       performanceScore: 40
@@ -200,7 +200,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByText('Performance issues detected')).toBeInTheDocument()
   })
 
-  it('должен отображать интервал обновления', () => {
+  it('should отображать интервал обновления', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor updateInterval={2000} />)
@@ -208,7 +208,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getByText('Updates every 2000ms')).toBeInTheDocument()
   })
 
-  it('должен применять правильный цвет для хорошего FPS', () => {
+  it('should применять правильный цвет for хорошего FPS', () => {
     mockUsePerformanceMetrics.mockReturnValue({
       ...defaultProps,
       fps: 60
@@ -220,7 +220,7 @@ describe('PerformanceMonitor', () => {
     expect(fpsValue).toHaveClass('performance-monitor__value--good')
   })
 
-  it('должен применять правильный цвет для warning FPS', () => {
+  it('should применять правильный цвет for warning FPS', () => {
     mockUsePerformanceMetrics.mockReturnValue({
       ...defaultProps,
       fps: 40
@@ -232,7 +232,7 @@ describe('PerformanceMonitor', () => {
     expect(fpsValue).toHaveClass('performance-monitor__value--warning')
   })
 
-  it('должен применять правильный цвет для плохого FPS', () => {
+  it('should применять правильный цвет for плохого FPS', () => {
     mockUsePerformanceMetrics.mockReturnValue({
       ...defaultProps,
       fps: 20
@@ -244,7 +244,7 @@ describe('PerformanceMonitor', () => {
     expect(fpsValue).toHaveClass('performance-monitor__value--bad')
   })
 
-  it('должен рендерить FPS chart', () => {
+  it('should рендерить FPS chart', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor />)
@@ -253,7 +253,7 @@ describe('PerformanceMonitor', () => {
     expect(screen.getAllByTestId(/fps-chart-bar-\d+/)).toHaveLength(20)
   })
 
-  it('должен рендерить memory bar', () => {
+  it('should рендерить memory bar', () => {
     mockUsePerformanceMetrics.mockReturnValue(defaultProps)
 
     render(<PerformanceMonitor />)

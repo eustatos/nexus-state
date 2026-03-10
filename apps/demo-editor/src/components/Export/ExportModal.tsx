@@ -5,7 +5,7 @@ import { X, Download, Copy, FileJson, FileCode, FileText } from 'lucide-react'
 import './ExportModal.css'
 
 export interface ExportModalProps {
-  /** Обработчик закрытия */
+  /** Handler close */
   onClose: () => void
   /** Заголовок модалки */
   title?: string

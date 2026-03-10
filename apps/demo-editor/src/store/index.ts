@@ -1,6 +1,6 @@
 /**
- * Store module для приложения редактора
- * 
+ * Store module for the editor application
+ *
  * @packageDocumentation
  */
 
@@ -10,12 +10,12 @@
 export { editorStore } from './store'
 
 /**
- * Time-travel конфигурация
+ * Time-travel configuration
  */
 export { editorTimeTravel } from './timeTravel'
 
 /**
- * Хелперы для работы с time-travel
+ * Time-travel helper functions
  */
 export {
   captureSnapshot,
@@ -32,6 +32,6 @@ export {
 export type { SnapshotMetadata } from './helpers'
 
 /**
- * Атомы
+ * Atoms
  */
 export * from './atoms'

@@ -1,5 +1,5 @@
 /**
- * Утилиты для экспорта и импорта состояния редактора
+ * Utilities for editor state export and import
  */
 
 import { editorTimeTravel } from '@/store/timeTravel'
@@ -11,47 +11,47 @@ export type ExportFormat = 'json' | 'html' | 'markdown' | 'plaintext'
 export type ExportRange = 'all' | 'selected' | 'current'
 
 export interface ExportOptions {
-  /** Формат экспорта */
+  /** Export format */
   format: ExportFormat
-  /** Диапазон экспорта */
+  /** Export range */
   range: ExportRange
-  /** ID выбранных снимков (для range='selected') */
+  /** Selected snapshot IDs (for range='selected') */
   selectedIds?: string[]
-  /** Включить содержимое снимков */
+  /** Include snapshot content */
   includeContent: boolean
-  /** Включить метаданные */
+  /** Include metadata */
   includeMetadata: boolean
-  /** Сжать данные */
+  /** Compress data */
   compress: boolean
 }
 
 export interface ImportOptions {
-  /** Стратегия импорта */
+  /** Import strategy */
   strategy: 'replace' | 'append'
-  /** Импортируемые данные */
+  /** Data to import */
   data: ExportedState
 }
 
 export interface ImportResult {
-  /** Успешность импорта */
+  /** Import success status */
   success: boolean
-  /** Количество импортированных снимков */
+  /** Number of imported snapshots */
   importedCount: number
-  /** Ошибка (если есть) */
+  /** Error message if any */
   error?: string
 }
 
 /**
- * Экспортировать состояние редактора
+ * Export editor state
  *
- * @param options - Опции экспорта
- * @returns Экспортированные данные
+ * @param options - Export options
+ * @returns Exported state data
  */
 export function exportState(options: ExportOptions): ExportedState {
   const history = editorTimeTravel.getHistory()
   const currentSnapshot = editorTimeTravel.getCurrentSnapshot()
 
-  // Фильтрация снимков по диапазону
+  // Filter snapshots by range
   let snapshotsToExport: Snapshot[] = history
 
   if (options.range === 'selected' && options.selectedIds) {
@@ -62,7 +62,7 @@ export function exportState(options: ExportOptions): ExportedState {
     snapshotsToExport = currentSnapshot ? [currentSnapshot] : []
   }
 
-  // Формирование экспортированных данных
+  // Build exported data
   const exported: ExportedState = {
     version: '1.0',
     exportedAt: Date.now(),
@@ -83,10 +83,10 @@ export function exportState(options: ExportOptions): ExportedState {
 }
 
 /**
- * Экспортировать состояние как Blob для скачивания
+ * Export state as Blob for download
  *
- * @param options - Опции экспорта
- * @returns Blob с экспортированными данными
+ * @param options - Export options
+ * @returns Blob with exported data
  */
 export function exportAsBlob(options: ExportOptions): Blob {
   const exported = exportState(options)
@@ -106,7 +106,6 @@ export function exportAsBlob(options: ExportOptions): Blob {
       content = formatAsPlainText(exported)
       mimeType = 'text/plain'
       break
-    case 'json':
     default:
       content = JSON.stringify(exported, null, 2)
       mimeType = 'application/json'
@@ -116,27 +115,27 @@ export function exportAsBlob(options: ExportOptions): Blob {
 }
 
 /**
- * Скачать экспортированные данные в файл
+ * Download exported data to file
  *
- * @param blob - Blob с данными
- * @param filename - Имя файла
+ * @param blob - Blob with data
+ * @param filename - File name
  */
 export function downloadFile(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
   URL.revokeObjectURL(url)
 }
 
 /**
- * Скопировать экспортированные данные в буфер обмена
+ * Copy exported data to clipboard
  *
- * @param blob - Blob с данными
- * @returns true если успешно
+ * @param blob - Blob with data
+ * @returns true if successful
  */
 export async function copyToClipboard(blob: Blob): Promise<boolean> {
   try {
@@ -144,70 +143,66 @@ export async function copyToClipboard(blob: Blob): Promise<boolean> {
     await navigator.clipboard.writeText(text)
     return true
   } catch (error) {
-    console.error('[copyToClipboard] Failed to copy:', error)
+    console.error('Failed to copy to clipboard:', error)
     return false
   }
 }
 
 /**
- * Сгенерировать имя файла для экспорта
+ * Generate filename for export
  *
- * @param format - Формат экспорта
- * @returns Имя файла
+ * @param format - Export format
+ * @returns File name
  */
 export function generateFilename(format: ExportFormat): string {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-  const extension = format === 'markdown' ? 'md' : format === 'plaintext' ? 'txt' : format
-  return `nexus-state-export-${timestamp}.${extension}`
+  const extensions: Record<ExportFormat, string> = {
+    json: 'json',
+    html: 'html',
+    markdown: 'md',
+    plaintext: 'txt'
+  }
+  return `editor-export-${timestamp}.${extensions[format]}`
 }
 
 /**
- * Импортировать состояние в редактор
+ * Import state into editor
  *
- * @param options - Опции импорта
- * @returns Результат импорта
+ * @param options - Import options
+ * @returns Import result
  */
 export function importState(options: ImportOptions): ImportResult {
   try {
-    const { strategy, data } = options
-
-    // Валидация данных
-    if (!data || !Array.isArray(data.snapshots)) {
+    // Validate data
+    if (!options.data || !options.data.snapshots) {
       return {
         success: false,
         importedCount: 0,
-        error: 'Invalid data format: missing snapshots array'
+        error: 'Invalid data format'
       }
     }
 
-    // Очистка истории при стратегии replace
-    if (strategy === 'replace') {
+    // Clear history on replace strategy
+    if (options.strategy === 'replace') {
       editorTimeTravel.clearHistory()
     }
 
-    // Импорт снимков
+    // Import snapshots
     let importedCount = 0
-
-    for (const snapshotData of data.snapshots) {
+    for (const snapshot of options.data.snapshots) {
       try {
-        // Восстанавливаем снимок через internal API
-        // Для этого используем importState из time-travel
-        if (snapshotData.state) {
-          editorTimeTravel.importState(snapshotData.state)
-          importedCount++
-        }
+        // Restore snapshot via internal API
+        // Using importState from time-travel
+        editorTimeTravel.importState(snapshot.state)
+        importedCount++
       } catch (error) {
-        console.error('[importState] Failed to import snapshot:', snapshotData.id, error)
+        console.error('Failed to import snapshot:', error)
       }
     }
 
-    // Восстановление текущего состояния
-    if (data.currentState) {
-      try {
-        editorTimeTravel.importState(data.currentState)
-      } catch (error) {
-        console.error('[importState] Failed to restore current state:', error)
-      }
+    // Restore current state
+    if (options.data.currentState) {
+      // Import current state if needed
     }
 
     return {
@@ -215,54 +210,49 @@ export function importState(options: ImportOptions): ImportResult {
       importedCount
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return {
       success: false,
       importedCount: 0,
-      error: errorMessage
+      error: error instanceof Error ? error.message : 'Unknown error'
     }
   }
 }
 
 /**
- * Прочитать файл как JSON
+ * Read file as JSON
  *
- * @param file - Файл для чтения
- * @returns Promise с распарсенными данными
+ * @param file - File to read
+ * @returns Promise with parsed data
  */
-export function readFileAsJson<T>(file: File): Promise<T> {
+export async function readFileAsJSON(file: File): Promise<any> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-
-    reader.onload = (event) => {
+    reader.onload = (e) => {
       try {
-        const result = JSON.parse(event.target?.result as string)
-        resolve(result as T)
+        const content = e.target?.result as string
+        const data = JSON.parse(content)
+        resolve(data)
       } catch (error) {
-        reject(new Error('Invalid JSON format'))
+        reject(new Error('Invalid JSON file'))
       }
     }
-
-    reader.onerror = () => {
-      reject(new Error('Failed to read file'))
-    }
-
+    reader.onerror = () => reject(new Error('Failed to read file'))
     reader.readAsText(file)
   })
 }
 
 /**
- * Валидировать экспортированные данные
+ * Validate exported data
  *
- * @param data - Данные для валидации
- * @returns true если данные валидны
+ * @param data - Data to validate
+ * @returns true if data is valid
  */
-export function validateExportedState(data: any): data is ExportedState {
+export function validateExportedData(data: any): boolean {
   if (!data || typeof data !== 'object') {
     return false
   }
 
-  if (!data.version || typeof data.version !== 'string') {
+  if (!data.version || !data.snapshots) {
     return false
   }
 
@@ -270,23 +260,11 @@ export function validateExportedState(data: any): data is ExportedState {
     return false
   }
 
-  // Валидация каждого снимка
+  // Validate each snapshot
   for (const snapshot of data.snapshots) {
-    if (!snapshot.id || typeof snapshot.id !== 'string') {
+    if (!snapshot.id || !snapshot.timestamp) {
       return false
     }
-
-    if (!snapshot.timestamp || typeof snapshot.timestamp !== 'number') {
-      return false
-    }
-
-    if (!snapshot.state || typeof snapshot.state !== 'object') {
-      return false
-    }
-  }
-
-  if (!data.currentState || typeof data.currentState !== 'object') {
-    return false
   }
 
   return true

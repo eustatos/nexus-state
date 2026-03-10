@@ -1,5 +1,5 @@
 /**
- * Интеграционные тесты для SnapshotList с функционалом jump to snapshot
+ * Интеграционные testы for SnapshotList с функционалом jump to snapshot
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -34,7 +34,7 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
     vi.clearAllMocks()
   })
 
-  it('должен вызывать jumpTo при клике на снимок', () => {
+  it('should вызывать jumpTo при клике на snapshot', () => {
     const mockSnapshots = createMockSnapshots(3)
     const mockJumpTo = vi.fn()
 
@@ -42,7 +42,7 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
       snapshots: mockSnapshots,
       filteredSnapshots: mockSnapshots,
       totalCount: 3,
-      currentIndex: 2, // Последний снимок - текущий
+      currentIndex: 2, // Последний snapshot - current
       jumpTo: mockJumpTo,
       undo: vi.fn(),
       redo: vi.fn(),
@@ -57,21 +57,21 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
 
     render(<SnapshotList />)
 
-    // Кликаем на первый снимок (самый новый, индекс 0 в UI)
+    // Кликаем на первый snapshot (самый новый, индекс 0 в UI)
     const firstItem = screen.getByTestId('snapshot-item-0')
     fireEvent.click(firstItem)
 
     expect(mockJumpTo).toHaveBeenCalledWith(0)
   })
 
-  it('должен подсвечивать текущий снимок', () => {
+  it('should подсвечивать current snapshot', () => {
     const mockSnapshots = createMockSnapshots(3)
 
     mockUseSnapshots.mockReturnValue({
       snapshots: mockSnapshots,
       filteredSnapshots: mockSnapshots,
       totalCount: 3,
-      currentIndex: 2, // Последний снимок - текущий
+      currentIndex: 2, // Последний snapshot - current
       jumpTo: vi.fn(),
       undo: vi.fn(),
       redo: vi.fn(),
@@ -86,13 +86,13 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
 
     render(<SnapshotList />)
 
-    // Последний снимок должен быть подсвечен как текущий
+    // Последний snapshot should быть подсвечен как current
     // currentIndex = 2, что соответствует UI индексу 0 (totalCount - 1 - currentIndex)
     const currentBadge = screen.getByTestId('snapshot-current-badge')
     expect(currentBadge).toBeInTheDocument()
   })
 
-  it('должен отображать количество снимков', () => {
+  it('should отображать count снимков', () => {
     const mockSnapshots = createMockSnapshots(5)
 
     mockUseSnapshots.mockReturnValue({
@@ -118,7 +118,7 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
     expect(countElement).toHaveTextContent('5 snapshots')
   })
 
-  it('должен вызывать undo при клике на кнопку undo', () => {
+  it('should вызывать undo при клике на кнопку undo', () => {
     const mockSnapshots = createMockSnapshots(3)
     const mockUndo = vi.fn()
 
@@ -147,7 +147,7 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
     expect(mockUndo).toHaveBeenCalled()
   })
 
-  it('должен вызывать redo при клике на кнопку redo', () => {
+  it('should вызывать redo при клике на кнопку redo', () => {
     const mockSnapshots = createMockSnapshots(3)
     const mockRedo = vi.fn()
 
@@ -176,7 +176,7 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
     expect(mockRedo).toHaveBeenCalled()
   })
 
-  it('должен отключать кнопку undo когда canUndo=false', () => {
+  it('should отключать кнопку undo когда canUndo=false', () => {
     const mockSnapshots = createMockSnapshots(1)
 
     mockUseSnapshots.mockReturnValue({
@@ -202,7 +202,7 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
     expect(undoButton).toBeDisabled()
   })
 
-  it('должен отображать empty state когда нет снимков', () => {
+  it('should отображать empty state когда нет снимков', () => {
     mockUseSnapshots.mockReturnValue({
       snapshots: [],
       filteredSnapshots: [],
@@ -227,7 +227,7 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
     expect(screen.getByText('No snapshots yet')).toBeInTheDocument()
   })
 
-  it('должен вызывать onSnapshotSelect при клике на снимок', () => {
+  it('should вызывать onSnapshotSelect при клике на snapshot', () => {
     const mockSnapshots = createMockSnapshots(3)
     const mockJumpTo = vi.fn()
     const mockOnSnapshotSelect = vi.fn()
@@ -258,7 +258,7 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
     expect(mockOnSnapshotSelect).toHaveBeenCalledWith(0)
   })
 
-  it('должен фильтровать снимки по action', () => {
+  it('should filter snapshots по action', () => {
     const mockSnapshots = createMockSnapshots(5)
     mockSnapshots[0].metadata.action = 'paste'
     mockSnapshots[1].metadata.action = 'delete'
@@ -287,7 +287,7 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
     expect(filterSelect).toHaveValue('paste')
   })
 
-  it('должен искать снимки по search query', () => {
+  it('should искать snapshots по search query', () => {
     const mockSnapshots = createMockSnapshots(5)
 
     mockUseSnapshots.mockReturnValue({
@@ -312,7 +312,7 @@ describe('SnapshotList - Jump to Snapshot Integration', () => {
     const searchInput = screen.getByTestId('snapshot-search-input')
     expect(searchInput).toHaveValue('nonexistent')
 
-    // Должен отображаться empty state с другим сообщением
+    // Should отображаться empty state с другим сообщением
     const emptyState = screen.getByTestId('snapshot-empty-state')
     expect(emptyState).toBeInTheDocument()
   })

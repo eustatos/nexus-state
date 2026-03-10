@@ -14,10 +14,10 @@ export interface EditorToolbarProps {
 }
 
 /**
- * Toolbar компонент для редактора
+ * Toolbar component для editorа
  *
  * Содержит кнопки для:
- * - Очистки редактора (Clear)
+ * - Очистки editorа (Clear)
  * - Копирования содержимого (Copy)
  * - Статистики (опционально)
  */
@@ -44,7 +44,7 @@ export function EditorToolbar({ onClear, onCopy, showStats = false }: EditorTool
   }, [content, onCopy])
 
   /**
-   * Форматирование времени с последнего сохранения
+   * Formatирование времени с последнего сохранения
    */
   const formatLastSaved = (timestamp: number | null): string => {
     if (!timestamp) return 'Not saved'
@@ -60,7 +60,7 @@ export function EditorToolbar({ onClear, onCopy, showStats = false }: EditorTool
   }
 
   /**
-   * Форматирование времени чтения
+   * Formatирование времени чтения
    */
   const formatReadingTime = (minutes: number): string => {
     if (minutes === 0) return '< 1 min'
@@ -71,7 +71,7 @@ export function EditorToolbar({ onClear, onCopy, showStats = false }: EditorTool
   }
 
   /**
-   * Форматирование больших чисел
+   * Formatирование больших чисел
    */
   const formatNumber = (num: number | undefined | null): string => {
     if (num === undefined || num === null) return '0'

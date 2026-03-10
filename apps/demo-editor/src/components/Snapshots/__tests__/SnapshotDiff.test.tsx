@@ -1,5 +1,5 @@
 /**
- * Тесты для компонента SnapshotDiff
+ * Tests for componentа SnapshotDiff
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -7,7 +7,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { SnapshotDiff } from '../SnapshotDiff'
 import * as useSnapshotComparisonModule from '@/hooks/useSnapshotComparison'
 
-// Моки для хука сравнения
+// Mocks for hookа comparison
 vi.mock('@/hooks/useSnapshotComparison', () => ({
   useSnapshotComparison: vi.fn()
 }))
@@ -91,7 +91,7 @@ describe('SnapshotDiff', () => {
     vi.clearAllMocks()
   })
 
-  it('должен отображать пустое состояние когда нет результата', () => {
+  it('should отображать пустое состояние когда нет resultа', () => {
     vi.mocked(useSnapshotComparisonModule.useSnapshotComparison).mockReturnValue({
       baseline: null,
       comparison: null,
@@ -111,7 +111,7 @@ describe('SnapshotDiff', () => {
     expect(screen.getByTestId('snapshot-diff')).toBeInTheDocument()
   })
 
-  it('должен отображать статистику изменений', () => {
+  it('should отображать статистику changes', () => {
     vi.mocked(useSnapshotComparisonModule.useSnapshotComparison).mockReturnValue({
       baseline: mockBaseline,
       comparison: mockComparison,
@@ -133,7 +133,7 @@ describe('SnapshotDiff', () => {
     expect(screen.getByText('±1 modified')).toBeInTheDocument()
   })
 
-  it('должен переключать режимы отображения', () => {
+  it('should переключать modeы display', () => {
     const mockSetMode = vi.fn()
 
     vi.mocked(useSnapshotComparisonModule.useSnapshotComparison).mockReturnValue({
@@ -162,7 +162,7 @@ describe('SnapshotDiff', () => {
     expect(mockSetMode).toHaveBeenCalledWith('unified')
   })
 
-  it('должен отображать информацию о базовом снимке', () => {
+  it('should отображать информацию о базовом снимке', () => {
     vi.mocked(useSnapshotComparisonModule.useSnapshotComparison).mockReturnValue({
       baseline: mockBaseline,
       comparison: mockComparison,
@@ -183,7 +183,7 @@ describe('SnapshotDiff', () => {
     expect(screen.getByText('text-edit')).toBeInTheDocument()
   })
 
-  it('должен отображать информацию о снимке сравнения', () => {
+  it('should отображать информацию о снимке comparison', () => {
     vi.mocked(useSnapshotComparisonModule.useSnapshotComparison).mockReturnValue({
       baseline: mockBaseline,
       comparison: mockComparison,
@@ -204,7 +204,7 @@ describe('SnapshotDiff', () => {
     expect(screen.getByText('paste')).toBeInTheDocument()
   })
 
-  it('должен вызывать onClose при клике на кнопку закрытия', () => {
+  it('should вызывать onClose при клике на кнопку close', () => {
     const mockOnClose = vi.fn()
 
     vi.mocked(useSnapshotComparisonModule.useSnapshotComparison).mockReturnValue({
@@ -228,7 +228,7 @@ describe('SnapshotDiff', () => {
     expect(mockOnClose).toHaveBeenCalled()
   })
 
-  it('должен вызывать reset при клике на кнопку Back to list', () => {
+  it('should вызывать reset при клике на кнопку Back to list', () => {
     const mockReset = vi.fn()
 
     vi.mocked(useSnapshotComparisonModule.useSnapshotComparison).mockReturnValue({
@@ -252,7 +252,7 @@ describe('SnapshotDiff', () => {
     expect(mockReset).toHaveBeenCalled()
   })
 
-  it('должен скрывать статистику при showStats=false', () => {
+  it('should скрывать статистику при showStats=false', () => {
     vi.mocked(useSnapshotComparisonModule.useSnapshotComparison).mockReturnValue({
       baseline: mockBaseline,
       comparison: mockComparison,
@@ -271,7 +271,7 @@ describe('SnapshotDiff', () => {
     expect(screen.queryByTestId('snapshot-diff-stats')).not.toBeInTheDocument()
   })
 
-  it('должен скрывать переключатель режимов при showModeSwitch=false', () => {
+  it('should скрывать switch modes при showModeSwitch=false', () => {
     vi.mocked(useSnapshotComparisonModule.useSnapshotComparison).mockReturnValue({
       baseline: mockBaseline,
       comparison: mockComparison,
@@ -290,7 +290,7 @@ describe('SnapshotDiff', () => {
     expect(screen.queryByTestId('snapshot-diff-modes')).not.toBeInTheDocument()
   })
 
-  it('должен скрывать информацию о снимках при showSnapshotInfo=false', () => {
+  it('should скрывать информацию о снимках при showSnapshotInfo=false', () => {
     vi.mocked(useSnapshotComparisonModule.useSnapshotComparison).mockReturnValue({
       baseline: mockBaseline,
       comparison: mockComparison,

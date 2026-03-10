@@ -5,35 +5,35 @@ import {
   downloadFile,
   copyToClipboard,
   importState,
-  readFileAsJson,
-  validateExportedState,
+  readFileAsJSON,
+  validateExportedData,
   generateFilename
 } from '@/utils/exportImport'
 import type { ExportOptions, ImportOptions, ImportResult, ExportFormat, ExportRange } from '@/utils/exportImport'
 import type { ExportedState } from '@/utils/exportFormatters'
 
 export interface UseExportImportReturn {
-  /** Экспортировать состояние */
+  /** Export state */
   exportState: (options: ExportOptions) => ExportedState
-  /** Экспортировать как Blob */
+  /** Export as Blob */
   exportAsBlob: (options: ExportOptions) => Blob
-  /** Скачать файл */
+  /** Download file */
   downloadFile: (options: ExportOptions, filename?: string) => void
-  /** Копировать в буфер */
+  /** Copy to clipboard */
   copyToClipboard: (options: ExportOptions) => Promise<boolean>
-  /** Импортировать состояние */
+  /** Import state */
   importState: (options: ImportOptions) => ImportResult
-  /** Обработать загрузку файла */
+  /** Handle file upload */
   handleFileUpload: (file: File) => Promise<ExportedState>
-  /** Валидировать данные */
+  /** Validate data */
   validateData: (data: any) => data is ExportedState
-  /** Сгенерировать имя файла */
+  /** Generate filename */
   generateFilename: (format: ExportFormat) => string
-  /** Статус импорта */
+  /** Import status */
   importStatus: ImportStatus | null
-  /** Статус экспорта */
+  /** Export status */
   exportStatus: ExportStatus | null
-  /** Сбросить статусы */
+  /** Reset statuses */
   resetStatus: () => void
 }
 
@@ -49,19 +49,19 @@ export interface ExportStatus {
 }
 
 export interface UseExportImportOptions {
-  /** Опции экспорта по умолчанию */
+  /** Default export options */
   defaultOptions?: Partial<ExportOptions>
-  /** Автоматически скачивать после экспорта */
+  /** Automatically download after export */
   autoDownload?: boolean
-  /** Автоматически показывать уведомления */
+  /** Automatically show notifications */
   showNotifications?: boolean
 }
 
 /**
- * Хук для управления экспортом и импортом состояния
+ * Hook for managing state export and import
  *
- * @param options - Опции хука
- * @returns Объект с методами экспорта/импорта
+ * @param options - Hook options
+ * @returns Object with export/import methods
  */
 export function useExportImport(
   options: UseExportImportOptions = {}
@@ -82,7 +82,7 @@ export function useExportImport(
   const [exportStatus, setExportStatus] = useState<ExportStatus | null>(null)
 
   /**
-   * Экспортировать состояние
+   * Export состояние
    */
   const handleExportState = useCallback((overrideOptions: Partial<ExportOptions> = {}): ExportedState => {
     const mergedOptions: ExportOptions = {
@@ -104,7 +104,7 @@ export function useExportImport(
   }, [defaultOptions])
 
   /**
-   * Экспортировать как Blob
+   * Export как Blob
    */
   const handleExportAsBlob = useCallback((overrideOptions: Partial<ExportOptions> = {}): Blob => {
     const mergedOptions: ExportOptions = {
@@ -116,7 +116,7 @@ export function useExportImport(
   }, [defaultOptions])
 
   /**
-   * Скачать файл
+   * Download file
    */
   const handleDownloadFile = useCallback((
     overrideOptions: Partial<ExportOptions> = {},
@@ -142,7 +142,7 @@ export function useExportImport(
   }, [defaultOptions])
 
   /**
-   * Копировать в буфер обмена
+   * Копировать в clipboard обмена
    */
   const handleCopyToClipboard = useCallback(async (
     overrideOptions: Partial<ExportOptions> = {}
@@ -173,7 +173,7 @@ export function useExportImport(
   }, [defaultOptions])
 
   /**
-   * Импортировать состояние
+   * Import состояние
    */
   const handleImportState = useCallback((
     overrideOptions: Partial<ImportOptions>
@@ -206,15 +206,15 @@ export function useExportImport(
   }, [])
 
   /**
-   * Обработать загрузку файла
+   * Обработать загрузку fileа
    */
   const handleFileUpload = useCallback(async (file: File): Promise<ExportedState> => {
     setImportStatus({ status: 'processing' })
 
     try {
-      const data = await readFileAsJson<ExportedState>(file)
+      const data = await readFileAsJSON<ExportedState>(file)
 
-      if (!validateExportedState(data)) {
+      if (!validateExportedData(data)) {
         throw new Error('Invalid data format')
       }
 
@@ -231,7 +231,7 @@ export function useExportImport(
    * Валидировать данные
    */
   const validateData = useCallback((data: any): data is ExportedState => {
-    return validateExportedState(data)
+    return validateExportedData(data)
   }, [])
 
   /**

@@ -2,21 +2,21 @@ import { atom, Atom, Getter } from '@nexus-state/core'
 import { editorTimeTravel } from '../timeTravel'
 
 /**
- * Атом для получения текущей позиции в time-travel
- * 
- * Используется для синхронизации UI с текущей позицией в истории.
+ * Atom for getting current position in time-travel
+ *
+ * Used to synchronize UI with current position in history.
  */
 const timeTravelPositionAtom = atom(
   (_get: Getter) => {
-    // Получаем текущую позицию из time-travel
-    // Это значение должно обновляться при изменениях в истории
+    // Get current position from time-travel
+    // This value should update on history changes
     return 0
   },
   'timeline.timeTravelPosition'
 ) as unknown as Atom<number>
 
 /**
- * Атом для получения количества снимков в истории
+ * Atom for getting number of snapshots in history
  */
 const snapshotsCountValueAtom = atom(
   (_get: Getter) => {
@@ -26,10 +26,10 @@ const snapshotsCountValueAtom = atom(
 ) as unknown as Atom<number>
 
 /**
- * Текущая позиция в истории снимков
+ * Current position in snapshot history
  *
- * Вычисляемый атом, который возвращает индекс текущего снимка.
- * Для undo/redo используется отдельная логика.
+ * Computed atom that returns current snapshot index.
+ * Separate logic is used for undo/redo.
  */
 export const currentPositionAtom = atom(
   (_get: Getter) => {
@@ -40,16 +40,16 @@ export const currentPositionAtom = atom(
 ) as unknown as Atom<number>
 
 /**
- * Общее количество снимков в истории
+ * Total number of snapshots in history
  *
- * Вычисляемый атом, который возвращает длину истории.
+ * Computed atom that returns history length.
  */
 export const snapshotsCountAtom = snapshotsCountValueAtom
 
 /**
- * Возможность отмены
+ * Undo availability
  *
- * Вычисляемый атом, который возвращает true если есть куда отменять.
+ * Computed atom that returns true if undo is available.
  */
 export const canUndoAtom = atom(
   (_get: Getter) => {
@@ -59,9 +59,9 @@ export const canUndoAtom = atom(
 ) as unknown as Atom<boolean>
 
 /**
- * Возможность повтора
+ * Redo availability
  *
- * Вычисляемый атом, который возвращает true если есть куда повторять.
+ * Computed atom that returns true if redo is available.
  */
 export const canRedoAtom = atom(
   (_get: Getter) => {
@@ -71,9 +71,9 @@ export const canRedoAtom = atom(
 ) as unknown as Atom<boolean>
 
 /**
- * Атом для управления позицией timeline slider
- * 
- * Этот атом синхронизируется с позицией time-travel и позволяет
- * управлять навигацией через UI.
+ * Atom for controlling timeline slider position
+ *
+ * This atom synchronizes with time-travel position and allows
+ * navigation control through UI.
  */
 export const timelinePositionAtom = timeTravelPositionAtom

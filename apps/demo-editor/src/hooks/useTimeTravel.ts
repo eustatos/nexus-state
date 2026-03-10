@@ -20,16 +20,16 @@ export interface UseTimeTravelReturn {
 }
 
 /**
- * Хук для управления time-travel навигацией
- * 
- * Предоставляет методы для навигации по истории снимков
- * и синхронизирует состояние с UI компонентами.
+ * Time-travel navigation hook
+ *
+ * Provides methods for navigating through snapshot history
+ * and synchronizes state with UI components.
  */
 export function useTimeTravel(): UseTimeTravelReturn {
-  // Состояние для принудительного ре-рендера при изменениях
+  // State for forcing re-render on changes
   const [version, setVersion] = useState(0)
 
-  // Получаем историю снимков - всегда актуальная версия
+  // Get snapshot history - always current version
   const history = useMemo(() => {
     const h = editorTimeTravel.getHistory()
     // Force re-computation when version changes
@@ -39,40 +39,40 @@ export function useTimeTravel(): UseTimeTravelReturn {
 
   const snapshotsCount = history.length
 
-  // Получаем текущую позицию из time-travel
+  // Get current position from time-travel
   const canUndo = editorTimeTravel.canUndo()
   const canRedo = editorTimeTravel.canRedo()
   const stats = editorTimeTravel.getHistoryStats()
 
-  // Используем currentIndex из stats если доступен, иначе вычисляем
+  // Use currentIndex from stats if available, otherwise calculate
   const currentPosition = useMemo(() => {
-    // stats.currentIndex может быть доступен в некоторых реализациях
+    // stats.currentIndex may be available in some implementations
     if (stats && 'currentIndex' in stats && typeof stats.currentIndex === 'number') {
       return stats.currentIndex
     }
-    
-    // Fallback: вычисляем на основе canUndo/canRedo
+
+    // Fallback: calculate based on canUndo/canRedo
     if (snapshotsCount === 0) return 0
     if (!canUndo) return 0
     if (!canRedo) return snapshotsCount - 1
-    // Мы где-то посередине - предполагаем, что мы на последнем
+    // We're somewhere in the middle - assume we're on the last one
     return snapshotsCount - 1
   }, [snapshotsCount, canUndo, canRedo, stats])
 
   /**
-   * Переход к конкретному снимку по индексу
+   * Jump to specific snapshot by index
    */
   const jumpTo = useCallback((index: number) => {
     console.log('[useTimeTravel.jumpTo] called with index:', index)
     const success = editorTimeTravel.jumpTo(index)
     console.log('[useTimeTravel.jumpTo] result:', success)
-    // После jumpTo принудительно обновляем состояние
+    // Force update state after jumpTo
     setVersion(v => v + 1)
     return success
   }, [])
 
   /**
-   * Переход к предыдущему снимку (undo)
+   * Jump to previous snapshot (undo)
    */
   const undo = useCallback(() => {
     const success = editorTimeTravel.undo()
@@ -81,7 +81,7 @@ export function useTimeTravel(): UseTimeTravelReturn {
   }, [])
 
   /**
-   * Переход к следующему снимку (redo)
+   * Jump to next snapshot (redo)
    */
   const redo = useCallback(() => {
     const success = editorTimeTravel.redo()
@@ -90,21 +90,21 @@ export function useTimeTravel(): UseTimeTravelReturn {
   }, [])
 
   /**
-   * Переход к первому снимку
+   * Jump to first snapshot
    */
   const jumpToFirst = useCallback(() => {
     return jumpTo(0)
   }, [jumpTo])
 
   /**
-   * Переход к последнему снимку
+   * Jump to last snapshot
    */
   const jumpToLast = useCallback(() => {
     return jumpTo(snapshotsCount - 1)
   }, [jumpTo, snapshotsCount])
 
   /**
-   * Переход к предыдущему снимку
+   * Jump to previous snapshot
    */
   const jumpToPrev = useCallback(() => {
     const newIndex = Math.max(0, currentPosition - 1)
@@ -112,16 +112,16 @@ export function useTimeTravel(): UseTimeTravelReturn {
   }, [currentPosition, jumpTo])
 
   /**
-   * Переход к следующему снимку
+   * Jump to next snapshot
    */
   const jumpToNext = useCallback(() => {
     const newIndex = Math.min(snapshotsCount - 1, currentPosition + 1)
     return jumpTo(newIndex)
   }, [currentPosition, snapshotsCount, jumpTo])
 
-  // Подписка на изменения в time-travel для авто-обновления
+  // Subscribe to time-travel changes for auto-refresh
   useEffect(() => {
-    // Подписка на события навигации (undo/redo/jump)
+    // Subscribe to navigation events (undo/redo/jump)
     const unsubscribeUndo = editorTimeTravel.subscribe('undo', () => {
       setVersion(v => v + 1)
     })
@@ -134,7 +134,7 @@ export function useTimeTravel(): UseTimeTravelReturn {
       setVersion(v => v + 1)
     })
 
-    // Подписка на создание новых снапшотов
+    // Subscribe to new snapshot creation
     const unsubscribeSnapshots = editorTimeTravel.subscribeToSnapshots(() => {
       setVersion(v => v + 1)
     })

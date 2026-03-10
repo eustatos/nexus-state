@@ -3,20 +3,20 @@ import { Activity, HardDrive, Clock, Database, TrendingUp, AlertTriangle } from 
 import './PerformanceMonitor.css'
 
 export interface PerformanceMonitorProps {
-  /** Класс для кастомизации */
+  /** Class для customization */
   className?: string
-  /** Показывать ли подробные метрики */
+  /** Show ли подробные метрики */
   showDetailed?: boolean
-  /** Показывать ли графики */
+  /** Show ли графики */
   showCharts?: boolean
   /** Интервал обновления */
   updateInterval?: number
 }
 
 /**
- * Компонент монитора производительности
+ * Component монитора производительности
  *
- * @param props - Пропсы компонента
+ * @param props - Props componentа
  */
 export function PerformanceMonitor({
   className = '',
@@ -242,7 +242,7 @@ export function PerformanceMonitor({
 }
 
 /**
- * Компонент графика FPS
+ * Component графика FPS
  */
 function FpsChart({ fps, avgFps }: { fps: number; avgFps: number }) {
   // Генерируем простые бары для визуализации
@@ -273,7 +273,7 @@ function FpsChart({ fps, avgFps }: { fps: number; avgFps: number }) {
 }
 
 /**
- * Компонент индикатора памяти
+ * Component индикатора памяти
  */
 function MemoryBar({ percent }: { percent: number }) {
   return (

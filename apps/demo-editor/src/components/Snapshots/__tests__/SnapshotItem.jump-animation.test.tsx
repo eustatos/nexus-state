@@ -1,5 +1,5 @@
 /**
- * Тесты для визуальной обратной связи SnapshotItem при jump to snapshot
+ * Tests for визуальной обратной связи SnapshotItem при jump to snapshot
  */
 
 import { describe, it, expect, vi } from 'vitest'
@@ -35,7 +35,7 @@ describe('SnapshotItem - Jump Animation', () => {
     }
   }
 
-  it('должен применять класс jumping при клике', async () => {
+  it('should применять class jumping при клике', async () => {
     const handleClick = vi.fn()
 
     render(
@@ -55,11 +55,11 @@ describe('SnapshotItem - Jump Animation', () => {
     // Проверяем, что onClick был вызван
     expect(handleClick).toHaveBeenCalledWith(0)
 
-    // Проверяем, что элемент имеет правильные классы
+    // Проверяем, что элемент имеет правильные classы
     expect(item).toHaveClass('snapshot-item')
   })
 
-  it('должен применять класс current когда isCurrent=true', () => {
+  it('should применять class current когда isCurrent=true', () => {
     render(
       <SnapshotItem
         snapshot={mockSnapshot}
@@ -76,7 +76,7 @@ describe('SnapshotItem - Jump Animation', () => {
     expect(badge).toHaveTextContent('Current')
   })
 
-  it('должен применять класс major-change для больших изменений', () => {
+  it('should применять class major-change for больших changes', () => {
     render(
       <SnapshotItem
         snapshot={mockSnapshotLarge}
@@ -90,7 +90,7 @@ describe('SnapshotItem - Jump Animation', () => {
     expect(item).toHaveClass('snapshot-item--major-change')
   })
 
-  it('должен применять класс significant-change для умеренно больших изменений', () => {
+  it('should применять class significant-change for умеренно больших changes', () => {
     const mediumSnapshot: ExtendedSnapshot = {
       ...mockSnapshot,
       metadata: {
@@ -116,7 +116,7 @@ describe('SnapshotItem - Jump Animation', () => {
     expect(item).toHaveClass('snapshot-item--significant-change')
   })
 
-  it('не должен применять классы изменений для небольших delta', () => {
+  it('не should применять classы changes for небольших delta', () => {
     const smallSnapshot: ExtendedSnapshot = {
       ...mockSnapshot,
       metadata: {
@@ -143,7 +143,7 @@ describe('SnapshotItem - Jump Animation', () => {
     expect(item).not.toHaveClass('snapshot-item--major-change')
   })
 
-  it('должен запускать анимацию при изменении isCurrent с false на true', () => {
+  it('should launchать анимацию при изменении isCurrent с false на true', () => {
     const { rerender } = render(
       <SnapshotItem
         snapshot={mockSnapshot}
@@ -170,7 +170,7 @@ describe('SnapshotItem - Jump Animation', () => {
     expect(item).toHaveClass('snapshot-item--current')
   })
 
-  it('должен поддерживать keyboard navigation (Enter)', () => {
+  it('should поддерживать keyboard navigation (Enter)', () => {
     const handleClick = vi.fn()
 
     render(
@@ -190,7 +190,7 @@ describe('SnapshotItem - Jump Animation', () => {
     expect(handleClick).toHaveBeenCalledWith(0)
   })
 
-  it('должен поддерживать keyboard navigation (Space)', () => {
+  it('should поддерживать keyboard navigation (Space)', () => {
     const handleClick = vi.fn()
 
     render(
@@ -210,7 +210,7 @@ describe('SnapshotItem - Jump Animation', () => {
     expect(handleClick).toHaveBeenCalledWith(0)
   })
 
-  it('должен вызывать onMouseEnter при наведении', () => {
+  it('should вызывать onMouseEnter при наведении', () => {
     const handleMouseEnter = vi.fn()
 
     render(
@@ -229,7 +229,7 @@ describe('SnapshotItem - Jump Animation', () => {
     expect(handleMouseEnter).toHaveBeenCalledWith(0)
   })
 
-  it('должен вызывать onMouseLeave при уходе курсора', () => {
+  it('should вызывать onMouseLeave при уходе курсора', () => {
     const handleMouseLeave = vi.fn()
 
     render(
@@ -248,7 +248,7 @@ describe('SnapshotItem - Jump Animation', () => {
     expect(handleMouseLeave).toHaveBeenCalledWith(0)
   })
 
-  it('должен отображать delta информацию', () => {
+  it('should отображать delta информацию', () => {
     render(
       <SnapshotItem
         snapshot={mockSnapshot}
@@ -262,7 +262,7 @@ describe('SnapshotItem - Jump Animation', () => {
     expect(screen.getByTestId('snapshot-delta-removed-0')).toHaveTextContent('-5')
   })
 
-  it('должен отображать metadata с количеством атомов', () => {
+  it('should отображать metadata с countм atoms', () => {
     render(
       <SnapshotItem
         snapshot={mockSnapshot}

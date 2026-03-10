@@ -2,37 +2,37 @@ import { SimpleTimeTravel } from '@nexus-state/core'
 import { editorStore } from './store'
 
 /**
- * Time-travel конфигурация для редактора
+ * Time-travel configuration for the editor
  *
- * Обеспечивает возможность отката изменений и навигации по истории состояний.
+ * Provides state change rollback and history navigation capabilities.
  */
 export const editorTimeTravel = new SimpleTimeTravel(editorStore, {
-  // Максимальное количество снимков в истории
+  // Maximum number of snapshots to keep in history
   maxHistory: 100,
 
-  // Отключаем авто-снимки — используем debounce-хук
+  // Disable auto-snapshots — using debounce hook
   autoCapture: false,
 
-  // Delta-сжатие для экономии памяти
+  // Delta compression for memory efficiency
   deltaSnapshots: {
     enabled: true,
-    fullSnapshotInterval: 10,        // Полный снимок каждые 10 изменений
-    maxDeltaChainLength: 20,         // Максимальная длина цепочки дельт
-    changeDetection: 'deep'          // Глубокое сравнение изменений
+    fullSnapshotInterval: 10,        // Full snapshot every 10 changes
+    maxDeltaChainLength: 20,         // Maximum delta chain length
+    changeDetection: 'deep'          // Deep change detection
   },
 
-  // TTL для атомов (очистка старых данных)
-  atomTTL: 300000, // 5 минут
+  // TTL for atoms (cleanup old data)
+  atomTTL: 300000, // 5 minutes
 
-  // Настройки отслеживания
+  // Tracking configuration
   trackingConfig: {
-    autoTrack: true,                 // Автоматически отслеживать новые атомы
-    trackComputed: true,             // Отслеживать вычисляемые атомы
-    trackWritable: true,             // Отслеживать записываемые атомы
-    trackPrimitive: true             // Отслеживать примитивные значения
+    autoTrack: true,                 // Automatically track new atoms
+    trackComputed: true,             // Track computed atoms
+    trackWritable: true,             // Track writable atoms
+    trackPrimitive: true             // Track primitive values
   },
 
-  // Стратегия очистки
+  // Cleanup strategy
   cleanupStrategy: 'lru',            // Least Recently Used
-  gcInterval: 60000                  // Сборка мусора каждую минуту
+  gcInterval: 60000                  // Garbage collection every minute
 })

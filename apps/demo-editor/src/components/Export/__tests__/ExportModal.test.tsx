@@ -1,5 +1,5 @@
 /**
- * Тесты для ExportModal
+ * Tests for ExportModal
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -7,7 +7,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ExportModal } from '../ExportModal'
 import { useExportImport } from '@/hooks/useExportImport'
 
-// Моки для хука
+// Mocks for hookа
 vi.mock('@/hooks/useExportImport', () => ({
   useExportImport: vi.fn()
 }))
@@ -23,7 +23,7 @@ describe('ExportModal', () => {
     onClose: vi.fn()
   }
 
-  it('должен рендерить модальное окно', () => {
+  it('should рендерить модальное окно', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -44,7 +44,7 @@ describe('ExportModal', () => {
     expect(screen.getByText('Export State')).toBeInTheDocument()
   })
 
-  it('должен закрываться при клике на кнопку закрытия', () => {
+  it('should закрываться при клике на кнопку close', () => {
     const onClose = vi.fn()
 
     mockUseExportImport.mockReturnValue({
@@ -68,7 +68,7 @@ describe('ExportModal', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  it('должен позволять выбрать формат экспорта', () => {
+  it('should позволять выбрать format export', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -85,7 +85,7 @@ describe('ExportModal', () => {
 
     render(<ExportModal onClose={defaultProps.onClose} />)
 
-    // Проверяем, что все опции формата присутствуют
+    // Проверяем, что all options formatа присутствуют
     expect(screen.getByTestId('format-json')).toBeInTheDocument()
     expect(screen.getByTestId('format-html')).toBeInTheDocument()
     expect(screen.getByTestId('format-markdown')).toBeInTheDocument()
@@ -96,7 +96,7 @@ describe('ExportModal', () => {
     expect(screen.getByTestId('format-html')).toBeChecked()
   })
 
-  it('должен позволять выбрать диапазон экспорта', () => {
+  it('should позволять выбрать range export', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -120,7 +120,7 @@ describe('ExportModal', () => {
     expect(rangeSelect).toHaveValue('current')
   })
 
-  it('должен позволять включить/выключить опции', () => {
+  it('should позволять включить/выключить options', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -150,7 +150,7 @@ describe('ExportModal', () => {
     expect(metadataCheckbox).not.toBeChecked()
   })
 
-  it('должен вызывать downloadFile при клике на Download', async () => {
+  it('should вызывать downloadFile при клике на Download', async () => {
     const downloadFile = vi.fn()
 
     mockUseExportImport.mockReturnValue({
@@ -176,7 +176,7 @@ describe('ExportModal', () => {
     })
   })
 
-  it('должен вызывать copyToClipboard при клике на Copy', async () => {
+  it('should вызывать copyToClipboard при клике на Copy', async () => {
     const copyToClipboard = vi.fn().mockResolvedValue(true)
 
     mockUseExportImport.mockReturnValue({
@@ -202,7 +202,7 @@ describe('ExportModal', () => {
     })
   })
 
-  it('должен показывать статус экспорта', () => {
+  it('should show статус export', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -223,7 +223,7 @@ describe('ExportModal', () => {
     expect(screen.getByText('Export successful')).toBeInTheDocument()
   })
 
-  it('должен отключать кнопки во время экспорта', () => {
+  it('should отключать кнопки во время export', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),

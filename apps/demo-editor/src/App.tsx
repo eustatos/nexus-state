@@ -1,16 +1,22 @@
 import { useTimeTravel } from '@/hooks/useTimeTravel'
+import { useStressTest } from '@/hooks/useStressTest'
 import { SimpleEditor, EditorToolbar } from './components/Editor'
 import { SnapshotList } from './components/Snapshots'
 import { TimelineSlider, NavigationControls, PlaybackControls } from './components/Timeline'
+import { StressTestControls } from './components/StressTest'
+import { ChevronUp, ChevronDown, Zap } from 'lucide-react'
 import { useSetAtom } from '@nexus-state/react'
 import { contentAtom, isDirtyAtom } from '@/store/atoms/editor'
 import { editorStore } from '@/store/store'
+import { useState } from 'react'
 import './App.css'
 
 function App() {
   const setContent = useSetAtom(contentAtom, editorStore)
   const setIsDirty = useSetAtom(isDirtyAtom, editorStore)
   const { snapshotsCount, jumpTo } = useTimeTravel()
+  const stressTest = useStressTest()
+  const [showStressTest, setShowStressTest] = useState(false)
 
   const handleClear = () => {
     setContent('')
@@ -23,7 +29,6 @@ function App() {
 
   const handleSnapshotSelect = (index: number) => {
     console.log('Snapshot selected:', index)
-    // jumpTo уже вызван в SnapshotList, здесь просто логирование
   }
 
   const handleTimelinePositionChange = (position: number) => {
@@ -44,6 +49,11 @@ function App() {
             Snapshots: {snapshotsCount}
           </span>
           <span className="text-xs text-muted">Time-Travel Enabled</span>
+          {stressTest.isRunning && (
+            <span className="text-xs text-success flex items-center gap-1">
+              <Zap size={12} /> Stress Test
+            </span>
+          )}
         </div>
       </header>
 
@@ -88,15 +98,34 @@ function App() {
           </footer>
         </div>
 
-        {/* Sidebar - Snapshots */}
+        {/* Sidebar */}
         <aside className="w-80 border-l border-border bg-surface/30 flex flex-col shrink-0 h-full min-h-0">
-          <div className="h-10 border-b border-border flex items-center px-4 shrink-0">
-            <h2 className="font-semibold text-sm">Snapshots</h2>
-            <span className="ml-auto text-xs text-muted">{snapshotsCount}</span>
+          {/* Snapshots Header */}
+          <div className="h-10 border-b border-border flex items-center justify-between px-4 shrink-0 bg-surface/50">
+            <div className="flex items-center gap-2">
+              <h2 className="font-semibold text-sm">Snapshots</h2>
+              <span className="text-xs text-muted">{snapshotsCount}</span>
+            </div>
+            <button
+              className="text-xs text-muted hover:text-foreground transition-colors"
+              onClick={() => setShowStressTest(!showStressTest)}
+              title={showStressTest ? 'Hide stress tests' : 'Show stress tests'}
+              type="button"
+            >
+              {showStressTest ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+            </button>
           </div>
-          <div className="flex-1 overflow-hidden min-h-0 flex flex-col">
+
+          {/* Stress Test Controls (collapsible) */}
+          {showStressTest && (
+            <div className="border-b border-border shrink-0 animate-in slide-in-from-top duration-200">
+              <StressTestControls stressTest={stressTest} />
+            </div>
+          )}
+
+          {/* Snapshots List - takes remaining space */}
+          <div className="flex-1 overflow-hidden min-h-0">
             <SnapshotList
-              style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
               showUndoRedo={true}
               showSearch={true}
               showFilter={true}

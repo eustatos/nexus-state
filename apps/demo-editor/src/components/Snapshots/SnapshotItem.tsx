@@ -5,26 +5,26 @@ import { Clock, Type, Trash2, PlusCircle, Save, Edit3 } from 'lucide-react'
 import './SnapshotItem.css'
 
 export interface SnapshotItemProps {
-  /** Снимок для отображения */
+  /** Snapshot for display */
   snapshot: Snapshot & { metadata: SnapshotMetadata & { timestamp: number; atomCount: number } }
-  /** Индекс снимка в списке (UI индекс, 0 = самый новый) */
+  /** Snapshot index in list (UI index, 0 = newest) */
   index: number
-  /** Является ли этот снимок текущим */
+  /** Is this snapshot current */
   isCurrent?: boolean
-  /** Режим сравнения активен */
+  /** Compare mode active */
   compareMode?: boolean
-  /** Выбран ли этот снимок для сравнения */
+  /** Is this snapshot selected for compare */
   isSelectedForCompare?: boolean
-  /** Обработчик клика по снимку */
+  /** Click handler */
   onClick?: (index: number) => void
-  /** Обработчик наведения на снимок */
+  /** Mouse enter handler */
   onMouseEnter?: (index: number) => void
-  /** Обработчик ухода с снимка */
+  /** Mouse leave handler */
   onMouseLeave?: (index: number) => void
 }
 
 /**
- * Иконка для типа действия
+ * Icon for action type
  */
 function getActionIcon(action: string | undefined, size: number = 14) {
   switch (action) {
@@ -44,7 +44,7 @@ function getActionIcon(action: string | undefined, size: number = 14) {
 }
 
 /**
- * Форматирование времени
+ * Format time
  */
 function formatTime(timestamp: number): string {
   const now = Date.now()
@@ -59,14 +59,14 @@ function formatTime(timestamp: number): string {
 }
 
 /**
- * Форматирование полного времени
+ * Format full time
  */
 function formatFullTime(timestamp: number): string {
   return new Date(timestamp).toLocaleString()
 }
 
 /**
- * Получение названия действия
+ * Get action name
  */
 function getActionName(action: string | undefined): string {
   switch (action) {
@@ -86,7 +86,7 @@ function getActionName(action: string | undefined): string {
 }
 
 /**
- * Вычисление дельты изменений
+ * Calculate delta changes
  */
 function getDeltaInfo(snapshot: SnapshotItemProps['snapshot']): { added: number; removed: number } | null {
   const delta = (snapshot.metadata as any).delta
@@ -99,7 +99,7 @@ function getDeltaInfo(snapshot: SnapshotItemProps['snapshot']): { added: number;
 }
 
 /**
- * Определение класса для значительных изменений
+ * Determine class for significant changes
  */
 function getChangeClass(delta: { added: number; removed: number } | null): string {
   if (!delta) return ''
@@ -118,9 +118,9 @@ function getChangeClass(delta: { added: number; removed: number } | null): strin
 }
 
 /**
- * Компонент отображения одного снимка в списке
+ * Component displaying single snapshot in list
  *
- * @param props - Пропсы компонента
+ * @param props - Component props
  */
 export function SnapshotItem({
   snapshot,
@@ -150,11 +150,11 @@ export function SnapshotItem({
   }, [isCurrent])
 
   const handleClick = () => {
-    // Визуальный feedback перед переходом
+    // Visual feedback before jump
     setIsJumping(true)
     onClick?.(index)
 
-    // Сбрасываем анимацию после завершения
+    // Reset animation after completion
     setTimeout(() => setIsJumping(false), 400)
   }
 

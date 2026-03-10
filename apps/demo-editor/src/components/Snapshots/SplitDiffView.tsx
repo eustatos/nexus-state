@@ -3,12 +3,12 @@ import type { SnapshotComparison, AtomComparison } from '@nexus-state/core/time-
 import './SnapshotDiff.css'
 
 export interface SplitDiffViewProps {
-  /** Результат сравнения */
+  /** Result comparison */
   result: SnapshotComparison
 }
 
 /**
- * Получить текст из атома для старой версии
+ * Get text из atom для старой версии
  */
 function getOldText(atom: AtomComparison): string {
   if (atom.status === 'removed' && atom.oldValue !== undefined) {
@@ -33,7 +33,7 @@ function getOldText(atom: AtomComparison): string {
 }
 
 /**
- * Получить текст из атома для новой версии
+ * Get text из atom для новой версии
  */
 function getNewText(atom: AtomComparison): string {
   if (atom.status === 'added' && atom.newValue !== undefined) {
@@ -58,7 +58,7 @@ function getNewText(atom: AtomComparison): string {
 }
 
 /**
- * Компонент для split отображения diff
+ * Component для split display diff
  *
  * Две колонки: слева старая версия, справа новая
  * с синхронной прокруткой
@@ -108,7 +108,7 @@ export function SplitDiffView({ result }: SplitDiffViewProps) {
     }, 10)
   }, [scrollSync])
 
-  // Фильтруем только измененные атомы
+  // Фильтруем только измененные atoms
   const changedAtoms = result.atoms.filter(a => a.status !== 'unchanged')
   const unchangedAtoms = result.atoms.filter(a => a.status === 'unchanged')
 

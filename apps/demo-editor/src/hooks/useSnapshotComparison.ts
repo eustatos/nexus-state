@@ -6,40 +6,40 @@ import type { SnapshotComparison, ComparisonOptions } from '@nexus-state/core/ti
 export type DiffMode = 'inline' | 'split' | 'unified'
 
 export interface UseSnapshotComparisonReturn {
-  /** Базовый снимок для сравнения */
+  /** Baseline snapshot for comparison */
   baseline: Snapshot | null
-  /** Снимок для сравнения с базовым */
+  /** Comparison snapshot */
   comparison: Snapshot | null
-  /** Режим отображения diff */
+  /** Diff display mode */
   mode: DiffMode
-  /** Результат сравнения */
+  /** Comparison result */
   result: SnapshotComparison | null
-  /** Установить режим отображения */
+  /** Set display mode */
   setMode: (mode: DiffMode) => void
-  /** Выбрать базовый снимок */
+  /** Select baseline snapshot */
   selectBaseline: (snapshot: Snapshot) => void
-  /** Выбрать снимок для сравнения */
+  /** Select comparison snapshot */
   selectComparison: (snapshot: Snapshot) => void
-  /** Сбросить выбор снимков */
+  /** Reset snapshot selection */
   reset: () => void
-  /** Активно ли сравнение */
+  /** Is comparison active */
   isComparing: boolean
-  /** Выполнить сравнение */
+  /** Perform comparison */
   compare: () => SnapshotComparison | null
 }
 
 export interface UseSnapshotComparisonOptions {
-  /** Опции сравнения */
+  /** Comparison options */
   comparisonOptions?: Partial<ComparisonOptions>
-  /** Автоматическое сравнение при выборе обоих снимков */
+  /** Auto-compare when both snapshots are selected */
   autoCompare?: boolean
 }
 
 /**
- * Хук для управления сравнением снимков
+ * Hook for managing snapshot comparison
  *
- * @param options - Опции хука
- * @returns Объект с данными и методами управления сравнением
+ * @param options - Hook options
+ * @returns Object with comparison data and control methods
  */
 export function useSnapshotComparison(
   options: UseSnapshotComparisonOptions = {}
@@ -55,7 +55,7 @@ export function useSnapshotComparison(
   const [cachedResult, setCachedResult] = useState<SnapshotComparison | null>(null)
 
   /**
-   * Выполнить сравнение двух снимков
+   * Выполнить comparison двух снимков
    */
   const compare = useCallback((): SnapshotComparison | null => {
     if (!baseline || !comparison) {
@@ -83,33 +83,33 @@ export function useSnapshotComparison(
   }, [baseline, comparison, comparisonOptions])
 
   /**
-   * Выбрать базовый снимок
+   * Выбрать базовый snapshot
    */
   const selectBaseline = useCallback((snapshot: Snapshot) => {
     setBaseline(snapshot)
     setCachedResult(null)
 
     if (comparison && autoCompare) {
-      // Автоматическое сравнение если оба снимка выбраны
+      // Auto-compare if both snapshots are selected
       setTimeout(() => compare(), 0)
     }
   }, [comparison, autoCompare, compare])
 
   /**
-   * Выбрать снимок для сравнения
+   * Select comparison snapshot
    */
   const selectComparison = useCallback((snapshot: Snapshot) => {
     setComparison(snapshot)
     setCachedResult(null)
 
     if (baseline && autoCompare) {
-      // Автоматическое сравнение если оба снимка выбраны
+      // Auto-compare if both snapshots are selected
       setTimeout(() => compare(), 0)
     }
   }, [baseline, autoCompare, compare])
 
   /**
-   * Сбросить выбор снимков
+   * Reset snapshot selection
    */
   const reset = useCallback(() => {
     setBaseline(null)
@@ -118,7 +118,7 @@ export function useSnapshotComparison(
   }, [])
 
   /**
-   * Результат сравнения - вычисляется автоматически
+   * Result comparison - computed automatically
    */
   const result = useMemo(() => {
     if (cachedResult) {
@@ -133,7 +133,7 @@ export function useSnapshotComparison(
   }, [cachedResult, baseline, comparison, autoCompare, compare])
 
   /**
-   * Проверка, активно ли сравнение
+   * Check if comparison is active
    */
   const isComparing = baseline !== null && comparison !== null
 

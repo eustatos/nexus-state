@@ -12,10 +12,10 @@ export interface UseDebounceSnapshotsOptions {
 }
 
 /**
- * Хук для debounce создания снимков time-travel
- * 
- * @param options - Опции debounce
- * @returns Объект с функциями управления снимками
+ * Hook for debouncing time-travel snapshot creation
+ *
+ * @param options - Debounce options
+ * @returns Object with snapshot control functions
  */
 export function useDebounceSnapshots(
   options: UseDebounceSnapshotsOptions = {}
@@ -30,7 +30,7 @@ export function useDebounceSnapshots(
   const previousContentRef = useRef<string>('')
   const setIsSaving = useSetAtom(isSavingAtom, editorStore)
 
-  // Создаем debounced функцию захвата
+  // Create debounced capture function
   useEffect(() => {
     if (!enabled) {
       captureRef.current?.cancel()
@@ -47,7 +47,7 @@ export function useDebounceSnapshots(
             id: snapshot.id,
             timestamp: snapshot.metadata.timestamp
           })
-          // Сбрасываем флаг сохранения после создания снимка
+          // Reset saving flag after snapshot creation
           setIsSaving(false)
         }
       },
@@ -62,7 +62,7 @@ export function useDebounceSnapshots(
   }, [delay, maxWait, enabled, setIsSaving])
 
   /**
-   * Вычисление delta между старым и новым контентом
+   * Calculate delta between old and new content
    */
   const calculateDelta = useCallback((oldText: string, newText: string) => {
     const added = newText.length - oldText.length
@@ -86,10 +86,10 @@ export function useDebounceSnapshots(
   }, [])
 
   /**
-   * Создание снимка с debounce
-   * 
-   * @param action - Тип действия
-   * @param newContent - Новый контент
+   * Create snapshot with debounce
+   *
+   * @param action - Action type
+   * @param newContent - New content
    */
   const captureSnapshotDebounced = useCallback((
     action: string = 'text-edit',
@@ -104,10 +104,10 @@ export function useDebounceSnapshots(
   }, [enabled])
 
   /**
-   * Принудительный захват (игнорирует debounce)
-   * 
-   * @param action - Тип действия
-   * @param newContent - Новый контент
+   * Force capture (ignores debounce)
+   *
+   * @param action - Action type
+   * @param newContent - New content
    */
   const forceCapture = useCallback((
     action: string = 'manual-save',
@@ -130,14 +130,14 @@ export function useDebounceSnapshots(
   }, [enabled, calculateDelta])
 
   /**
-   * Отмена отложенного захвата
+   * Cancel pending capture
    */
   const cancelPending = useCallback(() => {
     captureRef.current?.cancel()
   }, [])
 
   /**
-   * Сброс предыдущего контента
+   * Reset previous content
    */
   const resetPreviousContent = useCallback((content: string) => {
     previousContentRef.current = content

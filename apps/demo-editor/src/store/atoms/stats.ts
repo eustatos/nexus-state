@@ -2,52 +2,52 @@ import { atom } from '@nexus-state/core'
 import { contentAtom } from './editor'
 
 /**
- * Статистика редактора
+ * Editor statistics
  */
 export interface EditorStats {
-  /** Количество символов (с пробелами) */
+  /** Character count (with spaces) */
   characters: number
-  /** Количество символов (без пробелов) */
+  /** Character count (without spaces) */
   charactersNoSpaces: number
-  /** Количество слов */
+  /** Word count */
   words: number
-  /** Количество строк */
+  /** Line count */
   lines: number
-  /** Время чтения в минутах (округлено вверх) */
+  /** Reading time in minutes (rounded up) */
   readingTime: number
-  /** Средняя длина слова */
+  /** Average word length */
   avgWordLength: number
-  /** Средняя длина строки */
+  /** Average line length */
   avgLineLength: number
 }
 
 /**
- * Вычисляемая статистика редактора
- * 
- * Автоматически пересчитывается при изменении contentAtom.
- * Использует паттерн computed atom с функцией-геттером.
+ * Computed editor statistics
+ *
+ * Automatically recalculates when contentAtom changes.
+ * Uses computed atom pattern with getter function.
  */
 export const statsAtom = atom<EditorStats>((get) => {
   const content = get(contentAtom)
-  
+
   const characters = content.length
   const charactersNoSpaces = content.replace(/\s/g, '').length
   const words = content.trim() ? content.trim().split(/\s+/).length : 0
   const lines = content.split('\n').length
-  
-  // ~200 символов в минуту для среднего читателя
+
+  // ~200 characters per minute for average reader
   const readingTime = Math.ceil(characters / 200 / 60)
-  
-  // Средняя длина слова (символов на слово)
-  const avgWordLength = words > 0 
-    ? Math.round((charactersNoSpaces / words) * 10) / 10 
+
+  // Average word length (characters per word)
+  const avgWordLength = words > 0
+    ? Math.round((charactersNoSpaces / words) * 10) / 10
     : 0
-  
-  // Средняя длина строки (символов на строку)
-  const avgLineLength = lines > 0 
-    ? Math.round((characters / lines) * 10) / 10 
+
+  // Average line length (characters per line)
+  const avgLineLength = lines > 0
+    ? Math.round((characters / lines) * 10) / 10
     : 0
-  
+
   return {
     characters,
     charactersNoSpaces,

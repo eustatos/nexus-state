@@ -1,5 +1,5 @@
 /**
- * Тесты для хука usePlayback
+ * Tests for hookа usePlayback
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
@@ -7,7 +7,7 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { usePlayback } from '../usePlayback'
 import { useTimeTravel } from '@/hooks/useTimeTravel'
 
-// Моки для useTimeTravel
+// Mocks for useTimeTravel
 vi.mock('@/hooks/useTimeTravel', () => ({
   useTimeTravel: vi.fn()
 }))
@@ -43,7 +43,7 @@ describe('usePlayback', () => {
     return renderHook(() => usePlayback(options))
   }
 
-  it('должен возвращать начальное состояние', () => {
+  it('should return начальное состояние', () => {
     const { result } = setup()
 
     expect(result.current.isPlaying).toBe(false)
@@ -56,7 +56,7 @@ describe('usePlayback', () => {
     expect(result.current.progress).toBe(20) // (0+1)/5 * 100 = 20%
   })
 
-  it('должен начинать воспроизведение при вызове play', () => {
+  it('should начинать воспроизведение при вызове play', () => {
     const { result } = setup()
 
     act(() => {
@@ -67,7 +67,7 @@ describe('usePlayback', () => {
     expect(result.current.isPaused).toBe(false)
   })
 
-  it('должен ставить на паузу при вызове pause', () => {
+  it('should ставить на паузу при вызове pause', () => {
     const { result } = setup()
 
     act(() => {
@@ -84,7 +84,7 @@ describe('usePlayback', () => {
     expect(result.current.isPaused).toBe(true)
   })
 
-  it('должен возобновлять при вызове resume', () => {
+  it('should возобновлять при вызове resume', () => {
     const { result } = setup()
 
     // Сначала ставим на паузу
@@ -108,7 +108,7 @@ describe('usePlayback', () => {
     expect(result.current.isPaused).toBe(false)
   })
 
-  it('должен останавливать и сбрасывать к началу при вызове stop', () => {
+  it('should останавливать и сбрасывать к началу при вызове stop', () => {
     const { result } = setup()
 
     act(() => {
@@ -126,7 +126,7 @@ describe('usePlayback', () => {
     expect(mockJumpTo).toHaveBeenCalledWith(0)
   })
 
-  it('должен переключать play/pause при togglePlayPause', () => {
+  it('should переключать play/pause при togglePlayPause', () => {
     const { result } = setup()
 
     // Начальное состояние -> play
@@ -150,7 +150,7 @@ describe('usePlayback', () => {
     expect(result.current.isPaused).toBe(false)
   })
 
-  it('должен переключать режим loop при toggleLoop', () => {
+  it('should переключать mode loop при toggleLoop', () => {
     const { result } = setup()
 
     expect(result.current.isLooping).toBe(false)
@@ -168,7 +168,7 @@ describe('usePlayback', () => {
     expect(result.current.isLooping).toBe(false)
   })
 
-  it('должен устанавливать скорость', () => {
+  it('should устанавливать скорость', () => {
     const { result } = setup()
 
     expect(result.current.speed).toBe(1000)
@@ -186,7 +186,7 @@ describe('usePlayback', () => {
     expect(result.current.speed).toBe(2000)
   })
 
-  it('должен ограничивать скорость мин/макс значениями', () => {
+  it('should ограничивать скорость мин/макс valueми', () => {
     const { result } = setup({ defaultSpeed: 1000, minSpeed: 200, maxSpeed: 3000 })
 
     act(() => {
@@ -202,7 +202,7 @@ describe('usePlayback', () => {
     expect(result.current.speed).toBe(3000)
   })
 
-  it('должен устанавливать направление', () => {
+  it('should устанавливать направление', () => {
     const { result } = setup()
 
     expect(result.current.direction).toBe('forward')
@@ -214,7 +214,7 @@ describe('usePlayback', () => {
     expect(result.current.direction).toBe('backward')
   })
 
-  it('должен переходить к позиции при jumpTo', () => {
+  it('should переходить к позиции при jumpTo', () => {
     const { result } = setup()
 
     act(() => {
@@ -224,7 +224,7 @@ describe('usePlayback', () => {
     expect(mockJumpTo).toHaveBeenCalledWith(3)
   })
 
-  it('должен автоматически переключаться к следующему снимку во время воспроизведения', () => {
+  it('should автоматически переключаться к следующему снимку во время воспроизведения', () => {
     const { result } = setup({ defaultSpeed: 100 })
 
     act(() => {
@@ -238,12 +238,12 @@ describe('usePlayback', () => {
       vi.advanceTimersByTime(100)
     })
 
-    // Должен был вызван jumpTo
+    // Should был вызван jumpTo
     expect(mockJumpTo).toHaveBeenCalled()
   })
 
-  it('должен останавливаться при достижении конца (без loop)', () => {
-    // Этот тест требует сложной мокировки currentPosition
+  it('should останавливаться при достижении конца (без loop)', () => {
+    // Этот test требует сложной mocksровки currentPosition
     // Проверяем базовую логику остановки
     const { result } = setup({ defaultSpeed: 100 })
 
@@ -261,8 +261,8 @@ describe('usePlayback', () => {
     expect(result.current.isPaused).toBe(false)
   })
 
-  it('должен зацикливаться при включенном loop', () => {
-    // Этот тест требует сложной мокировки currentPosition
+  it('should зацикливаться при включенном loop', () => {
+    // Этот test требует сложной mocksровки currentPosition
     // Проверяем базовую логику loop
     const { result } = setup()
 
@@ -275,7 +275,7 @@ describe('usePlayback', () => {
     expect(result.current.isLooping).toBe(true)
   })
 
-  it('должен вычислять прогресс корректно', () => {
+  it('should вычислять прогресс корректно', () => {
     vi.mocked(useTimeTravel).mockReturnValue({
       currentPosition: 2,
       snapshotsCount: 10,
@@ -297,7 +297,7 @@ describe('usePlayback', () => {
     expect(result.current.progress).toBe(20)
   })
 
-  it('должен очищать интервал при размонтировании', () => {
+  it('should очищать интервал при размонтировании', () => {
     const clearIntervalSpy = vi.spyOn(global, 'clearInterval')
 
     const { result, unmount } = setup({ defaultSpeed: 100 })

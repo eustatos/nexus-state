@@ -1,10 +1,10 @@
 /**
- * Debounce функция с поддержкой maxWait
- * 
- * @param func - Функция для вызова
- * @param wait - Задержка в мс
- * @param options - Опции
- * @returns Debounced функция
+ * Debounce function with maxWait support
+ *
+ * @param func - Function to invoke
+ * @param wait - Delay in milliseconds
+ * @param options - Options
+ * @returns Debounced function
  */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
@@ -153,7 +153,7 @@ export function debounce<T extends (...args: any[]) => any>(
 }
 
 /**
- * Throttle функция (обертка над debounce)
+ * Throttle function (debounce wrapper)
  */
 export function throttle<T extends (...args: any[]) => any>(
   func: T,

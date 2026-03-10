@@ -1,18 +1,18 @@
 import { atom } from '@nexus-state/core'
 
 /**
- * Содержимое редактора
+ * Editor content
  *
- * Основной атом для хранения текста документа.
+ * Main atom for document text storage.
  */
 export const contentAtom = atom('', 'editor.content')
 
 /**
- * Позиция курсора
- * 
- * Хранит текущую позицию курсора в редакторе.
- * line - номер строки (0-based)
- * col - номер колонки (0-based)
+ * Cursor position
+ *
+ * Stores current cursor position in editor.
+ * line - line number (0-based)
+ * col - column number (0-based)
  */
 export const cursorAtom = atom<{ line: number; col: number }>(
   { line: 0, col: 0 },
@@ -20,12 +20,12 @@ export const cursorAtom = atom<{ line: number; col: number }>(
 )
 
 /**
- * Выделение текста
- * 
- * Хранит информацию о выделенном тексте.
- * from - позиция начала выделения
- * to - позиция конца выделения
- * null - если нет активного выделения
+ * Text selection
+ *
+ * Stores information about selected text.
+ * from - selection start position
+ * to - selection end position
+ * null - if no active selection
  */
 export const selectionAtom = atom<{ from: number; to: number } | null>(
   null,
@@ -33,25 +33,25 @@ export const selectionAtom = atom<{ from: number; to: number } | null>(
 )
 
 /**
- * Флаг "грязного" состояния
- * 
- * true - есть несохраненные изменения
- * false - все изменения сохранены в снимке
+ * Dirty state flag
+ *
+ * true - has unsaved changes
+ * false - all changes saved to snapshot
  */
 export const isDirtyAtom = atom(false, 'editor.isDirty')
 
 /**
- * Флаг сохранения (debounce в процессе)
- * 
- * true - снимок создается (debounce)
- * false - снимок создан или нет изменений
+ * Saving flag (debounce in progress)
+ *
+ * true - snapshot being created (debounce)
+ * false - snapshot created or no changes
  */
 export const isSavingAtom = atom(false, 'editor.isSaving')
 
 /**
- * Время последнего сохранения
- * 
- * Timestamp последнего созданного снимка time-travel.
- * null - если снимки еще не создавались
+ * Last save time
+ *
+ * Timestamp of last created time-travel snapshot.
+ * null - if no snapshots created yet
  */
 export const lastSavedAtom = atom<number | null>(null, 'editor.lastSaved')

@@ -1,5 +1,5 @@
 /**
- * Тесты для утилит экспорта/импорта
+ * Tests for utilities export/import
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
@@ -16,13 +16,13 @@ import {
 import { formatAsHTML, formatAsMarkdown, formatAsPlainText } from '../exportFormatters'
 import { editorTimeTravel } from '@/store/timeTravel'
 
-// Мокаем URL.createObjectURL и revokeObjectURL для jsdom
+// Mock URL.createObjectURL и revokeObjectURL for jsdom
 beforeAll(() => {
   URL.createObjectURL = vi.fn(() => 'blob:test-url')
   URL.revokeObjectURL = vi.fn()
 })
 
-// Моки для editorTimeTravel
+// Mocks for editorTimeTravel
 vi.mock('@/store/timeTravel', () => ({
   editorTimeTravel: {
     getHistory: vi.fn(() => []),
@@ -59,7 +59,7 @@ describe('exportFormatters', () => {
   }
 
   describe('formatAsHTML', () => {
-    it('должен генерировать валидный HTML', () => {
+    it('should generate валидный HTML', () => {
       const html = formatAsHTML(mockExportedState)
 
       expect(html).toContain('<!DOCTYPE html>')
@@ -70,7 +70,7 @@ describe('exportFormatters', () => {
       expect(html).toContain('snapshot-2')
     })
 
-    it('должен включать метаданные', () => {
+    it('should include metadata', () => {
       const html = formatAsHTML(mockExportedState)
 
       expect(html).toContain('Snapshots: 2')
@@ -79,7 +79,7 @@ describe('exportFormatters', () => {
   })
 
   describe('formatAsMarkdown', () => {
-    it('должен генерировать валидный Markdown', () => {
+    it('should generate валидный Markdown', () => {
       const md = formatAsMarkdown(mockExportedState)
 
       expect(md).toContain('# 📦 Exported State')
@@ -88,7 +88,7 @@ describe('exportFormatters', () => {
       expect(md).toContain('```json')
     })
 
-    it('должен включать все снимки', () => {
+    it('should include all snapshots', () => {
       const md = formatAsMarkdown(mockExportedState)
 
       expect(md).toContain('#1: text-edit')
@@ -97,7 +97,7 @@ describe('exportFormatters', () => {
   })
 
   describe('formatAsPlainText', () => {
-    it('должен генерировать текстовый формат', () => {
+    it('should generate text format', () => {
       const text = formatAsPlainText(mockExportedState)
 
       expect(text).toContain('EXPORTED STATE')
@@ -113,19 +113,19 @@ describe('exportImport utilities', () => {
   })
 
   describe('generateFilename', () => {
-    it('должен генерировать имя файла с timestamp', () => {
+    it('should generate name fileа с timestamp', () => {
       const filename = generateFilename('json')
 
       expect(filename).toMatch(/nexus-state-export-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.json/)
     })
 
-    it('должен использовать правильное расширение для markdown', () => {
+    it('should use correct extension for markdown', () => {
       const filename = generateFilename('markdown')
 
       expect(filename).toMatch(/\.md$/)
     })
 
-    it('должен использовать правильное расширение для plaintext', () => {
+    it('should use correct extension for plaintext', () => {
       const filename = generateFilename('plaintext')
 
       expect(filename).toMatch(/\.txt$/)
@@ -133,14 +133,14 @@ describe('exportImport utilities', () => {
   })
 
   describe('validateExportedState', () => {
-    it('должен возвращать false для невалидных данных', () => {
+    it('should return false for невалидных data', () => {
       expect(validateExportedState(null)).toBe(false)
       expect(validateExportedState({})).toBe(false)
       expect(validateExportedState({ snapshots: [] })).toBe(false)
       expect(validateExportedState({ version: '1.0' })).toBe(false)
     })
 
-    it('должен возвращать true для валидных данных', () => {
+    it('should return true for валидных data', () => {
       const validData = {
         version: '1.0',
         exportedAt: Date.now(),
@@ -157,7 +157,7 @@ describe('exportImport utilities', () => {
       expect(validateExportedState(validData)).toBe(true)
     })
 
-    it('должен проверять каждый снимок', () => {
+    it('should check each snapshot', () => {
       const invalidData = {
         version: '1.0',
         exportedAt: Date.now(),
@@ -176,7 +176,7 @@ describe('exportImport utilities', () => {
   })
 
   describe('exportState', () => {
-    it('должен экспортировать все снимки при range=all', () => {
+    it('should export all snapshots при range=all', () => {
       const mockSnapshots = [
         {
           id: 'snap-1',
@@ -200,7 +200,7 @@ describe('exportImport utilities', () => {
       expect(result.snapshots[0].id).toBe('snap-1')
     })
 
-    it('должен экспортировать только текущий снимок при range=current', () => {
+    it('should export only current snapshot при range=current', () => {
       const mockSnapshot = {
         id: 'current-snap',
         metadata: { timestamp: Date.now(), action: 'edit', atomCount: 1 },
@@ -222,7 +222,7 @@ describe('exportImport utilities', () => {
       expect(result.snapshots[0].id).toBe('current-snap')
     })
 
-    it('должен фильтровать снимки при range=selected', () => {
+    it('should filter snapshots при range=selected', () => {
       const mockSnapshots = [
         {
           id: 'snap-1',
@@ -254,7 +254,7 @@ describe('exportImport utilities', () => {
   })
 
   describe('exportAsBlob', () => {
-    it('должен создавать Blob с JSON данными', () => {
+    it('should create Blob с JSON data', () => {
       vi.mocked(editorTimeTravel.getHistory).mockReturnValue([])
       vi.mocked(editorTimeTravel.getCurrentSnapshot).mockReturnValue(null)
 
@@ -270,7 +270,7 @@ describe('exportImport utilities', () => {
       expect(blob.type).toBe('application/json')
     })
 
-    it('должен создавать Blob с HTML данными', () => {
+    it('should create Blob с HTML data', () => {
       vi.mocked(editorTimeTravel.getHistory).mockReturnValue([])
       vi.mocked(editorTimeTravel.getCurrentSnapshot).mockReturnValue(null)
 
@@ -285,7 +285,7 @@ describe('exportImport utilities', () => {
       expect(blob.type).toBe('text/html')
     })
 
-    it('должен создавать Blob с Markdown данными', () => {
+    it('should create Blob с Markdown data', () => {
       vi.mocked(editorTimeTravel.getHistory).mockReturnValue([])
       vi.mocked(editorTimeTravel.getCurrentSnapshot).mockReturnValue(null)
 
@@ -302,7 +302,7 @@ describe('exportImport utilities', () => {
   })
 
   describe('importState', () => {
-    it('должен очищать историю при стратегии replace', () => {
+    it('should очищать историю при стратегии replace', () => {
       const mockData = {
         version: '1.0',
         exportedAt: Date.now(),
@@ -318,7 +318,7 @@ describe('exportImport utilities', () => {
       expect(editorTimeTravel.clearHistory).toHaveBeenCalled()
     })
 
-    it('должен возвращать успех при успешном импорте', () => {
+    it('should return успех при успешном импорте', () => {
       const mockData = {
         version: '1.0',
         exportedAt: Date.now(),
@@ -344,7 +344,7 @@ describe('exportImport utilities', () => {
       expect(result.importedCount).toBeGreaterThan(0)
     })
 
-    it('должен возвращать ошибку при невалидных данных', () => {
+    it('should return ошибку при невалидных data', () => {
       const result = importState({
         strategy: 'replace',
         data: { snapshots: 'invalid' } as any
@@ -356,7 +356,7 @@ describe('exportImport utilities', () => {
   })
 
   describe('readFileAsJson', () => {
-    it('должен читать файл и парсить JSON', async () => {
+    it('should читать file и парсить JSON', async () => {
       const mockData = { test: 'data' }
       const mockFile = new Blob([JSON.stringify(mockData)], { type: 'application/json' })
 
@@ -365,7 +365,7 @@ describe('exportImport utilities', () => {
       expect(result).toEqual(mockData)
     })
 
-    it('должен выбрасывать ошибку при невалидном JSON', async () => {
+    it('should выбрасывать ошибку при невалидном JSON', async () => {
       const mockFile = new Blob(['invalid json'], { type: 'application/json' })
 
       await expect(readFileAsJson(mockFile as File)).rejects.toThrow('Invalid JSON format')
@@ -373,7 +373,7 @@ describe('exportImport utilities', () => {
   })
 
   describe('downloadFile', () => {
-    it('должен создавать ссылку для скачивания', () => {
+    it('should create ссылку for скачивания', () => {
       const blob = new Blob(['test'], { type: 'text/plain' })
       const createElementSpy = vi.spyOn(document, 'createElement')
       const appendChildSpy = vi.spyOn(document.body, 'appendChild')
@@ -396,12 +396,12 @@ describe('exportImport utilities', () => {
       navigator.clipboard = originalClipboard
     })
 
-    it('должен копировать текст в буфер', async () => {
+    it('should copy text to clipboard', async () => {
       const writeTextSpy = vi.fn().mockResolvedValue(undefined)
-      // @ts-ignore - мокаем clipboard
+      // @ts-ignore - mock clipboard
       navigator.clipboard = { writeText: writeTextSpy }
       
-      // Мокаем blob.text()
+      // Mock blob.text()
       const blob = { text: vi.fn().mockResolvedValue('test') } as any
 
       const result = await copyToClipboard(blob)
@@ -410,12 +410,12 @@ describe('exportImport utilities', () => {
       expect(writeTextSpy).toHaveBeenCalledWith('test')
     })
 
-    it('должен возвращать false при ошибке', async () => {
+    it('should return false on error', async () => {
       const writeTextSpy = vi.fn().mockRejectedValue(new Error('Failed'))
-      // @ts-ignore - мокаем clipboard
+      // @ts-ignore - mock clipboard
       navigator.clipboard = { writeText: writeTextSpy }
       
-      // Мокаем blob.text() с ошибкой
+      // Mock blob.text() with error
       const blob = { text: vi.fn().mockRejectedValue(new Error('Failed')) } as any
 
       const result = await copyToClipboard(blob)

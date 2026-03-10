@@ -3,21 +3,21 @@ import { useTimeTravel } from '@/hooks/useTimeTravel'
 import './TimelineSlider.css'
 
 export interface TimelineSliderProps {
-  /** Высота компонента */
+  /** Component height */
   height?: number
-  /** Показывать ли текущую позицию */
+  /** Show current position indicator */
   showCurrentIndicator?: boolean
-  /** Показывать ли подписи к точкам */
+  /** Show labels for points */
   showLabels?: boolean
-  /** Скорость анимации при клике (мс) */
+  /** Click animation speed (ms) */
   animationDuration?: number
-  /** Обработчик изменения позиции */
+  /** Position change handler */
   onPositionChange?: (position: number) => void
 }
 
 /**
- * Timeline Slider - компонент для визуального отображения истории снимков
- * и навигации по ним с помощью перетаскивания
+ * Timeline Slider - component for visual display of snapshot history
+ * and navigation using drag and drop
  */
 export function TimelineSlider({
   height = 80,
@@ -41,10 +41,10 @@ export function TimelineSlider({
   const startPositionRef = useRef<number>(0)
   const targetPositionRef = useRef<number>(0)
 
-  // Получаем историю снимков
+  // Get snapshot history
   const history = useTimeTravel().getHistory()
 
-  // Синхронизация displayPosition с currentPosition при внешних изменениях
+  // Sync displayPosition with currentPosition on external changes
   useEffect(() => {
     if (!isDragging && currentPosition !== displayPosition) {
       setDisplayPosition(currentPosition)
@@ -52,7 +52,7 @@ export function TimelineSlider({
   }, [currentPosition, isDragging, displayPosition])
 
   /**
-   * Анимация перехода к целевой позиции
+   * Animate to target position
    */
   const animateToPosition = useCallback((target: number) => {
     if (animationFrameRef.current) {
@@ -91,7 +91,7 @@ export function TimelineSlider({
   }, [displayPosition, animationDuration])
 
   /**
-   * Обработка изменения позиции
+   * Handle position change
    */
   const handlePositionChange = useCallback((newPosition: number) => {
     const roundedPosition = Math.round(newPosition)
@@ -103,7 +103,7 @@ export function TimelineSlider({
   }, [currentPosition, jumpTo, onPositionChange])
 
   /**
-   * Вычисление позиции точки по индексу
+   * Calculate point position by index
    */
   const getPointPosition = useCallback((index: number): number => {
     if (!sliderRef.current || snapshotsCount === 0) return 0
@@ -114,7 +114,7 @@ export function TimelineSlider({
   }, [snapshotsCount])
 
   /**
-   * Вычисление индекса снимка по X координате
+   * Calculate snapshot index from X coordinate
    */
   const getIndexFromX = useCallback((x: number): number => {
     if (!sliderRef.current || snapshotsCount === 0) return 0
@@ -132,7 +132,7 @@ export function TimelineSlider({
   }, [snapshotsCount])
 
   /**
-   * Обработка начала перетаскивания
+   * Handle drag start
    */
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
@@ -142,11 +142,11 @@ export function TimelineSlider({
   }, [getIndexFromX])
 
   /**
-   * Обработка перетаскивания
+   * Handle drag
    */
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!isDragging) {
-      // Показываем позицию при наведении
+      // Show position on hover
       const index = getIndexFromX(e.clientX)
       setHoveredPosition(index)
       return
@@ -157,7 +157,7 @@ export function TimelineSlider({
   }, [isDragging, getIndexFromX])
 
   /**
-   * Обработка окончания перетаскивания
+   * Handle drag end
    */
   const handleMouseUp = useCallback(() => {
     if (isDragging) {
@@ -169,7 +169,7 @@ export function TimelineSlider({
   }, [isDragging, displayPosition, handlePositionChange])
 
   /**
-   * Обработка ухода курсора
+   * Handle cursor leave
    */
   const handleMouseLeave = useCallback(() => {
     if (isDragging) {
@@ -179,14 +179,14 @@ export function TimelineSlider({
   }, [isDragging, handleMouseUp])
 
   /**
-   * Обработка клика по точке снимка
+   * Handle snapshot point click
    */
   const handlePointClick = useCallback((index: number) => {
-    animateToPosition(index)
-    setTimeout(() => {
-      handlePositionChange(index)
-    }, animationDuration)
-  }, [animateToPosition, handlePositionChange, animationDuration])
+    // Direct jump without animation for reliability
+    jumpTo(index)
+    onPositionChange?.(index)
+    setDisplayPosition(index)
+  }, [jumpTo, onPositionChange])
 
   /**
    * Keyboard navigation
@@ -222,7 +222,7 @@ export function TimelineSlider({
   }, [displayPosition, snapshotsCount, handlePositionChange])
 
   /**
-   * Очистка animation frame при размонтировании
+   * Cleanup animation frame on unmount
    */
   useEffect(() => {
     return () => {
@@ -232,7 +232,7 @@ export function TimelineSlider({
     }
   }, [])
 
-  // Если нет снимков, показываем пустой слайдер
+  // If no snapshots, show empty slider
   if (snapshotsCount === 0) {
     return (
       <div
@@ -248,12 +248,16 @@ export function TimelineSlider({
   }
 
   const roundedPosition = Math.round(displayPosition)
+  
+  // Use compact mode for many snapshots (50+)
+  const isCompactMode = snapshotsCount > 50
 
   return (
     <div
       className={`timeline-slider ${isDragging ? 'timeline-slider--dragging' : ''}`}
       data-testid="timeline-slider"
       data-position={roundedPosition}
+      data-snapshots-count={snapshotsCount}
       style={{ height: `${height}px` }}
       ref={sliderRef}
       onMouseDown={handleMouseDown}
@@ -268,9 +272,9 @@ export function TimelineSlider({
       aria-valuemax={snapshotsCount - 1}
       aria-label="Timeline slider"
     >
-      {/* Трек слайдера */}
+      {/* Slider track */}
       <div className="timeline-slider__track" data-testid="timeline-slider-track">
-        {/* Линия прогресса */}
+        {/* Progress line */}
         <div
           className="timeline-slider__progress"
           data-testid="timeline-slider-progress"
@@ -279,7 +283,7 @@ export function TimelineSlider({
           }}
         />
 
-        {/* Точки снимков */}
+        {/* Snapshot points */}
         {history.map((snapshot, index) => {
           const isCurrent = index === currentPosition
           const isHovered = hoveredPosition === index
@@ -290,6 +294,7 @@ export function TimelineSlider({
               key={snapshot.id}
               className={`
                 timeline-slider__point
+                ${isCompactMode ? 'timeline-slider__point--compact' : ''}
                 ${isCurrent ? 'timeline-slider__point--current' : ''}
                 ${isHovered ? 'timeline-slider__point--hovered' : ''}
                 ${isPassed ? 'timeline-slider__point--passed' : ''}
@@ -306,10 +311,10 @@ export function TimelineSlider({
               tabIndex={-1}
               aria-label={`Snapshot ${index + 1} of ${snapshotsCount}`}
             >
-              {/* Визуальный индикатор точки */}
+              {/* Point visual indicator */}
               <div className="timeline-slider__point-dot" />
 
-              {/* Подпись (опционально) */}
+              {/* Label (optional) */}
               {showLabels && (
                 <div className="timeline-slider__point-label">
                   {index + 1}
@@ -319,7 +324,7 @@ export function TimelineSlider({
           )
         })}
 
-        {/* Текущий индикатор позиции */}
+        {/* Current position indicator */}
         {showCurrentIndicator && (
           <div
             className="timeline-slider__indicator"
@@ -334,7 +339,7 @@ export function TimelineSlider({
         )}
       </div>
 
-      {/* Информация о позиции */}
+      {/* Position information */}
       <div className="timeline-slider__info" data-testid="timeline-slider-info">
         <span className="timeline-slider__position">
           {roundedPosition + 1} / {snapshotsCount}

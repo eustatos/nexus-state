@@ -1,5 +1,5 @@
 /**
- * Тесты для функций jumpToSnapshot и checkDeltaThreshold
+ * Tests for функций jumpToSnapshot и checkDeltaThreshold
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
@@ -23,7 +23,7 @@ describe('checkDeltaThreshold', () => {
     }
   })
 
-  it('должен возвращать minor для снимков без delta', () => {
+  it('should return minor for снимков без delta', () => {
     const snapshot = createSnapshot(undefined)
     const result = checkDeltaThreshold(snapshot)
 
@@ -36,7 +36,7 @@ describe('checkDeltaThreshold', () => {
     })
   })
 
-  it('должен возвращать minor для небольших изменений (< 50)', () => {
+  it('should return minor for небольших changes (< 50)', () => {
     const snapshot = createSnapshot({ added: 20, removed: 10, type: 'insert' })
     const result = checkDeltaThreshold(snapshot)
 
@@ -49,7 +49,7 @@ describe('checkDeltaThreshold', () => {
     })
   })
 
-  it('должен возвращать moderate для изменений от 50 до 200', () => {
+  it('should return moderate for changes от 50 до 200', () => {
     const snapshot = createSnapshot({ added: 100, removed: 50, type: 'insert' })
     const result = checkDeltaThreshold(snapshot)
 
@@ -58,7 +58,7 @@ describe('checkDeltaThreshold', () => {
     expect(result.totalChanges).toBe(150)
   })
 
-  it('должен возвращать significant для изменений от 200 до 500', () => {
+  it('should return significant for changes от 200 до 500', () => {
     const snapshot = createSnapshot({ added: 300, removed: 100, type: 'replace' })
     const result = checkDeltaThreshold(snapshot)
 
@@ -67,7 +67,7 @@ describe('checkDeltaThreshold', () => {
     expect(result.totalChanges).toBe(400)
   })
 
-  it('должен возвращать major для изменений > 500 и требовать подтверждения', () => {
+  it('should return major for changes > 500 и требовать подтверждения', () => {
     const snapshot = createSnapshot({ added: 400, removed: 200, type: 'replace' })
     const result = checkDeltaThreshold(snapshot)
 
@@ -76,7 +76,7 @@ describe('checkDeltaThreshold', () => {
     expect(result.totalChanges).toBe(600)
   })
 
-  it('должен корректно обрабатывать только добавления', () => {
+  it('should корректно обрабатывать only добавления', () => {
     const snapshot = createSnapshot({ added: 600, removed: 0, type: 'insert' })
     const result = checkDeltaThreshold(snapshot)
 
@@ -86,7 +86,7 @@ describe('checkDeltaThreshold', () => {
     expect(result.removed).toBe(0)
   })
 
-  it('должен корректно обрабатывать только удаления', () => {
+  it('should корректно обрабатывать only удаления', () => {
     const snapshot = createSnapshot({ added: 0, removed: 600, type: 'delete' })
     const result = checkDeltaThreshold(snapshot)
 
@@ -96,7 +96,7 @@ describe('checkDeltaThreshold', () => {
     expect(result.removed).toBe(600)
   })
 
-  it('должен обрабатывать пограничное значение 50 (minor/moderate)', () => {
+  it('should обрабатывать пограничное value 50 (minor/moderate)', () => {
     const snapshot50 = createSnapshot({ added: 30, removed: 20, type: 'insert' })
     const result50 = checkDeltaThreshold(snapshot50)
     expect(result50.changeType).toBe('minor')
@@ -106,7 +106,7 @@ describe('checkDeltaThreshold', () => {
     expect(result51.changeType).toBe('moderate')
   })
 
-  it('должен обрабатывать пограничное значение 200 (moderate/significant)', () => {
+  it('should обрабатывать пограничное value 200 (moderate/significant)', () => {
     const snapshot200 = createSnapshot({ added: 100, removed: 100, type: 'insert' })
     const result200 = checkDeltaThreshold(snapshot200)
     expect(result200.changeType).toBe('moderate')
@@ -116,7 +116,7 @@ describe('checkDeltaThreshold', () => {
     expect(result201.changeType).toBe('significant')
   })
 
-  it('должен обрабатывать пограничное значение 500 (significant/major)', () => {
+  it('should обрабатывать пограничное value 500 (significant/major)', () => {
     const snapshot500 = createSnapshot({ added: 250, removed: 250, type: 'replace' })
     const result500 = checkDeltaThreshold(snapshot500)
     expect(result500.changeType).toBe('significant')
@@ -130,7 +130,7 @@ describe('checkDeltaThreshold', () => {
 })
 
 describe('DELTA_THRESHOLDS', () => {
-  it('должен иметь правильные пороговые значения', () => {
+  it('should иметь правильные пороговые value', () => {
     expect(DELTA_THRESHOLDS.minor).toBe(50)
     expect(DELTA_THRESHOLDS.moderate).toBe(200)
     expect(DELTA_THRESHOLDS.significant).toBe(500)
@@ -152,10 +152,10 @@ describe('jumpToSnapshot', () => {
     window.confirm = originalConfirm
   })
 
-  it('должен вызывать confirm для major изменений', () => {
-    // Этот тест требует интеграции с editorTimeTravel
-    // Проверяем только логику вызова confirm
-    mockConfirm.mockReturnValue(false) // Пользователь отменяет
+  it('should вызывать confirm for major changes', () => {
+    // Этот test требует интеграции с editorTimeTravel
+    // Проверяем only логику вызова confirm
+    mockConfirm.mockReturnValue(false) // User отменяет
 
     expect(mockConfirm).not.toHaveBeenCalled()
 
@@ -168,7 +168,7 @@ describe('jumpToSnapshot', () => {
     expect(mockConfirm).toHaveBeenCalledWith('Test message')
   })
 
-  it('должен пропускать confirm при skipConfirmation: true', () => {
+  it('should пропускать confirm при skipConfirmation: true', () => {
     mockConfirm.mockReturnValue(true)
 
     // Симуляция пропуска подтверждения

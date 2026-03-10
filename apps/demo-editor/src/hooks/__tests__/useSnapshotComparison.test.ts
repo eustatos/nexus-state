@@ -1,5 +1,5 @@
 /**
- * Тесты для хука useSnapshotComparison
+ * Tests for hookа useSnapshotComparison
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -7,7 +7,7 @@ import { renderHook, act } from '@testing-library/react'
 import { useSnapshotComparison } from '../useSnapshotComparison'
 import { editorTimeTravel } from '@/store/timeTravel'
 
-// Моки для editorTimeTravel
+// Mocks for editorTimeTravel
 vi.mock('@/store/timeTravel', () => ({
   editorTimeTravel: {
     compareSnapshots: vi.fn(),
@@ -20,7 +20,7 @@ describe('useSnapshotComparison', () => {
     vi.clearAllMocks()
   })
 
-  it('должен возвращать начальное состояние', () => {
+  it('should return начальное состояние', () => {
     const { result } = renderHook(() => useSnapshotComparison())
 
     expect(result.current.baseline).toBeNull()
@@ -30,7 +30,7 @@ describe('useSnapshotComparison', () => {
     expect(result.current.isComparing).toBe(false)
   })
 
-  it('должен позволять выбрать базовый снимок', () => {
+  it('should позволять выбрать базовый snapshot', () => {
     const mockSnapshot = {
       id: 'snapshot-1',
       state: {},
@@ -51,7 +51,7 @@ describe('useSnapshotComparison', () => {
     expect(result.current.comparison).toBeNull()
   })
 
-  it('должен позволять выбрать снимок для сравнения', () => {
+  it('should позволять выбрать snapshot for comparison', () => {
     const mockSnapshot = {
       id: 'snapshot-2',
       state: {},
@@ -72,7 +72,7 @@ describe('useSnapshotComparison', () => {
     expect(result.current.baseline).toBeNull()
   })
 
-  it('должен выполнять автоматическое сравнение при выборе обоих снимков', async () => {
+  it('should выполнять автоматическое comparison при выборе обоих снимков', async () => {
     const mockSnapshot1 = {
       id: 'snapshot-1',
       state: { content: { value: 'Hello', type: 'writable' } },
@@ -130,7 +130,7 @@ describe('useSnapshotComparison', () => {
       result.current.selectComparison(mockSnapshot2)
     })
 
-    // Ждем выполнения асинхронного сравнения
+    // Ждем выполнения асинхронного comparison
     await new Promise(resolve => setTimeout(resolve, 10))
 
     expect(editorTimeTravel.compareSnapshots).toHaveBeenCalledWith(
@@ -144,7 +144,7 @@ describe('useSnapshotComparison', () => {
     )
   })
 
-  it('должен позволять изменить режим отображения', () => {
+  it('should позволять изменить mode display', () => {
     const { result } = renderHook(() => useSnapshotComparison())
 
     act(() => {
@@ -160,7 +160,7 @@ describe('useSnapshotComparison', () => {
     expect(result.current.mode).toBe('unified')
   })
 
-  it('должен сбрасывать выбор при вызове reset', () => {
+  it('should сбрасывать выбор при вызове reset', () => {
     const mockSnapshot1 = {
       id: 'snapshot-1',
       state: {},
@@ -200,7 +200,7 @@ describe('useSnapshotComparison', () => {
     expect(result.current.result).toBeNull()
   })
 
-  it('должен возвращать isComparing=true когда оба снимка выбраны', () => {
+  it('should return isComparing=true когда оба снимка выбраны', () => {
     const mockSnapshot1 = {
       id: 'snapshot-1',
       state: {},
@@ -233,7 +233,7 @@ describe('useSnapshotComparison', () => {
     expect(result.current.isComparing).toBe(true)
   })
 
-  it('должен отключать autoCompare при установке autoCompare: false', () => {
+  it('should отключать autoCompare при установке autoCompare: false', () => {
     const mockSnapshot1 = {
       id: 'snapshot-1',
       state: {},
@@ -264,7 +264,7 @@ describe('useSnapshotComparison', () => {
       result.current.selectComparison(mockSnapshot2)
     })
 
-    // compareSnapshots не должен вызываться автоматически
+    // compareSnapshots не should вызываться автоматически
     expect(editorTimeTravel.compareSnapshots).not.toHaveBeenCalled()
   })
 })

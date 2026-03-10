@@ -4,50 +4,50 @@ import { getHistory, jumpToSnapshot, undo, redo, canUndo, canRedo } from '@/stor
 import { editorTimeTravel } from '@/store/timeTravel'
 
 export interface UseSnapshotsReturn {
-  /** Все снимки, отсортированные по времени (новые сверху) */
+  /** All snapshots sorted by time (newest first) */
   snapshots: Snapshot[]
-  /** Индекс текущего снимка в истории */
+  /** Current snapshot index in history */
   currentIndex: number
-  /** Общее количество снимков */
+  /** Total number of snapshots */
   totalCount: number
-  /** Перейти к снимку по индексу */
+  /** Jump to snapshot by index */
   jumpTo: (index: number) => boolean
-  /** Отменить последнее изменение */
+  /** Undo last change */
   undo: () => boolean
-  /** Повторить отмененное изменение */
+  /** Redo undone change */
   redo: () => boolean
-  /** Можно ли отменить */
+  /** Can undo */
   canUndo: boolean
-  /** Можно ли повторить */
+  /** Can redo */
   canRedo: boolean
-  /** Поисковый запрос */
+  /** Search query */
   searchQuery: string
-  /** Установить поисковый запрос */
+  /** Set search query */
   setSearchQuery: (query: string) => void
-  /** Фильтр по типу действия */
+  /** Filter by action type */
   actionFilter: string
-  /** Установить фильтр по действию */
+  /** Set action filter */
   setActionFilter: (action: string) => void
-  /** Отфильтрованные снимки */
+  /** Filtered snapshots */
   filteredSnapshots: Snapshot[]
-  /** Обновить список снимков (force re-fetch) */
+  /** Update snapshot list (force re-fetch) */
   refresh: () => void
 }
 
 export interface UseSnapshotsOptions {
-  /** Включить поиск */
+  /** Enable search */
   enableSearch?: boolean
-  /** Включить фильтр по действиям */
+  /** Enable action filter */
   enableActionFilter?: boolean
-  /** Автоматическое обновление при изменениях */
+  /** Auto-refresh on changes */
   autoRefresh?: boolean
 }
 
 /**
- * Хук для работы со списком снимков time-travel
+ * Hook for working with time-travel snapshot list
  *
- * @param options - Опции хука
- * @returns Объект с данными и методами управления снимками
+ * @param options - Hook options
+ * @returns Object with snapshot data and management methods
  */
 export function useSnapshots(
   options: UseSnapshotsOptions = {}
@@ -58,44 +58,44 @@ export function useSnapshots(
     autoRefresh = true
   } = options
 
-  // Состояние для принудительного обновления списка
+  // State for forcing list update
   const [version, forceUpdate] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [actionFilter, setActionFilter] = useState('')
 
-  // Получаем снимки из истории
+  // Get snapshots from history
   const getSnapshots = useCallback((): Snapshot[] => {
     return getHistory()
   }, [])
 
-  // Находим индекс текущего снимка в истории (до сортировки)
-  // Возвращаем -1 если мы не на самом новом снимке (есть redo)
-  // Возвращаем snapshots.length - 1 если мы на самом новом снимке
+  // Find current snapshot index in history (before sorting)
+  // Returns -1 if not on the newest snapshot (has redo)
+  // Returns snapshots.length - 1 if on the newest snapshot
   const getCurrentIndex = useCallback((): number => {
     const snapshots = getSnapshots()
     if (snapshots.length === 0) return -1
 
-    // Если canRedo = false, значит мы на последнем снимке (самом новом)
-    // Если canRedo = true, значит мы откатились назад
+    // If canRedo = false, we're on the last snapshot (newest)
+    // If canRedo = true, we've scrolled back
     if (!canRedo()) {
-      return snapshots.length - 1 // На последнем снимке (новый)
+      return snapshots.length - 1 // On the last snapshot (newest)
     }
 
-    // Мы откатились назад - возвращаем -1 чтобы не подсвечивать ни один снимок как "Current"
+    // We've scrolled back - return -1 to not highlight any snapshot as "Current"
     return -1
   }, [getSnapshots, canRedo])
 
-  // Обновляем список снимков
+  // Update snapshot list
   const refresh = useCallback(() => {
     if (autoRefresh) {
       forceUpdate(n => n + 1)
     }
   }, [autoRefresh])
 
-  // Все снимки, отсортированные по времени (новые сверху)
+  // All snapshots sorted by time (newest first)
   const snapshots = useMemo(() => {
     const allSnapshots = getSnapshots()
-    // Сортируем по timestamp (новые сверху)
+    // Sort by timestamp (newest first)
     return [...allSnapshots].sort(
       (a, b) => b.metadata.timestamp - a.metadata.timestamp
     )
@@ -104,10 +104,10 @@ export function useSnapshots(
   const currentIndex = getCurrentIndex()
   const totalCount = snapshots.length
 
-  // Фильтрация снимков
+  // Filter snapshots
   const filteredSnapshots = useMemo(() => {
     return snapshots.filter(snapshot => {
-      // Поиск по действию и timestamp
+      // Search by action and timestamp
       if (enableSearch && searchQuery) {
         const query = searchQuery.toLowerCase()
         const action = snapshot.metadata.action?.toLowerCase() || ''
@@ -118,7 +118,7 @@ export function useSnapshots(
         }
       }
 
-      // Фильтр по типу действия
+      // Filter by action type
       if (enableActionFilter && actionFilter) {
         if (snapshot.metadata.action !== actionFilter) {
           return false
@@ -129,41 +129,41 @@ export function useSnapshots(
     })
   }, [snapshots, enableSearch, searchQuery, enableActionFilter, actionFilter])
 
-  // Перейти к снимку по индексу
+  // Jump to snapshot by index
   const jumpTo = useCallback((uiIndex: number): boolean => {
-    // uiIndex - это индекс в UI (отсортированном списке, 0 = самый новый)
-    // historyIndex - это индекс в истории (0 = самый старый)
-    // Преобразование: historyIndex = totalCount - 1 - uiIndex
+    // uiIndex is index in UI (sorted list, 0 = newest)
+    // historyIndex is index in history (0 = oldest)
+    // Conversion: historyIndex = totalCount - 1 - uiIndex
     const historyIndex = totalCount - 1 - uiIndex
     const result = jumpToSnapshot(historyIndex)
     refresh()
     return result
   }, [refresh, totalCount])
 
-  // Отмена
+  // Undo
   const handleUndo = useCallback((): boolean => {
     const result = undo()
     refresh()
     return result
   }, [refresh])
 
-  // Повтор
+  // Redo
   const handleRedo = useCallback((): boolean => {
     const result = redo()
     refresh()
     return result
   }, [refresh])
 
-  // Подписка на события time-travel для автообновления
+  // Subscribe to time-travel events for auto-refresh
   useEffect(() => {
     if (!autoRefresh) return
 
-    // Подписка на события создания снимков
+    // Subscribe to snapshot creation events
     const unsubscribeSnapshots = editorTimeTravel.subscribeToSnapshots(() => {
       refresh()
     })
 
-    // Подписка на события навигации (undo/redo/jump)
+    // Subscribe to navigation events (undo/redo/jump)
     const unsubscribeUndo = editorTimeTravel.subscribe('undo', () => {
       refresh()
     })

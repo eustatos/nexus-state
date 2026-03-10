@@ -1,5 +1,5 @@
 /**
- * Тесты для ImportModal
+ * Tests for ImportModal
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -7,7 +7,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ImportModal } from '../ImportModal'
 import { useExportImport } from '@/hooks/useExportImport'
 
-// Моки для хука
+// Mocks for hookа
 vi.mock('@/hooks/useExportImport', () => ({
   useExportImport: vi.fn()
 }))
@@ -23,7 +23,7 @@ describe('ImportModal', () => {
     onClose: vi.fn()
   }
 
-  it('должен рендерить модальное окно', () => {
+  it('should рендерить модальное окно', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -49,7 +49,7 @@ describe('ImportModal', () => {
     expect(screen.getByText('Import State')).toBeInTheDocument()
   })
 
-  it('должен закрываться при клике на кнопку закрытия', () => {
+  it('should закрываться при клике на кнопку close', () => {
     const onClose = vi.fn()
 
     mockUseExportImport.mockReturnValue({
@@ -73,7 +73,7 @@ describe('ImportModal', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  it('должен иметь drag & drop зону', () => {
+  it('should иметь drag & drop зону', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -95,7 +95,7 @@ describe('ImportModal', () => {
     expect(dropZone).toHaveAttribute('role', 'button')
   })
 
-  it('должен иметь textarea для вставки JSON', () => {
+  it('should иметь textarea for вставки JSON', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -115,7 +115,7 @@ describe('ImportModal', () => {
     expect(screen.getByTestId('import-textarea')).toBeInTheDocument()
   })
 
-  it('должен показывать preview после загрузки файла', async () => {
+  it('should show preview после загрузки fileа', async () => {
     const handleFileUpload = vi.fn().mockResolvedValue({
       version: '1.0',
       exportedAt: Date.now(),
@@ -142,7 +142,7 @@ describe('ImportModal', () => {
 
     render(<ImportModal onClose={defaultProps.onClose} />)
 
-    // Симулируем загрузку файла через handleFileUpload
+    // Симулируем загрузку fileа через handleFileUpload
     await act(async () => {
       await handleFileUpload(new Blob(['{}'], { type: 'application/json' }) as File)
     })
@@ -151,7 +151,7 @@ describe('ImportModal', () => {
     expect(screen.queryByTestId('import-preview')).toBeInTheDocument()
   })
 
-  it('должен позволять выбрать стратегию импорта', () => {
+  it('should позволять выбрать стратегию import', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -173,7 +173,7 @@ describe('ImportModal', () => {
 
     render(<ImportModal onClose={defaultProps.onClose} />)
 
-    // Проверяем опции стратегии
+    // Проверяем options стратегии
     expect(screen.getByTestId('strategy-replace')).toBeInTheDocument()
     expect(screen.getByTestId('strategy-append')).toBeInTheDocument()
 
@@ -181,7 +181,7 @@ describe('ImportModal', () => {
     expect(screen.getByTestId('strategy-replace')).toBeChecked()
   })
 
-  it('должен показывать ошибку при невалидном JSON', async () => {
+  it('should show ошибку при невалидном JSON', async () => {
     const handleFileUpload = vi.fn().mockRejectedValue(new Error('Invalid JSON'))
 
     mockUseExportImport.mockReturnValue({
@@ -212,7 +212,7 @@ describe('ImportModal', () => {
     expect(screen.queryByTestId('import-paste-error')).toBeInTheDocument()
   })
 
-  it('должен вызывать onImportSuccess при успешном импорте', async () => {
+  it('should вызывать onImportSuccess при успешном импорте', async () => {
     const onImportSuccess = vi.fn()
     const importState = vi.fn().mockReturnValue({
       success: true,
@@ -244,7 +244,7 @@ describe('ImportModal', () => {
     expect(screen.getByTestId('import-confirm-button')).toBeInTheDocument()
   })
 
-  it('должен показывать статус импорта', () => {
+  it('should show статус import', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -265,7 +265,7 @@ describe('ImportModal', () => {
     expect(screen.getByText('Import successful')).toBeInTheDocument()
   })
 
-  it('должен отключать кнопки во время импорта', () => {
+  it('should отключать кнопки во время import', () => {
     mockUseExportImport.mockReturnValue({
       exportState: vi.fn(),
       exportAsBlob: vi.fn(),
@@ -286,7 +286,7 @@ describe('ImportModal', () => {
   })
 })
 
-// Helper для act
+// Helper for act
 async function act<T>(fn: () => Promise<T>): Promise<void> {
   return fn()
 }

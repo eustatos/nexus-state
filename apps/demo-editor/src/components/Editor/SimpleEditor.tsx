@@ -11,7 +11,7 @@ export interface SimpleEditorProps {
 }
 
 /**
- * Простой компонент редактора на базе textarea
+ * Простой component editorа на базе textarea
  */
 export function SimpleEditor({
   readOnly = false,
@@ -23,7 +23,7 @@ export function SimpleEditor({
   const setCursor = useSetAtom(cursorAtom, editorStore)
   const setIsSaving = useSetAtom(isSavingAtom, editorStore)
 
-  // Хук для debounce создания снимков
+  // Hook для debounce создания снимков
   const { captureSnapshot, resetPreviousContent } = useDebounceSnapshots({
     delay: 1000,
     maxWait: 5000,

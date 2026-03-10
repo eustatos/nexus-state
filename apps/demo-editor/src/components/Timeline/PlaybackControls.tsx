@@ -3,20 +3,20 @@ import { Play, Pause, Square, Repeat } from 'lucide-react'
 import './PlaybackControls.css'
 
 export interface PlaybackControlsProps {
-  /** Класс для кастомизации */
+  /** Class для customization */
   className?: string
-  /** Показывать ли расширенные контролы */
+  /** Show ли расширенные контролы */
   showExtended?: boolean
-  /** Компактный режим для footer */
+  /** Компактный mode для footer */
   size?: 'compact' | 'full'
-  /** Обработчик изменения скорости */
+  /** Handler changes скорости */
   onSpeedChange?: (speed: number) => void
 }
 
 /**
- * Компонент управления воспроизведением истории
+ * Component управления воспроизведением истории
  *
- * @param props - Пропсы компонента
+ * @param props - Props componentа
  */
 export function PlaybackControls({
   className = '',

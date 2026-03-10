@@ -4,26 +4,26 @@ import { contentAtom } from './atoms/editor'
 import type { Snapshot } from '@nexus-state/core'
 
 /**
- * Метаданные для снимка time-travel
+ * Metadata for time-travel snapshot
  */
 export interface SnapshotMetadata {
-  /** Тип действия */
+  /** Action type */
   action?: 'text-edit' | 'paste' | 'delete' | 'bulk-edit' | 'manual-save' | 'initial'
-  /** Delta изменений */
+  /** Delta changes */
   delta?: {
     added: number
     removed: number
     type: 'insert' | 'delete' | 'replace' | 'empty'
     netChange?: number
   }
-  /** Триггер создания снимка */
+  /** Snapshot creation trigger */
   trigger?: 'debounce' | 'maxWait' | 'manual'
-  /** Дополнительная информация */
+  /** Additional information */
   [key: string]: any
 }
 
 /**
- * Расширенный снимок с дополнительными метаданными
+ * Extended snapshot with additional metadata
  */
 export interface ExtendedSnapshot extends Snapshot {
   metadata: SnapshotMetadata & {
@@ -34,40 +34,40 @@ export interface ExtendedSnapshot extends Snapshot {
 }
 
 /**
- * Результат проверки delta для подтверждения
+ * Delta check result for confirmation
  */
 export interface DeltaThresholdCheck {
-  /** Требуется ли подтверждение */
+  /** Whether confirmation is required */
   requiresConfirmation: boolean
-  /** Общее количество изменений */
+  /** Total number of changes */
   totalChanges: number
-  /** Добавлено символов */
+  /** Characters added */
   added: number
-  /** Удалено символов */
+  /** Characters removed */
   removed: number
-  /** Тип изменений */
+  /** Change type */
   changeType: 'minor' | 'moderate' | 'significant' | 'major'
 }
 
 /**
- * Пороговые значения для подтверждения больших изменений
+ * Threshold values for confirming large changes
  */
 export const DELTA_THRESHOLDS = {
-  /** Minor: менее 50 изменений - без подтверждения */
+  /** Minor: less than 50 changes - no confirmation */
   minor: 50,
-  /** Moderate: 50-200 изменений - визуальная индикация */
+  /** Moderate: 50-200 changes - visual indication */
   moderate: 200,
-  /** Significant: 200-500 изменений - рекомендуется подтверждение */
+  /** Significant: 200-500 changes - confirmation recommended */
   significant: 500,
-  /** Major: более 500 изменений - требуется подтверждение */
+  /** Major: more than 500 changes - confirmation required */
   major: Infinity
 } as const
 
 /**
- * Создать снимок состояния
+ * Capture a state snapshot
  *
- * @param action - Название действия для истории
- * @returns Созданный снимок или undefined если не удалось
+ * @param action - Action name for history
+ * @returns Created snapshot or undefined if failed
  */
 export function captureSnapshot(
   action: string = 'text-edit'
@@ -76,10 +76,10 @@ export function captureSnapshot(
 }
 
 /**
- * Проверить delta снимка на пороговые значения
+ * Check snapshot delta against threshold values
  *
- * @param snapshot - Снимок для проверки
- * @returns Результат проверки порога
+ * @param snapshot - Snapshot to check
+ * @returns Threshold check result
  */
 export function checkDeltaThreshold(
   snapshot: ExtendedSnapshot
@@ -120,12 +120,12 @@ export function checkDeltaThreshold(
 }
 
 /**
- * Перейти к снимку по индексу
+ * Jump to a snapshot by index
  *
- * @param index - Индекс снимка в истории (0-based)
- * @param options - Опции перехода
- * @param options.skipConfirmation - Пропустить подтверждение для больших delta
- * @returns true если переход успешен
+ * @param index - Snapshot index in history (0-based)
+ * @param options - Jump options
+ * @param options.skipConfirmation - Skip confirmation for large delta
+ * @returns true if jump was successful
  */
 export function jumpToSnapshot(
   index: number,
@@ -143,13 +143,13 @@ export function jumpToSnapshot(
   console.log('[jumpToSnapshot] snapshot state:', snapshot.state)
   console.log('[jumpToSnapshot] snapshot state editor.content:', snapshot.state['editor.content'])
 
-  // Проверяем delta для больших изменений
+  // Check delta for large changes
   if (!options.skipConfirmation) {
     const deltaCheck = checkDeltaThreshold(snapshot)
 
     if (deltaCheck.requiresConfirmation) {
-      const message = `Переход к этому снимку изменит ${deltaCheck.totalChanges} символов` +
-        ` (+${deltaCheck.added}/-${deltaCheck.removed}). Продолжить?`
+      const message = `Jumping to this snapshot will change ${deltaCheck.totalChanges} characters` +
+        ` (+${deltaCheck.added}/-${deltaCheck.removed}). Continue?`
 
       if (!window.confirm(message)) {
         return false
@@ -160,61 +160,61 @@ export function jumpToSnapshot(
   console.log('[jumpToSnapshot] calling editorTimeTravel.jumpTo')
   const result = editorTimeTravel.jumpTo(index)
   console.log('[jumpToSnapshot] editorTimeTravel.jumpTo result:', result)
-  
-  // Проверяем content сразу после jumpTo
+
+  // Check content immediately after jumpTo
   const currentValue = editorStore.get(contentAtom)
   console.log('[jumpToSnapshot] content after jumpTo:', currentValue)
-  
+
   return result
 }
 
 /**
- * Отменить последнее изменение
- * 
- * @returns true если отмена успешна
+ * Undo the last change
+ *
+ * @returns true if undo was successful
  */
 export function undo(): boolean {
   return editorTimeTravel.undo()
 }
 
 /**
- * Повторить отмененное изменение
- * 
- * @returns true если повтор успешен
+ * Redo the undone change
+ *
+ * @returns true if redo was successful
  */
 export function redo(): boolean {
   return editorTimeTravel.redo()
 }
 
 /**
- * Проверить возможность отмены
- * 
- * @returns true если есть куда отменять
+ * Check if undo is available
+ *
+ * @returns true if there is something to undo
  */
 export function canUndo(): boolean {
   return editorTimeTravel.canUndo()
 }
 
 /**
- * Проверить возможность повтора
- * 
- * @returns true если есть куда повторять
+ * Check if redo is available
+ *
+ * @returns true if there is something to redo
  */
 export function canRedo(): boolean {
   return editorTimeTravel.canRedo()
 }
 
 /**
- * Получить историю снимков
- * 
- * @returns Массив всех снимков
+ * Get snapshot history
+ *
+ * @returns Array of all snapshots
  */
 export function getHistory(): Snapshot[] {
   return editorTimeTravel.getHistory()
 }
 
 /**
- * Очистить историю снимков
+ * Clear snapshot history
  */
 export function clearHistory(): void {
   editorTimeTravel.clearHistory()
@@ -230,9 +230,9 @@ export function getCurrentSnapshot(): Snapshot | null {
 }
 
 /**
- * Получить статистику истории
- * 
- * @returns Статистика истории снимков
+ * Get history statistics
+ *
+ * @returns History statistics
  */
 export function getHistoryStats() {
   return editorTimeTravel.getHistoryStats()

@@ -3,11 +3,11 @@ import { useTimeTravel } from '@/hooks/useTimeTravel'
 import './NavigationControls.css'
 
 export interface NavigationControlsProps {
-  /** Показывать ли tooltip */
+  /** Show ли tooltip */
   showTooltip?: boolean
   /** Размер кнопок */
   size?: 'small' | 'medium' | 'large'
-  /** Обработчик навигации */
+  /** Handler навигации */
   onNavigate?: (action: 'undo' | 'redo' | 'first' | 'last') => void
 }
 
@@ -31,7 +31,7 @@ export function NavigationControls({
   } = useTimeTravel()
 
   /**
-   * Обработчик Undo
+   * Handler Undo
    */
   const handleUndo = useCallback(() => {
     if (canUndo) {
@@ -41,7 +41,7 @@ export function NavigationControls({
   }, [canUndo, undo, onNavigate])
 
   /**
-   * Обработчик Redo
+   * Handler Redo
    */
   const handleRedo = useCallback(() => {
     if (canRedo) {
@@ -51,7 +51,7 @@ export function NavigationControls({
   }, [canRedo, redo, onNavigate])
 
   /**
-   * Обработчик First
+   * Handler First
    */
   const handleFirst = useCallback(() => {
     if (currentPosition > 0) {
@@ -61,7 +61,7 @@ export function NavigationControls({
   }, [currentPosition, jumpToFirst, onNavigate])
 
   /**
-   * Обработчик Last
+   * Handler Last
    */
   const handleLast = useCallback(() => {
     if (currentPosition < snapshotsCount - 1) {

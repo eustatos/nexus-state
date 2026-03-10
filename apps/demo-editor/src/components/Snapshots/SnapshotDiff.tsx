@@ -6,27 +6,27 @@ import { X, GitCompare, ChevronLeft, ChevronRight } from 'lucide-react'
 import './SnapshotDiff.css'
 
 export interface SnapshotDiffProps {
-  /** Класс для кастомизации */
+  /** Class for customization */
   className?: string
-  /** Обработчик закрытия */
+  /** Close handler */
   onClose?: () => void
-  /** Показывать ли статистику */
+  /** Show statistics */
   showStats?: boolean
-  /** Показывать ли переключатель режимов */
+  /** Show mode switch */
   showModeSwitch?: boolean
-  /** Показывать ли информацию о снимках */
+  /** Show snapshot information */
   showSnapshotInfo?: boolean
 }
 
 /**
- * Форматирование даты
+ * Format date
  */
 function formatDateTime(timestamp: number): string {
   return new Date(timestamp).toLocaleString()
 }
 
 /**
- * Форматирование количества символов
+ * Format character count
  */
 function formatChars(count: number): string {
   if (count >= 1000) {
@@ -36,7 +36,7 @@ function formatChars(count: number): string {
 }
 
 /**
- * Подсчет количества символов в снимке
+ * Count characters in snapshot
  */
 function countChars(snapshot: any): number {
   if (!snapshot?.state) return 0
@@ -54,9 +54,9 @@ function countChars(snapshot: any): number {
 }
 
 /**
- * Компонент сравнения двух снимков
+ * Component for comparing two snapshots
  *
- * @param props - Пропсы компонента
+ * @param props - Component props
  */
 export function SnapshotDiff({
   className = '',
@@ -74,7 +74,7 @@ export function SnapshotDiff({
     reset
   } = useSnapshotComparison()
 
-  // Если нет результата сравнения, показываем пустое состояние
+  // If no comparison result, show empty state
   if (!result) {
     return (
       <div className={`snapshot-diff ${className}`} data-testid="snapshot-diff">
@@ -103,7 +103,7 @@ export function SnapshotDiff({
     <div className={`snapshot-diff ${className}`} data-testid="snapshot-diff">
       {/* Header */}
       <div className="snapshot-diff__header">
-        {/* Информация о базовом снимке */}
+        {/* Baseline snapshot information */}
         {showSnapshotInfo && baseline && (
           <div className="snapshot-diff__snapshot-info" data-testid="snapshot-diff-baseline">
             <div className="snapshot-diff__snapshot-icon">
@@ -123,7 +123,7 @@ export function SnapshotDiff({
           </div>
         )}
 
-        {/* Переключатель режимов */}
+        {/* Mode switch */}
         {showModeSwitch && (
           <div className="snapshot-diff__modes" data-testid="snapshot-diff-modes">
             <button
@@ -156,7 +156,7 @@ export function SnapshotDiff({
           </div>
         )}
 
-        {/* Информация о снимке сравнения */}
+        {/* Comparison snapshot information */}
         {showSnapshotInfo && comparison && (
           <div className="snapshot-diff__snapshot-info snapshot-diff__snapshot-info--comparison" data-testid="snapshot-diff-comparison">
             <div className="snapshot-diff__snapshot-details">
@@ -176,7 +176,7 @@ export function SnapshotDiff({
           </div>
         )}
 
-        {/* Кнопка закрытия */}
+        {/* Close button */}
         {onClose && (
           <button
             className="snapshot-diff__close-button"
@@ -190,7 +190,7 @@ export function SnapshotDiff({
         )}
       </div>
 
-      {/* Статистика */}
+      {/* Statistics */}
       {showStats && result && (
         <div className="snapshot-diff__stats" data-testid="snapshot-diff-stats">
           <span className="snapshot-diff__stat-item snapshot-diff__stat-item--added">
@@ -218,7 +218,7 @@ export function SnapshotDiff({
         {mode === 'inline' && <InlineDiffView result={result} />}
       </div>
 
-      {/* Footer с кнопками действий */}
+      {/* Footer with action buttons */}
       <div className="snapshot-diff__footer">
         <button
           className="snapshot-diff__action-button"

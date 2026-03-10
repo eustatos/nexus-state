@@ -1,62 +1,62 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
 export interface PerformanceMetrics {
-  /** Текущий FPS */
+  /** Current FPS */
   fps: number
-  /** Средний FPS за последнюю секунду */
+  /** Average FPS over the last second */
   avgFps: number
-  /** Минимальный FPS */
+  /** Minimum FPS */
   minFps: number
-  /** Максимальный FPS */
+  /** Maximum FPS */
   maxFps: number
-  /** Потребление памяти (MB) */
+  /** Memory usage (MB) */
   memory: MemoryMetrics | null
-  /** Статистика снимков */
+  /** Snapshot statistics */
   snapshots: SnapshotMetrics
-  /** Общая производительность */
+  /** Overall performance score */
   performanceScore: number
 }
 
 export interface MemoryMetrics {
-  /** Используется памяти (MB) */
+  /** Used JS heap size (MB) */
   usedJSHeapSize: number
-  /** Всего памяти (MB) */
+  /** Total JS heap size (MB) */
   totalJSHeapSize: number
-  /** Доступно памяти (MB) */
+  /** Available JS heap size (MB) */
   jsHeapSizeLimit: number
-  /** Процент использования */
+  /** Usage percentage */
   usagePercent: number
 }
 
 export interface SnapshotMetrics {
-  /** Количество снимков в истории */
+  /** Number of snapshots in history */
   count: number
-  /** Средний размер снимка (KB) */
+  /** Average snapshot size (KB) */
   avgSize: number
-  /** Время последнего захвата (ms) */
+  /** Time of last capture (ms) */
   lastCaptureTime: number
-  /** Среднее время захвата (ms) */
+  /** Average capture time (ms) */
   avgCaptureTime: number
-  /** Общее количество захватов */
+  /** Total number of captures */
   totalCaptures: number
 }
 
 export interface UsePerformanceMetricsOptions {
-  /** Интервал обновления метрик (ms) */
+  /** Metrics update interval (ms) */
   updateInterval?: number
-  /** Включить мониторинг памяти */
+  /** Enable memory monitoring */
   enableMemoryMonitoring?: boolean
-  /** Включить мониторинг снимков */
+  /** Enable snapshot monitoring */
   enableSnapshotMonitoring?: boolean
-  /** Количество точек для истории FPS */
+  /** Number of points for FPS history */
   fpsHistorySize?: number
 }
 
 /**
- * Хук для мониторинга производительности в реальном времени
+ * Hook for real-time performance monitoring
  *
- * @param options - Опции мониторинга
- * @returns Объект с метриками производительности
+ * @param options - Monitoring options
+ * @returns Object with performance metrics
  */
 export function usePerformanceMetrics(
   options: UsePerformanceMetricsOptions = {}
@@ -88,7 +88,7 @@ export function usePerformanceMetrics(
   const memoryIntervalRef = useRef<number | null>(null)
 
   /**
-   * Обновить метрики FPS
+   * Update FPS metrics
    */
   const updateFps = useCallback(() => {
     const now = performance.now()
@@ -97,18 +97,18 @@ export function usePerformanceMetrics(
 
     frameCountRef.current++
 
-    // Обновляем FPS каждую секунду
+    // Update FPS every second
     if (delta >= 1000) {
       const currentFps = Math.round((frameCountRef.current * 1000) / delta)
       frameCountRef.current = 0
 
-      // Добавляем в историю
+      // Add to history
       fpsHistoryRef.current.push(currentFps)
       if (fpsHistoryRef.current.length > fpsHistorySize) {
         fpsHistoryRef.current.shift()
       }
 
-      // Обновляем метрики
+      // Update metrics
       setFps(currentFps)
 
       const history = fpsHistoryRef.current
@@ -125,10 +125,10 @@ export function usePerformanceMetrics(
   }, [fpsHistorySize])
 
   /**
-   * Обновить метрики памяти
+   * Update memory metrics
    */
   const updateMemory = useCallback(() => {
-    // @ts-ignore - performance.memory не стандартизирован
+    // @ts-ignore - performance.memory is not standardized
     if (performance.memory) {
       // @ts-ignore
       const mem = performance.memory
@@ -147,34 +147,34 @@ export function usePerformanceMetrics(
   }, [])
 
   /**
-   * Обновить статистику снимков
+   * Update snapshot statistics
    */
   const updateSnapshotMetrics = useCallback(() => {
-    // Здесь можно интегрироваться с time-travel для получения статистики
-    // Для демо используем заглушку
+    // Can integrate with time-travel for statistics here
+    // Using stub for demo
     setSnapshots(prev => ({
       ...prev,
-      count: prev.count // Будет обновлено извне
+      count: prev.count // Will be updated from outside
     }))
   }, [])
 
   /**
-   * Вычислить score производительности
+   * Calculate performance score
    */
   const calculatePerformanceScore = useCallback((): number => {
     let score = 100
 
-    // Штраф за низкий FPS
+    // Penalty for low FPS
     if (avgFps < 60) {
       score -= (60 - avgFps) * 0.5
     }
 
-    // Штраф за высокое потребление памяти
+    // Penalty for high memory usage
     if (memory && memory.usagePercent > 80) {
       score -= (memory.usagePercent - 80) * 0.5
     }
 
-    // Штраф за медленные снимки
+    // Penalty for slow snapshots
     if (snapshots.avgCaptureTime > 100) {
       score -= Math.min((snapshots.avgCaptureTime - 100) * 0.1, 20)
     }
@@ -182,7 +182,7 @@ export function usePerformanceMetrics(
     return Math.max(0, Math.round(score))
   }, [avgFps, memory, snapshots.avgCaptureTime])
 
-  // Запуск мониторинга FPS
+  // Start FPS monitoring
   useEffect(() => {
     animationFrameRef.current = requestAnimationFrame(updateFps)
 
@@ -193,10 +193,10 @@ export function usePerformanceMetrics(
     }
   }, [updateFps])
 
-  // Запуск мониторинга памяти
+  // Start memory monitoring
   useEffect(() => {
     if (enableMemoryMonitoring) {
-      updateMemory() // Сразу обновить
+      updateMemory() // Update immediately
       memoryIntervalRef.current = window.setInterval(updateMemory, updateInterval)
     }
 
@@ -207,7 +207,7 @@ export function usePerformanceMetrics(
     }
   }, [enableMemoryMonitoring, updateInterval, updateMemory])
 
-  // Запуск мониторинга снимков
+  // Start snapshot monitoring
   useEffect(() => {
     if (enableSnapshotMonitoring) {
       updateSnapshotMetrics()
@@ -216,9 +216,9 @@ export function usePerformanceMetrics(
     }
   }, [enableSnapshotMonitoring, updateInterval, updateSnapshotMetrics])
 
-  // Публичный метод для обновления статистики снимков
+  // Public method for updating snapshot statistics
   useEffect(() => {
-    // Можно добавить external update mechanism
+    // Can add external update mechanism
   }, [])
 
   return {
@@ -233,11 +233,11 @@ export function usePerformanceMetrics(
 }
 
 /**
- * Экспорт функции для обновления метрик снимков извне
+ * Export function for updating snapshot metrics from outside
  */
 export function updateSnapshotMetrics(
   metrics: Partial<SnapshotMetrics>
 ): void {
-  // Эта функция может быть использована для обновления метрик из time-travel
-  // Реализация зависит от конкретной интеграции
+  // This function can be used to update metrics from time-travel
+  // Implementation depends on specific integration
 }

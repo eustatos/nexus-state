@@ -5,9 +5,9 @@ import { X, Upload, FileJson, AlertCircle, CheckCircle } from 'lucide-react'
 import './ImportModal.css'
 
 export interface ImportModalProps {
-  /** Обработчик закрытия */
+  /** Handler close */
   onClose: () => void
-  /** Обработчик успешного импорта */
+  /** Handler успешного импорта */
   onImportSuccess?: (result: { importedCount: number }) => void
   /** Заголовок модалки */
   title?: string
@@ -80,7 +80,7 @@ export function ImportModal({ onClose, onImportSuccess, title = 'Import State' }
   }, [handleFileUpload])
 
   /**
-   * Обработка выбора файла через input
+   * Обработка выбора fileа через input
    */
   const handleFileSelect = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -95,7 +95,7 @@ export function ImportModal({ onClose, onImportSuccess, title = 'Import State' }
       setPasteError(error instanceof Error ? error.message : 'Failed to read file')
     }
 
-    // Сбрасываем value чтобы можно было выбрать тот же файл снова
+    // Сбрасываем value чтобы можно было выбрать тот же file снова
     e.target.value = ''
   }, [handleFileUpload])
 
@@ -147,7 +147,7 @@ export function ImportModal({ onClose, onImportSuccess, title = 'Import State' }
   }, [importedData, strategy, importState, onImportSuccess])
 
   /**
-   * Обработка закрытия
+   * Обработка close
    */
   const handleClose = useCallback(() => {
     resetStatus()

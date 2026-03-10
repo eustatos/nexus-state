@@ -1,5 +1,5 @@
 /**
- * Тесты для проверки навигации по снимкам
+ * Tests for проверки навигации по снимкам
  * Проверяют корректность переходов через NavigationControls и TimelineSlider
  */
 
@@ -9,7 +9,7 @@ import { useTimeTravel } from '@/hooks/useTimeTravel'
 import { TimelineSlider } from '@/components/Timeline'
 import { NavigationControls } from '@/components/Timeline'
 
-// Моки для useTimeTravel
+// Mocks for useTimeTravel
 vi.mock('@/hooks/useTimeTravel', () => ({
   useTimeTravel: vi.fn()
 }))
@@ -44,7 +44,7 @@ describe('Snapshot Navigation', () => {
   }
 
   describe('NavigationControls', () => {
-    it('должен выполнять undo при клике', () => {
+    it('should выполнять undo при клике', () => {
       const undo = vi.fn()
       setupTimeTravel({ undo, canUndo: true, canRedo: true })
 
@@ -56,7 +56,7 @@ describe('Snapshot Navigation', () => {
       expect(undo).toHaveBeenCalled()
     })
 
-    it('должен выполнять redo при клике', () => {
+    it('should выполнять redo при клике', () => {
       const redo = vi.fn()
       setupTimeTravel({ redo, canUndo: true, canRedo: true })
 
@@ -68,7 +68,7 @@ describe('Snapshot Navigation', () => {
       expect(redo).toHaveBeenCalled()
     })
 
-    it('должен переходить к первому снимку', () => {
+    it('should переходить к первому снимку', () => {
       const jumpToFirst = vi.fn()
       setupTimeTravel({ jumpToFirst, currentPosition: 2 })
 
@@ -80,7 +80,7 @@ describe('Snapshot Navigation', () => {
       expect(jumpToFirst).toHaveBeenCalled()
     })
 
-    it('должен переходить к последнему снимку', () => {
+    it('should переходить к последнему снимку', () => {
       const jumpToLast = vi.fn()
       setupTimeTravel({ jumpToLast, currentPosition: 0 })
 
@@ -92,7 +92,7 @@ describe('Snapshot Navigation', () => {
       expect(jumpToLast).toHaveBeenCalled()
     })
 
-    it('должен отключать undo когда canUndo=false', () => {
+    it('should отключать undo когда canUndo=false', () => {
       setupTimeTravel({ canUndo: false, canRedo: true })
 
       render(<NavigationControls />)
@@ -101,7 +101,7 @@ describe('Snapshot Navigation', () => {
       expect(undoButton).toBeDisabled()
     })
 
-    it('должен отключать redo когда canRedo=false', () => {
+    it('should отключать redo когда canRedo=false', () => {
       setupTimeTravel({ canUndo: true, canRedo: false })
 
       render(<NavigationControls />)
@@ -110,7 +110,7 @@ describe('Snapshot Navigation', () => {
       expect(redoButton).toBeDisabled()
     })
 
-    it('должен отключать first когда на первом снимке', () => {
+    it('should отключать first когда на первом снимке', () => {
       setupTimeTravel({ currentPosition: 0 })
 
       render(<NavigationControls />)
@@ -119,7 +119,7 @@ describe('Snapshot Navigation', () => {
       expect(firstButton).toBeDisabled()
     })
 
-    it('должен отключать last когда на последнем снимке', () => {
+    it('should отключать last когда на последнем снимке', () => {
       setupTimeTravel({ currentPosition: 2, snapshotsCount: 3 })
 
       render(<NavigationControls />)
@@ -130,7 +130,7 @@ describe('Snapshot Navigation', () => {
   })
 
   describe('TimelineSlider', () => {
-    it('должен отображать timeline с снимками', () => {
+    it('should отображать timeline с снимками', () => {
       setupTimeTravel()
 
       render(<TimelineSlider height={80} showLabels={false} />)
@@ -139,7 +139,7 @@ describe('Snapshot Navigation', () => {
       expect(screen.getByTestId('timeline-slider-track')).toBeInTheDocument()
     })
 
-    it('должен отображать индикатор позиции', () => {
+    it('should отображать индикатор позиции', () => {
       setupTimeTravel({ currentPosition: 1 })
 
       render(<TimelineSlider height={80} showLabels={false} />)
@@ -147,7 +147,7 @@ describe('Snapshot Navigation', () => {
       expect(screen.getByTestId('timeline-slider-indicator')).toBeInTheDocument()
     })
 
-    it('должен отображать информацию о позиции', () => {
+    it('should отображать информацию о позиции', () => {
       setupTimeTravel({ currentPosition: 1 })
 
       render(<TimelineSlider height={80} showLabels={false} />)
@@ -156,7 +156,7 @@ describe('Snapshot Navigation', () => {
       expect(info).toHaveTextContent('2 / 3')
     })
 
-    it('должен показывать точки для всех снимков', () => {
+    it('should show точки for allх снимков', () => {
       const fiveSnapshots = [
         { id: 'snap-1', state: {}, metadata: { timestamp: Date.now() - 4000, action: 'initial', atomCount: 1 } },
         { id: 'snap-2', state: {}, metadata: { timestamp: Date.now() - 3000, action: 'edit', atomCount: 1 } },
@@ -188,7 +188,7 @@ describe('Snapshot Navigation', () => {
       }
     })
 
-    it('должен подсвечивать текущий снимок', () => {
+    it('should подсвечивать current snapshot', () => {
       setupTimeTravel({ currentPosition: 2 })
 
       render(<TimelineSlider height={80} showLabels={false} />)
@@ -197,7 +197,7 @@ describe('Snapshot Navigation', () => {
       expect(currentPoint).toHaveClass('timeline-slider__point--current')
     })
 
-    it('должен вызывать jumpTo при клике на точку', () => {
+    it('should вызывать jumpTo при клике на точку', () => {
       const jumpTo = vi.fn().mockReturnValue(true)
       setupTimeTravel({ jumpTo, currentPosition: 2 })
 
@@ -206,12 +206,12 @@ describe('Snapshot Navigation', () => {
       const firstPoint = screen.getByTestId('timeline-slider-point-0')
       fireEvent.click(firstPoint)
 
-      // jumpTo должен быть вызван через TimelineSlider internal logic
+      // jumpTo should быть вызван через TimelineSlider internal logic
       // Проверяем что клик прошел
       expect(firstPoint).toBeInTheDocument()
     })
 
-    it('должен вызывать onPositionChange при клике', () => {
+    it('should вызывать onPositionChange при клике', () => {
       const onPositionChange = vi.fn()
       setupTimeTravel({ currentPosition: 2 })
 
@@ -220,11 +220,11 @@ describe('Snapshot Navigation', () => {
       const firstPoint = screen.getByTestId('timeline-slider-point-0')
       fireEvent.click(firstPoint)
 
-      // onPositionChange должен быть вызван через TimelineSlider internal logic
+      // onPositionChange should быть вызван через TimelineSlider internal logic
       expect(firstPoint).toBeInTheDocument()
     })
 
-    it('должен отображать empty state когда нет снимков', () => {
+    it('should отображать empty state когда нет снимков', () => {
       setupTimeTravel({ snapshotsCount: 0 })
 
       render(<TimelineSlider height={80} />)
@@ -235,7 +235,7 @@ describe('Snapshot Navigation', () => {
   })
 
   describe('Keyboard Navigation', () => {
-    it('должен реагировать на Ctrl+Z для undo', () => {
+    it('should реагировать на Ctrl+Z for undo', () => {
       const undo = vi.fn()
       setupTimeTravel({ undo, canUndo: true })
 
@@ -246,7 +246,7 @@ describe('Snapshot Navigation', () => {
       expect(undo).toHaveBeenCalled()
     })
 
-    it('должен реагировать на Ctrl+Y для redo', () => {
+    it('should реагировать на Ctrl+Y for redo', () => {
       const redo = vi.fn()
       setupTimeTravel({ redo, canRedo: true })
 

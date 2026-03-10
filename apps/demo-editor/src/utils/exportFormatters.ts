@@ -1,5 +1,5 @@
 /**
- * Утилиты для форматирования экспортированных данных
+ * Utilities for formatting exported data
  */
 
 import type { Snapshot } from '@nexus-state/core'
@@ -25,7 +25,7 @@ export interface ExportedState {
 }
 
 /**
- * Форматировать экспортированные данные как HTML
+ * Format exported data as HTML
  */
 export function formatAsHTML(data: ExportedState): string {
   const exportDate = new Date(data.exportedAt).toLocaleString()
@@ -156,7 +156,7 @@ export function formatAsHTML(data: ExportedState): string {
 }
 
 /**
- * Форматировать экспортированные данные как Markdown
+ * Format экспортированные данные как Markdown
  */
 export function formatAsMarkdown(data: ExportedState): string {
   const exportDate = new Date(data.exportedAt).toLocaleString()
@@ -193,7 +193,7 @@ ${JSON.stringify(data.currentState, null, 2)}
 }
 
 /**
- * Форматировать экспортированные данные как Plain Text
+ * Format экспортированные данные как Plain Text
  */
 export function formatAsPlainText(data: ExportedState): string {
   const exportDate = new Date(data.exportedAt).toLocaleString()
@@ -223,7 +223,7 @@ ${JSON.stringify(data.currentState, null, 2)}
 }
 
 /**
- * Экранировать HTML специальные символы
+ * Escape HTML специальные символы
  */
 function escapeHtml(text: string): string {
   const div = document.createElement('div')
@@ -232,7 +232,7 @@ function escapeHtml(text: string): string {
 }
 
 /**
- * Получить MIME тип для формата
+ * Get MIME тип для formatа
  */
 export function getMimeType(format: string): string {
   switch (format) {
@@ -249,7 +249,7 @@ export function getMimeType(format: string): string {
 }
 
 /**
- * Получить расширение файла для формата
+ * Get расширение fileа для formatа
  */
 export function getFileExtension(format: string): string {
   switch (format) {

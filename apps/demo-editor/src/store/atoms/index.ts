@@ -1,5 +1,5 @@
 /**
- * Атомы редактора
+ * Editor atoms
  */
 export {
   contentAtom,
@@ -10,13 +10,13 @@ export {
 } from './editor'
 
 /**
- * Статистика редактора
+ * Editor statistics
  */
 export { statsAtom } from './stats'
 export type { EditorStats } from './stats'
 
 /**
- * Атомы навигации
+ * Navigation atoms
  */
 export {
   currentPositionAtom,

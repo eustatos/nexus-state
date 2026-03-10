@@ -10,13 +10,13 @@ export interface EditorStatsProps {
 }
 
 /**
- * Компонент статистики редактора
+ * Component статистики editorа
  *
  * Отображает в реальном времени:
- * - Количество символов
- * - Количество слов
- * - Количество строк
- * - Время чтения
+ * - Count символов
+ * - Count слов
+ * - Count строк
+ * - Time чтения
  * - Статус сохранения
  */
 export function EditorStats({ className = '' }: EditorStatsProps) {
@@ -26,7 +26,7 @@ export function EditorStats({ className = '' }: EditorStatsProps) {
   const lastSaved = useAtomValue(lastSavedAtom, editorStore)
 
   /**
-   * Форматирование времени с последнего сохранения
+   * Formatирование времени с последнего сохранения
    */
   const formatLastSaved = (timestamp: number | null): string => {
     if (!timestamp) return 'Not saved'
@@ -42,7 +42,7 @@ export function EditorStats({ className = '' }: EditorStatsProps) {
   }
 
   /**
-   * Форматирование времени чтения
+   * Formatирование времени чтения
    */
   const formatReadingTime = (minutes: number): string => {
     if (minutes === 0) return '< 1 min'
@@ -53,7 +53,7 @@ export function EditorStats({ className = '' }: EditorStatsProps) {
   }
 
   /**
-   * Форматирование больших чисел
+   * Formatирование больших чисел
    */
   const formatNumber = (num: number | undefined | null): string => {
     if (num === undefined || num === null) return '0'

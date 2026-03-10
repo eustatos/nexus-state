@@ -9,30 +9,30 @@ import { ImportModal } from '@/components/Export/ImportModal'
 import './SnapshotList.css'
 
 export interface SnapshotListProps {
-  /** Класс для кастомизации */
+  /** Class for customization */
   className?: string
-  /** Максимальная высота списка */
+  /** Maximum list height */
   maxHeight?: string
-  /** Показывать кнопки undo/redo */
+  /** Show undo/redo buttons */
   showUndoRedo?: boolean
-  /** Показывать поиск */
+  /** Show search */
   showSearch?: boolean
-  /** Показывать фильтр */
+  /** Show filter */
   showFilter?: boolean
-  /** Обработчик выбора снимка */
+  /** Snapshot select handler */
   onSnapshotSelect?: (index: number) => void
-  /** Показывать кнопку сравнения */
+  /** Show compare button */
   showCompare?: boolean
-  /** Обработчик включения режима сравнения */
+  /** Compare mode change handler */
   onCompareModeChange?: (isCompareMode: boolean) => void
-  /** Показывать кнопки экспорта/импорта */
+  /** Show export/import buttons */
   showExportImport?: boolean
 }
 
 type ExtendedSnapshot = Snapshot & { metadata: SnapshotMetadata & { timestamp: number; atomCount: number } }
 
 /**
- * Доступные типы действий для фильтра
+ * Available action types for filter
  */
 const ACTION_TYPES = [
   { value: '', label: 'All Actions' },
@@ -44,9 +44,9 @@ const ACTION_TYPES = [
 ]
 
 /**
- * Компонент списка снимков с поиском и фильтрацией
+ * Snapshot list component with search and filtering
  *
- * @param props - Пропсы компонента
+ * @param props - Component props
  */
 export function SnapshotList({
   className = '',
@@ -84,7 +84,7 @@ export function SnapshotList({
     autoRefresh: true
   })
 
-  // Уведомляем о изменении режима сравнения
+  // Notify about compare mode change
   const toggleCompareMode = useCallback(() => {
     const newMode = !compareMode
     setCompareMode(newMode)
@@ -94,19 +94,19 @@ export function SnapshotList({
 
   const handleSnapshotClick = useCallback((uiIndex: number) => {
     if (compareMode) {
-      // В режиме сравнения - выбираем снимки для сравнения
+      // In compare mode - select snapshots for comparison
       setSelectedForCompare(prev => {
         if (prev.includes(uiIndex)) {
-          // Уже выбран - убираем выделение
+          // Already selected - remove selection
           return prev.filter(i => i !== uiIndex)
         } else {
-          // Выбираем не более 2 снимков
+          // Select no more than 2 snapshots
           const newSelection = [...prev, uiIndex].slice(-2)
           return newSelection
         }
       })
     } else {
-      // Обычный режим - переход к снимку
+      // Normal mode - jump to snapshot
       jumpTo(uiIndex)
       onSnapshotSelect?.(uiIndex)
     }
