@@ -1,4 +1,6 @@
 {
+    "globalDependencies": ["**/.env.*local"],
+    "globalEnv": ["CI", "NODE_ENV"],
     "pipeline": {
         "build": {
             "dependsOn": [
@@ -6,7 +8,8 @@
             ],
             "outputs": [
                 "dist/**"
-            ]
+            ],
+            "env": ["NODE_ENV"]
         },
         "dev": {
             "cache": false

@@ -1,0 +1,151 @@
+/* Editor Toolbar */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  shrink: 0;
+  height: 40px;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.toolbar-button:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+}
+
+.toolbar-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.toolbar-button:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.toolbar-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.toolbar-button:disabled:hover {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+/* Stats section */
+.toolbar-stats-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding-left: 12px;
+  border-left: 1px solid var(--border);
+}
+
+.toolbar-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: fit-content;
+}
+
+.toolbar-stat-icon {
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+.toolbar-stat-value {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+
+.toolbar-stat-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+}
+
+.toolbar-status-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.toolbar-save-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-status-saving,
+.toolbar-status-unsaved {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--warning);
+}
+
+.toolbar-status-saved {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--success);
+}
+
+.toolbar-status-not-saved {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .toolbar-stat-item:last-of-type {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .editor-toolbar {
+    gap: 8px;
+    padding: 6px 8px;
+  }
+
+  .toolbar-stats-group {
+    gap: 6px;
+    padding-left: 8px;
+  }
+
+  .toolbar-stat-value {
+    font-size: 11px;
+  }
+
+  .toolbar-stat-divider {
+    display: none;
+  }
+}

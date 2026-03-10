@@ -1,5 +1,5 @@
 /**
- * History utilities for SimpleTimeTravel
+ * History utilities for TimeTravelController
  *
  * @packageDocumentation
  * Provides stack-based history management with navigation capabilities.
@@ -17,7 +17,7 @@ export {
   ERROR_CODES,
   COMPACTION_INTERVALS,
   DEFAULT_VALIDATION_MESSAGES,
-} from "./types";
+} from './types';
 
 /**
  * Check if a position is valid in history
@@ -27,7 +27,7 @@ export {
  */
 export function isValidHistoryPosition(
   index: number,
-  totalLength: number,
+  totalLength: number
 ): boolean {
   return index >= 0 && index < totalLength;
 }

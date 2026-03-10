@@ -3,6 +3,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     globals: true,
+    isolate: true,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
@@ -11,17 +12,33 @@ export default defineConfig({
         'index.ts'
       ],
       exclude: [
+        'apps/**',
+        // Тестовые файлы и директории
+        '**/__tests__/**',
+        '**/__fixtures__/**',
+        '**/__mocks__/**',
+        '**/__benchmarks__/**',
+        '**/test-utils/**',
+        '**/test-utils.ts',
         '**/*.test.ts',
         '**/*.spec.ts',
-        '**/*.config.ts',
+        '**/*.bench.ts',
+        '**/*.test-d.ts',
+        // Файлы деклараций и конфигурации
         '**/*.d.ts',
+        '**/*.config.ts',
+        '**/*.config.js',
+        // Файлы типов (только объявления типов и константы)
+        '**/types.ts',
+        '**/types/index.ts',
+        // Скомпилированные файлы и зависимости
         '**/node_modules/**',
         '**/dist/**',
+        '**/build/**',
         '**/coverage/**',
-        '**/__benchmarks__/**',
-        '**/__fixtures__/**',
-        '**/__tests__/**',
-        'src/test-utils/**'
+        // Прочее
+        '**/*.md',
+        '**/*.json',
       ]
     }
   }

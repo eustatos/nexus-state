@@ -43,7 +43,7 @@
  * // Create a computed atom with a name
  * const doubleCountAtom = atom((get) => get(countAtom) * 2, 'doubleCount');
  */
-export { atom } from "./atom";
+export { atom } from './atom';
 
 /**
  * Global registry for atoms to support DevTools integration and time travel.
@@ -58,8 +58,8 @@ export { atom } from "./atom";
  * // Get the name of an atom
  * const name = atomRegistry.getName(atom);
  */
-export { atomRegistry } from "./atom-registry";
-export type { AtomRegistry } from "./atom-registry";
+export { atomRegistry } from './atom-registry';
+export type { AtomRegistry } from './atom-registry';
 
 /**
  * Creates a store to hold atoms.
@@ -72,7 +72,7 @@ export type { AtomRegistry } from "./atom-registry";
  * // Create a store with plugins
  * const store = createStore([plugin1, plugin2]);
  */
-export { createStore } from "./store";
+export { createStore } from './store';
 
 /**
  * Creates an enhanced store with DevTools integration capabilities.
@@ -86,11 +86,10 @@ export { createStore } from "./store";
  * // Create an enhanced store with plugins and options
  * const store = createEnhancedStore([plugin1, plugin2], { enableDevTools: true });
  */
-export { createEnhancedStore } from "./enhanced-store";
-
+export { createEnhancedStore } from './enhanced-store';
 
 // Time travel compression strategies
-export { Compression } from "./time-travel";
+export { Compression } from './time-travel';
 export type {
   CompressionStrategy,
   CompressionStrategyConfig,
@@ -100,7 +99,7 @@ export type {
   SignificanceBasedCompressionConfig,
   CompressionFactoryConfig,
   CompressionStrategyType,
-} from "./time-travel";
+} from './time-travel';
 export {
   BaseCompressionStrategy,
   NoCompressionStrategy,
@@ -109,22 +108,24 @@ export {
   SignificanceBasedCompression,
   CompressionFactory,
   compareSnapshots,
-} from "./time-travel";
+} from './time-travel';
 
 // Time travel functionality
-export { SimpleTimeTravel } from "./time-travel";
+export { TimeTravelController } from './time-travel';
+export { SimpleTimeTravel } from './time-travel/SimpleTimeTravel';
+export type { SimpleTimeTravelOptions } from './time-travel/SimpleTimeTravel';
 
 // Export utility functions
 export {
   serializeState,
   serializeMap,
   serializeSet,
-} from "./utils/serialization";
+} from './utils/serialization';
 export {
   ActionTracker,
   globalActionTracker,
   createActionWithStackTrace,
-} from "./utils/action-tracker";
+} from './utils/action-tracker';
 
 // Export types
 export type {
@@ -156,17 +157,17 @@ export type {
   RestorationProgress,
   CheckpointResult,
   RollbackResult,
-} from "./types";
+} from './types';
 // Export type guards
-export { isPrimitiveAtom, isComputedAtom, isWritableAtom } from "./types";
-export type { EnhancedStore, StoreEnhancementOptions } from "./enhanced-store";
+export { isPrimitiveAtom, isComputedAtom, isWritableAtom } from './types';
+export type { EnhancedStore, StoreEnhancementOptions } from './enhanced-store';
 export type {
   ActionTrackingOptions,
   ActionMetadata as TrackedActionMetadata,
-} from "./utils/action-tracker";
+} from './utils/action-tracker';
 
 // Debug logger (development only)
-export { logger, storeLogger, atomLogger, reactLogger } from "./debug";
+export { logger, storeLogger, atomLogger, reactLogger } from './debug';
 
 // Batching utility
-export { batch, batcher, isBatching } from "./batching";
+export { batch, batcher, isBatching, type Batcher } from './batching';

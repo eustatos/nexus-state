@@ -123,6 +123,13 @@ export abstract class BaseCompressionStrategy implements CompressionStrategy {
   reset(): void {
     this.lastMetadata = null;
   }
+
+  /**
+   * Get configuration
+   */
+  getConfig(): CompressionStrategyConfig {
+    return { ...this.config };
+  }
 }
 
 /**

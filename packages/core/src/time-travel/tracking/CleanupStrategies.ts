@@ -5,14 +5,14 @@
  * Provides different strategies for selecting atoms eligible for cleanup.
  */
 
-import type { CleanupStrategy, TrackedAtom } from "./types";
+import type { CleanupStrategy, CleanupStrategyType, TrackedAtom } from "./types";
 
 /**
  * LRU (Least Recently Used) cleanup strategy
  * Selects atoms that haven't been accessed for the longest time
  */
 export class LRUCleanupStrategy implements CleanupStrategy {
-  name = "lru";
+  name: CleanupStrategyType = "lru";
 
   /**
    * Select candidates for cleanup
@@ -23,18 +23,18 @@ export class LRUCleanupStrategy implements CleanupStrategy {
   selectCandidates(atoms: TrackedAtom[], count: number): TrackedAtom[] {
     return atoms
       .filter((a) => a.gcEligible)
-      .sort((a, b) => a.lastAccessed - b.lastAccessed) // Oldest access first
+      .sort((a, b) => a.lastAccessedAt - b.lastAccessedAt) // Oldest access first
       .slice(0, count);
   }
 
   /**
    * Get priority for an atom
-   * Lower lastAccessed = higher priority (more negative)
+   * Lower lastAccessedAt = higher priority (more negative)
    * @param atom - Tracked atom
    * @returns Priority value (higher = sooner cleanup)
    */
   getPriority(atom: TrackedAtom): number {
-    return -atom.lastAccessed;
+    return -atom.lastAccessedAt;
   }
 }
 
@@ -43,7 +43,7 @@ export class LRUCleanupStrategy implements CleanupStrategy {
  * Selects atoms with the lowest access count
  */
 export class LFUCleanupStrategy implements CleanupStrategy {
-  name = "lfu";
+  name: CleanupStrategyType = "lfu";
 
   /**
    * Select candidates for cleanup
@@ -74,7 +74,7 @@ export class LFUCleanupStrategy implements CleanupStrategy {
  * Selects atoms that were created earliest
  */
 export class FIFOCleanupStrategy implements CleanupStrategy {
-  name = "fifo";
+  name: CleanupStrategyType = "fifo";
 
   /**
    * Select candidates for cleanup
@@ -105,7 +105,7 @@ export class FIFOCleanupStrategy implements CleanupStrategy {
  * Selects atoms that have exceeded their TTL
  */
 export class TimeBasedCleanupStrategy implements CleanupStrategy {
-  name = "time-based";
+  name: CleanupStrategyType = "time-based";
   private currentTime: number;
 
   /**
@@ -127,8 +127,8 @@ export class TimeBasedCleanupStrategy implements CleanupStrategy {
       .filter((a) => this.isExpired(a))
       .sort((a, b) => {
         // Most expired first (highest age - ttl difference)
-        const ageA = this.currentTime - a.lastAccessed;
-        const ageB = this.currentTime - b.lastAccessed;
+        const ageA = this.currentTime - a.lastAccessedAt;
+        const ageB = this.currentTime - b.lastAccessedAt;
         return (ageB - b.ttl) - (ageA - a.ttl);
       })
       .slice(0, count);
@@ -140,7 +140,7 @@ export class TimeBasedCleanupStrategy implements CleanupStrategy {
    * @returns True if atom has exceeded its TTL
    */
   private isExpired(atom: TrackedAtom): boolean {
-    const age = this.currentTime - atom.lastAccessed;
+    const age = this.currentTime - atom.lastAccessedAt;
     return age > atom.ttl;
   }
 
@@ -151,7 +151,7 @@ export class TimeBasedCleanupStrategy implements CleanupStrategy {
    * @returns Priority value (higher = sooner cleanup)
    */
   getPriority(atom: TrackedAtom): number {
-    const age = this.currentTime - atom.lastAccessed;
+    const age = this.currentTime - atom.lastAccessedAt;
     return age - atom.ttl;
   }
 
@@ -171,7 +171,7 @@ export class TimeBasedCleanupStrategy implements CleanupStrategy {
  * @returns Cleanup strategy instance
  */
 export function createCleanupStrategy(
-  type: string,
+  type: CleanupStrategyType,
   now?: number,
 ): CleanupStrategy {
   switch (type) {

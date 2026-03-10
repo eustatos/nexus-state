@@ -1,17 +1,30 @@
 /**
- * SimpleTimeTravel - Time travel debugging for Nexus State
+ * TimeTravel - Time travel debugging for Nexus State
  *
  * @packageDocumentation
  * Main entry point for the time travel package.
  * Provides time travel capabilities for state management.
+ *
+ * @example
+ * // Basic usage (backward compatible)
+ * const controller = new TimeTravelController(store, config);
+ *
+ * @example
+ * // Using factory (recommended for DI)
+ * const controller = TimeTravelFactory.createController(store, config);
+ *
+ * @example
+ * // With custom services
+ * const services = TimeTravelFactory.createServices(store, config);
+ * const controller = TimeTravelFactory.createControllerWithServices(store, services, config);
  */
 
 // ============================================================================
 // Core exports
 // ============================================================================
 
-import { SimpleTimeTravel } from "./core/SimpleTimeTravel";
-export { SimpleTimeTravel };
+export { TimeTravelController } from './core/TimeTravelController';
+export { TimeTravelFactory } from './core/TimeTravelFactory';
 
 // ============================================================================
 // Types from main types file
@@ -32,7 +45,7 @@ import type {
   HistorySearchCriteria,
   SearchResult,
   ExportFormat,
-} from "./types";
+} from './types';
 
 export type {
   TimeTravelAPI,
@@ -66,7 +79,7 @@ import type {
   HistorySearchOptions,
   CompactionOptions,
   SerializedHistory,
-} from "./core/types";
+} from './core/types';
 
 export type {
   HistoryManagerConfig,
@@ -85,8 +98,8 @@ export type {
 // Core components
 // ============================================================================
 
-import { HistoryManager } from "./core/HistoryManager";
-import { HistoryNavigator } from "./core/HistoryNavigator";
+import { HistoryManager } from './core/HistoryManager';
+import { HistoryNavigator } from './core/HistoryNavigator';
 
 export { HistoryManager, HistoryNavigator };
 
@@ -94,15 +107,11 @@ export { HistoryManager, HistoryNavigator };
 // Snapshot components and types
 // ============================================================================
 
-import { SnapshotCreator } from "./snapshot/SnapshotCreator";
-import { SnapshotRestorer } from "./snapshot/SnapshotRestorer";
-import { SnapshotValidator } from "./snapshot/SnapshotValidator";
+import { SnapshotCreator } from './snapshot/SnapshotCreator';
+import { SnapshotRestorer } from './snapshot/SnapshotRestorer';
+import { SnapshotValidator } from './snapshot/SnapshotValidator';
 
-export {
-  SnapshotCreator,
-  SnapshotRestorer,
-  SnapshotValidator,
-};
+export { SnapshotCreator, SnapshotRestorer, SnapshotValidator };
 
 import type {
   SnapshotCreatorConfig,
@@ -135,7 +144,7 @@ import type {
   SnapshotPipelineResult,
   SnapshotTemplate,
   SnapshotFromTemplateResult,
-} from "./snapshot/types";
+} from './snapshot/types';
 
 export type {
   SnapshotCreatorConfig,
@@ -174,9 +183,9 @@ export type {
 // Tracking components and types
 // ============================================================================
 
-import { AtomTracker } from "./tracking/AtomTracker";
-import { AtomChangeDetector } from "./tracking/AtomChangeDetector";
-import { ComputedAtomHandler } from "./tracking/ComputedAtomHandler";
+import { AtomTracker } from './tracking/AtomTracker';
+import { AtomChangeDetector } from './tracking/AtomChangeDetector';
+import { ComputedAtomHandler } from './tracking/ComputedAtomHandler';
 
 export { AtomTracker, AtomChangeDetector, ComputedAtomHandler };
 
@@ -199,7 +208,7 @@ import type {
   AtomSubscription,
   TrackerSnapshot,
   TrackerRestorePoint,
-} from "./tracking/types";
+} from './tracking/types';
 
 export type {
   TrackerConfig,
@@ -228,7 +237,7 @@ export type {
 // Compression module
 // ============================================================================
 
-import * as Compression from "./compression";
+import * as Compression from './compression';
 
 export { Compression };
 export type {
@@ -240,7 +249,7 @@ export type {
   SignificanceBasedCompressionConfig,
   CompressionFactoryConfig,
   CompressionStrategyType,
-} from "./compression";
+} from './compression';
 
 export {
   BaseCompressionStrategy,
@@ -250,7 +259,7 @@ export {
   SignificanceBasedCompression,
   CompressionFactory,
   compareSnapshots,
-} from "./compression";
+} from './compression';
 
 // History utilities and types
 // ============================================================================
@@ -266,11 +275,11 @@ export {
  */
 export function isSnapshot(obj: unknown): obj is Snapshot {
   return (
-    typeof obj === "object" &&
+    typeof obj === 'object' &&
     obj !== null &&
-    "id" in obj &&
-    "state" in obj &&
-    "metadata" in obj
+    'id' in obj &&
+    'state' in obj &&
+    'metadata' in obj
   );
 }
 
@@ -317,10 +326,10 @@ export function createEmptySnapshot(action?: string): Snapshot {
  * @returns Filter function
  */
 export function filterByAction(
-  actionName: string | RegExp,
+  actionName: string | RegExp
 ): (snapshot: Snapshot) => boolean {
   return (snapshot: Snapshot) => {
-    const action = snapshot.metadata?.action || "";
+    const action = snapshot.metadata?.action || '';
     if (actionName instanceof RegExp) {
       return actionName.test(action);
     }
@@ -336,7 +345,7 @@ export function filterByAction(
  */
 export function filterByTimeRange(
   start: number,
-  end: number,
+  end: number
 ): (snapshot: Snapshot) => boolean {
   return (snapshot: Snapshot) => {
     const timestamp = snapshot.metadata?.timestamp || 0;
@@ -352,7 +361,7 @@ export function filterByTimeRange(
  */
 export function filterByAtomValue(
   atomName: string,
-  value: any,
+  value: any
 ): (snapshot: Snapshot) => boolean {
   return (snapshot: Snapshot) => {
     const entry = snapshot.state?.[atomName];
@@ -366,7 +375,7 @@ export function filterByAtomValue(
  * @returns Batch result
  */
 export function batch<T>(
-  operations: Array<() => T>,
+  operations: Array<() => T>
 ): Array<{ success: boolean; result?: T; error?: string }> {
   return operations.map((op) => {
     try {
@@ -411,7 +420,7 @@ export function mergeSnapshots(target: Snapshot, source: Snapshot): Snapshot {
  */
 export function createPatch(
   source: Snapshot,
-  target: Snapshot,
+  target: Snapshot
 ): SnapshotPatch[] {
   const patches: SnapshotPatch[] = [];
 
@@ -419,12 +428,12 @@ export function createPatch(
   Object.entries(target.state).forEach(([key, entry]) => {
     const sourceEntry = source.state[key];
     if (!sourceEntry) {
-      patches.push({ type: "add", atomName: key, value: entry.value });
+      patches.push({ type: 'add', atomName: key, value: entry.value });
     } else if (
       JSON.stringify(sourceEntry.value) !== JSON.stringify(entry.value)
     ) {
       patches.push({
-        type: "modify",
+        type: 'modify',
         atomName: key,
         value: entry.value,
         oldValue: sourceEntry.value,
@@ -435,7 +444,7 @@ export function createPatch(
   // Find removed atoms
   Object.keys(source.state).forEach((key) => {
     if (!target.state[key]) {
-      patches.push({ type: "remove", atomName: key });
+      patches.push({ type: 'remove', atomName: key });
     }
   });
 
@@ -450,22 +459,22 @@ export function createPatch(
  */
 export function applyPatch(
   snapshot: Snapshot,
-  patches: SnapshotPatch[],
+  patches: SnapshotPatch[]
 ): Snapshot {
   const newState = { ...snapshot.state };
 
   patches.forEach((patch) => {
     switch (patch.type) {
-      case "add":
-      case "modify":
+      case 'add':
+      case 'modify':
         newState[patch.atomName] = {
           ...newState[patch.atomName],
           value: patch.value,
-          type: newState[patch.atomName]?.type || "primitive",
+          type: newState[patch.atomName]?.type || 'primitive',
           name: patch.atomName,
         };
         break;
-      case "remove":
+      case 'remove':
         delete newState[patch.atomName];
         break;
     }
@@ -486,8 +495,8 @@ export function applyPatch(
 // Constants
 // ============================================================================
 
-/** Current version of SimpleTimeTravel */
-export const VERSION = "1.0.0";
+/** Current version of TimeTravelController */
+export const VERSION = '1.0.0';
 
 /** Default maximum history size */
 export const DEFAULT_MAX_HISTORY = 50;
@@ -497,80 +506,89 @@ export const DEFAULT_AUTO_CAPTURE = true;
 
 /** Supported registry modes */
 export const REGISTRY_MODES = {
-  GLOBAL: "global",
-  ISOLATED: "isolated",
+  GLOBAL: 'global',
+  ISOLATED: 'isolated',
 } as const;
 
 /** Event types */
 export const EVENT_TYPES = {
-  CAPTURE: "capture",
-  UNDO: "undo",
-  REDO: "redo",
-  JUMP: "jump",
-  CLEAR: "clear",
-  IMPORT: "import",
-  ERROR: "error",
+  CAPTURE: 'capture',
+  UNDO: 'undo',
+  REDO: 'redo',
+  JUMP: 'jump',
+  CLEAR: 'clear',
+  IMPORT: 'import',
+  ERROR: 'error',
 } as const;
 
 /** Snapshot events */
 export const SNAPSHOT_EVENTS = {
-  CREATED: "created",
-  RESTORED: "restored",
-  DELETED: "deleted",
-  UPDATED: "updated",
-  EXPORTED: "exported",
-  IMPORTED: "imported",
+  CREATED: 'created',
+  RESTORED: 'restored',
+  DELETED: 'deleted',
+  UPDATED: 'updated',
+  EXPORTED: 'exported',
+  IMPORTED: 'imported',
 } as const;
 
 /** Tracking events */
 export const TRACKING_EVENTS = {
-  TRACK: "track",
-  UNTRACK: "untrack",
-  CHANGE: "change",
-  ACCESS: "access",
-  ERROR: "error",
+  TRACK: 'track',
+  UNTRACK: 'untrack',
+  CHANGE: 'change',
+  ACCESS: 'access',
+  ERROR: 'error',
 } as const;
 
 /** History events */
 export const HISTORY_EVENTS = {
-  PUSH: "push",
-  POP: "pop",
-  CLEAR: "clear",
-  EVICT: "evict",
-  RESIZE: "resize",
+  PUSH: 'push',
+  POP: 'pop',
+  CLEAR: 'clear',
+  EVICT: 'evict',
+  RESIZE: 'resize',
 } as const;
 
 /** Change types */
 export const CHANGE_TYPES = {
-  CREATED: "created",
-  DELETED: "deleted",
-  VALUE: "value",
-  TYPE: "type",
+  CREATED: 'created',
+  DELETED: 'deleted',
+  VALUE: 'value',
+  TYPE: 'type',
 } as const;
 
 /** Atom types */
 export const ATOM_TYPES = {
-  PRIMITIVE: "primitive",
-  COMPUTED: "computed",
-  WRITABLE: "writable",
+  PRIMITIVE: 'primitive',
+  COMPUTED: 'computed',
+  WRITABLE: 'writable',
 } as const;
 
 /** Serialization formats */
 export const SERIALIZATION_FORMATS = {
-  JSON: "json",
-  BINARY: "binary",
-  COMPACT: "compact",
+  JSON: 'json',
+  BINARY: 'binary',
+  COMPACT: 'compact',
 } as const;
 
 /** Validation levels */
 export const VALIDATION_LEVELS = {
-  ERROR: "error",
-  WARNING: "warning",
-  INFO: "info",
+  ERROR: 'error',
+  WARNING: 'warning',
+  INFO: 'info',
 } as const;
 
 // ============================================================================
-// Default export
+// New service exports (refactored architecture)
 // ============================================================================
 
-export default SimpleTimeTravel;
+export { HistoryService } from './core/HistoryService';
+export { SnapshotService } from './core/SnapshotService';
+export { ComparisonService } from './core/ComparisonService';
+export { DeltaService } from './core/DeltaService';
+export { CleanupService } from './core/CleanupService';
+export { SubscriptionManager } from './core/SubscriptionManager';
+export { StoreWrapper } from './core/StoreWrapper';
+
+// Default export
+export { TimeTravelController as default } from './core/TimeTravelController';

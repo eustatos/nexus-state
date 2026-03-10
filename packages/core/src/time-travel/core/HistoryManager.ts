@@ -69,7 +69,7 @@ export class HistoryManager extends BaseDisposable {
 
   add(snapshot: Snapshot): void {
     logger.log(`[HISTORY.add] Adding snapshot: ${snapshot.metadata.action || 'unknown'}, past.length: ${this.past.length}, current: ${this.current?.metadata.action || 'none'}`);
-    
+
     // If maxHistory is 0, don't save any history
     if (this.maxHistory <= 0) {
       logger.log(`[HISTORY.add] maxHistory is ${this.maxHistory}, skipping history save`);
@@ -77,40 +77,42 @@ export class HistoryManager extends BaseDisposable {
       this.past = [];
       this.future = [];
       logger.log(`[HISTORY.add] Added. Total: ${this.getAll().length} (past: ${this.past.length}, current: ${this.current ? 1 : 0}, future: ${this.future.length})`);
+      this.emit({ type: 'change', timestamp: Date.now() });
       return;
     }
-    
+
     // First, push current to past if it exists
     if (this.current) {
       this.past.push(this.current);
       logger.log(`[HISTORY.add] Pushed current to past, past.length now: ${this.past.length}`);
     }
-    
+
     // Update current and clear future
     this.current = snapshot;
     this.future = [];
-    
+
     // Enforce maxHistory limit: past + current <= maxHistory
     // We need to keep at most (maxHistory - 1) items in past
     // because current counts as one slot
     const maxPastSize = this.maxHistory - 1;
-    
+
     if (this.past.length > maxPastSize) {
       // Calculate how many items to remove from the beginning
       const itemsToRemove = this.past.length - maxPastSize;
-      
+
       // Keep only the most recent (maxPastSize) items
       this.past = this.past.slice(itemsToRemove);
       logger.log(`[HISTORY.add] Trimmed past from ${this.past.length + itemsToRemove} to ${this.past.length} items (maxPastSize: ${maxPastSize})`);
     }
-    
+
     // Apply compression if strategy is configured and should compress
     if (this.compressionStrategy && this.compressionStrategy.shouldCompress(this.getAll(), this.past.length)) {
       logger.log(`[HISTORY.add] Applying compression`);
       this.applyCompression();
     }
-    
+
     logger.log(`[HISTORY.add] Added. Total: ${this.getAll().length} (past: ${this.past.length}, current: ${this.current ? 1 : 0}, future: ${this.future.length})`);
+    this.emit({ type: 'change', timestamp: Date.now() });
   }
 
   getCurrent(): Snapshot | null {
@@ -125,7 +127,11 @@ export class HistoryManager extends BaseDisposable {
     ];
   }
 
-  // Методы для навигации
+  getLength(): number {
+    return this.past.length + (this.current ? 1 : 0) + this.future.length;
+  }
+
+  // Navigation methods
   canUndo(): boolean {
     return this.past.length > 0;
   }
@@ -166,24 +172,30 @@ export class HistoryManager extends BaseDisposable {
 
   jumpTo(index: number): Snapshot | null {
     const allSnapshots = this.getAll();
-    
+    logger.log(`[HISTORY.jumpTo] called with index=${index}, allSnapshots.length=${allSnapshots.length}, past.length=${this.past.length}, current=${this.current?.metadata.action || 'none'}`);
+
     // Check if index is valid
     if (index < 0 || index >= allSnapshots.length) {
+      logger.log(`[HISTORY.jumpTo] invalid index, returning null`);
       return null;
     }
 
     // If already at the target index, return current snapshot
     const currentIndex = this.past.length;
+    logger.log(`[HISTORY.jumpTo] currentIndex=${currentIndex}`);
     if (index === currentIndex) {
+      logger.log(`[HISTORY.jumpTo] already at target, returning current`);
       return this.current;
     }
 
     const targetSnapshot = allSnapshots[index];
+    logger.log(`[HISTORY.jumpTo] targetSnapshot: ${targetSnapshot.metadata.action || 'unknown'}, value: ${Object.values(targetSnapshot.state)[0]?.value}`);
 
     // Reset history
     this.past = allSnapshots.slice(0, index);
     this.future = allSnapshots.slice(index + 1);
     this.current = targetSnapshot;
+    logger.log(`[HISTORY.jumpTo] after jump: past.length=${this.past.length}, future.length=${this.future.length}`);
 
     return targetSnapshot;
   }
@@ -248,7 +260,7 @@ export class HistoryManager extends BaseDisposable {
     this.compressionStrategy.reset?.();
   }
 
-  // Остальные методы...
+  // Other methods...
 
   /**
    * Clear all history
@@ -261,10 +273,9 @@ export class HistoryManager extends BaseDisposable {
     // Reset compression tracking
     this.originalHistorySize = 0;
     this.compressedHistorySize = 0;
-    
+
     this.emit({
       type: "change",
-      operation: { type: "clear" },
       timestamp: Date.now(),
     });
   }
@@ -275,6 +286,10 @@ export class HistoryManager extends BaseDisposable {
   getStats(): HistoryStats {
     const all = this.getAll();
     return {
+      length: all.length,
+      currentIndex: this.past.length,
+      canUndo: this.past.length > 0,
+      canRedo: this.future.length > 0,
       totalSnapshots: all.length,
       pastCount: this.past.length,
       futureCount: this.future.length,

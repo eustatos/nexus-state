@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --filter=@nexus-state/*",
     "dev": "turbo run dev --parallel",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
+    "test:coverage:packages": "pnpm --filter \"@nexus-state/*\" test:coverage",
     "test:memory": "vitest run packages/core/src/__tests__/memory-leak.test.ts",
     "bench": "vitest bench packages/core/src/__benchmarks__/",
     "lint": "turbo run lint",
@@ -17,6 +18,8 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs",
+    "coverage:badges": "node scripts/add-coverage-badges.js",
+    "coverage:badge": "node scripts/add-coverage-badges.js",
     "test:e2e": "npm run test --workspace=e2e",
     "dev:react": "npm run dev --workspace=demo-react",
     "dev:svelte": "npm run dev --workspace=demo-svelte",
@@ -56,6 +59,8 @@
   },
   "pnpm": {
     "overrides": {
+      "@nexus-state/core": "workspace:*",
+      "@nexus-state/react": "workspace:*",
       "minimatch": "^10.2.3",
       "basic-ftp": "^5.2.0",
       "rollup": "^4.59.0",

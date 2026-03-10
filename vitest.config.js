@@ -14,18 +14,51 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
-      include: ["packages/*/src/**/*"],
-      exclude: [
-        "packages/**/src/**/*.d.ts",
-        "**/legacy.ts",
-        "**/*.config.*",
-        "**/*.test.*",
-        "**/*.spec.*",
-        "packages/**/dist/**",
-        "packages/**/node_modules/**",
+      // Включаем только исходный код пакетов
+      include: [
+        "packages/*/src/**/*.{ts,tsx}",
       ],
-      // Выводим lcov в директорию пакета для последующего объединения
-      reportsDirectory: "./coverage",
+      // Исключаем тесты, фикстуры, бенчмарки, apps и другие служебные файлы
+      exclude: [
+        // Приложения (apps)
+        "apps/**",
+        // Тестовые файлы и директории
+        "**/__tests__/**",
+        "**/__fixtures__/**",
+        "**/__mocks__/**",
+        "**/__benchmarks__/**",
+        "**/test-utils/**",
+        "**/test-utils.ts",
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}",
+        "**/*.bench.{ts,tsx}",
+        "**/*.test-d.{ts,tsx}",
+        // Файлы деклараций и конфигурации
+        "**/*.d.ts",
+        "**/legacy.ts",
+        "**/*.config.{js,ts,mjs,cjs}",
+        "**/*.config.*",
+        // Скомпилированные файлы и зависимости
+        "**/dist/**",
+        "**/build/**",
+        "**/node_modules/**",
+        // Прочее
+        "**/*.css",
+        "**/*.scss",
+        "**/*.less",
+        "**/*.md",
+        "**/*.json",
+      ],
+      // Пороговые значения для покрытия (опционально)
+      thresholds: {
+        global: {
+          // Можно установить минимальные пороги
+          // statements: 80,
+          // branches: 80,
+          // functions: 80,
+          // lines: 80,
+        },
+      },
     },
     // Настройка среды для разных типов тестов
     environmentMatchGlobs: [

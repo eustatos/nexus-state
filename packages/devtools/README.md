@@ -53,6 +53,8 @@ const devtoolsPlugin = devTools({
   latency: 50,              // Delay before sending updates (ms)
   actionNamingStrategy: 'auto', // or 'manual'
   stateSanitizer: (state) => state, // Custom state sanitization
+>
+> [![Coverage for devtools package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=devtools)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
 });
 
 devtoolsPlugin.apply(store);

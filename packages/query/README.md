@@ -45,6 +45,8 @@ function UserProfile({ userId }: { userId: number }) {
   const { data, isLoading, error, refetch } = useQuery(
     `user-${userId}`,
     async () => {
+>
+> [![Coverage for query package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=query)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
       const response = await fetch(`/api/users/${userId}`);
       return response.json();
     },

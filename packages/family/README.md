@@ -14,6 +14,8 @@ For example:
 
 ```js
 const userFamily = atomFamily((userId) => atom({ id: userId, name: "" }));
+>
+> [![Coverage for family package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=family)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
 const user1Atom = userFamily(1); // Creates an atom for user ID 1
 const user2Atom = userFamily(2); // Creates an atom for user ID 2
 ```

@@ -1,0 +1,123 @@
+/* StressTestStats styles */
+
+.stress-test-stats {
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--surface-color, #1e293b);
+}
+
+.stress-test-stats__section {
+  margin-bottom: 16px;
+}
+
+.stress-test-stats__section:last-child {
+  margin-bottom: 0;
+}
+
+.stress-test-stats__section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color, #334155);
+}
+
+.stress-test-stats__icon {
+  color: var(--text-color, #f1f5f9);
+}
+
+.stress-test-stats__icon--turbo {
+  color: var(--warning-color, #f59e0b);
+}
+
+.stress-test-stats__icon--storm {
+  color: var(--danger-color, #ef4444);
+}
+
+.stress-test-stats__icon--perf {
+  color: var(--success-color, #10b981);
+}
+
+.stress-test-stats__section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-color, #f1f5f9);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stress-test-stats__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stress-test-stats__grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.stress-test-stats__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stress-test-stats__stat-label {
+  font-size: 11px;
+  color: var(--muted-color, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stress-test-stats__stat-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color, #f1f5f9);
+}
+
+.stress-test-stats__stat-value--active {
+  color: var(--success-color, #10b981);
+  animation: pulse-text 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.stress-test-stats__stat-value--success {
+  color: var(--success-color, #10b981);
+}
+
+.stress-test-stats__stat-value--warning {
+  color: var(--warning-color, #f59e0b);
+}
+
+.stress-test-stats__stat-value--error {
+  color: var(--danger-color, #ef4444);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stress-test-stats__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stress-test-stats__grid--3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .stress-test-stats__grid,
+  .stress-test-stats__grid--3 {
+    grid-template-columns: 1fr;
+  }
+}

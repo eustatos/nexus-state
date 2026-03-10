@@ -1,0 +1,318 @@
+/* Performance Monitor */
+.performance-monitor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+}
+
+.performance-monitor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.performance-monitor__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.performance-monitor__score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.performance-monitor__score--good {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+
+.performance-monitor__score--warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+}
+
+.performance-monitor__score--bad {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+
+.performance-monitor__score-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.performance-monitor__score-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Section */
+.performance-monitor__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.performance-monitor__section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.performance-monitor__icon {
+  color: var(--text-muted);
+}
+
+.performance-monitor__icon-small {
+  color: var(--text-muted);
+  width: 14px;
+  height: 14px;
+}
+
+/* Metrics */
+.performance-monitor__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.performance-monitor__metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+
+.performance-monitor__metric--large {
+  grid-column: span 2;
+}
+
+.performance-monitor__value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.performance-monitor__value--good {
+  color: var(--success);
+}
+
+.performance-monitor__value--warning {
+  color: var(--warning);
+}
+
+.performance-monitor__value--bad {
+  color: var(--error);
+}
+
+.performance-monitor__label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Charts */
+.performance-monitor__chart {
+  padding: 12px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  min-height: 80px;
+}
+
+/* FPS Chart */
+.fps-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+.fps-chart__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 60px;
+}
+
+.fps-chart__bar {
+  flex: 1;
+  background: var(--primary);
+  border-radius: 2px 2px 0 0;
+  min-width: 4px;
+  transition: height 0.3s ease;
+}
+
+.fps-chart__bar--good {
+  background: var(--success);
+}
+
+.fps-chart__bar--warning {
+  background: var(--warning);
+}
+
+.fps-chart__bar--bad {
+  background: var(--error);
+}
+
+.fps-chart__labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+/* Memory Bar */
+.memory-bar {
+  position: relative;
+  height: 24px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.memory-bar__fill {
+  height: 100%;
+  background: var(--success);
+  border-radius: 4px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.memory-bar__fill--good {
+  background: var(--success);
+}
+
+.memory-bar__fill--warning {
+  background: var(--warning);
+}
+
+.memory-bar__fill--bad {
+  background: var(--error);
+}
+
+.memory-bar__label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Warning */
+.performance-monitor__warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+  color: var(--error);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Footer */
+.performance-monitor__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.performance-monitor__footer-text {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.performance-monitor__footer-warning {
+  font-size: 10px;
+  color: var(--error);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .performance-monitor {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .performance-monitor__metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .performance-monitor__metric--large {
+    grid-column: span 1;
+  }
+
+  .performance-monitor__chart {
+    min-height: 60px;
+  }
+
+  .fps-chart__bars {
+    height: 40px;
+  }
+}
+
+/* Animations */
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.performance-monitor__warning {
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .performance-monitor {
+    background: rgba(30, 30, 30, 0.9);
+  }
+
+  .performance-monitor__metric {
+    background: rgba(40, 40, 40, 0.8);
+  }
+
+  .performance-monitor__chart {
+    background: rgba(40, 40, 40, 0.8);
+  }
+}

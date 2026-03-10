@@ -1,17 +1,19 @@
 /**
- * Public types for SimpleTimeTravel
+ * Public types for TimeTravelController
  */
 
-import type { Store, Snapshot, SnapshotStateEntry } from "../types";
+import type { Store, Snapshot, SnapshotStateEntry, Atom } from '../types';
 
-// Re-export core types that are used by SimpleTimeTravel
+// Re-export core types that are used by TimeTravelController
 export type {
   TimeTravelAPI,
   TimeTravelOptions,
   Snapshot,
   SnapshotMetadata,
   SnapshotStateEntry,
-} from "../types";
+  Atom,
+  Store,
+} from '../types';
 
 // Re-export snapshot module types
 export type {
@@ -24,17 +26,17 @@ export type {
   RestorationProgress,
   CheckpointResult,
   RollbackResult,
-} from "./snapshot/types";
+} from './snapshot/types';
 
 // Define HistoryEvent for history manager compatibility
 export type HistoryEventType =
-  | "capture"
-  | "undo"
-  | "redo"
-  | "jump"
-  | "clear"
-  | "import"
-  | "error";
+  | 'capture'
+  | 'undo'
+  | 'redo'
+  | 'jump'
+  | 'clear'
+  | 'import'
+  | 'error';
 
 export interface HistoryEvent {
   type: HistoryEventType;
@@ -86,7 +88,7 @@ export interface StoreRegistry {
 export interface AtomMetadata {
   name: string;
   createdAt: number;
-  type: "primitive" | "computed" | "writable";
+  type: 'primitive' | 'computed' | 'writable';
   [key: string]: unknown;
 }
 
@@ -95,7 +97,7 @@ export interface TimeTravelMiddlewareConfig {
   whitelist?: string[];
   blacklist?: string[];
   transform?: (
-    state: Record<string, SnapshotStateEntry>,
+    state: Record<string, SnapshotStateEntry>
   ) => Record<string, SnapshotStateEntry>;
   validate?: (snapshot: Snapshot) => boolean;
 }
@@ -113,7 +115,7 @@ export interface HistorySearchCriteria {
   atomValue?: {
     name: string;
     value: unknown;
-    operator?: "eq" | "neq" | "gt" | "lt" | "regex";
+    operator?: 'eq' | 'neq' | 'gt' | 'lt' | 'regex';
   };
   id?: string | string[];
   filter?: (snapshot: Snapshot) => boolean;
@@ -130,7 +132,7 @@ export interface SearchResult {
 }
 
 export interface ExportFormat {
-  version: "1.0";
+  version: '1.0';
   exportedAt: number;
   snapshots: Snapshot[];
   metadata: {
@@ -182,9 +184,7 @@ export type {
   DeltaCompressionConfig,
   DeltaCompressionFactoryConfig,
   DeltaCompressionStrategyType,
-} from "./delta/index";
+} from './delta/index';
 
 // Re-export delta compression strategy
-export type {
-  DeltaCompressionStrategy,
-} from "./delta/compression/types";
+export type { DeltaCompressionStrategy } from './delta/compression/types';

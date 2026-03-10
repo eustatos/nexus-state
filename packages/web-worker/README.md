@@ -35,6 +35,8 @@ workerStore.dispatch({
 
 // Subscribing to results
 workerStore.subscribe((state) => {
+>
+> [![Coverage for web-worker package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=web-worker)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
   console.log('Calculation results:', state.calculations);
 });
 ```

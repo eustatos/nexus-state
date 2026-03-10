@@ -3,6 +3,7 @@
 > React integration for Nexus State — powerful state management with fine-grained reactivity
 >
 > [![npm version](https://img.shields.io/npm/v/@nexus-state/react)](https://www.npmjs.com/package/@nexus-state/react)
+> [![Coverage for react package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=react)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
 > [![npm downloads](https://img.shields.io/npm/dw/@nexus-state/react)](https://www.npmjs.com/package/@nexus-state/react)
 > [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
 

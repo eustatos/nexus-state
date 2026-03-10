@@ -2,7 +2,10 @@
  * Snapshot module types
  */
 
-import type { Snapshot, SnapshotMetadata } from "../types";
+import type { Snapshot, SnapshotMetadata, SnapshotStateEntry } from "../types";
+
+// Re-export core snapshot types
+export type { Snapshot, SnapshotMetadata, SnapshotStateEntry };
 
 /**
  * Configuration for SnapshotCreator
@@ -208,6 +211,9 @@ export interface RestorationResult {
 
   /** Whether operation timed out */
   timedOut?: boolean;
+
+  /** Atoms that were restored (atom name -> value) */
+  restored?: Record<string, unknown>;
 }
 
 /**

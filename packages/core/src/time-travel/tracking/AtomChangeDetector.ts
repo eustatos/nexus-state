@@ -4,18 +4,17 @@
 
 import type {
   ChangeEvent,
-  ChangeListener,
   ChangeFilter,
   ChangeBatch,
   TrackedAtom,
 } from "./types";
-import { AtomTracker } from "./AtomTracker";
+import type { AtomTracker } from "./AtomTracker.di";
 import { Atom } from "../../types";
 
 export class AtomChangeDetector {
   private tracker: AtomTracker;
-  private listeners: Map<symbol, Set<ChangeListener>> = new Map();
-  private globalListeners: Set<ChangeListener> = new Set();
+  private listeners: Map<symbol, Set<(event: ChangeEvent) => void>> = new Map();
+  private globalListeners: Set<(event: ChangeEvent) => void> = new Set();
   private filters: ChangeFilter[] = [];
   private batchMode: boolean = false;
   private batchQueue: ChangeEvent[] = [];
@@ -32,9 +31,14 @@ export class AtomChangeDetector {
    */
   private setupTracking(): void {
     // Subscribe to tracker events
-    this.tracker.subscribe((event) => {
-      if (event.type === "change" && event.atom) {
-        this.handleAtomChange(event.atom, event.oldValue, event.newValue);
+    this.tracker.subscribe('atom-changed', (event) => {
+      if (event.atom) {
+        const trackedAtom = event.atom as TrackedAtom;
+        this.handleAtomChange(
+          trackedAtom,
+          event.data?.oldValue,
+          event.data?.newValue
+        );
       }
     });
   }
@@ -57,7 +61,7 @@ export class AtomChangeDetector {
       oldValue,
       newValue,
       timestamp: Date.now(),
-      type: this.detectChangeType(oldValue, newValue),
+      type: 'change',
     };
 
     // Apply filters
@@ -128,8 +132,8 @@ export class AtomChangeDetector {
    * @param atom Atom to watch
    * @param listener Change listener
    */
-  watch(atom: Atom<unknown>, listener: ChangeListener): () => void {
-    if (!this.tracker.isTracked(atom)) {
+  watch(atom: Atom<unknown>, listener: (event: ChangeEvent) => void): () => void {
+    if (!this.tracker.isTracked(atom.id)) {
       this.tracker.track(atom);
     }
 
@@ -159,7 +163,7 @@ export class AtomChangeDetector {
    * @param atoms Atoms to watch
    * @param listener Change listener
    */
-  watchMany(atoms: any[], listener: ChangeListener): () => void {
+  watchMany(atoms: any[], listener: (event: ChangeEvent) => void): () => void {
     const unwatchFns = atoms.map((atom) => this.watch(atom, listener));
 
     return () => {
@@ -172,11 +176,11 @@ export class AtomChangeDetector {
    * @param pattern Atom name pattern
    * @param listener Change listener
    */
-  watchPattern(pattern: RegExp, listener: ChangeListener): () => void {
+  watchPattern(pattern: RegExp, listener: (event: ChangeEvent) => void): () => void {
     const atoms = this.tracker
-      .getAllTracked()
+      .getTrackedAtoms()
       .filter((t) => pattern.test(t.name))
-      .map((t) => t.atom);
+      .map((t) => t.atom as Atom<unknown>);
 
     return this.watchMany(atoms, listener);
   }
@@ -185,7 +189,7 @@ export class AtomChangeDetector {
    * Add global listener
    * @param listener Change listener
    */
-  addGlobalListener(listener: ChangeListener): () => void {
+  addGlobalListener(listener: (event: ChangeEvent) => void): () => void {
     this.globalListeners.add(listener);
     return () => this.globalListeners.delete(listener);
   }
@@ -272,8 +276,9 @@ export class AtomChangeDetector {
    * Check for changes manually
    */
   checkForChanges(): void {
-    this.tracker.getTrackedAtoms().forEach((atom) => {
-      const atomId = atom.id;
+    this.tracker.getTrackedAtoms().forEach((trackedAtom) => {
+      const atom = trackedAtom.atom as Atom<unknown>;
+      const atomId = trackedAtom.id;
       const currentValue = this.tracker["store"].get(atom);
       const previousValue = this.previousValues.get(atomId);
 
@@ -300,7 +305,7 @@ export class AtomChangeDetector {
    */
   getMostChanged(count: number = 5): TrackedAtom[] {
     return this.tracker
-      .getAllTracked()
+      .getTrackedAtoms()
       .sort((a, b) => b.changeCount - a.changeCount)
       .slice(0, count);
   }
@@ -311,7 +316,7 @@ export class AtomChangeDetector {
    */
   getRecentlyChanged(minutes: number = 5): TrackedAtom[] {
     const cutoff = Date.now() - minutes * 60 * 1000;
-    return this.tracker.getAllTracked().filter((t) => t.lastSeen > cutoff);
+    return this.tracker.getTrackedAtoms().filter((t) => t.lastSeen > cutoff);
   }
 
   /**

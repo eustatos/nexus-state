@@ -1,15 +1,15 @@
 /**
- * Snapshot module for SimpleTimeTravel
+ * Snapshot module for TimeTravelController
  *
  * @packageDocumentation
  * Provides snapshot creation, restoration, validation, and serialization.
  */
 
-import { Snapshot } from "..";
-import { Store } from "../../types";
-import { SnapshotCreator } from "./SnapshotCreator";
-import { SnapshotRestorer } from "./SnapshotRestorer";
-import { SnapshotValidator } from "./SnapshotValidator";
+import { Snapshot } from '..';
+import { Store } from '../../types';
+import { SnapshotCreator } from './SnapshotCreator';
+import { SnapshotRestorer } from './SnapshotRestorer';
+import { SnapshotValidator } from './SnapshotValidator';
 
 import type {
   SnapshotCreatorConfig,
@@ -17,13 +17,26 @@ import type {
   TransactionalRestorerConfig,
   RestorationConfig,
   SnapshotFilter,
-} from "./types";
+} from './types';
 
 // Re-export main classes
-export { SnapshotCreator } from "./SnapshotCreator";
-export { SnapshotRestorer } from "./SnapshotRestorer";
-export { SnapshotValidator } from "./SnapshotValidator";
+export { SnapshotCreator } from './SnapshotCreator';
+export { SnapshotRestorer } from './SnapshotRestorer';
+export { SnapshotValidator } from './SnapshotValidator';
+export { AtomFinder } from './AtomFinder';
+export { ValueDeserializer } from './ValueDeserializer';
+export { RestorationEngine } from './RestorationEngine';
+export { TransactionalRestorer } from './TransactionalRestorer';
+export { RestorationProgressTracker } from './RestorationProgressTracker';
+export { RestorationConfigManager } from './RestorationConfig';
+// RestorationError is exported from types below
 
+// Re-export transactional components
+export { CheckpointManager } from './CheckpointManager';
+export { RollbackEngine } from './RollbackEngine';
+export { TransactionValidator } from './TransactionValidator';
+export { RestorationApplier } from './RestorationApplier';
+export { TransactionContext } from './TransactionContext';
 
 // Re-export types
 export type {
@@ -47,7 +60,7 @@ export type {
   RestorationProgress,
   CheckpointResult,
   RollbackResult,
-} from "./types";
+} from './types';
 
 // Re-export constants
 export {
@@ -56,7 +69,7 @@ export {
   SERIALIZATION_FORMATS,
   VALIDATION_LEVELS,
   SNAPSHOT_EVENTS,
-} from "./constants";
+} from './constants';
 
 /**
  * Create a new snapshot creator
@@ -66,7 +79,7 @@ export {
  */
 export function createSnapshotCreator(
   store: Store,
-  config?: Partial<SnapshotCreatorConfig>,
+  config?: Partial<SnapshotCreatorConfig>
 ): SnapshotCreator {
   return new SnapshotCreator(store, config);
 }
@@ -79,7 +92,9 @@ export function createSnapshotCreator(
  */
 export function createSnapshotRestorer(
   store: Store,
-  config?: Partial<SnapshotRestorerConfig> & Partial<TransactionalRestorerConfig> & Partial<RestorationConfig>,
+  config?: Partial<SnapshotRestorerConfig> &
+    Partial<TransactionalRestorerConfig> &
+    Partial<RestorationConfig>
 ): SnapshotRestorer {
   return new SnapshotRestorer(store, config);
 }
@@ -119,7 +134,7 @@ export function compareByAtomCount(a: Snapshot, b: Snapshot): number {
  */
 export function filterByAction(actionName: string | RegExp): SnapshotFilter {
   return (snapshot: Snapshot) => {
-    const action = snapshot.metadata?.action || "";
+    const action = snapshot.metadata?.action || '';
     if (actionName instanceof RegExp) {
       return actionName.test(action);
     }
@@ -148,7 +163,7 @@ export function filterByTimeRange(start: number, end: number): SnapshotFilter {
  */
 export function filterByAtomValue(
   atomName: string,
-  value: unknown,
+  value: unknown
 ): SnapshotFilter {
   return (snapshot: Snapshot) => {
     const entry = snapshot.state?.[atomName];

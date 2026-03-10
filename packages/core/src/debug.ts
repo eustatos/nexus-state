@@ -78,3 +78,6 @@ export const logger = new DebugLogger('[Nexus]');
 export const storeLogger = new DebugLogger('[Nexus:Store]');
 export const atomLogger = new DebugLogger('[Nexus:Atom]');
 export const reactLogger = new DebugLogger('[Nexus:React]');
+
+// Export class for testing
+export { DebugLogger };
