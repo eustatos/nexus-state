@@ -110,18 +110,18 @@ export const yupPlugin = createSchemaPlugin<AnySchema, Record<string, unknown>>(
       validateField: async <K extends keyof Record<string, unknown>>(
         fieldName: K,
         value: Record<string, unknown>[K],
-        context?: ValidationContext
+        _context?: ValidationContext
       ): Promise<FieldError | null> => {
         try {
           // Yup's validateAt requires all values, so we create a temporary object
           // with just the field being validated
           const tempValues = { [fieldName as string]: value };
-          
+
           await schema.validateAt(fieldName as string, tempValues, {
             abortEarly: true,
             stripUnknown: true,
           });
-          
+
           return null;
         } catch (error) {
           if (error instanceof ValidationError) {
