@@ -23,6 +23,7 @@ import {
   validateField,
 } from './field';
 import { createFieldArray, getFieldArray } from './field-array';
+import { defaultSchemaRegistry } from './schema';
 
 /**
  * Create a form
@@ -37,6 +38,32 @@ export function createForm<TValues extends FormValues>(
   const defaultRevalidateMode: ReValidateMode =
     options.defaultRevalidateMode ?? 'onChange';
   const showErrorsOnTouched = options.showErrorsOnTouched ?? true;
+
+  // Get schema from registry or options
+  let schema: SchemaValidator<TValues> | undefined;
+
+  // Priority 1: schemaType + schemaConfig (new way via registry)
+  if (options.schemaType && options.schemaConfig !== undefined) {
+    const registrySchema = defaultSchemaRegistry.create(
+      options.schemaType,
+      options.schemaConfig
+    );
+    if (registrySchema) {
+      schema = registrySchema as SchemaValidator<TValues>;
+    }
+
+    if (!schema) {
+      const availableTypes = defaultSchemaRegistry.getRegisteredTypes();
+      throw new Error(
+        `Schema type "${options.schemaType}" not registered. ` +
+        `Available types: ${availableTypes.join(', ') || 'none'}`
+      );
+    }
+  }
+  // Priority 2: direct schema (backward compatibility)
+  else if (options.schema) {
+    schema = options.schema;
+  }
 
   // Create field atoms for each initial value
   const fieldMetas: Map<keyof TValues, FieldMeta<any>> = new Map();
@@ -117,20 +144,21 @@ export function createForm<TValues extends FormValues>(
     const values = getValues();
 
     // Schema validation takes precedence
-    if (options.schema) {
-      const errors = await options.schema.validate(values);
+    if (schema) {
+      const errors = await schema.validate(values);
 
       // Apply schema errors to fields
-      for (const key in errors) {
+      for (const key of Object.keys(errors)) {
         const meta = fieldMetas.get(key as keyof TValues);
-        if (meta && errors[key]) {
-          setFieldError(store, meta, errors[key]!);
+        const error = errors[key as keyof typeof errors];
+        if (meta && error) {
+          setFieldError(store, meta, error);
         }
       }
 
       // Clear errors for fields without schema errors
       for (const [key, meta] of fieldMetas.entries()) {
-        if (!errors[key]) {
+        if (!errors[key as keyof TValues]) {
           setFieldError(store, meta, null);
         }
       }
@@ -262,39 +290,34 @@ export function createForm<TValues extends FormValues>(
       setValue: (value: TValues[K]) => {
         setFieldValue(store, meta as FieldMeta<TValues[K]>, value);
 
-        if (options.validateOnChange) {
+        if (options.validateOnChange && schema?.validateField) {
           const values = { ...getValues(), [name]: value };
 
-          // Validate with schema if available
-          if (options.schema && options.schema.validateField) {
-            const validationPromise = options.schema.validateField(name, value, values as TValues);
-            Promise.resolve(validationPromise).then((error: string | null) => {
-              if (error) {
-                setFieldError(store, meta, error);
-              } else {
-                setFieldError(store, meta, null);
-              }
-            });
-          }
+          const validationPromise = schema.validateField(name, value, values as TValues);
+          Promise.resolve(validationPromise).then((error) => {
+            if (error) {
+              setFieldError(store, meta, error);
+            } else {
+              setFieldError(store, meta, null);
+            }
+          });
         }
       },
 
       setTouched: (touched: boolean) => {
         setFieldTouched(store, meta, touched);
 
-        if (touched && options.validateOnBlur) {
+        if (touched && options.validateOnBlur && schema?.validateField) {
           const values = getValues();
 
-          if (options.schema && options.schema.validateField) {
-            const validationPromise = options.schema.validateField(name, fieldState.value, values);
-            Promise.resolve(validationPromise).then((error: string | null) => {
-              if (error) {
-                setFieldError(store, meta, error);
-              } else {
-                setFieldError(store, meta, null);
-              }
-            });
-          }
+          const validationPromise = schema.validateField(name, fieldState.value, values);
+          Promise.resolve(validationPromise).then((error) => {
+            if (error) {
+              setFieldError(store, meta, error);
+            } else {
+              setFieldError(store, meta, null);
+            }
+          });
         }
       },
 

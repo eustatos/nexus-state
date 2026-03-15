@@ -655,6 +655,91 @@ importers:
         specifier: ^3.23.8
         version: 3.25.76
 
+  packages/form-schema-ajv:
+    dependencies:
+      '@nexus-state/form':
+        specifier: workspace:*
+        version: link:../form
+    devDependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../core
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.37
+      ajv:
+        specifier: ^6.14.0
+        version: 6.14.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.7
+        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
+
+  packages/form-schema-dsl:
+    dependencies:
+      '@nexus-state/form':
+        specifier: workspace:*
+        version: link:../form
+    devDependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../core
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.37
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.7
+        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
+
+  packages/form-schema-yup:
+    dependencies:
+      '@nexus-state/form':
+        specifier: workspace:*
+        version: link:../form
+    devDependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../core
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.37
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.7
+        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
+      yup:
+        specifier: ^1.4.0
+        version: 1.7.1
+
+  packages/form-schema-zod:
+    dependencies:
+      '@nexus-state/form':
+        specifier: workspace:*
+        version: link:../form
+    devDependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../core
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.37
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.7
+        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
+
   packages/immer:
     dependencies:
       '@nexus-state/core':
