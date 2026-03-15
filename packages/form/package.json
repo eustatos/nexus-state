@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/form",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Type-safe form management with field-level granularity for Nexus State",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,6 +14,11 @@
       "types": "./dist/react/index.d.ts",
       "import": "./dist/react/index.js",
       "require": "./dist/react/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema/index.d.ts",
+      "import": "./dist/schema/index.js",
+      "require": "./dist/schema/index.js"
     }
   },
   "files": [

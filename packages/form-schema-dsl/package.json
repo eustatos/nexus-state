@@ -1,0 +1,107 @@
+{
+  "name": "@nexus-state/form-schema-dsl",
+  "version": "0.1.0",
+  "description": "Custom DSL schema validator for Nexus State forms",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./validators": {
+      "types": "./dist/validators/index.d.ts",
+      "import": "./dist/validators/index.js",
+      "require": "./dist/validators/index.cjs"
+    },
+    "./validators/required": {
+      "types": "./dist/validators/required.d.ts",
+      "import": "./dist/validators/required.js",
+      "require": "./dist/validators/required.cjs"
+    },
+    "./validators/minLength": {
+      "types": "./dist/validators/minLength.d.ts",
+      "import": "./dist/validators/minLength.js",
+      "require": "./dist/validators/minLength.cjs"
+    },
+    "./validators/maxLength": {
+      "types": "./dist/validators/maxLength.d.ts",
+      "import": "./dist/validators/maxLength.js",
+      "require": "./dist/validators/maxLength.cjs"
+    },
+    "./validators/email": {
+      "types": "./dist/validators/email.d.ts",
+      "import": "./dist/validators/email.js",
+      "require": "./dist/validators/email.cjs"
+    },
+    "./validators/pattern": {
+      "types": "./dist/validators/pattern.d.ts",
+      "import": "./dist/validators/pattern.js",
+      "require": "./dist/validators/pattern.cjs"
+    },
+    "./validators/equalTo": {
+      "types": "./dist/validators/equalTo.d.ts",
+      "import": "./dist/validators/equalTo.js",
+      "require": "./dist/validators/equalTo.cjs"
+    },
+    "./validators/unique": {
+      "types": "./dist/validators/unique.d.ts",
+      "import": "./dist/validators/unique.js",
+      "require": "./dist/validators/unique.cjs"
+    },
+    "./async-validators": {
+      "types": "./dist/async-validators.d.ts",
+      "import": "./dist/async-validators.js",
+      "require": "./dist/async-validators.cjs"
+    },
+    "./parser": {
+      "types": "./dist/parser.d.ts",
+      "import": "./dist/parser.js",
+      "require": "./dist/parser.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --ext .ts",
+    "size": "size-limit"
+  },
+  "keywords": [
+    "dsl",
+    "validation",
+    "schema",
+    "nexus-state",
+    "forms",
+    "custom"
+  ],
+  "dependencies": {
+    "@nexus-state/form": "workspace:*"
+  },
+  "devDependencies": {
+    "@nexus-state/core": "workspace:*",
+    "@nexus-state/form": "workspace:*",
+    "@size-limit/preset-small-lib": "^11.0.0",
+    "@types/node": "^20.0.0",
+    "size-limit": "^11.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eustatos/nexus-state",
+    "directory": "packages/form-schema-dsl"
+  },
+  "license": "MIT",
+  "author": "Nexus State Contributors"
+}

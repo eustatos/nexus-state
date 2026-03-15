@@ -230,7 +230,25 @@ export interface FieldOptions<TValue = any> {
 export interface FormOptions<TValues extends FormValues = FormValues> {
   initialValues?: TValues;
   validate?: FormValidator<TValues>;
-  schema?: SchemaValidator<TValues>; // Schema validator
+
+  /**
+   * Direct schema validator instance (backward compatibility)
+   * @deprecated Use schemaType + schemaConfig for automatic registration via registry
+   */
+  schema?: SchemaValidator<TValues>;
+
+  /**
+   * Schema type for use via registry
+   * @example 'zod', 'yup', 'ajv', 'dsl'
+   */
+  schemaType?: string;
+
+  /**
+   * Schema configuration to pass to plugin factory
+   * Interpreted based on schemaType
+   */
+  schemaConfig?: unknown;
+
   onSubmit?: (values: TValues) => void | Promise<void>;
   validateOnChange?: boolean;
   validateOnBlur?: boolean;

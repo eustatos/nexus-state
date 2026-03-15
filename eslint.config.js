@@ -68,11 +68,20 @@ export default [
       '@typescript-eslint': tsPlugin,
     },
     rules: {
+      // Disable base rule for TypeScript files
+      'no-unused-vars': 'off',
+
       // TypeScript specific
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_|^__',
+          ignoreRestSiblings: true,
+          caughtErrors: 'none',
+        },
       ],
 
       // General code quality
