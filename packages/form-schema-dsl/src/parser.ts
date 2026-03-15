@@ -13,7 +13,7 @@
  * ```
  */
 
-import type { DSLSchema, DSLRule } from '@nexus-state/form-schema-dsl';
+import type { DSLSchema, DSLRule } from './types';
 import {
   required,
   minLength,
@@ -25,9 +25,9 @@ import {
   minValue,
   maxValue,
   equalTo,
-  unique,
   // ... other validators
-} from '@nexus-state/form-schema-dsl';
+} from './validators';
+import { unique } from './async-validators';
 
 /**
  * Token types for the DSL lexer
