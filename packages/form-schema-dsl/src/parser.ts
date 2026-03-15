@@ -220,11 +220,17 @@ export class Lexer {
       return;
     }
 
+    // Special characters (for regex patterns etc.) - skip them
+    if (this.isSpecialChar(char)) {
+      this.advance();
+      return;
+    }
+
     throw new LexerError(`Unexpected character: ${char}`, this.line, this.column);
   }
 
   private comment(): void {
-    while (this.peek() !== '\n' && !this.isAtEnd()) {
+    while (!this.isAtEnd() && this.peek() !== '\n') {
       this.advance();
     }
   }
@@ -232,14 +238,14 @@ export class Lexer {
   private identifierOrRule(): void {
     const start = this.position;
 
-    while (this.isAlphaNumeric(this.peek()) || this.peek() === '_') {
+    while (!this.isAtEnd() && (this.isAlphaNumeric(this.peek()) || this.peek() === '_')) {
       this.advance();
     }
 
     const value = this.input.substring(start, this.position);
 
     // Check if followed by colon (field name) or not (rule)
-    if (this.peek() === ':') {
+    if (!this.isAtEnd() && this.peek() === ':') {
       this.tokens.push({
         type: TokenType.FIELD_NAME,
         value,
@@ -259,16 +265,16 @@ export class Lexer {
   private number(): void {
     const start = this.position;
 
-    while (this.isDigit(this.peek())) {
+    while (!this.isAtEnd() && this.isDigit(this.peek())) {
       this.advance();
     }
 
     // Check for range (e.g., 3..20)
-    if (this.input.substring(this.position, this.position + 2) === '..') {
+    if (!this.isAtEnd() && this.input.substring(this.position, this.position + 2) === '..') {
       this.advance(); // .
       this.advance(); // .
 
-      while (this.isDigit(this.peek())) {
+      while (!this.isAtEnd() && this.isDigit(this.peek())) {
         this.advance();
       }
 
@@ -301,6 +307,11 @@ export class Lexer {
 
   private isAlphaNumeric(char: string): boolean {
     return this.isAlpha(char) || this.isDigit(char);
+  }
+
+  private isSpecialChar(char: string): boolean {
+    // Special characters that can appear in patterns/regex
+    return '/\\[]{}()^$*+?.!@#%&_-~|'.includes(char);
   }
 }
 
@@ -403,12 +414,14 @@ export class Parser {
 
     while (!this.check(TokenType.NEWLINE) && !this.isAtEnd()) {
       // Skip commas
-      this.match(TokenType.COMMA);
+      if (this.match(TokenType.COMMA)) {
+        continue;
+      }
 
       if (this.check(TokenType.RULE)) {
         const rule = this.parseRule();
         rules.push(rule);
-      } else if (!this.isAtEnd()) {
+      } else {
         this.advance(); // Skip unexpected token
       }
     }
@@ -439,39 +452,185 @@ export class Parser {
  * Validator mapping - maps rule names to validator functions
  */
 export interface ValidatorMap {
-  [ruleName: string]: (...params: string[]) => DSLRule | null;
+  [ruleName: string]: (...params: string[]) => DSLRule | undefined;
 }
 
 /**
  * Default validator mapping
  */
 export const defaultValidators: ValidatorMap = {
-  required: () => required as any,
-  email: () => email as any,
-  url: () => url as any,
-  phone: () => phone as any,
-  min: (value) => minLength(parseInt(value, 10)) as any,
-  max: (value) => maxLength(parseInt(value, 10)) as any,
-  minlength: (value) => minLength(parseInt(value, 10)) as any,
-  maxlength: (value) => maxLength(parseInt(value, 10)) as any,
-  minvalue: (value) => minValue(parseInt(value, 10)) as any,
-  maxvalue: (value) => maxValue(parseInt(value, 10)) as any,
-  pattern: (value) => pattern(new RegExp(value)) as any,
-  regex: (value) => pattern(new RegExp(value)) as any,
-  same: (field) => equalTo(field) as any,
-  equals: (value) => equalTo(value) as any,
+  required: () => ({
+    validate: (value) => {
+      if (value === null || value === undefined || value === '') {
+        return 'This field is required';
+      }
+      if (Array.isArray(value) && value.length === 0) {
+        return 'At least one item is required';
+      }
+      return null;
+    },
+    code: 'required',
+  }),
+  email: () => ({
+    validate: (value) => {
+      if (!value) return null;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(value) ? null : 'Invalid email format';
+    },
+    code: 'email',
+  }),
+  url: () => ({
+    validate: (value) => {
+      if (!value) return null;
+      const urlRegex = /^https?:\/\/.+\..+/;
+      return urlRegex.test(value) ? null : 'Invalid URL format';
+    },
+    code: 'url',
+  }),
+  phone: () => ({
+    validate: (value) => {
+      if (!value) return null;
+      const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+      return phoneRegex.test(value) ? null : 'Invalid phone format';
+    },
+    code: 'phone',
+  }),
+  min: (value) => ({
+    validate: (val) => {
+      if (typeof val !== 'string') return null;
+      const min = parseInt(value, 10);
+      return val.length >= min ? null : `Minimum length is ${min} characters`;
+    },
+    code: 'min_length',
+  }),
+  max: (value) => ({
+    validate: (val) => {
+      if (typeof val !== 'string') return null;
+      const max = parseInt(value, 10);
+      return val.length <= max ? null : `Maximum length is ${max} characters`;
+    },
+    code: 'max_length',
+  }),
+  minlength: (value) => defaultValidators.min(value),
+  maxlength: (value) => defaultValidators.max(value),
+  minvalue: (value) => ({
+    validate: (val) => {
+      if (typeof val !== 'number') return null;
+      const min = parseInt(value, 10);
+      return val >= min ? null : `Minimum value is ${min}`;
+    },
+    code: 'min_value',
+  }),
+  maxvalue: (value) => ({
+    validate: (val) => {
+      if (typeof val !== 'number') return null;
+      const max = parseInt(value, 10);
+      return val <= max ? null : `Maximum value is ${max}`;
+    },
+    code: 'max_value',
+  }),
+  pattern: (value) => ({
+    validate: (val) => {
+      if (!val) return null;
+      try {
+        const regex = new RegExp(value);
+        return regex.test(val) ? null : 'Invalid format';
+      } catch {
+        return 'Invalid pattern';
+      }
+    },
+    code: 'pattern',
+  }),
+  regex: (value) => defaultValidators.pattern(value),
+  same: (field) => ({
+    validate: (value, allValues) => {
+      const targetValue = allValues?.[field];
+      return value === targetValue ? null : `Must match ${field}`;
+    },
+    code: 'same',
+  }),
+  equals: (value) => ({
+    validate: (val) => {
+      return val === value ? null : `Must equal ${value}`;
+    },
+    code: 'equals',
+  }),
   unique: (ref) => {
     const [table, field] = ref.split('.');
-    return unique(table, field) as any;
+    return {
+      validate: async (value) => {
+        if (!value) return null;
+        try {
+          const response = await fetch(`/api/validate/unique`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ table, field, value }),
+          });
+          const data = await response.json() as { available: boolean };
+          return data.available ? null : 'Already exists';
+        } catch {
+          return 'Validation failed';
+        }
+      },
+      code: 'unique',
+    };
   },
-  uppercase: () => pattern(/[A-Z]/, 'Must contain uppercase letter') as any,
-  lowercase: () => pattern(/[a-z]/, 'Must contain lowercase letter') as any,
-  number: () => pattern(/[0-9]/, 'Must contain number') as any,
-  special: () => pattern(/[!@#$%^&*]/, 'Must contain special character') as any,
-  alphanumeric: () => pattern(/^[a-zA-Z0-9]+$/, 'Must be alphanumeric') as any,
-  integer: () => pattern(/^-?\d+$/, 'Must be an integer') as any,
-  positive: () => minValue(0) as any,
-  negative: () => maxValue(0) as any,
+  uppercase: () => ({
+    validate: (value) => {
+      if (!value) return null;
+      return /[A-Z]/.test(value) ? null : 'Must contain uppercase letter';
+    },
+    code: 'uppercase',
+  }),
+  lowercase: () => ({
+    validate: (value) => {
+      if (!value) return null;
+      return /[a-z]/.test(value) ? null : 'Must contain lowercase letter';
+    },
+    code: 'lowercase',
+  }),
+  number: () => ({
+    validate: (value) => {
+      if (!value) return null;
+      return /[0-9]/.test(value) ? null : 'Must contain number';
+    },
+    code: 'number',
+  }),
+  special: () => ({
+    validate: (value) => {
+      if (!value) return null;
+      return /[!@#$%^&*]/.test(value) ? null : 'Must contain special character';
+    },
+    code: 'special',
+  }),
+  alphanumeric: () => ({
+    validate: (value) => {
+      if (!value) return null;
+      return /^[a-zA-Z0-9]+$/.test(value) ? null : 'Must be alphanumeric';
+    },
+    code: 'alphanumeric',
+  }),
+  integer: () => ({
+    validate: (value) => {
+      if (value === null || value === undefined) return null;
+      return Number.isInteger(value) ? null : 'Must be an integer';
+    },
+    code: 'integer',
+  }),
+  positive: () => ({
+    validate: (value) => {
+      if (typeof value !== 'number') return null;
+      return value > 0 ? null : 'Must be positive';
+    },
+    code: 'positive',
+  }),
+  negative: () => ({
+    validate: (value) => {
+      if (typeof value !== 'number') return null;
+      return value < 0 ? null : 'Must be negative';
+    },
+    code: 'negative',
+  }),
 };
 
 /**

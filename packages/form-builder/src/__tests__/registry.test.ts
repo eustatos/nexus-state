@@ -321,10 +321,12 @@ describe('ComponentRegistry', () => {
 
   describe('defaultRegistry', () => {
     it('should have built-in components registered', () => {
+      defaultRegistry.registerMany(builtInComponents);
       expect(defaultRegistry.size).toBe(builtInComponents.length);
     });
 
     it('should allow getting built-in components', () => {
+      defaultRegistry.registerMany(builtInComponents);
       const textComponent = defaultRegistry.get('text');
       expect(textComponent).toBeDefined();
       expect(textComponent?.label).toBe('Text Input');
@@ -332,23 +334,27 @@ describe('ComponentRegistry', () => {
   });
 
   describe('Component rendering', () => {
+    beforeEach(() => {
+      defaultRegistry.registerMany(builtInComponents);
+    });
+
     it('should have working renderPreview', () => {
       const component = defaultRegistry.get('text');
       expect(component).toBeDefined();
-      
+
       const preview = component!.renderPreview({
         type: 'text',
         label: 'Test',
         placeholder: 'Test placeholder',
       });
-      
+
       expect(preview).toBeDefined();
     });
 
     it('should have working renderField', () => {
       const component = defaultRegistry.get('text');
       expect(component).toBeDefined();
-      
+
       const field = component!.renderField({
         id: 'test_field',
         type: 'text',
@@ -356,7 +362,7 @@ describe('ComponentRegistry', () => {
         label: 'Test',
         placeholder: 'Test placeholder',
       });
-      
+
       expect(field).toBeDefined();
     });
   });

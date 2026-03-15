@@ -13,24 +13,29 @@
       "require": "./dist/index.cjs"
     },
     "./schema": {
-      "types": "./dist/schema/index.d.ts",
-      "import": "./dist/schema/index.js",
-      "require": "./dist/schema/index.cjs"
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js",
+      "require": "./dist/schema.cjs"
     },
     "./registry": {
-      "types": "./dist/registry/index.d.ts",
-      "import": "./dist/registry/index.js",
-      "require": "./dist/registry/index.cjs"
+      "types": "./dist/registry.d.ts",
+      "import": "./dist/registry.js",
+      "require": "./dist/registry.cjs"
+    },
+    "./built-in-components": {
+      "types": "./dist/built-in-components.d.ts",
+      "import": "./dist/built-in-components.js",
+      "require": "./dist/built-in-components.cjs"
     },
     "./state": {
-      "types": "./dist/state/index.d.ts",
-      "import": "./dist/state/index.js",
-      "require": "./dist/state/index.cjs"
+      "types": "./dist/state.d.ts",
+      "import": "./dist/state.js",
+      "require": "./dist/state.cjs"
     },
     "./export": {
-      "types": "./dist/export/index.d.ts",
-      "import": "./dist/export/index.js",
-      "require": "./dist/export/index.cjs"
+      "types": "./dist/export.d.ts",
+      "import": "./dist/export.js",
+      "require": "./dist/export.cjs"
     }
   },
   "sideEffects": false,

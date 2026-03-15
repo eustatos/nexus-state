@@ -1,10 +1,10 @@
 /**
  * Form Builder State
- * 
+ *
  * Manages the state of the form builder including schema, selection, and history.
  */
 
-import { atom } from '@nexus-state/core';
+import { atom, type WritableAtom } from '@nexus-state/core';
 import type { FormSchema, FieldSchema } from '../schema/types';
 
 /**
@@ -70,6 +70,7 @@ export const builderAtom = atom<BuilderState>(createInitialBuilderState());
 function addToHistory(state: BuilderState, newSchema: FormSchema): BuilderState {
   return {
     ...state,
+    schema: newSchema,
     history: {
       past: [...state.history.past, state.history.present],
       present: newSchema,
@@ -81,13 +82,21 @@ function addToHistory(state: BuilderState, newSchema: FormSchema): BuilderState 
 
 /**
  * Builder actions
+ *
+ * Note: All actions take state as first parameter for pure function behavior.
+ * This makes them easier to test and compose.
+ *
+ * @example
+ * ```typescript
+ * const newState = builderActions.addField(state, field);
+ * ```
  */
 export const builderActions = {
   /**
    * Set the entire schema
    */
-  setSchema(schema: FormSchema) {
-    builderAtom.update((state) => ({
+  setSchema: (state: BuilderState, schema: FormSchema): BuilderState => {
+    return {
       ...state,
       schema,
       history: {
@@ -95,211 +104,190 @@ export const builderActions = {
         present: schema,
       },
       isDirty: false,
-    }));
+    };
   },
 
   /**
    * Add a field to the form
    */
-  addField(field: FieldSchema) {
-    builderAtom.update((state) => {
-      const newSchema = {
-        ...state.schema,
-        fields: [...state.schema.fields, field],
-      };
-
-      return addToHistory(state, newSchema);
-    });
+  addField: (state: BuilderState, field: FieldSchema): BuilderState => {
+    const newSchema = {
+      ...state.schema,
+      fields: [...state.schema.fields, field],
+    };
+    return addToHistory(state, newSchema);
   },
 
   /**
    * Add a field at a specific index
    */
-  addFieldAt(field: FieldSchema, index: number) {
-    builderAtom.update((state) => {
-      const newFields = [...state.schema.fields];
-      newFields.splice(index, 0, field);
-      
-      const newSchema = {
-        ...state.schema,
-        fields: newFields,
-      };
+  addFieldAt: (state: BuilderState, field: FieldSchema, index: number): BuilderState => {
+    const newFields = [...state.schema.fields];
+    newFields.splice(index, 0, field);
 
-      return addToHistory(state, newSchema);
-    });
+    const newSchema = {
+      ...state.schema,
+      fields: newFields,
+    };
+    return addToHistory(state, newSchema);
   },
 
   /**
    * Remove a field by id
    */
-  removeField(fieldId: string) {
-    builderAtom.update((state) => {
-      const newSchema = {
-        ...state.schema,
-        fields: state.schema.fields.filter(f => f.id !== fieldId),
-      };
-
-      return addToHistory(state, newSchema);
-    });
+  removeField: (state: BuilderState, fieldId: string): BuilderState => {
+    const newSchema = {
+      ...state.schema,
+      fields: state.schema.fields.filter(f => f.id !== fieldId),
+    };
+    return addToHistory(state, newSchema);
   },
 
   /**
    * Update a field
    */
-  updateField(fieldId: string, updates: Partial<FieldSchema>) {
-    builderAtom.update((state) => {
-      const newSchema = {
-        ...state.schema,
-        fields: state.schema.fields.map(f =>
-          f.id === fieldId ? { ...f, ...updates } : f
-        ),
-      };
-
-      return addToHistory(state, newSchema);
-    });
+  updateField: (state: BuilderState, fieldId: string, updates: Partial<FieldSchema>): BuilderState => {
+    const newSchema = {
+      ...state.schema,
+      fields: state.schema.fields.map(f =>
+        f.id === fieldId ? { ...f, ...updates } : f
+      ),
+    };
+    return addToHistory(state, newSchema);
   },
 
   /**
    * Reorder fields
    */
-  reorderFields(fromIndex: number, toIndex: number) {
-    builderAtom.update((state) => {
-      const newFields = [...state.schema.fields];
-      const [removed] = newFields.splice(fromIndex, 1);
-      newFields.splice(toIndex, 0, removed);
-      
-      const newSchema = {
-        ...state.schema,
-        fields: newFields,
-      };
+  reorderFields: (state: BuilderState, fromIndex: number, toIndex: number): BuilderState => {
+    const newFields = [...state.schema.fields];
+    const [removed] = newFields.splice(fromIndex, 1);
+    newFields.splice(toIndex, 0, removed);
 
-      return addToHistory(state, newSchema);
-    });
+    const newSchema = {
+      ...state.schema,
+      fields: newFields,
+    };
+    return addToHistory(state, newSchema);
   },
 
   /**
    * Move field
    */
-  moveField(fieldId: string, toIndex: number) {
-    builderAtom.update((state) => {
-      const fromIndex = state.schema.fields.findIndex(f => f.id === fieldId);
-      if (fromIndex === -1) return state;
+  moveField: (state: BuilderState, fieldId: string, toIndex: number): BuilderState => {
+    const fromIndex = state.schema.fields.findIndex(f => f.id === fieldId);
+    if (fromIndex === -1) return state;
 
-      const newFields = [...state.schema.fields];
-      const [removed] = newFields.splice(fromIndex, 1);
-      newFields.splice(toIndex, 0, removed);
-      
-      const newSchema = {
-        ...state.schema,
-        fields: newFields,
-      };
+    const newFields = [...state.schema.fields];
+    const [removed] = newFields.splice(fromIndex, 1);
+    newFields.splice(toIndex, 0, removed);
 
-      return addToHistory(state, newSchema);
-    });
+    const newSchema = {
+      ...state.schema,
+      fields: newFields,
+    };
+
+    return addToHistory(state, newSchema);
   },
 
   /**
    * Select a field
    */
-  selectField(fieldId: string | null) {
-    builderAtom.update((state) => ({
+  selectField: (state: BuilderState, fieldId: string | null): BuilderState => {
+    return {
       ...state,
       selectedFieldId: fieldId,
-    }));
+    };
   },
 
   /**
    * Toggle preview mode
    */
-  togglePreviewMode() {
-    builderAtom.update((state) => ({
+  togglePreviewMode: (state: BuilderState): BuilderState => {
+    return {
       ...state,
       isPreviewMode: !state.isPreviewMode,
-    }));
+    };
   },
 
   /**
    * Set preview mode
    */
-  setPreviewMode(isPreviewMode: boolean) {
-    builderAtom.update((state) => ({
+  setPreviewMode: (state: BuilderState, isPreviewMode: boolean): BuilderState => {
+    return {
       ...state,
       isPreviewMode,
-    }));
+    };
   },
 
   /**
    * Undo last action
    */
-  undo() {
-    builderAtom.update((state) => {
-      if (state.history.past.length === 0) return state;
+  undo: (state: BuilderState): BuilderState => {
+    if (state.history.past.length === 0) return state;
 
-      const previous = state.history.past[state.history.past.length - 1];
-      const newPast = state.history.past.slice(0, -1);
+    const previous = state.history.past[state.history.past.length - 1];
+    const newPast = state.history.past.slice(0, -1);
 
-      return {
-        ...state,
-        schema: previous,
-        history: {
-          past: newPast,
-          present: previous,
-          future: [state.history.present, ...state.history.future],
-        },
-        isDirty: true,
-      };
-    });
+    return {
+      ...state,
+      schema: previous,
+      history: {
+        past: newPast,
+        present: previous,
+        future: [state.history.present, ...state.history.future],
+      },
+      isDirty: true,
+    };
   },
 
   /**
    * Redo last undone action
    */
-  redo() {
-    builderAtom.update((state) => {
-      if (state.history.future.length === 0) return state;
+  redo: (state: BuilderState): BuilderState => {
+    if (state.history.future.length === 0) return state;
 
-      const next = state.history.future[0];
-      const newFuture = state.history.future.slice(1);
+    const next = state.history.future[0];
+    const newFuture = state.history.future.slice(1);
 
-      return {
-        ...state,
-        schema: next,
-        history: {
-          past: [...state.history.past, state.history.present],
-          present: next,
-          future: newFuture,
-        },
-        isDirty: true,
-      };
-    });
+    return {
+      ...state,
+      schema: next,
+      history: {
+        past: [...state.history.past, state.history.present],
+        present: next,
+        future: newFuture,
+      },
+      isDirty: true,
+    };
   },
 
   /**
    * Reset form to initial state
    */
-  reset() {
-    builderAtom.update(() => createInitialBuilderState());
+  reset: (): BuilderState => {
+    return createInitialBuilderState();
   },
 
   /**
    * Clear history
    */
-  clearHistory() {
-    builderAtom.update((state) => ({
+  clearHistory: (state: BuilderState): BuilderState => {
+    return {
       ...state,
       history: {
         past: [],
         present: state.schema,
         future: [],
       },
-    }));
+    };
   },
 
   /**
    * Save (mark as clean)
    */
-  save() {
-    builderAtom.update((state) => ({
+  save: (state: BuilderState): BuilderState => {
+    return {
       ...state,
       isDirty: false,
       history: {
@@ -307,11 +295,14 @@ export const builderActions = {
         present: state.schema,
         future: [],
       },
-      metadata: {
-        ...state.schema.metadata,
-        updatedAt: new Date().toISOString(),
+      schema: {
+        ...state.schema,
+        metadata: {
+          ...state.schema.metadata,
+          updatedAt: new Date().toISOString(),
+        },
       },
-    }));
+    };
   },
 };
 

@@ -2,7 +2,7 @@
  * Schema validation utilities
  */
 
-import type { FormSchema, FieldSchema, ValidationRule } from './types';
+import type { FormSchema, FieldSchema, ValidationRule, FieldType } from './types';
 
 /**
  * Validate a field schema

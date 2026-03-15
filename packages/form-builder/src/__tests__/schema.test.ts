@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { validateFormSchema, validateFieldSchema, createDefaultField, createDefaultFormSchema } from '../validator';
+import { validateFormSchema, validateFieldSchema, createDefaultField, createDefaultFormSchema } from '../schema/validator';
 
 describe('Schema Validator', () => {
   describe('validateFieldSchema', () => {
@@ -32,7 +32,7 @@ describe('Schema Validator', () => {
         ...createDefaultField('text', 'invalid-name!'),
       };
       const errors = validateFieldSchema(field);
-      expect(errors).toContain('must be a valid identifier');
+      expect(errors.join(' ')).toContain('must be a valid identifier');
     });
 
     it('should error on select without options', () => {
@@ -41,7 +41,7 @@ describe('Schema Validator', () => {
         options: [],
       };
       const errors = validateFieldSchema(field);
-      expect(errors).toContain('must have options');
+      expect(errors.join(' ')).toContain('must have options');
     });
   });
 
@@ -77,7 +77,7 @@ describe('Schema Validator', () => {
       const field2 = { ...field1, id: 'field_2' };
       schema.fields = [field1, field2];
       const errors = validateFormSchema(schema);
-      expect(errors).toContain('Duplicate field name');
+      expect(errors.join(' ')).toContain('Duplicate field name');
     });
 
     it('should error on invalid conditional reference', () => {
@@ -93,7 +93,7 @@ describe('Schema Validator', () => {
         },
       ];
       const errors = validateFormSchema(schema);
-      expect(errors).toContain('non-existent field');
+      expect(errors.join(' ')).toContain('non-existent field');
     });
   });
 
