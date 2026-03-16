@@ -1,6 +1,8 @@
 {
-  "name": "@nexus-state/core",
-  "version": "0.1.12",
+  "name": "@nexus-state/undo-redo",
+  "version": "0.1.0",
+  "description": "Undo/Redo functionality for Nexus State",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
@@ -15,40 +17,28 @@
       "import": "./dist/index.js",
       "require": "./dist/index.js"
     },
-    "./debug": {
-      "types": "./dist/debug.d.ts",
-      "import": "./dist/debug.js",
-      "require": "./dist/debug.js"
-    },
-    "./batching": {
-      "types": "./dist/batching.d.ts",
-      "import": "./dist/batching.js",
-      "require": "./dist/batching.js"
-    },
-    "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js",
-      "require": "./dist/utils/index.js"
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.js"
     }
   },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist && mkdir dist",
     "dev": "tsc -w",
-    "test": "vitest run src",
-    "test:coverage": "vitest run src --coverage",
+    "test": "vitest run src/__tests__",
+    "test:coverage": "vitest run src/__tests__ --coverage",
     "lint": "eslint . --ext .ts"
   },
   "files": [
     "dist",
-    "!dist/**/__tests__",
-    "!dist/test-utils",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"
   ],
-  "peerDependencies": {
-    "@nexus-state/time-travel": "^0.1.0"
+  "dependencies": {
+    "@nexus-state/core": "workspace:*"
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.2",
@@ -63,5 +53,13 @@
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.56.1",
     "vitest": "^3.0.7"
-  }
+  },
+  "keywords": [
+    "nexus-state",
+    "undo",
+    "redo",
+    "state-management"
+  ],
+  "author": "Nexus State Team",
+  "license": "MIT"
 }

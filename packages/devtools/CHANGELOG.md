@@ -1,5 +1,18 @@
 # @nexus-state/devtools
 
+## 0.1.6 - 2026-03-16
+
+### Patch Changes
+
+- **BREAKING**: Migrated to @nexus-state/time-travel package
+  - Replaced internal time-travel implementation with @nexus-state/time-travel
+  - Updated imports from @nexus-state/core to @nexus-state/time-travel
+  - SimpleTimeTravel now imported from @nexus-state/time-travel
+- Updated dependencies
+  - @nexus-state/core@0.1.12
+  - @nexus-state/time-travel@0.1.0
+  - @nexus-state/undo-redo@0.1.0
+
 ## 0.1.5
 
 ### Patch Changes
@@ -47,6 +60,3 @@
 - feat: Add family atoms support
 
 ### Patch Changes
-
-- Updated dependencies
-  - @nexus-state/core@0.1.0

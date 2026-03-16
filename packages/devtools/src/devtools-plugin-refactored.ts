@@ -20,7 +20,7 @@ import type {
   DevToolsMode,
   ActionMetadata,
 } from "./types";
-import type { SimpleTimeTravel } from "@nexus-state/core";
+import type { SimpleTimeTravel } from "@nexus-state/time-travel";
 import { atomRegistry } from "@nexus-state/core";
 
 // Import decomposed services

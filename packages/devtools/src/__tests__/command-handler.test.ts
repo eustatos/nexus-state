@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { CommandHandler } from "../command-handler";
 import type { Command, ImportStateFormat } from "../types";
-import type { SimpleTimeTravel } from "@nexus-state/core";
+import type { SimpleTimeTravel } from "@nexus-state/time-travel";
 import {
   unknownCommand,
   missingPayloadCommand,

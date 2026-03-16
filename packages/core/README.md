@@ -14,7 +14,7 @@
 ## 📦 Installation
 
 ```bash
-npm install @nexus-state/core
+npm install @nexus-state/core @nexus-state/time-travel
 ```
 
 ---
@@ -27,6 +27,7 @@ npm install @nexus-state/core
 - 🌐 **Framework Agnostic** — Works with React, Vue, Svelte, or vanilla JS
 - 🔌 **Extensible** — Middleware and plugin support
 - 🛠️ **DevTools Ready** — Automatic atom registration for debugging
+- 🕒 **Time Travel** — Debug state changes with undo/redo (via @nexus-state/time-travel)
 
 ---
 
@@ -142,6 +143,42 @@ console.log(myStore.get(nameAtom)); // "Jane"
 const unsubscribe = myStore.subscribe(countAtom, (value) => {
   console.log('Count changed to:', value);
 });
+```
+
+### Enhanced Stores with DevTools
+
+For DevTools integration and enhanced debugging capabilities:
+
+```javascript
+import { atom, createEnhancedStore } from '@nexus-state/core';
+
+const countAtom = atom(0, 'count');
+const store = createEnhancedStore();
+
+// Connect to DevTools
+store.connectDevTools();
+```
+
+For Time Travel functionality (undo/redo), use the separate package:
+
+```bash
+npm install @nexus-state/time-travel
+```
+
+```javascript
+import { atom, createEnhancedStore } from '@nexus-state/core';
+import { SimpleTimeTravel } from '@nexus-state/time-travel';
+
+const countAtom = atom(0, 'count');
+const store = createEnhancedStore();
+const timeTravel = new SimpleTimeTravel(store);
+
+// Capture snapshots
+timeTravel.capture('action');
+
+// Navigate through history
+timeTravel.undo();
+timeTravel.redo();
 ```
 
 ---
@@ -402,9 +439,10 @@ store.set(countAtom, 5); // Logs: Atom changed: 0 → 5
 
 | Class                    | Description                  | Example                              |
 | ------------------------ | ---------------------------- | ------------------------------------ |
-| **StateSnapshotManager** | Create state snapshots       | `new StateSnapshotManager(registry)` |
-| **StateRestorer**        | Restore state from snapshots | `new StateRestorer(registry)`        |
-| **HistoryManager**       | Undo/redo functionality      | `new HistoryManager()`               |
+| **TimeTravelController** | Main time travel controller  | `new TimeTravelController(store)`    |
+| **SimpleTimeTravel**     | Simplified time travel API   | `new SimpleTimeTravel(store)`        |
+
+For more information, see [@nexus-state/time-travel](https://github.com/eustatos/nexus-state/tree/main/packages/time-travel).
 
 ### Global Registry
 

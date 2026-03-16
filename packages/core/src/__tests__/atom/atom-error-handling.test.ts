@@ -153,8 +153,8 @@ describe('Atom Error Handling', () => {
 
     it('should handle circular dependency error gracefully', () => {
       const store = createStore();
-      let atom1Value = 1;
-      let atom2Value = 2;
+      const atom1Value = 1;
+      const atom2Value = 2;
 
       const atom1 = atom((get: Getter) => {
         try {

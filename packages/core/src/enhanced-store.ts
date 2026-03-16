@@ -4,12 +4,9 @@ import type {
   Plugin,
   EnhancedStore as EnhancedStoreType,
   StoreEnhancementOptions as StoreEnhancementOptionsType,
-  TimeTravelOptions,
-  Snapshot,
 } from './types';
 import { createStore } from './store';
 import { atomRegistry } from './atom-registry';
-import { TimeTravelController } from './time-travel';
 
 /**
  * Represents an enhanced store with additional capabilities.
@@ -25,14 +22,6 @@ import { TimeTravelController } from './time-travel';
  * @property {Function} [setIntercepted] - Set the value of an atom with interception
  * @property {Function} [getPlugins] - Get the list of applied plugins
  * @property {Function} [connectDevTools] - Connect to DevTools for debugging
- * @property {Function} [captureSnapshot] - Capture a new snapshot
- * @property {Function} [undo] - Undo to the previous state
- * @property {Function} [redo] - Redo to the next state
- * @property {Function} [canUndo] - Check if undo is available
- * @property {Function} [canRedo] - Check if redo is available
- * @property {Function} [jumpTo] - Jump to a specific snapshot
- * @property {Function} [clearHistory] - Clear all history
- * @property {Function} [getHistory] - Get all snapshots in history
  */
 
 /**
@@ -41,9 +30,6 @@ import { TimeTravelController } from './time-travel';
  * @property {boolean} [enableDevTools] - Whether to enable DevTools integration
  * @property {string} [devToolsName] - Name to display in DevTools
  * @property {string} [registryMode] - Registry mode: 'global' or 'isolated'
- * @property {boolean} [enableTimeTravel] - Whether to enable Time Travel functionality
- * @property {number} [maxHistory] - Maximum number of snapshots to keep (default: 50)
- * @property {boolean} [autoCapture] - Automatically capture snapshots on store changes (default: true)
  */
 
 // Export the types
@@ -51,7 +37,8 @@ export type EnhancedStore = EnhancedStoreType;
 export type StoreEnhancementOptions = StoreEnhancementOptionsType;
 
 /**
- * Creates an enhanced store with DevTools and Time Travel capabilities.
+ * Creates an enhanced store with DevTools capabilities.
+ * For Time Travel functionality, use @nexus-state/time-travel package.
  * @param {Array<Plugin>} [plugins] - Array of plugins to apply to the store
  * @param {StoreEnhancementOptions} [options] - Options for store enhancement
  * @returns {EnhancedStore} The created enhanced store
@@ -61,9 +48,6 @@ export type StoreEnhancementOptions = StoreEnhancementOptionsType;
  *
  * // Create an enhanced store with plugins and options
  * const store = createEnhancedStore([plugin1, plugin2], { enableDevTools: true });
- *
- * // Create an enhanced store with time travel
- * const store = createEnhancedStore([], { enableTimeTravel: true, maxHistory: 100 });
  */
 export function createEnhancedStore(
   plugins: Plugin[] = [],
@@ -73,21 +57,11 @@ export function createEnhancedStore(
     enableDevTools = true,
     devToolsName = 'EnhancedStore',
     registryMode = 'global',
-    enableTimeTravel = false,
-    maxHistory = 50,
-    autoCapture = true,
   } = options;
 
   // Create a basic store
   const store = createStore(plugins) as EnhancedStore & {
-    captureSnapshot?: (action?: string) => Snapshot | undefined;
-    undo?: () => boolean;
-    redo?: () => boolean;
-    canUndo?: () => boolean;
-    canRedo?: () => boolean;
-    jumpTo?: (index: number) => boolean;
-    clearHistory?: () => void;
-    getHistory?: () => Snapshot[];
+    connectDevTools?: () => void;
   };
 
   // Auto-attach to registry with specified mode (CORE-001 requirement)
@@ -100,25 +74,6 @@ export function createEnhancedStore(
     store.connectDevTools = () => {
       console.log('DevTools connected for store:', devToolsName);
     };
-  }
-
-  // Add Time Travel functionality if enabled
-  if (enableTimeTravel) {
-    const timeTravelOptions: TimeTravelOptions = {
-      maxHistory,
-      autoCapture,
-    };
-    const timeTravel = new TimeTravelController(store, timeTravelOptions);
-
-    // Add time travel methods to store
-    store.captureSnapshot = (action?: string) => timeTravel.capture(action);
-    store.undo = () => timeTravel.undo();
-    store.redo = () => timeTravel.redo();
-    store.canUndo = () => timeTravel.canUndo();
-    store.canRedo = () => timeTravel.canRedo();
-    store.jumpTo = (index: number) => timeTravel.jumpTo(index);
-    store.clearHistory = () => timeTravel.clearHistory();
-    store.getHistory = () => timeTravel.getHistory();
   }
 
   return store as EnhancedStore;
