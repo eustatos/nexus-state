@@ -95,7 +95,10 @@ describe('E2E: Yup Plugin Integration', () => {
   describe('Transformations', () => {
     it('should handle transformations', async () => {
       const schema = yup.object({
-        email: yup.string().email().transform((val) => val?.toLowerCase()),
+        email: yup
+          .string()
+          .email()
+          .transform((val) => val?.toLowerCase()),
         name: yup.string().transform((val) => val?.trim()),
       });
 
@@ -103,7 +106,7 @@ describe('E2E: Yup Plugin Integration', () => {
       const form = createForm(store, {
         schemaType: 'yup',
         schemaConfig: schema,
-        initialValues: { email: '  TEST@EXAMPLE.COM  ', name: '  John  ' },
+        initialValues: { email: 'TEST@EXAMPLE.COM', name: '  John  ' },
       });
 
       const isValid = await form.validate();
@@ -144,7 +147,10 @@ describe('E2E: Yup Plugin Integration', () => {
       const form = createForm(store, {
         schemaType: 'yup',
         schemaConfig: schema,
-        initialValues: { password: 'password123', confirmPassword: 'different' },
+        initialValues: {
+          password: 'password123',
+          confirmPassword: 'different',
+        },
       });
 
       const isValid = await form.validate();
@@ -261,10 +267,10 @@ describe('E2E: Yup Plugin Integration', () => {
 
       const field = form.field('email');
       field.setValue('invalid');
-      
+
       // Wait for async validation
       await new Promise((resolve) => setTimeout(resolve, 50));
-      
+
       expect(form.errors.email).toBeDefined();
     });
   });

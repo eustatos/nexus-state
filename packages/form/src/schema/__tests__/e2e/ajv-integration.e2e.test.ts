@@ -69,7 +69,7 @@ describe('E2E: AJV Plugin Integration', () => {
               profile: {
                 type: 'object',
                 properties: {
-                  name: { type: 'string' },
+                  name: { type: 'string', minLength: 1 },
                   bio: { type: 'string', maxLength: 500 },
                 },
                 required: ['name'],
@@ -290,7 +290,7 @@ describe('E2E: AJV Plugin Integration', () => {
         type: 'object',
         properties: {
           accountType: { type: 'string', enum: ['personal', 'business'] },
-          company: { type: 'string' },
+          company: { type: 'string', minLength: 1 },
         },
         required: ['accountType'],
         if: {
@@ -328,7 +328,7 @@ describe('E2E: AJV Plugin Integration', () => {
       const store = createStore();
       const form = createForm(store, {
         schemaType: 'ajv',
-        schemaConfig: { 
+        schemaConfig: {
           schema,
           formats: {
             uri: /^https?:\/\//,
@@ -363,10 +363,10 @@ describe('E2E: AJV Plugin Integration', () => {
 
       const field = form.field('email');
       field.setValue('invalid');
-      
+
       // Wait for async validation
       await new Promise((resolve) => setTimeout(resolve, 50));
-      
+
       expect(form.errors.email).toBeDefined();
     });
   });

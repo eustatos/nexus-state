@@ -9,6 +9,7 @@ import {
 import { setFieldError } from './field';
 import { defaultSchemaRegistry } from './schema';
 import { FormCore } from './core';
+import { normalizeFieldPath } from './schema/utils';
 
 export interface ValidationOptions<TValues extends FormValues> {
   /** Direct schema validator instance */
@@ -84,22 +85,32 @@ export function createValidation<TValues extends FormValues>(
         (errors as any).fieldErrors || errors;
       const newExtraErrors: Record<string, string> = {};
 
+      // Normalize field errors and map them to field metas
+      const normalizedFieldErrors: Record<string, string> = {};
       for (const key of Object.keys(fieldErrors)) {
-        const meta = fields.get(key as keyof TValues);
         const error = fieldErrors[key];
         if (error == null) continue;
         const errorMessage =
           typeof error === 'string' ? error : (error as any).message;
+        const normalizedKey = normalizeFieldPath(key);
+        normalizedFieldErrors[normalizedKey] = errorMessage;
+      }
+
+      // Apply errors to fields or extra errors
+      for (const [normalizedKey, errorMessage] of Object.entries(
+        normalizedFieldErrors
+      )) {
+        const meta = fields.get(normalizedKey as keyof TValues);
         if (meta) {
           setFieldError(store, meta, errorMessage);
         } else {
-          newExtraErrors[key] = errorMessage;
+          newExtraErrors[normalizedKey] = errorMessage;
         }
       }
 
       // Clear errors for fields without schema errors
       for (const [key, meta] of fields.entries()) {
-        if (!fieldErrors[key as string]) {
+        if (!normalizedFieldErrors[key as string]) {
           setFieldError(store, meta, null);
         }
       }
@@ -115,11 +126,12 @@ export function createValidation<TValues extends FormValues>(
       if (errors) {
         const newExtraErrors: Record<string, string> = {};
         for (const key in errors) {
-          const meta = fields.get(key as keyof TValues);
+          const normalizedKey = normalizeFieldPath(key);
+          const meta = fields.get(normalizedKey as keyof TValues);
           if (meta && errors[key]) {
             setFieldError(store, meta, errors[key]!);
           } else if (errors[key]) {
-            newExtraErrors[key] = errors[key]!;
+            newExtraErrors[normalizedKey] = errors[key]!;
           }
         }
         if (Object.keys(newExtraErrors).length > 0) {

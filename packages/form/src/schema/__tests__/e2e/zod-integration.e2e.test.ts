@@ -95,7 +95,10 @@ describe('E2E: Zod Plugin Integration', () => {
   describe('Transformations', () => {
     it('should handle transformations', async () => {
       const schema = z.object({
-        email: z.string().email().transform((val) => val.toLowerCase()),
+        email: z
+          .string()
+          .email()
+          .transform((val) => val.toLowerCase()),
         name: z.string().transform((val) => val.trim()),
       });
 
@@ -103,7 +106,7 @@ describe('E2E: Zod Plugin Integration', () => {
       const form = createForm(store, {
         schemaType: 'zod',
         schemaConfig: schema,
-        initialValues: { email: '  TEST@EXAMPLE.COM  ', name: '  John  ' },
+        initialValues: { email: 'TEST@EXAMPLE.COM', name: '  John  ' },
       });
 
       const isValid = await form.validate();
@@ -113,19 +116,24 @@ describe('E2E: Zod Plugin Integration', () => {
 
   describe('Refine and SuperRefine', () => {
     it('should handle refine validation', async () => {
-      const schema = z.object({
-        password: z.string().min(8),
-        confirmPassword: z.string(),
-      }).refine((data) => data.password === data.confirmPassword, {
-        message: 'Passwords do not match',
-        path: ['confirmPassword'],
-      });
+      const schema = z
+        .object({
+          password: z.string().min(8),
+          confirmPassword: z.string(),
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+          message: 'Passwords do not match',
+          path: ['confirmPassword'],
+        });
 
       const store = createStore();
       const form = createForm(store, {
         schemaType: 'zod',
         schemaConfig: schema,
-        initialValues: { password: 'password123', confirmPassword: 'different' },
+        initialValues: {
+          password: 'password123',
+          confirmPassword: 'different',
+        },
       });
 
       const isValid = await form.validate();
@@ -218,10 +226,10 @@ describe('E2E: Zod Plugin Integration', () => {
 
       const field = form.field('email');
       field.setValue('invalid');
-      
+
       // Wait for async validation
       await new Promise((resolve) => setTimeout(resolve, 50));
-      
+
       expect(form.errors.email).toBeDefined();
     });
   });

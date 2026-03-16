@@ -77,50 +77,33 @@ export function createForm<TValues extends FormValues>(
       setValue: (value: TValues[K]) => {
         setFieldValue(store, meta as any, value);
         // Trigger validation if needed
-        if (
-          options.validateOnChange &&
-          validationOptions.schema?.validateField
-        ) {
+        if (options.validateOnChange) {
           const values = core.getValues();
-          const validationPromise = validationOptions.schema.validateField(
-            name,
-            value,
-            values as TValues
-          );
-          Promise.resolve(validationPromise).then((error) => {
-            if (error) {
-              const errorMessage =
-                typeof error === 'string' ? error : (error as any).message;
-              setFieldError(store, meta, errorMessage);
-            } else {
-              setFieldError(store, meta, null);
-            }
-          });
+          validation
+            .validateField(name, value, values as TValues)
+            .then((error) => {
+              if (error) {
+                setFieldError(store, meta, error);
+              } else {
+                setFieldError(store, meta, null);
+              }
+            });
         }
       },
 
       setTouched: (touched: boolean) => {
         setFieldTouched(store, meta, touched);
-        if (
-          touched &&
-          options.validateOnBlur &&
-          validationOptions.schema?.validateField
-        ) {
+        if (touched && options.validateOnBlur) {
           const values = core.getValues();
-          const validationPromise = validationOptions.schema.validateField(
-            name,
-            fieldState.value,
-            values
-          );
-          Promise.resolve(validationPromise).then((error) => {
-            if (error) {
-              const errorMessage =
-                typeof error === 'string' ? error : (error as any).message;
-              setFieldError(store, meta, errorMessage);
-            } else {
-              setFieldError(store, meta, null);
-            }
-          });
+          validation
+            .validateField(name, fieldState.value, values as TValues)
+            .then((error) => {
+              if (error) {
+                setFieldError(store, meta, error);
+              } else {
+                setFieldError(store, meta, null);
+              }
+            });
         }
       },
 

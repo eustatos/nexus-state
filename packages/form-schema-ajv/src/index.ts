@@ -1,7 +1,20 @@
 import Ajv from 'ajv';
-import type { Options as AjvOptions, ErrorObject, KeywordDefinition, ValidateFunction } from 'ajv';
-import type { FieldError, ValidationContext, ValidationErrors } from '@nexus-state/form/schema';
-import { createFieldError, createSchemaPlugin, normalizeFieldPath } from '@nexus-state/form/schema';
+import type {
+  Options as AjvOptions,
+  ErrorObject,
+  KeywordDefinition,
+  ValidateFunction,
+} from 'ajv';
+import type {
+  FieldError,
+  ValidationContext,
+  ValidationErrors,
+} from '@nexus-state/form/schema';
+import {
+  createFieldError,
+  createSchemaPlugin,
+  normalizeFieldPath,
+} from '@nexus-state/form/schema';
 
 /**
  * AJV schema configuration
@@ -45,7 +58,10 @@ export interface AjvSchemaConfig {
  * });
  * ```
  */
-export const ajvPlugin = createSchemaPlugin<AjvSchemaConfig, Record<string, unknown>>({
+export const ajvPlugin = createSchemaPlugin<
+  AjvSchemaConfig,
+  Record<string, unknown>
+>({
   type: 'ajv',
   meta: {
     description: 'AJV (JSON Schema) validator for Nexus State forms',
@@ -59,8 +75,8 @@ export const ajvPlugin = createSchemaPlugin<AjvSchemaConfig, Record<string, unkn
      * Initialize AJV instance
      */
     const ajv = new Ajv({
-      allErrors: true,        // Collect all errors
-      useDefaults: true,      // Use default values
+      allErrors: true, // Collect all errors
+      useDefaults: true, // Use default values
       ...config.ajvOptions,
     });
 
@@ -96,8 +112,10 @@ export const ajvPlugin = createSchemaPlugin<AjvSchemaConfig, Record<string, unkn
       // AJV v6 uses dataPath, v7+ uses instancePath
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const errAny = error as any;
-      let path = normalizeFieldPath(errAny.instancePath ?? errAny.dataPath ?? '');
-      
+      let path = normalizeFieldPath(
+        errAny.instancePath ?? errAny.dataPath ?? ''
+      );
+
       // Handle required property errors - path is in params.missingProperty
       if (error.keyword === 'required' && errAny.params?.missingProperty) {
         const parentPath = path ? path + '.' : '';
@@ -126,14 +144,16 @@ export const ajvPlugin = createSchemaPlugin<AjvSchemaConfig, Record<string, unkn
       for (const error of errors) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const errAny = error as any;
-        let path = normalizeFieldPath(errAny.instancePath ?? errAny.dataPath ?? '');
-        
+        let path = normalizeFieldPath(
+          errAny.instancePath ?? errAny.dataPath ?? ''
+        );
+
         // Handle required property errors
         if (error.keyword === 'required' && errAny.params?.missingProperty) {
           const parentPath = path ? path + '.' : '';
           path = parentPath + errAny.params.missingProperty;
         }
-        
+
         if (path) {
           fieldErrors[path] = ajvErrorToFieldError(error);
         }
@@ -169,10 +189,38 @@ export const ajvPlugin = createSchemaPlugin<AjvSchemaConfig, Record<string, unkn
        * AJV validates the entire schema, but we return
        * error only for the specific field
        */
-      validateField: async (): Promise<FieldError | null> => {
-        // Note: validateField receives field context, but AJV requires
-        // all values. This is a limitation - we return null and rely on
-        // full validate() for proper validation.
+      validateField: async <K extends keyof Record<string, unknown>>(
+        fieldName: K,
+        value: Record<string, unknown>[K],
+        context?: ValidationContext<Record<string, unknown>>
+      ): Promise<FieldError | null> => {
+        // Use context values or create a copy with updated field
+        const values = context?.values ?? {};
+        const updatedValues = { ...values, [fieldName]: value };
+        const valid = validate(updatedValues);
+        if (valid) {
+          return null;
+        }
+        if (!validate.errors) {
+          return null;
+        }
+        // Find error for this field
+        const normalizedFieldName = String(fieldName);
+        for (const error of validate.errors) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const errAny = error as any;
+          let path = normalizeFieldPath(
+            errAny.instancePath ?? errAny.dataPath ?? ''
+          );
+          // Handle required property errors
+          if (error.keyword === 'required' && errAny.params?.missingProperty) {
+            const parentPath = path ? path + '.' : '';
+            path = parentPath + errAny.params.missingProperty;
+          }
+          if (path === normalizedFieldName) {
+            return ajvErrorToFieldError(error);
+          }
+        }
         return null;
       },
 
@@ -219,11 +267,9 @@ export const ajvPlugin = createSchemaPlugin<AjvSchemaConfig, Record<string, unkn
  */
 if (typeof globalThis !== 'undefined') {
   try {
-    import('@nexus-state/form/schema').then(
-      ({ defaultSchemaRegistry }) => {
-        defaultSchemaRegistry.register('ajv', ajvPlugin);
-      }
-    );
+    import('@nexus-state/form/schema').then(({ defaultSchemaRegistry }) => {
+      defaultSchemaRegistry.register('ajv', ajvPlugin);
+    });
   } catch {
     // Ignore if registry is unavailable
   }
@@ -248,7 +294,8 @@ export const builtInFormats = {
   date: /^\d{4}-\d{2}-\d{2}$/,
 
   /** DateTime format (ISO 8601) */
-  'date-time': /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$/,
+  'date-time':
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$/,
 
   /** Time format (HH:MM:SS) */
   time: /^\d{2}:\d{2}:\d{2}(\.\d+)?$/,
@@ -272,6 +319,8 @@ export const builtInFormats = {
  * });
  * ```
  */
-export function createCustomKeyword(keyword: KeywordDefinition): KeywordDefinition {
+export function createCustomKeyword(
+  keyword: KeywordDefinition
+): KeywordDefinition {
   return keyword;
 }

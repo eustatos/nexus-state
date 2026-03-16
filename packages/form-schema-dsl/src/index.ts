@@ -2,9 +2,15 @@ import {
   createFieldError,
   createSchemaPlugin,
   type FieldError,
+  type ValidationContext,
   type ValidationErrors,
 } from '@nexus-state/form/schema';
-import type { CompiledDSLRule, CompiledDSLSchema, DSLRule, DSLSchema } from './types';
+import type {
+  CompiledDSLRule,
+  CompiledDSLSchema,
+  DSLRule,
+  DSLSchema,
+} from './types';
 
 /**
  * Compile a DSL rule
@@ -88,109 +94,136 @@ function compileSchema<TValues extends Record<string, any>>(
  * });
  * ```
  */
-export const dslPlugin = createSchemaPlugin<DSLSchema, Record<string, unknown>>({
-  type: 'dsl',
-  meta: {
-    description: 'Custom DSL schema validator for Nexus State forms',
-    version: '0.1.0',
-    author: 'Nexus State Contributors',
-    repository: 'https://github.com/eustatos/nexus-state',
-    dependencies: [],
-  },
-  create: (schema) => {
-    // Compile schema
-    const compiledSchema = compileSchema(schema);
+export const dslPlugin = createSchemaPlugin<DSLSchema, Record<string, unknown>>(
+  {
+    type: 'dsl',
+    meta: {
+      description: 'Custom DSL schema validator for Nexus State forms',
+      version: '0.1.0',
+      author: 'Nexus State Contributors',
+      repository: 'https://github.com/eustatos/nexus-state',
+      dependencies: [],
+    },
+    create: (schema) => {
+      // Compile schema
+      const compiledSchema = compileSchema(schema);
 
-    return {
-      /**
-       * Validate all form values
-       */
-      validate: async (values, context) => {
-        const errors: ValidationErrors = { fieldErrors: {} };
+      return {
+        /**
+         * Validate all form values
+         */
+        validate: async (values, context) => {
+          const errors: ValidationErrors = { fieldErrors: {} };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        for (const [fieldName, rules] of Object.entries(compiledSchema as any)) {
-          const value = values[fieldName];
+          for (const [fieldName, rules] of Object.entries(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            compiledSchema as any
+          )) {
+            const value = values[fieldName];
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          for (const compiledRule of rules as any) {
-            const error = await compiledRule.validate(value, values, context);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            for (const compiledRule of rules as any) {
+              const error = await compiledRule.validate(value, values, context);
 
-            if (error) {
-              errors.fieldErrors[fieldName] = error;
-              break; // First error stops field validation
+              if (error) {
+                errors.fieldErrors[fieldName] = error;
+                break; // First error stops field validation
+              }
             }
           }
-        }
 
-        return errors;
-      },
+          return errors;
+        },
 
-      /**
-       * Validate a single field
-       */
-      validateField: async (): Promise<FieldError | null> => {
-        // Note: validateField receives field context, but DSL requires
-        // all values. This is a limitation - we return null and rely on
-        // full validate() for proper validation.
-        return null;
-      },
-    };
-  },
+        /**
+         * Validate a single field
+         */
+        validateField: async <K extends keyof Record<string, unknown>>(
+          fieldName: K,
+          value: Record<string, unknown>[K],
+          context?: ValidationContext<Record<string, unknown>>
+        ): Promise<FieldError | null> => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const rules = (compiledSchema as any)[fieldName];
+          if (!rules) {
+            return null;
+          }
+          const allValues = context?.values ?? {};
+          // Evaluate each rule
+          for (const compiledRule of rules) {
+            const error = await compiledRule.validate(
+              value,
+              allValues,
+              context
+            );
+            if (error) {
+              return error;
+            }
+          }
+          return null;
+        },
+      };
+    },
 
-  /**
-   * Check if schema is a DSL schema
-   */
-  supports: (schema: unknown): schema is DSLSchema => {
-    if (!schema || typeof schema !== 'object') {
-      return false;
-    }
-
-    const entries = Object.entries(schema);
-    
-    // Empty object is not a valid schema
-    if (entries.length === 0) {
-      return false;
-    }
-
-    // Check that all values are rules or arrays of rules
-    for (const value of entries.map(([, v]) => v)) {
-      if (Array.isArray(value)) {
-        // Array of rules
-        if (!value.every((r) => r && typeof r === 'object' && 'validate' in r)) {
-          return false;
-        }
-      } else if (value && typeof value === 'object') {
-        // Single rule
-        if (!('validate' in value)) {
-          return false;
-        }
-      } else {
+    /**
+     * Check if schema is a DSL schema
+     */
+    supports: (schema: unknown): schema is DSLSchema => {
+      if (!schema || typeof schema !== 'object') {
         return false;
       }
-    }
 
-    return true;
-  },
-});
+      const entries = Object.entries(schema);
+
+      // Empty object is not a valid schema
+      if (entries.length === 0) {
+        return false;
+      }
+
+      // Check that all values are rules or arrays of rules
+      for (const value of entries.map(([, v]) => v)) {
+        if (Array.isArray(value)) {
+          // Array of rules
+          if (
+            !value.every((r) => r && typeof r === 'object' && 'validate' in r)
+          ) {
+            return false;
+          }
+        } else if (value && typeof value === 'object') {
+          // Single rule
+          if (!('validate' in value)) {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      }
+
+      return true;
+    },
+  }
+);
 
 /**
  * Auto-registration in global registry
  */
 if (typeof globalThis !== 'undefined') {
   try {
-    import('@nexus-state/form/schema').then(
-      ({ defaultSchemaRegistry }) => {
-        defaultSchemaRegistry.register('dsl', dslPlugin);
-      }
-    );
+    import('@nexus-state/form/schema').then(({ defaultSchemaRegistry }) => {
+      defaultSchemaRegistry.register('dsl', dslPlugin);
+    });
   } catch {
     // Ignore if registry is unavailable
   }
 }
 
 export default dslPlugin;
-export type { DSLSchema, DSLRule, CompiledDSLRule, CompiledDSLSchema } from './types';
+export type {
+  DSLSchema,
+  DSLRule,
+  CompiledDSLRule,
+  CompiledDSLSchema,
+} from './types';
 export { compileRule, compileSchema };
 
 // Export validators
@@ -257,5 +290,4 @@ export {
   type ParsedFieldValidation,
   type ParsedRule,
   type ValidatorMap,
-} from "./parser";
-
+} from './parser';
