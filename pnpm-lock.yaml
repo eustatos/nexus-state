@@ -506,6 +506,40 @@ importers:
         specifier: ^5.4.21
         version: 5.4.21(@types/node@20.19.37)
 
+  apps/form-builder-examples:
+    dependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@nexus-state/form-builder-react':
+        specifier: workspace:*
+        version: link:../../packages/form-builder-react
+      '@nexus-state/react':
+        specifier: workspace:*
+        version: link:../../packages/react
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      '@types/react-dom':
+        specifier: ^18.2.0
+        version: 18.3.7(@types/react@18.3.28)
+      '@vitejs/plugin-react':
+        specifier: ^4.0.0
+        version: 4.7.0(vite@5.4.21(@types/node@20.19.37))
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.21
+        version: 5.4.21(@types/node@20.19.37)
+
   packages/async:
     dependencies:
       '@nexus-state/core':
@@ -539,6 +573,10 @@ importers:
         version: 5.9.3
 
   packages/core:
+    dependencies:
+      '@nexus-state/time-travel':
+        specifier: ^0.1.0
+        version: link:../time-travel
     devDependencies:
       '@eslint/compat':
         specifier: ^2.0.2
@@ -582,6 +620,12 @@ importers:
       '@nexus-state/core':
         specifier: workspace:*
         version: link:../core
+      '@nexus-state/time-travel':
+        specifier: workspace:*
+        version: link:../time-travel
+      '@nexus-state/undo-redo':
+        specifier: workspace:*
+        version: link:../undo-redo
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -655,7 +699,7 @@ importers:
         specifier: ^3.23.8
         version: 3.25.76
 
-  packages/form-builder:
+  packages/form-builder-core:
     dependencies:
       '@nexus-state/core':
         specifier: workspace:*
@@ -663,6 +707,37 @@ importers:
       '@nexus-state/form':
         specifier: workspace:*
         version: link:../form
+    devDependencies:
+      '@size-limit/preset-small-lib':
+        specifier: ^11.0.0
+        version: 11.2.0(size-limit@11.2.0)
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.37
+      size-limit:
+        specifier: ^11.0.0
+        version: 11.2.0
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.8)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.7
+        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
+
+  packages/form-builder-react:
+    dependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../core
+      '@nexus-state/form':
+        specifier: workspace:*
+        version: link:../form
+      '@nexus-state/form-builder-core':
+        specifier: workspace:*
+        version: link:../form-builder-core
       '@nexus-state/form-schema-dsl':
         specifier: workspace:*
         version: link:../form-schema-dsl
@@ -712,9 +787,12 @@ importers:
       '@nexus-state/form':
         specifier: workspace:*
         version: link:../form
-      '@nexus-state/form-builder':
+      '@nexus-state/form-builder-core':
         specifier: workspace:*
-        version: link:../form-builder
+        version: link:../form-builder-core
+      '@nexus-state/form-builder-react':
+        specifier: workspace:*
+        version: link:../form-builder-react
       '@nexus-state/react':
         specifier: workspace:*
         version: link:../react
@@ -1121,6 +1199,92 @@ importers:
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
+      vitest:
+        specifier: ^3.0.7
+        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
+
+  packages/time-travel:
+    dependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@eslint/compat':
+        specifier: ^2.0.2
+        version: 2.0.3(eslint@10.0.3(jiti@2.6.1))
+      '@eslint/eslintrc':
+        specifier: ^3.3.4
+        version: 3.3.5
+      '@eslint/js':
+        specifier: ^10.0.1
+        version: 10.0.1(eslint@10.0.3(jiti@2.6.1))
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.37
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.56.1
+        version: 8.56.1(@typescript-eslint/parser@8.56.1(eslint@10.0.3(jiti@2.6.1))(typescript@5.9.3))(eslint@10.0.3(jiti@2.6.1))(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.56.1
+        version: 8.56.1(eslint@10.0.3(jiti@2.6.1))(typescript@5.9.3)
+      '@vitest/coverage-v8':
+        specifier: ^3.0.7
+        version: 3.2.4(vitest@3.2.4(@types/node@20.19.37)(jsdom@26.1.0))
+      eslint:
+        specifier: ^10.0.2
+        version: 10.0.3(jiti@2.6.1)
+      globals:
+        specifier: ^17.3.0
+        version: 17.4.0
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.56.1
+        version: 8.56.1(eslint@10.0.3(jiti@2.6.1))(typescript@5.9.3)
+      vitest:
+        specifier: ^3.0.7
+        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
+
+  packages/undo-redo:
+    dependencies:
+      '@nexus-state/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@eslint/compat':
+        specifier: ^2.0.2
+        version: 2.0.3(eslint@10.0.3(jiti@2.6.1))
+      '@eslint/eslintrc':
+        specifier: ^3.3.4
+        version: 3.3.5
+      '@eslint/js':
+        specifier: ^10.0.1
+        version: 10.0.1(eslint@10.0.3(jiti@2.6.1))
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.37
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.56.1
+        version: 8.56.1(@typescript-eslint/parser@8.56.1(eslint@10.0.3(jiti@2.6.1))(typescript@5.9.3))(eslint@10.0.3(jiti@2.6.1))(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.56.1
+        version: 8.56.1(eslint@10.0.3(jiti@2.6.1))(typescript@5.9.3)
+      '@vitest/coverage-v8':
+        specifier: ^3.0.7
+        version: 3.2.4(vitest@3.2.4(@types/node@20.19.37)(jsdom@26.1.0))
+      eslint:
+        specifier: ^10.0.2
+        version: 10.0.3(jiti@2.6.1)
+      globals:
+        specifier: ^17.3.0
+        version: 17.4.0
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.56.1
+        version: 8.56.1(eslint@10.0.3(jiti@2.6.1))(typescript@5.9.3)
       vitest:
         specifier: ^3.0.7
         version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
