@@ -5,7 +5,7 @@
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useAtom } from '@nexus-state/react';
-import { builderAtom } from '@nexus-state/form-builder';
+import { builderAtom } from '@nexus-state/form-builder-react';
 import { SortableField } from './SortableField';
 
 /**

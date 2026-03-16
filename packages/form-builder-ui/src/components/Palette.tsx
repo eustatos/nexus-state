@@ -3,8 +3,8 @@
  */
 
 import { useDraggable } from '@dnd-kit/core';
-import type { ComponentDefinition } from '@nexus-state/form-builder';
-import { defaultRegistry } from '@nexus-state/form-builder';
+import type { ComponentDefinition } from '@nexus-state/form-builder-react';
+import { defaultRegistry } from '@nexus-state/form-builder-react';
 
 interface PaletteItemProps {
   component: ComponentDefinition;

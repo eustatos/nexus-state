@@ -4,9 +4,9 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useAtom } from '@nexus-state/react';
-import type { FieldSchema } from '@nexus-state/form-builder';
-import { builderAtom, builderActions } from '@nexus-state/form-builder';
+import { useAtom, useStore } from '@nexus-state/react';
+import type { FieldSchema } from '@nexus-state/form-builder-react';
+import { builderAtom, builderActions } from '@nexus-state/form-builder-react';
 import { FieldPreview } from './FieldPreview';
 
 interface SortableFieldProps {
@@ -18,6 +18,7 @@ interface SortableFieldProps {
  */
 export function SortableField({ field }: SortableFieldProps) {
   const [state] = useAtom(builderAtom);
+  const store = useStore();
   const {
     attributes,
     listeners,
@@ -43,11 +44,13 @@ export function SortableField({ field }: SortableFieldProps) {
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
-    builderActions.removeField(field.id);
+    const newState = builderActions.removeField(state, field.id);
+    store.set(builderAtom, newState);
   };
 
   const handleClick = () => {
-    builderActions.selectField(field.id);
+    const newState = builderActions.selectField(state, field.id);
+    store.set(builderAtom, newState);
   };
 
   return (

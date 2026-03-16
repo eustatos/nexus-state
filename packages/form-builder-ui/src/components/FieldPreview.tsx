@@ -2,7 +2,7 @@
  * FieldPreview Component - Preview of form field
  */
 
-import type { FieldSchema } from '@nexus-state/form-builder';
+import type { FieldSchema } from '@nexus-state/form-builder-react';
 
 interface FieldPreviewProps {
   field: FieldSchema;

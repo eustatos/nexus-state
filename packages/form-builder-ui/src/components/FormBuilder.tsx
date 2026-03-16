@@ -10,9 +10,9 @@ import {
   DragOverlay,
   closestCorners,
 } from '@dnd-kit/core';
-import { useAtom } from '@nexus-state/react';
-import type { FieldSchema, ComponentDefinition } from '@nexus-state/form-builder';
-import { builderAtom, builderActions, defaultRegistry, builtInComponents } from '@nexus-state/form-builder';
+import { useAtom, useStore } from '@nexus-state/react';
+import type { FieldSchema, ComponentDefinition } from '@nexus-state/form-builder-react';
+import { builderAtom, builderActions, defaultRegistry, builtInComponents } from '@nexus-state/form-builder-react';
 import { Palette } from './Palette';
 import { Canvas } from './Canvas';
 import { PropertiesPanel } from './PropertiesPanel';
@@ -58,6 +58,7 @@ function DragOverlayContent({ activeId }: { activeId: string }) {
  */
 export function FormBuilder() {
   const [state] = useAtom(builderAtom);
+  const store = useStore();
   const [activeId, setActiveId] = useState<string | null>(null);
 
   // Initialize registry with built-in components
@@ -80,33 +81,35 @@ export function FormBuilder() {
     // Adding new component from palette
     if (active.id.toString().startsWith('palette-')) {
       const component = (active.data as { component?: ComponentDefinition }).component;
-      
+
       if (component) {
         const newField: FieldSchema = {
           id: `field_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          type: component.type,
+          type: component.type as any,
           name: `field_${Date.now()}`,
           label: component.label,
           ...component.defaultProps,
         };
-        builderActions.addField(newField);
+        const newState = builderActions.addField(state, newField);
+        store.set(builderAtom, newState);
       }
     }
     // Reordering existing fields
     else if (active.id !== over.id) {
       const oldIndex = state.schema.fields.findIndex((f) => f.id === active.id);
       const overId = over.id.toString();
-      
+
       // Find the correct index
       let newIndex = state.schema.fields.findIndex((f) => f.id === overId);
-      
+
       // If over a field, insert before it
       if (newIndex === -1) {
         newIndex = state.schema.fields.length;
       }
-      
+
       if (oldIndex !== -1 && oldIndex !== newIndex) {
-        builderActions.reorderFields(oldIndex, newIndex);
+        const newState = builderActions.reorderFields(state, oldIndex, newIndex);
+        store.set(builderAtom, newState);
       }
     }
 

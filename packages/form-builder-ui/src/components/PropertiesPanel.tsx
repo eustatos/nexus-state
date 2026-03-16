@@ -2,8 +2,9 @@
  * PropertiesPanel Component - Field configuration panel
  */
 
-import { useAtom } from '@nexus-state/react';
-import { builderAtom, builderActions, defaultRegistry } from '@nexus-state/form-builder';
+import { useAtom, useStore } from '@nexus-state/react';
+import type { FieldSchema } from '@nexus-state/form-builder-core';
+import { builderAtom, builderActions, defaultRegistry } from '@nexus-state/form-builder-react';
 
 /**
  * Property field component
@@ -12,7 +13,7 @@ interface PropertyFieldProps {
   label: string;
   value: unknown;
   onChange: (value: unknown) => void;
-  type: 'string' | 'number' | 'boolean' | 'select';
+  type: 'string' | 'number' | 'boolean' | 'select' | 'array' | 'object';
   options?: Array<{ value: string; label: string }>;
 }
 
@@ -45,6 +46,26 @@ function PropertyField({ label, value, onChange, type, options }: PropertyFieldP
               </option>
             ))}
           </select>
+        </div>
+      );
+
+    case 'array':
+    case 'object':
+      return (
+        <div className="property-field">
+          <label className="property-label">{label}</label>
+          <input
+            type="text"
+            value={JSON.stringify(value)}
+            onChange={(e) => {
+              try {
+                onChange(JSON.parse(e.target.value));
+              } catch {
+                onChange(e.target.value);
+              }
+            }}
+            className="property-input"
+          />
         </div>
       );
 
@@ -81,6 +102,7 @@ function PropertyField({ label, value, onChange, type, options }: PropertyFieldP
  */
 export function PropertiesPanel() {
   const [state] = useAtom(builderAtom);
+  const store = useStore();
   const registry = defaultRegistry;
 
   if (!state.selectedFieldId) {
@@ -103,7 +125,8 @@ export function PropertiesPanel() {
   const component = registry.get(field.type);
 
   const updateField = (updates: Partial<FieldSchema>) => {
-    builderActions.updateField(field.id, updates);
+    const newState = builderActions.updateField(state, field.id, updates);
+    store.set(builderAtom, newState);
   };
 
   return (
@@ -112,7 +135,10 @@ export function PropertiesPanel() {
         <h3 className="properties-panel-title">Properties</h3>
         <button
           className="properties-panel-close"
-          onClick={() => builderActions.selectField(null)}
+          onClick={() => {
+            const newState = builderActions.selectField(state, null);
+            store.set(builderAtom, newState);
+          }}
           type="button"
         >
           ×
