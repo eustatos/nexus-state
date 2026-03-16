@@ -1,6 +1,15 @@
 import { defineConfig } from 'vitest/config';
+import { resolve } from 'path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@nexus-state/form-schema-ajv': resolve(__dirname, '../form-schema-ajv/src/index.ts'),
+      '@nexus-state/form-schema-dsl': resolve(__dirname, '../form-schema-dsl/src/index.ts'),
+      '@nexus-state/form-schema-yup': resolve(__dirname, '../form-schema-yup/src/index.ts'),
+      '@nexus-state/form-schema-zod': resolve(__dirname, '../form-schema-zod/src/index.ts'),
+    }
+  },
   test: {
     globals: true,
     coverage: {

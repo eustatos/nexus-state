@@ -3,6 +3,7 @@ import { createStore } from '@nexus-state/core';
 import { createForm } from '../../../create-form';
 import { defaultSchemaRegistry } from '../../registry';
 import {
+  dslPlugin,
   required,
   minLength,
   maxLength,
@@ -18,6 +19,7 @@ import {
 describe('E2E: DSL Plugin Integration', () => {
   beforeEach(() => {
     defaultSchemaRegistry.clear();
+    defaultSchemaRegistry.register('dsl', dslPlugin);
   });
 
   describe('Basic Validation', () => {
@@ -129,9 +131,15 @@ describe('E2E: DSL Plugin Integration', () => {
         schemaType: 'dsl',
         schemaConfig: {
           password: [required, minLength(8)],
-          confirmPassword: [required, matchesField('password', 'Passwords do not match')],
+          confirmPassword: [
+            required,
+            matchesField('password', 'Passwords do not match'),
+          ],
         },
-        initialValues: { password: 'password123', confirmPassword: 'different' },
+        initialValues: {
+          password: 'password123',
+          confirmPassword: 'different',
+        },
       });
 
       const isValid = await form.validate();
@@ -147,7 +155,10 @@ describe('E2E: DSL Plugin Integration', () => {
           password: [required, minLength(8)],
           confirmPassword: [required, matchesField('password')],
         },
-        initialValues: { password: 'password123', confirmPassword: 'password123' },
+        initialValues: {
+          password: 'password123',
+          confirmPassword: 'password123',
+        },
       });
 
       const isValid = await form.validate();
@@ -165,7 +176,8 @@ describe('E2E: DSL Plugin Integration', () => {
           accountType: [required],
           company: [
             conditional(
-              (_value, allValues) => (allValues as any)?.accountType === 'business',
+              (_value, allValues) =>
+                (allValues as any)?.accountType === 'business',
               [required]
             ),
           ],
@@ -186,7 +198,8 @@ describe('E2E: DSL Plugin Integration', () => {
           accountType: [required],
           company: [
             conditional(
-              (_value, allValues) => (allValues as any)?.accountType === 'business',
+              (_value, allValues) =>
+                (allValues as any)?.accountType === 'business',
               [required]
             ),
           ],
@@ -211,7 +224,9 @@ describe('E2E: DSL Plugin Integration', () => {
               (value) => {
                 if (!value) return null;
                 const hexRegex = /^#[0-9A-Fa-f]{6}$/;
-                return hexRegex.test(value as string) ? null : 'Invalid hex color';
+                return hexRegex.test(value as string)
+                  ? null
+                  : 'Invalid hex color';
               },
               'Invalid color',
               'color_format'
@@ -236,7 +251,9 @@ describe('E2E: DSL Plugin Integration', () => {
               (value) => {
                 if (!value) return null;
                 const hexRegex = /^#[0-9A-Fa-f]{6}$/;
-                return hexRegex.test(value as string) ? null : 'Invalid hex color';
+                return hexRegex.test(value as string)
+                  ? null
+                  : 'Invalid hex color';
               },
               'Invalid color',
               'color_format'
@@ -308,10 +325,7 @@ describe('E2E: DSL Plugin Integration', () => {
             maxLength(20, 'Username must be at most 20 characters'),
             pattern(/^[a-zA-Z0-9_]+$/, 'Invalid username format'),
           ],
-          email: [
-            required,
-            email('Invalid email address'),
-          ],
+          email: [required, email('Invalid email address')],
           password: [
             required,
             minLength(8, 'Password must be at least 8 characters'),
@@ -320,18 +334,12 @@ describe('E2E: DSL Plugin Integration', () => {
             required,
             matchesField('password', 'Passwords do not match'),
           ],
-          age: [
-            required,
-            minValue(18, 'You must be at least 18 years old'),
-          ],
+          age: [required, minValue(18, 'You must be at least 18 years old')],
           accountType: [
             required,
             oneOf(['personal', 'business'], 'Invalid account type'),
           ],
-          terms: [
-            required,
-            oneOf([true], 'You must accept the terms'),
-          ],
+          terms: [required, oneOf([true], 'You must accept the terms')],
         },
         initialValues: {
           username: '',
@@ -359,7 +367,12 @@ describe('E2E: DSL Plugin Integration', () => {
       const form = createForm(store, {
         schemaType: 'dsl',
         schemaConfig: {
-          username: [required, minLength(3), maxLength(20), pattern(/^[a-zA-Z0-9_]+$/)],
+          username: [
+            required,
+            minLength(3),
+            maxLength(20),
+            pattern(/^[a-zA-Z0-9_]+$/),
+          ],
           email: [required, email()],
           password: [required, minLength(8)],
           confirmPassword: [required, matchesField('password')],
@@ -403,10 +416,10 @@ describe('E2E: DSL Plugin Integration', () => {
 
       const field = form.field('email');
       field.setValue('invalid');
-      
+
       // Wait for async validation
       await new Promise((resolve) => setTimeout(resolve, 50));
-      
+
       expect(form.errors.email).toBeDefined();
     });
   });

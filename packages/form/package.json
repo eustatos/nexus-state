@@ -19,6 +19,26 @@
       "types": "./dist/schema/index.d.ts",
       "import": "./dist/schema/index.js",
       "require": "./dist/schema/index.js"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js",
+      "require": "./dist/core.js"
+    },
+    "./validation": {
+      "types": "./dist/validation.d.ts",
+      "import": "./dist/validation.js",
+      "require": "./dist/validation.js"
+    },
+    "./submission": {
+      "types": "./dist/submission.d.ts",
+      "import": "./dist/submission.js",
+      "require": "./dist/submission.js"
+    },
+    "./field-array": {
+      "types": "./dist/field-array.d.ts",
+      "import": "./dist/field-array.js",
+      "require": "./dist/field-array.js"
     }
   },
   "files": [

@@ -3,9 +3,10 @@
 > **Forms for complex applications** — with DevTools, atomic architecture, and full type safety
 
 [![npm version](https://img.shields.io/npm/v/@nexus-state/form.svg)](https://www.npmjs.com/package/@nexus-state/form)
+
 > [![Coverage for form package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=form)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-17+-61dafb.svg)](https://react.dev/)
+> [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+> [![React](https://img.shields.io/badge/React-17+-61dafb.svg)](https://react.dev/)
 
 ---
 
@@ -13,13 +14,13 @@
 
 ### ✅ Perfect for:
 
-| Scenario | Why |
-|----------|--------|
-| **Forms with 50+ fields** | Atomic architecture = minimal re-renders |
-| **Complex validation** | Async validation with debouncing, retry, cache out of the box |
-| **Enterprise applications** | DevTools for debugging, audit trail of changes |
-| **Cross-framework projects** | Single core for React, Vue, Svelte |
-| **High-performance UIs** | Granular updates, no unnecessary renders |
+| Scenario                     | Why                                                           |
+| ---------------------------- | ------------------------------------------------------------- |
+| **Forms with 50+ fields**    | Atomic architecture = minimal re-renders                      |
+| **Complex validation**       | Async validation with debouncing, retry, cache out of the box |
+| **Enterprise applications**  | DevTools for debugging, audit trail of changes                |
+| **Cross-framework projects** | Single core for React, Vue, Svelte                            |
+| **High-performance UIs**     | Granular updates, no unnecessary renders                      |
 
 ### ❌ Not suitable for:
 
@@ -56,8 +57,8 @@ function RegistrationForm() {
       email: '',
       password: '',
     },
-    mode: 'onBlur',              // Validate on blur
-    showErrorsOnTouched: true,   // Show errors after touch
+    mode: 'onBlur', // Validate on blur
+    showErrorsOnTouched: true, // Show errors after touch
   });
 
   const onSubmit = async (data) => {
@@ -120,8 +121,8 @@ const store = createStore();
 // Apply DevTools plugin
 const devtools = devTools({
   name: 'My App Forms',
-  trace: true,          // Stack trace for every change
-  maxAge: 100,          // Keep last 100 actions
+  trace: true, // Stack trace for every change
+  maxAge: 100, // Keep last 100 actions
 });
 
 devtools.apply(store);
@@ -149,19 +150,21 @@ function UsernameField() {
   const { field, fieldState } = useField('username', {
     initialValue: '',
     validators: [required],
-    asyncValidators: [{
-      validate: async (value) => {
-        const response = await fetch(`/api/check-username?username=${value}`);
-        const { available } = await response.json();
-        return available ? null : 'Username already taken';
+    asyncValidators: [
+      {
+        validate: async (value) => {
+          const response = await fetch(`/api/check-username?username=${value}`);
+          const { available } = await response.json();
+          return available ? null : 'Username already taken';
+        },
+        options: {
+          debounce: 500, // Wait 500ms after last keystroke
+          cache: true, // Cache results
+          retry: 2, // 2 retries on network error
+          timeout: 5000, // 5 second timeout
+        },
       },
-      options: {
-        debounce: 500,    // Wait 500ms after last keystroke
-        cache: true,      // Cache results
-        retry: 2,         // 2 retries on network error
-        timeout: 5000,    // 5 second timeout
-      }
-    }],
+    ],
     validateOn: 'onChange',
   });
 
@@ -176,6 +179,7 @@ function UsernameField() {
 ```
 
 **Built-in:**
+
 - ✅ Debouncing (don't spam API on every keystroke)
 - ✅ Caching (don't request same value twice)
 - ✅ Retry logic (recover from network errors)
@@ -189,9 +193,9 @@ Control when validation runs:
 
 ```tsx
 const form = useForm({
-  mode: 'onBlur',           // First validation on blur
+  mode: 'onBlur', // First validation on blur
   reValidateMode: 'onChange', // After error — validate on every change
-  showErrorsOnTouched: true,  // Show errors only after touch
+  showErrorsOnTouched: true, // Show errors only after touch
 });
 
 // UX example:
@@ -201,6 +205,7 @@ const form = useForm({
 ```
 
 **Modes:**
+
 - `'onChange'` — validate on every change
 - `'onBlur'` — validate on blur
 - `'onSubmit'` — validate only on submit
@@ -256,14 +261,14 @@ interface User {
 
 const { register, handleSubmit } = useForm<User>();
 
-register('name');    // ✅ OK
-register('age');     // ✅ OK
+register('name'); // ✅ OK
+register('age'); // ✅ OK
 register('invalid'); // ❌ TypeScript error: Property 'invalid' does not exist
 
 handleSubmit((data) => {
   // data is typed as User
-  console.log(data.name);  // ✅
-  console.log(data.age);   // ✅
+  console.log(data.name); // ✅
+  console.log(data.age); // ✅
 });
 ```
 
@@ -271,17 +276,17 @@ handleSubmit((data) => {
 
 ## 📊 Comparison with Alternatives
 
-| Feature | @nexus-state/form | React Hook Form | Formik | Redux Form |
-|---------|-------------------|-----------------|--------|------------|
-| **DevTools** | ✅ Redux DevTools | ❌ | ❌ | ✅ |
-| **Async validation** | ✅ Out of box | ⚠️ Manual | ⚠️ Manual | ⚠️ Manual |
-| **Debouncing** | ✅ Built-in | ❌ | ❌ | ❌ |
-| **Retry logic** | ✅ Built-in | ❌ | ❌ | ❌ |
-| **Validation triggers** | ✅ onChange/blur/submit | ⚠️ Limited | ⚠️ Limited | ⚠️ Limited |
-| **Performance (50+ fields)** | 🟢 Excellent | 🟢 Excellent | 🟡 Medium | 🔴 Slow |
-| **Cross-framework** | ✅ React/Vue/Svelte | ❌ React only | ❌ React only | ❌ React only |
-| **Bundle size** | 🟡 ~15KB | 🟢 ~7KB | 🟡 ~14KB | 🔴 ~25KB |
-| **Learning curve** | 🟡 Medium | 🟢 Low | 🟢 Low | 🔴 High |
+| Feature                      | @nexus-state/form       | React Hook Form | Formik        | Redux Form    |
+| ---------------------------- | ----------------------- | --------------- | ------------- | ------------- |
+| **DevTools**                 | ✅ Redux DevTools       | ❌              | ❌            | ✅            |
+| **Async validation**         | ✅ Out of box           | ⚠️ Manual       | ⚠️ Manual     | ⚠️ Manual     |
+| **Debouncing**               | ✅ Built-in             | ❌              | ❌            | ❌            |
+| **Retry logic**              | ✅ Built-in             | ❌              | ❌            | ❌            |
+| **Validation triggers**      | ✅ onChange/blur/submit | ⚠️ Limited      | ⚠️ Limited    | ⚠️ Limited    |
+| **Performance (50+ fields)** | 🟢 Excellent            | 🟢 Excellent    | 🟡 Medium     | 🔴 Slow       |
+| **Cross-framework**          | ✅ React/Vue/Svelte     | ❌ React only   | ❌ React only | ❌ React only |
+| **Bundle size**              | 🟡 ~15KB                | 🟢 ~7KB         | 🟡 ~14KB      | 🔴 ~25KB      |
+| **Learning curve**           | 🟡 Medium               | 🟢 Low          | 🟢 Low        | 🔴 High       |
 
 ---
 
@@ -305,6 +310,39 @@ const emailField = createField(store, 'email', { ... });
 ```
 
 **Result:** Performance doesn't degrade on forms with 100+ fields.
+
+### Modular Design
+
+The library is built with a modular architecture, allowing you to import only the parts you need (tree‑shaking) or compose custom form logic.
+
+| Module          | Purpose                                   | Import path                     |
+| --------------- | ----------------------------------------- | ------------------------------- |
+| **Core**        | Field and form state management           | `@nexus-state/form/core`        |
+| **Validation**  | Schema validation, field‑level validation | `@nexus-state/form/validation`  |
+| **Submission**  | Submit handling, submission state         | `@nexus-state/form/submission`  |
+| **Field‑Array** | Dynamic array fields                      | `@nexus-state/form/field-array` |
+
+**Example – building a custom form with only core and validation:**
+
+```ts
+import { createFormCore } from '@nexus-state/form/core';
+import { createValidation } from '@nexus-state/form/validation';
+import { createSubmission } from '@nexus-state/form/submission';
+
+const store = createStore();
+const core = createFormCore(store, { initialValues });
+const validation = createValidation(core, { schema: zodSchema });
+const submission = createSubmission(core, validation, { onSubmit });
+
+// Use the composed API
+const form = {
+  ...core,
+  ...validation,
+  ...submission,
+};
+```
+
+This design follows the **Open/Closed Principle**, making it easy to extend the library with custom modules (e.g., custom validation plugins, undo/redo, etc.) without modifying the core.
 
 ---
 
@@ -351,11 +389,15 @@ const {
 
 ```typescript
 const {
-  fields,             // Array of fields
-  append, prepend,    // Add items
-  remove, insert,     // Remove/insert
-  swap, move,         // Reorder
-  update, replace,    // Update
+  fields, // Array of fields
+  append,
+  prepend, // Add items
+  remove,
+  insert, // Remove/insert
+  swap,
+  move, // Reorder
+  update,
+  replace, // Update
 } = useFieldArray<Item>('items', {
   defaultValue: [],
 });
@@ -394,6 +436,7 @@ function LoanApplicationForm() {
 ```
 
 **Why @nexus-state/form:**
+
 - DevTools for debugging complex logic
 - Performance on 100+ fields
 - Audit trail of changes
@@ -413,26 +456,30 @@ function RegistrationForm() {
       <input
         {...register('username', {
           validators: [required, minLength(3)],
-          asyncValidators: [{
-            validate: async (v) => {
-              const res = await fetch(`/api/check?username=${v}`);
-              return res.available ? null : 'Taken';
+          asyncValidators: [
+            {
+              validate: async (v) => {
+                const res = await fetch(`/api/check?username=${v}`);
+                return res.available ? null : 'Taken';
+              },
+              options: { debounce: 500, cache: true },
             },
-            options: { debounce: 500, cache: true }
-          }]
+          ],
         })}
       />
-      
+
       <input
         {...register('email', {
           validators: [required, email],
-          asyncValidators: [{
-            validate: async (v) => {
-              const res = await fetch(`/api/check?email=${v}`);
-              return res.available ? null : 'Registered';
+          asyncValidators: [
+            {
+              validate: async (v) => {
+                const res = await fetch(`/api/check?email=${v}`);
+                return res.available ? null : 'Registered';
+              },
+              options: { debounce: 500 },
             },
-            options: { debounce: 500 }
-          }]
+          ],
         })}
       />
     </form>
@@ -441,6 +488,7 @@ function RegistrationForm() {
 ```
 
 **Why @nexus-state/form:**
+
 - Built-in debouncing (don't spam API)
 - Caching (don't request same value twice)
 - Retry on network errors
@@ -476,6 +524,7 @@ function FormBuilder() {
 ```
 
 **Why @nexus-state/form:**
+
 - Simple array manipulation
 - Each field is separate atom
 - Easy to add validation
@@ -548,18 +597,21 @@ const form = useForm({
 
 ## 📦 Bundle Size
 
-| Package | Size (minified) | Gzip |
-|---------|-----------------|------|
-| Core | ~8KB | ~3KB |
-| React hooks | ~4KB | ~2KB |
-| Utils | ~3KB | ~1KB |
-| **Total** | **~15KB** | **~6KB** |
+| Package     | Size (minified) | Gzip     |
+| ----------- | --------------- | -------- |
+| Core        | ~8KB            | ~3KB     |
+| React hooks | ~4KB            | ~2KB     |
+| Utils       | ~3KB            | ~1KB     |
+| **Total**   | **~15KB**       | **~6KB** |
+
+**Tree‑shaking friendly:** The library is built with a modular architecture and supports subpath imports. If you only need specific modules (e.g., core + validation), you can import them directly via `@nexus-state/form/core` and `@nexus-state/form/validation`. This allows bundlers (Webpack, Rollup, Vite) to eliminate unused code, resulting in even smaller final bundles.
 
 ---
 
 ## 🤝 Contributing
 
 Welcome:
+
 - ✅ Bug reports
 - ✅ Feature requests
 - ✅ Pull requests
