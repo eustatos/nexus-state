@@ -181,6 +181,29 @@ timeTravel.undo();
 timeTravel.redo();
 ```
 
+### Undo/Redo for User Interfaces
+
+For simple undo/redo in user interfaces (forms, text editors), use:
+
+```bash
+npm install @nexus-state/undo-redo
+```
+
+```javascript
+import { createStore } from '@nexus-state/core';
+import { UndoRedo } from '@nexus-state/undo-redo';
+
+const store = createStore();
+const undoRedo = new UndoRedo(store, { maxHistory: 50 });
+
+// Capture state
+undoRedo.capture();
+
+// Undo/Redo
+undoRedo.undo();
+undoRedo.redo();
+```
+
 ---
 
 ## 📖 Examples

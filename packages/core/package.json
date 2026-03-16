@@ -47,9 +47,6 @@
     "CHANGELOG.md",
     "LICENSE"
   ],
-  "peerDependencies": {
-    "@nexus-state/time-travel": "^0.1.0"
-  },
   "devDependencies": {
     "@eslint/compat": "^2.0.2",
     "@eslint/eslintrc": "^3.3.4",

@@ -88,14 +88,6 @@ export { createStore } from './store';
  */
 export { createEnhancedStore } from './enhanced-store';
 
-// ============================================================================
-// DEPRECATED: Time travel functionality has been moved to @nexus-state/time-travel
-// ============================================================================
-// For backward compatibility, use the compat module:
-// import { __deprecatedTimeTravel } from '@nexus-state/core';
-// ============================================================================
-export { __deprecatedTimeTravel } from './time-travel-compat';
-
 // Export utility functions
 export {
   serializeState,

@@ -15,7 +15,8 @@ Time-travel debugging allows you to:
 ### Step 1: Import Required Modules
 
 ```typescript
-import { atom, createStore, SimpleTimeTravel } from '@nexus-state/core';
+import { atom, createStore } from '@nexus-state/core';
+import { SimpleTimeTravel } from '@nexus-state/time-travel';
 import { devTools } from '@nexus-state/devtools';
 ```
 
@@ -135,7 +136,8 @@ if (process.env.NODE_ENV === 'development') {
 ```typescript
 import React from 'react';
 import { useAtom } from '@nexus-state/react';
-import { atom, createStore, SimpleTimeTravel } from '@nexus-state/core';
+import { atom, createStore } from '@nexus-state/core';
+import { SimpleTimeTravel } from '@nexus-state/time-travel';
 import { devTools } from '@nexus-state/devtools';
 
 const countAtom = atom(0, 'counter');

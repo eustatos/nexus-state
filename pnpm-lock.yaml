@@ -573,10 +573,6 @@ importers:
         version: 5.9.3
 
   packages/core:
-    dependencies:
-      '@nexus-state/time-travel':
-        specifier: ^0.1.0
-        version: link:../time-travel
     devDependencies:
       '@eslint/compat':
         specifier: ^2.0.2
@@ -587,6 +583,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.0.3(jiti@2.6.1))
+      '@nexus-state/time-travel':
+        specifier: workspace:*
+        version: link:../time-travel
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.37

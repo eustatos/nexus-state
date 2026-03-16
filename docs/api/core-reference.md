@@ -221,7 +221,7 @@ new SimpleTimeTravel(store, options);
 ### Example
 
 ```typescript
-import { SimpleTimeTravel } from "@nexus-state/core";
+import { SimpleTimeTravel } from "@nexus-state/time-travel";
 
 const timeTravel = new SimpleTimeTravel(store, {
   maxHistory: 100,
