@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/core",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
@@ -29,11 +29,6 @@
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js",
       "require": "./dist/utils/index.js"
-    },
-    "./test-utils": {
-      "types": "./dist/test-utils/index.d.ts",
-      "import": "./dist/test-utils/index.js",
-      "require": "./dist/test-utils/index.js"
     }
   },
   "scripts": {
@@ -46,6 +41,8 @@
   },
   "files": [
     "dist",
+    "!dist/**/__tests__",
+    "!dist/test-utils",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"

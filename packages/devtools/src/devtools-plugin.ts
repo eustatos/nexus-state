@@ -16,7 +16,7 @@ import type {
   ActionMetadata,
 } from './types';
 import type { SnapshotMapper } from './snapshot-mapper';
-import type { SimpleTimeTravel } from '@nexus-state/core';
+import type { SimpleTimeTravel } from '@nexus-state/time-travel';
 import {
   captureStackTrace,
   formatStackTraceForDevTools,
@@ -637,7 +637,7 @@ export class DevToolsPlugin {
             console.log(`[DevToolsPlugin] JUMP_TO_ACTION: ${actionName}`);
 
             // Find the index of the action in history
-            const history = this.timeTravel.getHistory();
+            const history = this.timeTravel.getHistory() as { metadata: { action?: string } }[];
             let foundIndex = -1;
 
             // Search backwards from the end

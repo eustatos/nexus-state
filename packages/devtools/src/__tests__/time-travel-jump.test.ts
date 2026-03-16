@@ -13,7 +13,7 @@ import { atom } from "@nexus-state/core";
 import { DevToolsPlugin } from "../devtools-plugin";
 import { createMessageHandler } from "../message-handler";
 import { CommandHandler } from "../command-handler";
-import { SimpleTimeTravel } from "@nexus-state/core";
+import { SimpleTimeTravel } from "@nexus-state/time-travel";
 
 describe.skip("Time Travel jumpTo Integration", () => {
   beforeEach(() => {

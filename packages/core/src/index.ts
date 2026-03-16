@@ -46,7 +46,7 @@
 export { atom } from './atom';
 
 /**
- * Global registry for atoms to support DevTools integration and time travel.
+ * Global registry for atoms to support DevTools integration.
  * All atoms created with the atom() function are automatically registered.
  * @example
  * // Get an atom by its ID
@@ -88,33 +88,6 @@ export { createStore } from './store';
  */
 export { createEnhancedStore } from './enhanced-store';
 
-// Time travel compression strategies
-export { Compression } from './time-travel';
-export type {
-  CompressionStrategy,
-  CompressionStrategyConfig,
-  CompressionMetadata,
-  TimeBasedCompressionConfig,
-  SizeBasedCompressionConfig,
-  SignificanceBasedCompressionConfig,
-  CompressionFactoryConfig,
-  CompressionStrategyType,
-} from './time-travel';
-export {
-  BaseCompressionStrategy,
-  NoCompressionStrategy,
-  TimeBasedCompression,
-  SizeBasedCompression,
-  SignificanceBasedCompression,
-  CompressionFactory,
-  compareSnapshots,
-} from './time-travel';
-
-// Time travel functionality
-export { TimeTravelController } from './time-travel';
-export { SimpleTimeTravel } from './time-travel/SimpleTimeTravel';
-export type { SimpleTimeTravelOptions } from './time-travel/SimpleTimeTravel';
-
 // Export utility functions
 export {
   serializeState,
@@ -140,23 +113,9 @@ export type {
   ActionMetadata,
   AtomValue,
   AnyAtom,
-  TimeTravelOptions,
-  Snapshot,
-  SnapshotMetadata as SnapshotMetadataType,
-  SnapshotStateEntry,
-  TimeTravelAPI,
   Getter,
   Setter,
   Subscriber,
-  RestorationCheckpoint,
-  TransactionalRestorerConfig,
-  TransactionalRestorationResult,
-  RestorationError,
-  TransactionConfig,
-  RestorationOptions,
-  RestorationProgress,
-  CheckpointResult,
-  RollbackResult,
 } from './types';
 // Export type guards
 export { isPrimitiveAtom, isComputedAtom, isWritableAtom } from './types';

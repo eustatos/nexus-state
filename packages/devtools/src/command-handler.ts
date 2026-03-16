@@ -15,8 +15,9 @@ import type {
   ImportStateFormat,
   CommandHandlerConfig,
 } from "./types";
+import type { Snapshot } from "@nexus-state/time-travel";
 import { SnapshotMapper } from "./snapshot-mapper";
-import type { SimpleTimeTravel } from "@nexus-state/core";
+import type { SimpleTimeTravel } from "@nexus-state/time-travel";
 import { StateSerializer, createStateSerializer } from "./state-serializer";
 
 /**
@@ -174,7 +175,7 @@ export class CommandHandler {
     }
 
     // If no snapshot found via mapper, search history directly
-    const history = this.timeTravel.getHistory();
+    const history = this.timeTravel.getHistory() as { id: string; metadata: { action?: string } }[];
     let foundIndex = -1;
 
     if (snapshotId) {
@@ -323,7 +324,7 @@ export class CommandHandler {
       }
 
       // Get current state from SimpleTimeTravel
-      const history = this.timeTravel.getHistory();
+      const history = this.timeTravel.getHistory() as { id: string; state: Record<string, { value: unknown }>; metadata: { timestamp: number } }[];
       if (history.length === 0) {
         return null;
       }
@@ -371,7 +372,7 @@ export class CommandHandler {
       }
 
       // Get current state from SimpleTimeTravel
-      const history = this.timeTravel.getHistory();
+      const history = this.timeTravel.getHistory() as { id: string; state: Record<string, { value: unknown }>; metadata: { timestamp: number } }[];
       if (history.length === 0) {
         return;
       }

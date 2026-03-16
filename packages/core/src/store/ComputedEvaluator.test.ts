@@ -22,7 +22,7 @@ describe('ComputedEvaluator', () => {
     });
 
     it('should evaluate computed atom', () => {
-      let value = 10;
+      const value = 10;
       const atom: ComputedAtom<number> = {
         id: Symbol('computed'),
         name: 'computedAtom',
@@ -98,7 +98,7 @@ describe('ComputedEvaluator', () => {
 
   describe('recompute', () => {
     it('should recompute computed atom', () => {
-      let multiplier = 2;
+      const multiplier = 2;
       const depAtom = createMockAtom('dep', 5);
       const atom: ComputedAtom<number> = {
         id: Symbol('computed'),
@@ -115,7 +115,7 @@ describe('ComputedEvaluator', () => {
     });
 
     it('should recompute writable atom', () => {
-      let value = 25;
+      const value = 25;
       const depAtom = createMockAtom('dep', value);
       const atom: WritableAtom<number> = {
         id: Symbol('writable'),
@@ -241,7 +241,7 @@ describe('ComputedEvaluator', () => {
 
   describe('integration', () => {
     it('should handle complex dependency graph', () => {
-      let baseValue = 10;
+      const baseValue = 10;
       const baseAtom = createMockAtom('base', baseValue);
 
       const computed1: ComputedAtom<number> = {

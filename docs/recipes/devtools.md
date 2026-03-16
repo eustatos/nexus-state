@@ -23,9 +23,10 @@ npm install @nexus-state/devtools
 ### React with DevTools and Time-Travel
 
 ```javascript
-import { atom, createStore, SimpleTimeTravel } from '@nexus-state/core';
+import { atom, createStore } from '@nexus-state/core';
 import { useAtom } from '@nexus-state/react';
 import { devTools } from '@nexus-state/devtools';
+import { SimpleTimeTravel } from '@nexus-state/time-travel';
 
 // Create atoms
 const countAtom = atom(0, 'counter');
@@ -113,7 +114,8 @@ Time-travel debugging allows you to navigate through your application's state hi
 To enable time-travel, create a `SimpleTimeTravel` instance and connect it to DevTools:
 
 ```javascript
-import { atom, createStore, SimpleTimeTravel } from '@nexus-state/core';
+import { atom, createStore } from '@nexus-state/core';
+import { SimpleTimeTravel } from '@nexus-state/time-travel';
 import { devTools } from '@nexus-state/devtools';
 
 const store = createStore();
@@ -347,7 +349,8 @@ function Form() {
 Enable time travel in development:
 
 ```javascript
-import { atom, createStore, SimpleTimeTravel } from '@nexus-state/core';
+import { atom, createStore } from '@nexus-state/core';
+import { SimpleTimeTravel } from '@nexus-state/time-travel';
 import { devTools } from '@nexus-state/devtools';
 
 const store = createStore();
@@ -362,7 +365,7 @@ if (process.env.NODE_ENV === 'development') {
     trace: true,
     maxAge: 100
   });
-  
+
   devtoolsPlugin.apply(store);
   devtoolsPlugin.setTimeTravel(timeTravel);
 }

@@ -6,7 +6,8 @@
 
 import { describe, it, expect, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { atom, createStore, SimpleTimeTravel } from '@nexus-state/core'
+import { atom, createStore } from '@nexus-state/core'
+import { SimpleTimeTravel } from '@nexus-state/time-travel'
 import { useAtomValue, useSetAtom } from '../../index'
 import type { Store } from '@nexus-state/core'
 

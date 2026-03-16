@@ -1,0 +1,59 @@
+{
+  "name": "@nexus-state/form-schema-yup",
+  "version": "0.1.0",
+  "description": "Yup schema validator plugin for Nexus State forms",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "lint": "eslint . --ext .ts",
+    "size": "size-limit"
+  },
+  "keywords": [
+    "yup",
+    "validation",
+    "schema",
+    "nexus-state",
+    "forms"
+  ],
+  "peerDependencies": {
+    "yup": "^1.0.0"
+  },
+  "dependencies": {
+    "@nexus-state/form": "workspace:*"
+  },
+  "devDependencies": {
+    "@nexus-state/core": "workspace:*",
+    "@nexus-state/form": "workspace:*",
+    "@size-limit/preset-small-lib": "^11.0.0",
+    "@types/node": "^20.0.0",
+    "size-limit": "^11.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.7",
+    "yup": "^1.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eustatos/nexus-state",
+    "directory": "packages/form-schema-yup"
+  },
+  "license": "MIT",
+  "author": "Nexus State Contributors"
+}

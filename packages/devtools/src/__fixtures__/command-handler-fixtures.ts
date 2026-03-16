@@ -5,7 +5,7 @@
  * including valid commands, invalid commands, and edge cases.
  */
 
-import { Snapshot, SnapshotStateEntry } from "@nexus-state/core";
+import { Snapshot, SnapshotStateEntry } from "@nexus-state/time-travel";
 
 /**
  * Valid JUMP_TO_STATE commands

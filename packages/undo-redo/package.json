@@ -1,0 +1,65 @@
+{
+  "name": "@nexus-state/undo-redo",
+  "version": "0.1.0",
+  "description": "Undo/Redo functionality for Nexus State",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "homepage": "https://nexus-state.website.yandexcloud.net/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eustatos/nexus-state.git"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist && mkdir dist",
+    "dev": "tsc -w",
+    "test": "vitest run src/__tests__",
+    "test:coverage": "vitest run src/__tests__ --coverage",
+    "lint": "eslint . --ext .ts"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@nexus-state/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^2.0.2",
+    "@eslint/eslintrc": "^3.3.4",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "@vitest/coverage-v8": "^3.0.7",
+    "eslint": "^10.0.2",
+    "globals": "^17.3.0",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^3.0.7"
+  },
+  "keywords": [
+    "nexus-state",
+    "undo",
+    "redo",
+    "state-management"
+  ],
+  "author": "Nexus State Team",
+  "license": "MIT"
+}

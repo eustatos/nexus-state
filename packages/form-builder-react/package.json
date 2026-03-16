@@ -1,0 +1,94 @@
+{
+  "name": "@nexus-state/form-builder-react",
+  "version": "0.1.0",
+  "description": "React UI components for Nexus State Form Builder",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js",
+      "require": "./dist/schema.cjs"
+    },
+    "./registry": {
+      "types": "./dist/registry.d.ts",
+      "import": "./dist/registry.js",
+      "require": "./dist/registry.cjs"
+    },
+    "./built-in-components": {
+      "types": "./dist/built-in-components.d.ts",
+      "import": "./dist/built-in-components.js",
+      "require": "./dist/built-in-components.cjs"
+    },
+    "./state": {
+      "types": "./dist/state.d.ts",
+      "import": "./dist/state.js",
+      "require": "./dist/state.cjs"
+    },
+    "./export": {
+      "types": "./dist/export.d.ts",
+      "import": "./dist/export.js",
+      "require": "./dist/export.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --ext .ts,.tsx",
+    "size": "size-limit"
+  },
+  "keywords": [
+    "form-builder",
+    "react",
+    "drag-and-drop",
+    "visual-builder",
+    "nexus-state",
+    "forms",
+    "no-code"
+  ],
+  "dependencies": {
+    "@nexus-state/core": "workspace:*",
+    "@nexus-state/form": "workspace:*",
+    "@nexus-state/form-builder-core": "workspace:*",
+    "@nexus-state/form-schema-dsl": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@nexus-state/react": "workspace:*",
+    "@size-limit/preset-small-lib": "^11.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "size-limit": "^11.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eustatos/nexus-state",
+    "directory": "packages/form-builder-react"
+  },
+  "license": "MIT",
+  "author": "Nexus State Contributors"
+}

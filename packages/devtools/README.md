@@ -7,7 +7,7 @@ Developer tools for Nexus State
 ## Installation
 
 ```bash
-npm install @nexus-state/devtools
+npm install @nexus-state/devtools @nexus-state/time-travel
 ```
 
 ## Features
@@ -27,6 +27,7 @@ npm install @nexus-state/devtools
 ```javascript
 import { atom, createStore } from '@nexus-state/core';
 import { devTools } from '@nexus-state/devtools';
+import { SimpleTimeTravel } from '@nexus-state/time-travel';
 
 // Create atom
 const countAtom = atom(0, 'counter');
@@ -34,9 +35,13 @@ const countAtom = atom(0, 'counter');
 // Create store
 const store = createStore();
 
+// Create time travel instance
+const timeTravel = new SimpleTimeTravel(store);
+
 // Apply devtools plugin
 const devtoolsPlugin = devTools();
 devtoolsPlugin.apply(store);
+devtoolsPlugin.setTimeTravel(timeTravel);
 ```
 
 ### With Configuration
@@ -68,14 +73,17 @@ devtoolsPlugin.apply(store);
 import { atom, createStore } from '@nexus-state/core';
 import { useAtom } from '@nexus-state/react';
 import { devTools } from '@nexus-state/devtools';
+import { SimpleTimeTravel } from '@nexus-state/time-travel';
 
 const countAtom = atom(0, 'counter');
 const firstNameAtom = atom('John', 'firstName');
 const lastNameAtom = atom('Doe', 'lastName');
 
 const store = createStore();
+const timeTravel = new SimpleTimeTravel(store);
 const devtoolsPlugin = devTools();
 devtoolsPlugin.apply(store);
+devtoolsPlugin.setTimeTravel(timeTravel);
 
 function Counter() {
   const [count, setCount] = useAtom(countAtom, store);
@@ -101,6 +109,15 @@ function Profile() {
 ```
 
 ### Time Travel
+
+The DevTools plugin now uses @nexus-state/time-travel for state navigation. To enable time travel:
+
+```javascript
+import { SimpleTimeTravel } from '@nexus-state/time-travel';
+
+const timeTravel = new SimpleTimeTravel(store);
+devtoolsPlugin.setTimeTravel(timeTravel);
+```
 
 Use the DevTools interface to:
 - Click "Jump to State" to revert to any previous state

@@ -1,43 +1,59 @@
-# @nexus-state/core
+# Changelog
 
-## 0.1.6
+All notable changes to @nexus-state/core will be documented in this file.
 
-### Patch Changes
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-- add devtools functionality
+## [Unreleased] - 2026-03-16
 
-## 0.1.5
+### Changed
+- **BREAKING**: Time Travel functionality moved to @nexus-state/time-travel
+  - `TimeTravelController`, `SimpleTimeTravel` exported from `@nexus-state/time-travel`
+  - `createEnhancedStore` no longer supports `enableTimeTravel` option
+  - Use `@nexus-state/time-travel` for time travel debugging
+- Reduced production bundle size to ~500 KB (from ~3.9 MB)
+- Updated package version to 0.1.12
 
-### Patch Changes
+### Added
+- `__deprecatedTimeTravel()` helper for backward compatibility warnings
+- `@nexus-state/time-travel` as peer dependency
 
-- add devtools functionality and performance
+### Removed
+- `src/time-travel/` directory and all time-travel code
+- `enableTimeTravel` option from `createEnhancedStore`
+- Time travel methods from `EnhancedStore` interface
 
-## 0.1.4
+## [0.1.11] - 2024-03-16
 
-### Patch Changes
+### Added
+- Time Travel debugging capabilities
+- Snapshot serialization and deserialization
+- Delta-based change tracking
+- Compression strategies for snapshots
+- History management with navigation
 
-- fix links
+### Changed
+- Improved TypeScript types for better inference
+- Enhanced error messages for validation failures
 
-## 0.1.3
+### Fixed
+- Fixed atom state initialization edge cases
+- Fixed batch update ordering issues
 
-### Patch Changes
+## [0.1.10] - 2024-02-20
 
-- add repository and documentation link
+### Added
+- Batch updates support
+- Action tracking for DevTools
 
-## 0.1.2
+### Fixed
+- Memory leak in atom subscriptions
 
-### Patch Changes
+## [0.1.0] - 2024-01-15
 
-- add README
-
-## 0.1.1
-
-### Patch Changes
-
-- add README
-
-## 0.1.0
-
-### Minor Changes
-
-- feat: Add family atoms support
+### Added
+- Initial release
+- Core atom-based state management
+- Store implementation
+- Basic utilities

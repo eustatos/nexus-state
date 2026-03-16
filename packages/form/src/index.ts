@@ -57,3 +57,16 @@ export type {
   ReValidateMode,
   ValidationConfig,
 } from './types';
+
+// Modular exports
+export { createFormCore, FormCore } from './core';
+export {
+  createValidation,
+  ValidationAPI,
+  ValidationOptions,
+} from './validation';
+export {
+  createSubmission,
+  SubmissionAPI,
+  SubmissionOptions,
+} from './submission';
