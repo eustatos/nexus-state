@@ -2,22 +2,23 @@
 
 ## 📊 Executive Summary
 
-**Project Status:** Pre-alpha (v0.1.6, early development)  
-**Creation Date:** January 2026  
-**Version Stability:** Unstable API (0.x series)  
-**Production Ready:** ❌ No  
+**Project Status:** Pre-alpha (v0.1.6, early development)
+**Creation Date:** January 2026
+**Version Stability:** Unstable API (0.x series)
+**Production Ready:** ❌ No
 
 ---
 
 ## 🔍 Project Overview
 
-Nexus State is a modern state management library with an atom-based architecture similar to Jotai and Recoil. The library aims to provide:
+Nexus State is a modern state management library with an atom-based architecture. The library aims to provide:
 
-- Framework-agnostic state management (React, Vue, Svelte support)
-- Built-in DevTools integration with Redux DevTools compatibility
-- Time travel debugging capabilities
-- Computed atoms with automatic dependency tracking
-- Extensible plugin system
+- **Framework-agnostic state management** (React, Vue, Svelte support)
+- **Fine-grained reactivity** (atom-level updates)
+- **Isolated stores** (per-request, per-test, per-component)
+- **Built-in Time Travel debugging** (independent timelines per store)
+- **SSR-friendly architecture** (no Provider needed)
+- **Extensible plugin system**
 
 ### Package Structure
 
@@ -34,29 +35,10 @@ Nexus State is a modern state management library with an atom-based architecture
 @nexus-state/family    - Atom families (v0.1.3)
 @nexus-state/web-worker - Web Worker support (v0.1.3)
 @nexus-state/cli       - CLI tools (v0.1.3)
+@nexus-state/query     - Data fetching & caching (v0.1.3)
+@nexus-state/form      - Form management (v0.1.3)
+@nexus-state/time-travel - Time travel debugging (v0.1.3)
 ```
-
----
-
-## 📈 Market Position & Demand Assessment
-
-### Current Demand: MINIMAL
-
-| Metric | Status | Notes |
-|--------|--------|-------|
-| **npm Downloads** | <100/week | New project, minimal visibility |
-| **GitHub Stars** | Unknown | Repository recently created |
-| **Community** | 0 | No active community yet |
-| **Documentation** | Basic | Incomplete coverage |
-| **Production Use** | None | No known production implementations |
-
-### Why Low Demand?
-
-1. **Timing:** Library just launched (Jan 2026)
-2. **Competition:**饱和 market with mature alternatives
-3. **No marketing:** No community building or content
-4. **Unstable API:** 0.x versions discourage production adoption
-5. **Incomplete:** Half of tests failing, incomplete features
 
 ---
 
@@ -64,27 +46,33 @@ Nexus State is a modern state management library with an atom-based architecture
 
 ### Top Alternatives Comparison
 
-| Feature | Nexus State | **Zustand** | **Jotai** | **Redux Toolkit** | **MobX** |
-|---------|-------------|-------------|-----------|-------------------|----------|
-| **Maturity** | ⭐ (0.x) | ⭐⭐⭐⭐⭐ (4.x) | ⭐⭐⭐⭐⭐ (2.x) | ⭐⭐⭐⭐⭐ (1.x) | ⭐⭐⭐⭐⭐ (6.x) |
-| **Popularity** | <100 wks | 4M+ wks | 500K+ wks | 8M+ wks | 800K+ wks |
-| **Bundle Size** | 4.2KB (target: 3KB) | 1KB | 12KB | 13KB | 14KB |
+| Feature | Nexus State | **Zustand** | **Jotai** | **Redux Toolkit** | **Pinia** |
+|---------|-------------|-------------|-----------|-------------------|-----------|
+| **Maturity** | ⭐ (0.x) | ⭐⭐⭐⭐⭐ (4.x) | ⭐⭐⭐⭐⭐ (2.x) | ⭐⭐⭐⭐⭐ (1.x) | ⭐⭐⭐⭐⭐ (2.x) |
+| **Popularity** | <100 wks | 4M+ wks | 500K+ wks | 8M+ wks | 2M+ wks |
+| **Bundle Size** | 4.2KB (target: 3KB) | 1KB | 3.1KB | 8.5KB | 1.6KB |
 | **Test Coverage** | ~85% (needs 95%) | 99% | 98% | 97% | 95% |
 | **DevTools** | Built-in | Plugin | Plugin | Redux DevTools | Plugin |
-| **Time Travel** | ✅ | ❌ | ❌ | ✅ | ❌ |
-| **Framework Agnostic** | ✅ | ❌ (React only) | ❌ (React only) | ✅ | ❌ (React only) |
+| **Time Travel** | ✅ Per-store | ❌ | ❌ | ⚠️ Global only | ❌ |
+| **Framework Agnostic** | ✅ React, Vue, Svelte | ❌ React only | ❌ React only | ✅ All | ❌ Vue only |
 | **Atom-based** | ✅ | ❌ | ✅ | ❌ | ❌ |
+| **Fine-grained** | ✅ Atom-level | ❌ Store-level | ✅ Atom-level | ❌ Store-level | ❌ Store-level |
+| **Isolated Stores** | ✅ Per-scope | ⚠️ Manual | ⚠️ Provider | ⚠️ Manual | ⚠️ Manual |
+| **SSR-Friendly** | ✅ No Provider | ⚠️ Provider | ⚠️ Provider | ⚠️ Complex | ⚠️ Provider |
 
-### Strengths vs Competitors
+### Unique Value Proposition
 
 ✅ **Nexus State Advantages:**
-- Framework-agnostic (works with any JS framework)
-- Built-in Time Travel (not just DevTools plugin)
-- Native atom registry for debugging
-- Complete monorepo structure (10+ packages)
-- Modern TypeScript-first approach
+
+1. **Framework-Agnostic + Fine-Grained** - Not tied to React ecosystem, atom-level reactivity
+2. **Built-in Time Travel Per-Store** - Independent timelines for each store
+3. **Isolated Stores** - Per-request (SSR), per-test, per-component isolation
+4. **SSR-Friendly** - No Provider needed, pass store explicitly
+5. **Complete Monorepo** - 15+ specialized packages
+6. **Modern TypeScript** - Built with strict TypeScript from ground up
 
 ❌ **Critical Weaknesses:**
+
 - No user base yet
 - API not stable (breaking changes likely)
 - Incomplete implementation (failing tests)
@@ -332,9 +320,9 @@ Overall:           42/100 (Not production ready)
 
 1. **Stability First** - Don't release until core is solid
 2. **Quality > Features** - Better 10 features working than 50 partially working
-3. **Documentation = Product** - invest in docs as much as code
-4. **Community = Growth** - start building early
-5. **Performance Matters** - benchmarks against competitors
+3. **Documentation = Product** - Invest in docs as much as code
+4. **Community = Growth** - Start building early
+5. **Performance Matters** - Benchmarks against competitors
 
 ### Risks to Mitigate
 
@@ -352,11 +340,12 @@ Overall:           42/100 (Not production ready)
 
 Once stabilized, Nexus State can compete by offering:
 
-1. **Truly Framework-Agnostic** - Not tied to React ecosystem
-2. **Built-in Time Travel** - Not an afterthought plugin
-3. **Atom Registry** - Native debugging support
-4. **Modern Architecture** - Built with TypeScript from ground up
-5. **Lightweight** - Smaller than Redux/Jotai with similar features
+1. **Truly Framework-Agnostic + Fine-Grained** - Not tied to React ecosystem, atom-level reactivity
+2. **Built-in Time Travel Per-Store** - Independent timelines for each store
+3. **Isolated Stores** - Per-request (SSR), per-test, per-component isolation
+4. **SSR-Friendly** - No Provider needed, pass store explicitly
+5. **Modern Architecture** - Built with TypeScript from ground up
+6. **Lightweight** - Smaller than Redux/Jotai with similar features
 
 ---
 
@@ -370,6 +359,6 @@ Once stabilized, Nexus State can compete by offering:
 
 ---
 
-*Document Version: 1.0*  
-*Last Updated: January 2026*  
+*Document Version: 1.0*
+*Last Updated: January 2026*
 *Next Review: After v1.0 RC release*

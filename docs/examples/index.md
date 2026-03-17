@@ -32,9 +32,6 @@ These examples demonstrate how to use Nexus State in various scenarios.
 - [DevTools Integration](/recipes/devtools) - Complete guide to debugging with DevTools
 - [Forms with Validation](/recipes/forms) - Advanced form handling
 - [Async Atoms](/recipes/async-atoms) - Handling async data
-<<<<<<< Updated upstream
-- [Caching](/recipes/caching) - Caching strategies
-=======
 - [Caching](/recipes/caching) - Caching strategies
 
 ## Unique Nexus State Features
@@ -106,20 +103,19 @@ const cartAtom = atom([], 'cart');
 
 // Use in React
 function ReactComponent() {
-  const [user, setUser] = useAtom(userAtom, store);
+  const [user, setUser] = useAtom(userAtom);
   return <div>{user?.name}</div>;
 }
 
-// Use in Vue (returns Ref, auto-unpacks in template)
+// Use in Vue
 function VueComponent() {
-  const user = useAtom(userAtom, store);
-  return <div>{user.value?.name}</div>;
+  const [user, setUser] = useAtom(userAtom);
+  return <div>{{ user?.name }}</div>;
 }
 
-// Use in Svelte (returns Readable, use $ prefix)
+// Use in Svelte
 function SvelteComponent() {
-  const user = useAtom(userAtom, store);
+  const user = useAtom(userAtom);
   return <div>{$user?.name}</div>;
 }
 ```
->>>>>>> Stashed changes

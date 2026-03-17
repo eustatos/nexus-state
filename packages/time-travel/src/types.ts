@@ -37,7 +37,12 @@ export interface Snapshot {
 export interface TimeTravelOptions {
   maxHistory?: number;
   autoCapture?: boolean;
+  autoInitializeAtoms?: boolean;  // Auto-initialize atoms from registry on capture (default: true)
 }
+
+export type TimeTravelEventType = 'undo' | 'redo' | 'jump' | 'snapshot';
+
+export type TimeTravelUnsubscribe = () => void;
 
 export interface TimeTravelAPI {
   capture(action?: string): void;
@@ -49,6 +54,8 @@ export interface TimeTravelAPI {
   clearHistory(): void;
   getHistory(): Snapshot[];
   importState(state: Record<string, unknown>): boolean;
+  subscribe(event: TimeTravelEventType, callback: () => void): TimeTravelUnsubscribe;
+  subscribeToSnapshots(callback: () => void): TimeTravelUnsubscribe;
 }
 
 export interface TimeTravelStats {

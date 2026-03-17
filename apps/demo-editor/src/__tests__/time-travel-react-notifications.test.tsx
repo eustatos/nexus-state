@@ -13,7 +13,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act, screen, render, fireEvent } from "@testing-library/react";
 import { atom } from "@nexus-state/core";
 import { useAtom, useAtomValue, useSetAtom } from "@nexus-state/react";
-import { SimpleTimeTravel } from "@nexus-state/core";
+import { SimpleTimeTravel } from "@nexus-state/time-travel";
 import { createStore } from "@nexus-state/core";
 
 describe("Demo Editor - Time Travel React Notifications", () => {

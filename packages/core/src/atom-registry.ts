@@ -68,6 +68,15 @@ export class AtomRegistry {
     // Generate fallback name if not provided
     const displayName = name || `atom-${++this.counter}`;
 
+    // Check for duplicate names (only when explicit name is provided)
+    if (name && this.getByName(name)) {
+      console.warn(
+        `[nexus-state] Atom with name "${name}" already exists. ` +
+        `Using duplicate names may cause issues with DevTools and time-travel. ` +
+        `Consider using unique names for all atoms.`
+      );
+    }
+
     // Determine atom type - use type property if available, otherwise infer from methods
     let type: AtomType;
     if (atom.type) {

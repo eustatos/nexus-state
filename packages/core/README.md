@@ -16,12 +16,10 @@
 ### 1. Framework-Agnostic + Fine-Grained Reactivity
 
 **The Problem:**
-
 - **Jotai/Recoil:** React-only, can't share state logic with Vue/Svelte
 - **Redux/Zustand:** Framework-agnostic, but coarse-grained (whole store updates)
 
 **Nexus State Solution:**
-
 ```typescript
 // Define atoms ONCE
 const userAtom = atom(null, 'user');
@@ -29,25 +27,24 @@ const cartAtom = atom([], 'cart');
 
 // Use in React
 function ReactComponent() {
-  const [user, setUser] = useAtom(userAtom, store);
+  const [user, setUser] = useAtom(userAtom);
   return <div>{user?.name}</div>;
 }
 
-// Use in Vue (returns Ref, auto-unpacks in template)
+// Use in Vue
 function VueComponent() {
-  const user = useAtom(userAtom, store);
-  return <div>{user.value?.name}</div>;
+  const [user, setUser] = useAtom(userAtom);
+  return <div>{{ user?.name }}</div>;
 }
 
-// Use in Svelte (returns Readable, use $ prefix)
+// Use in Svelte
 function SvelteComponent() {
-  const user = useAtom(userAtom, store);
+  const user = useAtom(userAtom);
   return <div>{$user?.name}</div>;
 }
 ```
 
 **Benefits:**
-
 - ✅ Write state logic once, use everywhere
 - ✅ Fine-grained updates (only affected components re-render)
 - ✅ Share business logic between frontend frameworks
@@ -57,14 +54,12 @@ function SvelteComponent() {
 ### 2. Isolated State + Time-Travel Per-Scope
 
 **The Problem:**
-
 - **Jotai/Recoil:** Global state, can't isolate for SSR or testing
 - **Redux:** Single global store, time-travel affects entire app
 
 **Nexus State Solution:**
 
 #### SSR: Isolated state per request (no memory leaks)
-
 ```typescript
 // Next.js / Nuxt.js
 export async function getServerSideProps(context) {
@@ -79,7 +74,6 @@ export async function getServerSideProps(context) {
 ```
 
 #### Testing: Clean state per test
-
 ```typescript
 describe('User feature', () => {
   it('should handle login', () => {
@@ -95,7 +89,6 @@ describe('User feature', () => {
 ```
 
 #### Time-Travel: Independent timelines for different components
-
 ```typescript
 // Component A has its own timeline
 const storeA = createStore();
@@ -111,7 +104,6 @@ controllerB.undo(); // ← Only Component B state changes
 ```
 
 **Benefits:**
-
 - ✅ SSR without memory leaks (isolated per request)
 - ✅ Testing without side effects (clean state per test)
 - ✅ Debug specific components independently
@@ -127,33 +119,25 @@ npm install @nexus-state/core @nexus-state/time-travel
 
 ---
 
-## ✨ Features
+## 🤔 When to Use Nexus State?
 
-- 🎯 **Atom-based architecture** — Fine-grained reactivity for precise updates
-- 🔄 **Reactive** — Automatic updates when state changes
-- 📘 **TypeScript First** — Full type inference with no `any` types
-- 🌐 **Framework Agnostic** — Works with React, Vue, Svelte, or vanilla JS
-- 🔌 **Extensible** — Middleware and plugin support
-- 🛠️ **DevTools Ready** — Automatic atom registration for debugging
-- 🕒 **Time Travel** — Debug state changes with undo/redo (via @nexus-state/time-travel)
+### ✅ Choose Nexus State if you need:
 
----
+| Use Case | Why Nexus State? |
+|----------|------------------|
+| **Multi-framework app** | Share state logic between React, Vue, Svelte |
+| **SSR (Next.js, Nuxt)** | Isolated stores per request, no Provider needed |
+| **Complex debugging** | Time-travel per component, not global |
+| **Testing** | Clean state per test, no mocks needed |
+| **Micro-frontends** | Independent stores for each micro-app |
 
-## 🤔 When to Use
+### ❌ Don't use Nexus State if:
 
-### If you need...
-
-- ✅ **Framework-agnostic state** — Share logic between React, Vue, and Svelte
-- ✅ **Fine-grained reactivity** — Atom-based updates, no unnecessary re-renders
-- ✅ **TypeScript support** — Full type inference out of the box
-- ✅ **Small bundle** — Lightweight core with tree-shaking
-- ✅ **DevTools integration** — Built-in debugging capabilities
-
-### If you don't need...
-
-- ❌ **Complex boilerplate** — No reducers, actions, or selectors required
-- ❌ **Context providers** — No wrapping your app in providers
-- ❌ **React-only solutions** — This works with any framework
+| Use Case | Better Alternative |
+|----------|-------------------|
+| **Simple React app** | Jotai (simpler API) |
+| **Global state only** | Zustand (lighter) |
+| **Redux ecosystem** | Redux Toolkit (more plugins) |
 
 ---
 
@@ -179,6 +163,61 @@ store.set(countAtom, 5);
 // Subscribe to changes
 const unsubscribe = store.subscribe(countAtom, (value) => {
   console.log('Count changed:', value);
+});
+```
+
+### SSR with Isolated Stores (Next.js)
+
+```javascript
+// pages/[id].tsx
+import { atom, createStore } from '@nexus-state/core';
+
+const userAtom = atom(null, 'user');
+
+export async function getServerSideProps(context) {
+  // Create isolated store per request - no memory leaks!
+  const store = createStore();
+  store.set(userAtom, await fetchUser(context.params.id));
+  return { props: { initialState: store.getState() } };
+}
+
+function Page({ initialState }) {
+  const store = useMemo(() => createStore().setState(initialState), [initialState]);
+  const [user] = useAtom(userAtom);
+  return <div>{user?.name}</div>;
+}
+```
+
+### Time-Travel Debugging
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+import { TimeTravelController } from '@nexus-state/time-travel';
+
+const countAtom = atom(0, 'count');
+const store = createStore();
+const controller = new TimeTravelController(store);
+
+controller.capture('init');
+store.set(countAtom, 5);
+controller.capture('increment');
+
+controller.undo(); // count = 0
+controller.redo(); // count = 5
+```
+
+### Testing with Clean State
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+
+describe('User feature', () => {
+  it('should handle login', () => {
+    // Fresh store per test - no side effects!
+    const store = createStore();
+    store.set(userAtom, { id: 1, name: 'John' });
+    expect(store.get(userAtom)).toEqual({ id: 1, name: 'John' });
+  });
 });
 ```
 
@@ -315,6 +354,114 @@ undoRedo.redo();
 ---
 
 ## 📖 Examples
+
+### Multi-Framework State Sharing
+
+Write state logic once, use in React, Vue, and Svelte:
+
+```typescript
+// Define atoms ONCE
+const userAtom = atom(null, 'user');
+const cartAtom = atom([], 'cart');
+
+// Use in React
+function ReactComponent() {
+  const [user, setUser] = useAtom(userAtom);
+  return <div>{user?.name}</div>;
+}
+
+// Use in Vue
+function VueComponent() {
+  const [user, setUser] = useAtom(userAtom);
+  return <div>{{ user?.name }}</div>;
+}
+
+// Use in Svelte
+function SvelteComponent() {
+  const user = useAtom(userAtom);
+  return <div>{$user?.name}</div>;
+}
+```
+
+### SSR with Isolated Stores
+
+Create isolated stores per request - perfect for Next.js, Nuxt.js:
+
+```javascript
+// pages/[id].tsx
+import { atom, createStore } from '@nexus-state/core';
+
+const userAtom = atom(null, 'user');
+const postsAtom = atom([], 'posts');
+
+export async function getServerSideProps(context) {
+  // Create isolated store per request - no memory leaks!
+  const store = createStore();
+  
+  store.set(userAtom, await fetchUser(context.params.id));
+  store.set(postsAtom, await fetchPosts(context.params.id));
+  
+  return { props: { initialState: store.getState() } };
+}
+
+function Page({ initialState }) {
+  const store = useMemo(() => createStore().setState(initialState), [initialState]);
+  const [user] = useAtom(userAtom);
+  const [posts] = useAtom(postsAtom);
+  return <div>{user?.name} - {posts.length} posts</div>;
+}
+```
+
+### Testing with Clean State
+
+Create fresh stores for each test - no mocks, no side effects:
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+
+describe('User feature', () => {
+  it('should handle login', () => {
+    // Fresh store per test - no side effects!
+    const store = createStore();
+    store.set(userAtom, { id: 1, name: 'John' });
+    expect(store.get(userAtom)).toEqual({ id: 1, name: 'John' });
+  });
+
+  it('should handle logout', () => {
+    // Another fresh store - clean state!
+    const store = createStore();
+    store.set(userAtom, { id: 1, name: 'John' });
+    store.set(userAtom, null); // Logout
+    expect(store.get(userAtom)).toBeNull();
+  });
+});
+```
+
+### Time-Travel Per-Scope
+
+Each store has its own time-travel timeline - debug Component A without affecting Component B:
+
+```javascript
+import { atom, createStore } from '@nexus-state/core';
+import { TimeTravelController } from '@nexus-state/time-travel';
+
+// Component A has its own timeline
+const storeA = createStore();
+const controllerA = new TimeTravelController(storeA);
+
+// Component B has its own timeline
+const storeB = createStore();
+const controllerB = new TimeTravelController(storeB);
+
+// Debug Component A without affecting Component B
+controllerA.capture('component-a-action');
+storeA.set(someAtom, 'value');
+controllerA.undo(); // Only Component A state changes
+
+controllerB.capture('component-b-action');
+storeB.set(otherAtom, 'value');
+controllerB.undo(); // Only Component B state changes
+```
 
 ### Counter with Computed Atoms
 
@@ -568,10 +715,10 @@ store.set(countAtom, 5); // Logs: Atom changed: 0 → 5
 
 ### Time Travel
 
-| Class                    | Description                 | Example                           |
-| ------------------------ | --------------------------- | --------------------------------- |
-| **TimeTravelController** | Main time travel controller | `new TimeTravelController(store)` |
-| **SimpleTimeTravel**     | Simplified time travel API  | `new SimpleTimeTravel(store)`     |
+| Class                    | Description                  | Example                              |
+| ------------------------ | ---------------------------- | ------------------------------------ |
+| **TimeTravelController** | Main time travel controller  | `new TimeTravelController(store)`    |
+| **SimpleTimeTravel**     | Simplified time travel API   | `new SimpleTimeTravel(store)`        |
 
 For more information, see [@nexus-state/time-travel](https://github.com/eustatos/nexus-state/tree/main/packages/time-travel).
 

@@ -20,7 +20,8 @@ import { TimeTravelController } from '@nexus-state/time-travel';
 const store = createStore();
 
 // Create atoms
-const countAtom = atom(0);
+const countAtom = atom(0, 'count');
+const nameAtom = atom('', 'name');
 
 // Create time travel controller
 const controller = new TimeTravelController(store, {
@@ -29,16 +30,46 @@ const controller = new TimeTravelController(store, {
 });
 
 // Capture snapshots
-controller.capture('increment');
+controller.capture('init');
+
+store.set(countAtom, 5);
+controller.capture('update-1');
+
+store.set(countAtom, 10);
+controller.capture('update-2');
 
 // Navigate through history
 controller.undo();
-controller.redo();
-controller.jumpTo(5);
+console.log(store.get(countAtom)); // 5
 
-// Get history
-const history = controller.getHistory();
+controller.undo();
+console.log(store.get(countAtom)); // 0
 ```
+
+### How capture() Works
+
+When you call `capture()`, the `TimeTravelController` automatically initializes all atoms registered in the global `atomRegistry`:
+
+1. **Primitive atoms** use their `initialValue`
+2. **Computed atoms** are evaluated based on their dependencies
+3. **Snapshot** is created with the current store state
+
+```typescript
+const atom1 = atom('initial', 'atom1');
+const atom2 = atom(42, 'atom2');
+
+const store = createStore();
+const controller = new TimeTravelController(store);
+
+// First capture - atoms are auto-initialized
+controller.capture('init');
+
+const snapshot = controller.getSnapshots()[0];
+console.log(snapshot.state);
+// { atom1: 'initial', atom2: 42 }
+```
+
+**Note:** You don't need to explicitly call `store.get()` or `store.set()` before the first `capture()`. All atoms are automatically initialized with their default values.
 
 ### Using SimpleTimeTravel
 
@@ -71,6 +102,140 @@ const controller = new TimeTravelController(store, {
 });
 ```
 
+## Advanced Usage
+
+### Atom Initialization
+
+The `TimeTravelController` automatically initializes all atoms registered in the global `atomRegistry` when you call `capture()`. This means:
+
+```typescript
+const atom1 = atom('initial', 'atom1');
+const atom2 = atom(42, 'atom2');
+
+const store = createStore();
+const controller = new TimeTravelController(store);
+
+// First capture - atoms are auto-initialized
+controller.capture('init');
+
+const snapshot = controller.getSnapshots()[0];
+console.log(snapshot.state);
+// { atom1: 'initial', atom2: 42 }
+```
+
+**How it works:**
+1. `capture()` iterates through all atoms in `atomRegistry`
+2. For each atom, it calls `store.get(atom)` to trigger initialization
+3. Primitive atoms return their `initialValue`
+4. Computed atoms are evaluated based on their dependencies
+5. The resulting store state is captured as a snapshot
+
+**Edge cases:**
+- If a computed atom's dependencies are not initialized, it may throw an error
+- Errors during initialization are caught and logged as warnings
+- Atoms that fail to initialize are excluded from the snapshot
+
+### Multiple Stores
+
+Each store maintains its own state, independent of other stores:
+
+```typescript
+const atom1 = atom('initial', 'shared');
+
+const store1 = createStore();
+const controller1 = new TimeTravelController(store1);
+
+const store2 = createStore();
+const controller2 = new TimeTravelController(store2);
+
+store1.set(atom1, 'store1-value');
+controller1.capture('store1-snapshot');
+
+store2.set(atom1, 'store2-value');
+controller2.capture('store2-snapshot');
+
+// Independent timelines
+controller1.undo(); // store1: 'initial'
+controller2.undo(); // store2: 'initial'
+```
+
+### Best Practices
+
+#### Use Unique Atom Names
+
+```typescript
+// ✅ Good - unique, descriptive names
+const userAtom = atom(null, 'user');
+const userSettingsAtom = atom({}, 'userSettings');
+const themeAtom = atom('light', 'theme');
+
+// ❌ Bad - duplicate names
+const atom1 = atom('value1', 'data');
+const atom2 = atom('value2', 'data');  // ⚠️ Warning: duplicate name!
+```
+
+**Why unique names matter:**
+- DevTools relies on names to display atoms
+- Time-travel uses names for snapshot serialization
+- Debugging is easier with descriptive, unique names
+- Duplicate names trigger a console warning
+
+**Naming conventions:**
+- Use descriptive names: `userProfile`, `shoppingCart`, `authToken`
+- Add prefixes for namespacing: `auth/user`, `ui/theme`, `api/cache`
+- Avoid generic names: `data`, `state`, `value`
+
+#### Performance Considerations
+
+For large applications with many atoms, `capture()` may initialize all atoms at once. Consider:
+
+```typescript
+// Option 1: Explicit initialization for critical atoms only
+store.get(criticalAtom1);
+store.get(criticalAtom2);
+controller.capture('critical-state');
+
+// Option 2: Use selective snapshots (future feature)
+// controller.capture('state', { atoms: [atom1, atom2] });
+```
+
+### Troubleshooting
+
+#### Warning: Duplicate atom names
+
+```
+[nexus-state] Atom with name "data" already exists.
+Using duplicate names may cause issues with DevTools and time-travel.
+Consider using unique names for all atoms.
+```
+
+**Solution:** Rename atoms to use unique, descriptive names:
+
+```typescript
+// Before
+const atom1 = atom('value1', 'data');
+const atom2 = atom('value2', 'data');
+
+// After
+const userData = atom('value1', 'userData');
+const settingsData = atom('value2', 'settingsData');
+```
+
+#### Computed atom initialization errors
+
+If you see warnings about atoms failing to initialize during `capture()`:
+
+```
+[TimeTravelController] Failed to initialize atom during capture: Error: ...
+```
+
+**Possible causes:**
+- Computed atom depends on atoms that don't exist yet
+- Circular dependencies between atoms
+- Runtime errors in computed atom's read function
+
+**Solution:** Ensure all dependencies are properly defined before calling `capture()`.
+
 ## API
 
 ### TimeTravelController
@@ -82,6 +247,7 @@ const controller = new TimeTravelController(store, {
 - `canUndo()`: Check if undo available
 - `canRedo()`: Check if redo available
 - `getHistory()`: Get history array
+- `getSnapshots()`: Get all snapshots
 - `clearHistory()`: Clear history
 - `subscribe(eventType, listener)`: Subscribe to events
 - `dispose()`: Clean up resources

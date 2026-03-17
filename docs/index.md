@@ -1,12 +1,12 @@
 ---
 layout: home
 title: Nexus State
-titleTemplate: A simple and powerful state management library
+titleTemplate: The only state management with isolated stores & independent time-travel
 
 hero:
   name: Nexus State
-  text: A simple and powerful state management library
-  tagline: Simple, fast, and scalable state management for JavaScript applications
+  text: State management reimagined
+  tagline: The only library with isolated stores and independent time-travel for each scope
   actions:
     - theme: brand
       text: Get Started
@@ -16,22 +16,8 @@ hero:
       link: https://github.com/eustatos/nexus-state
 
 features:
-<<<<<<< Updated upstream
-  - title: Simple API
-    details: Easy to learn and use API that makes state management straightforward
-  - title: Framework Agnostic
-    details: Works with React, Vue, Svelte, and vanilla JavaScript
-  - title: Lightweight
-    details: Small bundle size with minimal dependencies
-  - title: Powerful
-    details: Advanced features like async atoms, middleware, and family atoms
-  - title: TypeScript Support
-    details: First-class TypeScript support with excellent type inference
-  - title: Developer Experience
-    details: Great development experience with excellent documentation and examples
-=======
   - title: Framework-Agnostic + Fine-Grained
-    details: Write state logic once, use in React, Vue, Svelte — with atom-level reactivity (useAtom(atom, store))
+    details: Write state logic once, use in React, Vue, Svelte — with atom-level reactivity
   - title: Isolated Stores
     details: Create independent stores per request (SSR), per test, or per component — no memory leaks
   - title: Time-Travel Per-Scope
@@ -42,5 +28,4 @@ features:
     details: Fresh store per test — clean state, no mocks, no side effects
   - title: Micro-Frontends Ready
     details: Independent stores for each micro-app — no global state conflicts
->>>>>>> Stashed changes
 ---

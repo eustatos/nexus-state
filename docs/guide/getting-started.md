@@ -2,8 +2,6 @@
 
 Welcome to Nexus State! This guide will help you get started with using Nexus State in your projects.
 
-<<<<<<< Updated upstream
-=======
 ## What makes Nexus State unique?
 
 ### 1. Framework-Agnostic + Fine-Grained Reactivity
@@ -20,19 +18,19 @@ const cartAtom = atom([], 'cart');
 
 // Use in React
 function ReactComponent() {
-  const [user, setUser] = useAtom(userAtom, store);
+  const [user, setUser] = useAtom(userAtom);
   return <div>{user?.name}</div>;
 }
 
-// Use in Vue (returns Ref, auto-unpacks in template)
+// Use in Vue
 function VueComponent() {
-  const user = useAtom(userAtom, store);
-  return <div>{user.value?.name}</div>;
+  const [user, setUser] = useAtom(userAtom);
+  return <div>{{ user?.name }}</div>;
 }
 
-// Use in Svelte (returns Readable, use $ prefix)
+// Use in Svelte
 function SvelteComponent() {
-  const user = useAtom(userAtom, store);
+  const user = useAtom(userAtom);
   return <div>{$user?.name}</div>;
 }
 ```
@@ -89,7 +87,6 @@ controllerA.undo(); // ← Only Component A state changes
 controllerB.undo(); // ← Only Component B state changes
 ```
 
->>>>>>> Stashed changes
 ## Installation
 
 To install Nexus State, run the following command:
@@ -130,12 +127,6 @@ For state families:
 npm install @nexus-state/family
 ```
 
-For Immer integration:
-
-```bash
-npm install @nexus-state/immer
-```
-
 For middleware:
 
 ```bash
@@ -146,12 +137,6 @@ For persistence:
 
 ```bash
 npm install @nexus-state/persist
-```
-
-For CLI tools:
-
-```bash
-npm install -g @nexus-state/cli
 ```
 
 For developer tools:
@@ -171,16 +156,13 @@ npm install @nexus-state/web-worker
 Here's a simple example of how to use Nexus State:
 
 ```javascript
-import { atom, createEnhancedStore } from '@nexus-state/core';
+import { atom, createStore } from '@nexus-state/core';
 
 // Create an atom
 const countAtom = atom(0, 'count');
 
-// Create an enhanced store with time travel and DevTools
-const store = createEnhancedStore([], {
-  enableTimeTravel: true,
-  enableDevTools: true
-});
+// Create a store
+const store = createStore();
 
 // Get the value of the atom
 console.log(store.get(countAtom)); // 0
@@ -191,10 +173,6 @@ store.set(countAtom, 1);
 // Functional update
 store.set(countAtom, (prev) => prev + 1);
 console.log(store.get(countAtom)); // 2
-
-// Time travel
-store.undo();
-console.log(store.get(countAtom)); // 1
 
 // Subscribe to changes
 const unsubscribe = store.subscribe(countAtom, (value) => {
@@ -230,19 +208,6 @@ const userFamily = createFamily({
 
 // Access nested state
 const name = userFamily.get('profile.name');
-```
-
-### Immer Integration
-
-```javascript
-import { createImmerStore } from '@nexus-state/immer';
-
-const store = createImmerStore({ users: [] });
-
-// Update state with mutable API
-store.setState((draft) => {
-  draft.users.push({ id: 1, name: 'John' });
-});
 ```
 
 ### Middleware

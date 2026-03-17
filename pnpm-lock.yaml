@@ -160,6 +160,9 @@ importers:
       '@nexus-state/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@nexus-state/time-travel':
+        specifier: workspace:*
+        version: link:../../packages/time-travel
       lucide-react:
         specifier: ^0.460.0
         version: 0.460.0(react@18.3.1)
