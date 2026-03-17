@@ -2,7 +2,7 @@
  * SimpleTimeTravel - Simplified wrapper for TimeTravelController
  */
 
-import type { Store, TimeTravelOptions } from './types';
+import type { Store, TimeTravelOptions, TimeTravelEventType, TimeTravelUnsubscribe } from './types';
 import { TimeTravelController } from './TimeTravelController';
 
 export class SimpleTimeTravel {
@@ -50,6 +50,14 @@ export class SimpleTimeTravel {
 
   getHistoryStats(): { length: number; currentIndex: number; canUndo: boolean; canRedo: boolean } {
     return this.controller.getHistoryStats();
+  }
+
+  subscribe(event: TimeTravelEventType, callback: () => void): TimeTravelUnsubscribe {
+    return this.controller.subscribe(event, callback);
+  }
+
+  subscribeToSnapshots(callback: () => void): TimeTravelUnsubscribe {
+    return this.controller.subscribeToSnapshots(callback);
   }
 
   dispose(): void {

@@ -39,6 +39,10 @@ export interface TimeTravelOptions {
   autoCapture?: boolean;
 }
 
+export type TimeTravelEventType = 'undo' | 'redo' | 'jump' | 'snapshot';
+
+export type TimeTravelUnsubscribe = () => void;
+
 export interface TimeTravelAPI {
   capture(action?: string): void;
   undo(): boolean;
@@ -49,6 +53,8 @@ export interface TimeTravelAPI {
   clearHistory(): void;
   getHistory(): Snapshot[];
   importState(state: Record<string, unknown>): boolean;
+  subscribe(event: TimeTravelEventType, callback: () => void): TimeTravelUnsubscribe;
+  subscribeToSnapshots(callback: () => void): TimeTravelUnsubscribe;
 }
 
 export interface TimeTravelStats {

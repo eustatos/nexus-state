@@ -24,6 +24,7 @@
   "dependencies": {
     "@nexus-state/core": "workspace:*",
     "@nexus-state/react": "workspace:*",
+    "@nexus-state/time-travel": "workspace:*",
     "lucide-react": "^0.460.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

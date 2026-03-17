@@ -1,6 +1,7 @@
 import React from 'react'
 import { useAtom } from '@nexus-state/react'
-import { atom, createStore, SimpleTimeTravel } from '@nexus-state/core'
+import { atom, createStore } from '@nexus-state/core'
+import { SimpleTimeTravel } from '@nexus-state/time-travel'
 import { devTools } from '@nexus-state/devtools'
 
 // Простой пример счетчика

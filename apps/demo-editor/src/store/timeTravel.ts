@@ -1,4 +1,4 @@
-import { SimpleTimeTravel } from '@nexus-state/core'
+import { SimpleTimeTravel } from '@nexus-state/time-travel'
 import { editorStore } from './store'
 
 /**
