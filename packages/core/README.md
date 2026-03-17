@@ -11,6 +11,109 @@
 
 ---
 
+<<<<<<< Updated upstream
+=======
+## 🎯 What makes Nexus State unique?
+
+### 1. Framework-Agnostic + Fine-Grained Reactivity
+
+**The Problem:**
+- **Jotai/Recoil:** React-only, can't share state logic with Vue/Svelte
+- **Redux/Zustand:** Framework-agnostic, but coarse-grained (whole store updates)
+
+**Nexus State Solution:**
+```typescript
+// Define atoms ONCE
+const userAtom = atom(null, 'user');
+const cartAtom = atom([], 'cart');
+
+// Use in React
+function ReactComponent() {
+  const [user, setUser] = useAtom(userAtom, store);
+  return <div>{user?.name}</div>;
+}
+
+// Use in Vue (returns Ref, auto-unpacks in template)
+function VueComponent() {
+  const user = useAtom(userAtom, store);
+  return <div>{user.value?.name}</div>;
+}
+
+// Use in Svelte (returns Readable, use $ prefix)
+function SvelteComponent() {
+  const user = useAtom(userAtom, store);
+  return <div>{$user?.name}</div>;
+}
+```
+
+**Benefits:**
+- ✅ Write state logic once, use everywhere
+- ✅ Fine-grained updates (only affected components re-render)
+- ✅ Share business logic between frontend frameworks
+
+---
+
+### 2. Isolated State + Time-Travel Per-Scope
+
+**The Problem:**
+- **Jotai/Recoil:** Global state, can't isolate for SSR or testing
+- **Redux:** Single global store, time-travel affects entire app
+
+**Nexus State Solution:**
+
+#### SSR: Isolated state per request (no memory leaks)
+```typescript
+// Next.js / Nuxt.js
+export async function getServerSideProps(context) {
+  const store = createStore(); // ← Isolated store per request
+
+  store.set(userAtom, await fetchUser(context.params.id));
+  store.set(postsAtom, await fetchPosts(context.params.id));
+
+  return { props: { initialState: store.getState() } };
+}
+// No Provider needed! No memory leaks between users!
+```
+
+#### Testing: Clean state per test
+```typescript
+describe('User feature', () => {
+  it('should handle login', () => {
+    const store = createStore(); // ← Fresh store per test
+    const controller = new TimeTravelController(store);
+
+    store.set(userAtom, { id: 1 });
+    controller.capture('logged-in');
+
+    // Test in isolation, no side effects
+  });
+});
+```
+
+#### Time-Travel: Independent timelines for different components
+```typescript
+// Component A has its own timeline
+const storeA = createStore();
+const controllerA = new TimeTravelController(storeA);
+
+// Component B has its own timeline
+const storeB = createStore();
+const controllerB = new TimeTravelController(storeB);
+
+// Debug Component A without affecting Component B
+controllerA.undo(); // ← Only Component A state changes
+controllerB.undo(); // ← Only Component B state changes
+```
+
+**Benefits:**
+- ✅ SSR without memory leaks (isolated per request)
+- ✅ Testing without side effects (clean state per test)
+- ✅ Debug specific components independently
+- ✅ Multiple time-travel timelines in one app
+
+---
+
+>>>>>>> Stashed changes
 ## 📦 Installation
 
 ```bash

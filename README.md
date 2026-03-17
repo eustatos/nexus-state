@@ -11,12 +11,52 @@
 
 ## ✨ Features
 
+<<<<<<< Updated upstream
 - 🎯 **Atom-based architecture** — Fine-grained reactivity like Jotai
 - 🔄 **Built-in Time Travel** — Debug with undo/redo out of the box
 - 🌐 **Framework Agnostic** — React, Vue, Svelte, vanilla JS
 - 📦 **Lightweight** — Only ~4KB (smaller than Redux & Jotai)
 - 🔌 **Extensible** — Middleware, plugins, DevTools integration
 - 🛠️ **TypeScript First** — Full type inference
+=======
+### 1. Framework-Agnostic + Fine-Grained Reactivity
+
+**The Problem:**
+- **Jotai/Recoil:** React-only, can't share state logic with Vue/Svelte
+- **Redux/Zustand:** Framework-agnostic, but coarse-grained (whole store updates)
+- **Pinia/Vuex:** Vue-only, can't use in React
+
+**Nexus State Solution:**
+```typescript
+// Define atoms ONCE
+const userAtom = atom(null, 'user');
+const cartAtom = atom([], 'cart');
+
+// Use in React
+function ReactComponent() {
+  const [user, setUser] = useAtom(userAtom, store);
+  return <div>{user?.name}</div>;
+}
+
+// Use in Vue (returns Ref, auto-unpacks in template)
+function VueComponent() {
+  const user = useAtom(userAtom, store);
+  return <div>{user.value?.name}</div>;
+}
+
+// Use in Svelte (returns Readable, use $ prefix)
+function SvelteComponent() {
+  const user = useAtom(userAtom, store);
+  return <div>{$user?.name}</div>;
+}
+```
+
+**Benefits:**
+- ✅ Write state logic once, use everywhere
+- ✅ Fine-grained updates (only affected components re-render)
+- ✅ Share business logic between frontend frameworks
+- ✅ Migrate from React to Vue without rewriting state management
+>>>>>>> Stashed changes
 
 ---
 

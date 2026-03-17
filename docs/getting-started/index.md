@@ -6,12 +6,78 @@ Welcome to Nexus State! This section will help you get started with using Nexus 
 
 Nexus State is a modern, lightweight state management library for JavaScript applications. It provides a simple and intuitive API for managing application state with features like:
 
+<<<<<<< Updated upstream
 - 🎯 **Simple API**: Easy to learn and use
 - ⚡ **Fast Performance**: Optimized for speed and efficiency
 - 🔌 **Framework Support**: Works with React, Vue, and Svelte
 - 🛠️ **Developer Tools**: Built-in DevTools integration
 - 🕒 **Time Travel**: Debug and undo/redo state changes
 - 📦 **Ecosystem**: Rich set of plugins and adapters
+=======
+**The Problem:**
+- **Jotai/Recoil:** React-only, can't share state logic with Vue/Svelte
+- **Redux/Zustand:** Framework-agnostic, but coarse-grained (whole store updates)
+
+**Nexus State Solution:**
+```typescript
+// Define atoms ONCE
+const userAtom = atom(null, 'user');
+const cartAtom = atom([], 'cart');
+
+// Use in React
+function ReactComponent() {
+  const [user, setUser] = useAtom(userAtom, store);
+  return <div>{user?.name}</div>;
+}
+
+// Use in Vue (returns Ref, auto-unpacks in template)
+function VueComponent() {
+  const user = useAtom(userAtom, store);
+  return <div>{user.value?.name}</div>;
+}
+
+// Use in Svelte (returns Readable, use $ prefix)
+function SvelteComponent() {
+  const user = useAtom(userAtom, store);
+  return <div>{$user?.name}</div>;
+}
+```
+
+### Isolated State + Time-Travel Per-Scope
+
+**The Problem:**
+- **Jotai/Recoil:** Global state, can't isolate for SSR or testing
+- **Redux:** Single global store, time-travel affects entire app
+
+**Nexus State Solution:**
+```typescript
+// SSR: Isolated store per request (no memory leaks!)
+export async function getServerSideProps(context) {
+  const store = createStore();
+  store.set(userAtom, await fetchUser(context.params.id));
+  return { props: { initialState: store.getState() } };
+}
+
+// Testing: Fresh store per test (no side effects!)
+describe('User feature', () => {
+  it('should handle login', () => {
+    const store = createStore();
+    store.set(userAtom, { id: 1 });
+    // Test in isolation
+  });
+});
+
+// Time-Travel: Independent timelines for different components
+const storeA = createStore();
+const controllerA = new TimeTravelController(storeA);
+
+const storeB = createStore();
+const controllerB = new TimeTravelController(storeB);
+
+controllerA.undo(); // Only Component A state changes
+controllerB.undo(); // Only Component B state changes
+```
+>>>>>>> Stashed changes
 
 ## Quick Start
 
