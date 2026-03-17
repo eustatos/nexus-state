@@ -16,6 +16,7 @@ hero:
       link: https://github.com/eustatos/nexus-state
 
 features:
+<<<<<<< Updated upstream
   - title: Simple API
     details: Easy to learn and use API that makes state management straightforward
   - title: Framework Agnostic
@@ -28,4 +29,18 @@ features:
     details: First-class TypeScript support with excellent type inference
   - title: Developer Experience
     details: Great development experience with excellent documentation and examples
+=======
+  - title: Framework-Agnostic + Fine-Grained
+    details: Write state logic once, use in React, Vue, Svelte — with atom-level reactivity (useAtom(atom, store))
+  - title: Isolated Stores
+    details: Create independent stores per request (SSR), per test, or per component — no memory leaks
+  - title: Time-Travel Per-Scope
+    details: Independent time-travel timelines for each store — debug Component A without affecting Component B
+  - title: SSR-Friendly
+    details: No Provider needed — pass store explicitly for Next.js, Nuxt, and other SSR frameworks
+  - title: Testing Made Easy
+    details: Fresh store per test — clean state, no mocks, no side effects
+  - title: Micro-Frontends Ready
+    details: Independent stores for each micro-app — no global state conflicts
+>>>>>>> Stashed changes
 ---
