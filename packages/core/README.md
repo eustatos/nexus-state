@@ -1,6 +1,6 @@
 # @nexus-state/core
 
-> The core package of the Nexus State ecosystem - a powerful state management solution for modern JavaScript applications
+> The core package of the Nexus State ecosystem - the only state management with **isolated stores** and **independent time-travel** for each scope
 >
 > [![npm version](https://img.shields.io/npm/v/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
 > [![npm downloads](https://img.shields.io/npm/dw/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
@@ -11,17 +11,17 @@
 
 ---
 
-<<<<<<< Updated upstream
-=======
 ## 🎯 What makes Nexus State unique?
 
 ### 1. Framework-Agnostic + Fine-Grained Reactivity
 
 **The Problem:**
+
 - **Jotai/Recoil:** React-only, can't share state logic with Vue/Svelte
 - **Redux/Zustand:** Framework-agnostic, but coarse-grained (whole store updates)
 
 **Nexus State Solution:**
+
 ```typescript
 // Define atoms ONCE
 const userAtom = atom(null, 'user');
@@ -47,6 +47,7 @@ function SvelteComponent() {
 ```
 
 **Benefits:**
+
 - ✅ Write state logic once, use everywhere
 - ✅ Fine-grained updates (only affected components re-render)
 - ✅ Share business logic between frontend frameworks
@@ -56,12 +57,14 @@ function SvelteComponent() {
 ### 2. Isolated State + Time-Travel Per-Scope
 
 **The Problem:**
+
 - **Jotai/Recoil:** Global state, can't isolate for SSR or testing
 - **Redux:** Single global store, time-travel affects entire app
 
 **Nexus State Solution:**
 
 #### SSR: Isolated state per request (no memory leaks)
+
 ```typescript
 // Next.js / Nuxt.js
 export async function getServerSideProps(context) {
@@ -76,6 +79,7 @@ export async function getServerSideProps(context) {
 ```
 
 #### Testing: Clean state per test
+
 ```typescript
 describe('User feature', () => {
   it('should handle login', () => {
@@ -91,6 +95,7 @@ describe('User feature', () => {
 ```
 
 #### Time-Travel: Independent timelines for different components
+
 ```typescript
 // Component A has its own timeline
 const storeA = createStore();
@@ -106,6 +111,7 @@ controllerB.undo(); // ← Only Component B state changes
 ```
 
 **Benefits:**
+
 - ✅ SSR without memory leaks (isolated per request)
 - ✅ Testing without side effects (clean state per test)
 - ✅ Debug specific components independently
@@ -113,7 +119,6 @@ controllerB.undo(); // ← Only Component B state changes
 
 ---
 
->>>>>>> Stashed changes
 ## 📦 Installation
 
 ```bash
@@ -563,10 +568,10 @@ store.set(countAtom, 5); // Logs: Atom changed: 0 → 5
 
 ### Time Travel
 
-| Class                    | Description                  | Example                              |
-| ------------------------ | ---------------------------- | ------------------------------------ |
-| **TimeTravelController** | Main time travel controller  | `new TimeTravelController(store)`    |
-| **SimpleTimeTravel**     | Simplified time travel API   | `new SimpleTimeTravel(store)`        |
+| Class                    | Description                 | Example                           |
+| ------------------------ | --------------------------- | --------------------------------- |
+| **TimeTravelController** | Main time travel controller | `new TimeTravelController(store)` |
+| **SimpleTimeTravel**     | Simplified time travel API  | `new SimpleTimeTravel(store)`     |
 
 For more information, see [@nexus-state/time-travel](https://github.com/eustatos/nexus-state/tree/main/packages/time-travel).
 
