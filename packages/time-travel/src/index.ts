@@ -4,7 +4,7 @@
  */
 
 // Re-export from core for convenience
-export { atom, createStore, createEnhancedStore } from '@nexus-state/core';
+export { atom, createStore, createEnhancedStore, atomRegistry } from '@nexus-state/core';
 
 export { TimeTravelController } from './TimeTravelController';
 export { SimpleTimeTravel } from './SimpleTimeTravel';

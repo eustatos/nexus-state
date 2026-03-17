@@ -213,4 +213,52 @@ describe('Atom Registry', () => {
       expect(atomRegistry.getName(atom2)).toBe('second-42');
     });
   });
+
+  describe('Duplicate Name Warning', () => {
+    it('should warn when registering atom with duplicate name', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation();
+
+      const atom1 = atom('value1', 'duplicateName');
+      const atom2 = atom('value2', 'duplicateName');
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Atom with name "duplicateName" already exists')
+      );
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should not warn when registering atoms with unique names', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation();
+
+      const atom1 = atom('value1', 'uniqueName1');
+      const atom2 = atom('value2', 'uniqueName2');
+
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should not warn for atoms without explicit names', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation();
+
+      const atom1 = atom('value1'); // auto-generated name
+      const atom2 = atom('value2'); // auto-generated name
+
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should return first atom when multiple atoms have same name', () => {
+      const atom1 = atom('value1', 'shared');
+      const atom2 = atom('value2', 'shared');
+
+      const found = atomRegistry.getByName('shared');
+
+      // Должен вернуть первый зарегистрированный
+      expect(found).toBe(atom1);
+      expect(found).not.toBe(atom2);
+    });
+  });
 });

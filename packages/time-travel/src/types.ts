@@ -37,6 +37,7 @@ export interface Snapshot {
 export interface TimeTravelOptions {
   maxHistory?: number;
   autoCapture?: boolean;
+  autoInitializeAtoms?: boolean;  // Auto-initialize atoms from registry on capture (default: true)
 }
 
 export type TimeTravelEventType = 'undo' | 'redo' | 'jump' | 'snapshot';

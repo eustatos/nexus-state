@@ -9,6 +9,7 @@ export class TimeTravelController implements TimeTravelAPI {
   private store: Store;
   private maxHistory: number;
   private autoCapture: boolean;
+  private autoInitializeAtoms: boolean;
   private history: Snapshot[] = [];
   private currentIndex: number = -1;
   private subscribers: Map<TimeTravelEventType, Set<() => void>> = new Map();
@@ -18,6 +19,7 @@ export class TimeTravelController implements TimeTravelAPI {
     this.store = store;
     this.maxHistory = options?.maxHistory ?? 50;
     this.autoCapture = options?.autoCapture ?? true;
+    this.autoInitializeAtoms = options?.autoInitializeAtoms ?? true;
 
     if (this.autoCapture) {
       this.setupAutoCapture();
@@ -30,6 +32,22 @@ export class TimeTravelController implements TimeTravelAPI {
   }
 
   capture(action?: string): void {
+    // Auto-initialize all atoms from registry if enabled
+    if (this.autoInitializeAtoms) {
+      const allAtoms = atomRegistry.getAll();
+      for (const atom of allAtoms.values()) {
+        try {
+          this.store.get(atom as any);
+        } catch (error) {
+          // Ignore errors for computed atoms with missing dependencies
+          console.warn(
+            `[TimeTravelController] Failed to initialize atom during capture:`,
+            error
+          );
+        }
+      }
+    }
+
     const state = this.store.getState();
     const snapshotState: Record<string, SnapshotStateEntry> = {};
 

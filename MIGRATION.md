@@ -513,6 +513,11 @@ grep -r "SimpleTimeTravel.*from.*core" ./src
 - Удаление time-travel из core
 - Обновление DevTools для работы с новыми пакетами
 
+### v2.x (Март 2026)
+- Авто-инициализация атомов в `capture()`
+- Предупреждение при дублировании имён атомов
+- Обновление документации с best practices
+
 ### v0.1.x (До рефакторинга)
 - Time-travel встроен в `@nexus-state/core`
 - DevTools используют SimpleTimeTravel из core
@@ -526,3 +531,67 @@ grep -r "SimpleTimeTravel.*from.*core" ./src
 - [API Reference: @nexus-state/undo-redo](./packages/undo-redo/README.md)
 - [Time-Travel Debugging Guide](./docs/guides/time-travel.md)
 - [DevTools Integration](./docs/recipes/devtools.md)
+
+---
+
+## Time-Travel Improvements (v2.x)
+
+### Auto-initialization in capture()
+
+**Before:**
+```typescript
+const atom1 = atom('initial', 'atom1');
+const controller = new TimeTravelController(store);
+
+// Required explicit initialization
+store.set(atom1, 'initial');
+controller.capture('init');
+```
+
+**After:**
+```typescript
+const atom1 = atom('initial', 'atom1');
+const controller = new TimeTravelController(store);
+
+// Auto-initialization - no explicit set() needed
+controller.capture('init');
+// ✅ atom1 is automatically initialized with 'initial'
+```
+
+**Impact:** No breaking changes. Existing code continues to work.
+
+### Duplicate atom name warnings
+
+**New behavior:**
+```typescript
+const atom1 = atom('value1', 'shared');
+const atom2 = atom('value2', 'shared');
+// ⚠️ Console warning: "Atom with name 'shared' already exists..."
+```
+
+**Impact:** No breaking changes. Only adds console warnings.
+
+**Recommendation:** Update atom names to be unique to avoid warnings.
+
+### Best Practices for Atom Naming
+
+**Use unique, descriptive names:**
+```typescript
+// ✅ Good
+const userAtom = atom(null, 'user');
+const settingsAtom = atom({}, 'settings');
+
+// ❌ Bad - duplicate names
+const atom1 = atom('value1', 'data');
+const atom2 = atom('value2', 'data');  // ⚠️ Warning!
+```
+
+**Why unique names matter:**
+- DevTools relies on names to display atoms
+- Time-travel uses names for snapshot serialization
+- Debugging is easier with descriptive, unique names
+
+**Naming conventions:**
+- Use descriptive names: `userProfile`, `shoppingCart`, `authToken`
+- Add prefixes for namespacing: `auth/user`, `ui/theme`, `api/cache`
+- Avoid generic names: `data`, `state`, `value`
