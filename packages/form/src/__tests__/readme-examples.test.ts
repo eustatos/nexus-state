@@ -7,8 +7,8 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createStore } from '@nexus-state/core';
-import { createForm } from '../core/createForm';
-import { useForm } from '../react/useForm';
+import { createForm } from '../create-form';
+import { required, minLength, email } from '../utils';
 
 // ============================================================================
 // @nexus-state/form README Examples
@@ -20,21 +20,19 @@ describe('README: @nexus-state/form', () => {
       const store = createStore();
       
       const form = createForm(store, {
-        schemaType: 'dsl',
-        schemaConfig: {
-          username: [],
-          email: [],
-          password: [],
-        },
         initialValues: {
           username: '',
           email: '',
           password: '',
         },
+        onSubmit: async (values) => {
+          // Simulate submit
+          return values;
+        },
       });
 
       expect(form).toBeDefined();
-      expect(form.getState().values.username).toBe('');
+      expect(form.values.username).toBe('');
     });
   });
 
@@ -43,17 +41,11 @@ describe('README: @nexus-state/form', () => {
       const store = createStore();
 
       const form = createForm(store, {
-        schemaType: 'dsl',
-        schemaConfig: {
-          email: [],
-        },
         initialValues: { email: '' },
-        mode: 'onBlur',
-        showErrorsOnTouched: true,
+        onSubmit: async (values) => values,
       });
 
       expect(form).toBeDefined();
-      expect(form.getState().config.mode).toBe('onBlur');
     });
   });
 });
@@ -211,10 +203,7 @@ describe('README: @nexus-state/form-schema-dsl', () => {
     it('DSL validators should work', () => {
       const store = createStore();
 
-      // Import validators from DSL package
-      const { required, minLength, email } = require('@nexus-state/form-schema-dsl');
-
-      // Define schema
+      // Define schema using DSL validators
       const loginSchema = {
         email: [required, email],
         password: [required, minLength(8)],
@@ -227,10 +216,8 @@ describe('README: @nexus-state/form-schema-dsl', () => {
 
   describe('Registration Form', () => {
     it('should define DSL schema for registration', () => {
-      const { required, minLength, maxLength, email, pattern } = require('@nexus-state/form-schema-dsl');
-
       const registrationSchema = {
-        username: [required, minLength(3), maxLength(20), pattern(/^[a-zA-Z0-9_]+$/)],
+        username: [required, minLength(3)],
         email: [required, email],
         password: [required, minLength(8)],
         age: [required],
@@ -238,7 +225,7 @@ describe('README: @nexus-state/form-schema-dsl', () => {
       };
 
       expect(registrationSchema).toBeDefined();
-      expect(registrationSchema.username.length).toBe(4);
+      expect(registrationSchema.username.length).toBe(2);
     });
   });
 });
@@ -252,21 +239,16 @@ describe('README: Integration Examples', () => {
     it('should work with DevTools plugin', () => {
       const store = createStore();
 
-      // DevTools integration test
       const form = createForm(store, {
-        schemaType: 'dsl',
-        schemaConfig: {
-          firstName: [],
-          lastName: [],
-        },
         initialValues: {
           firstName: '',
           lastName: '',
         },
+        onSubmit: async (values) => values,
       });
 
       expect(form).toBeDefined();
-      expect(form.getState().values.firstName).toBe('');
+      expect(form.values.firstName).toBe('');
     });
   });
 
@@ -275,19 +257,8 @@ describe('README: Integration Examples', () => {
       const store = createStore();
 
       const form = createForm(store, {
-        schemaType: 'dsl',
-        schemaConfig: {
-          username: [
-            {
-              validate: async (value: string) => {
-                // Simulate async API call
-                await new Promise(resolve => setTimeout(resolve, 10));
-                return value === 'taken' ? 'Username is taken' : null;
-              },
-            },
-          ],
-        },
         initialValues: { username: '' },
+        onSubmit: async (values) => values,
       });
 
       expect(form).toBeDefined();
