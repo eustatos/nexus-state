@@ -8,6 +8,27 @@
 
 ---
 
+## 🎯 When to Use Yup
+
+### ✅ Choose Yup if you need:
+
+| Use Case | Why Yup |
+|----------|---------|
+| **Mature ecosystem** | Battle-tested in production, large community |
+| **Simple API** | Chainable validators, easy to learn |
+| **Transform support** | Coerce and transform values |
+| **Async validation** | Built-in async test support |
+
+### ❌ Use alternatives if:
+
+| Use Case | Better Alternative |
+|----------|-------------------|
+| **TypeScript-first** | [@nexus-state/form-schema-zod](https://www.npmjs.com/package/@nexus-state/form-schema-zod) |
+| **JSON Schema standard** | [@nexus-state/form-schema-ajv](https://www.npmjs.com/package/@nexus-state/form-schema-ajv) |
+| **Simple DSL** | [@nexus-state/form-schema-dsl](https://www.npmjs.com/package/@nexus-state/form-schema-dsl) |
+
+---
+
 ## 🎯 Overview
 
 Yup plugin integrates [Yup](https://github.com/jquense/yup) schema validation with Nexus State forms. Yup is a simple and powerful schema builder for value parsing and validation.
@@ -145,12 +166,12 @@ const registrationSchema = yup.object({
     .max(20, 'Username must be at most 20 characters')
     .matches(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores')
     .required('Username is required'),
-  
+
   email: yup
     .string()
     .email('Invalid email format')
     .required('Email is required'),
-  
+
   password: yup
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -158,17 +179,17 @@ const registrationSchema = yup.object({
     .matches(/[a-z]/, 'Password must contain a lowercase letter')
     .matches(/[0-9]/, 'Password must contain a number')
     .required('Password is required'),
-  
+
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password')], "Passwords don't match")
     .required('Please confirm your password'),
-  
+
   age: yup
     .number()
     .min(18, 'You must be at least 18 years old')
     .required('Age is required'),
-  
+
   terms: yup
     .boolean()
     .oneOf([true], 'You must accept the terms')
@@ -280,6 +301,8 @@ const uniqueEmailSchema = yup.object({
 ### Custom Error Messages
 
 ```tsx
+import * as yup from 'yup';
+
 const schema = yup.object({
   email: yup.string().email('Please enter a valid email address'),
   password: yup.string().min(8, 'Password must be at least 8 characters long'),
@@ -289,6 +312,8 @@ const schema = yup.object({
 ### Custom Tests
 
 ```tsx
+import * as yup from 'yup';
+
 const passwordSchema = yup.object({
   password: yup.string().test(
     'strong-password',
@@ -308,6 +333,8 @@ const passwordSchema = yup.object({
 ### Using References
 
 ```tsx
+import * as yup from 'yup';
+
 const schema = yup.object({
   password: yup.string().min(8).required(),
   confirmPassword: yup
@@ -381,6 +408,20 @@ yup.string().test('unique', 'Error', (value) => {
 - [Yup Documentation](https://github.com/jquense/yup)
 - [Nexus State Form Documentation](https://nexus-state.dev/)
 - [GitHub Repository](https://github.com/eustatos/nexus-state)
+
+---
+
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Forms:**
+  - [@nexus-state/form](https://www.npmjs.com/package/@nexus-state/form) — Form management
+  - [@nexus-state/form-schema-zod](https://www.npmjs.com/package/@nexus-state/form-schema-zod) — Zod validation
+  - [@nexus-state/form-builder-react](https://www.npmjs.com/package/@nexus-state/form-builder-react) — Visual form builder
+- **Framework integration:**
+  - [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react) — React hooks
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
 
 ---
 

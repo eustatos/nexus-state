@@ -1,14 +1,43 @@
 # @nexus-state/undo-redo
 
-Лёгкий пакет (~150 KB) для user-facing undo/redo функционала в Nexus State.
+> Лёгкий пакет для user-facing undo/redo функционала в Nexus State
+>
+> [![npm version](https://img.shields.io/npm/v/@nexus-state/undo-redo)](https://www.npmjs.com/package/@nexus-state/undo-redo)
+> [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
 
-## Установка
+[Documentation](https://nexus-state.website.yandexcloud.net/) • [Repository](https://github.com/eustatos/nexus-state)
+
+---
+
+## 📦 Installation
 
 ```bash
 pnpm add @nexus-state/undo-redo
 ```
 
-## Основной API
+**Required:**
+```bash
+pnpm add @nexus-state/core
+```
+
+---
+
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Framework integration:**
+  - [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react) — React hooks
+  - [@nexus-state/vue](https://www.npmjs.com/package/@nexus-state/vue) — Vue composables
+  - [@nexus-state/svelte](https://www.npmjs.com/package/@nexus-state/svelte) — Svelte stores
+- **Related:**
+  - [@nexus-state/time-travel](https://www.npmjs.com/package/@nexus-state/time-travel) — Time-travel debugging (dev)
+  - [@nexus-state/form](https://www.npmjs.com/package/@nexus-state/form) — Form management
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
+
+---
+
+## Установка
 
 ### `createUndoRedo(options?)`
 

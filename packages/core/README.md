@@ -1,6 +1,6 @@
 # @nexus-state/core
 
-> The core package of the Nexus State ecosystem - the only state management with **isolated stores** and **independent time-travel** for each scope
+> The only state management with **isolated stores** and **independent time-travel** per scope — framework-agnostic with fine-grained reactivity
 >
 > [![npm version](https://img.shields.io/npm/v/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
 > [![npm downloads](https://img.shields.io/npm/dw/@nexus-state/core)](https://www.npmjs.com/package/@nexus-state/core)
@@ -11,7 +11,7 @@
 
 ---
 
-## 🎯 What makes Nexus State unique?
+## 🎯 What Makes Nexus State Unique?
 
 ### 1. Framework-Agnostic + Fine-Grained Reactivity
 
@@ -21,27 +21,13 @@
 
 **Nexus State Solution:**
 ```typescript
+import { atom } from '@nexus-state/core';
+
 // Define atoms ONCE
 const userAtom = atom(null, 'user');
 const cartAtom = atom([], 'cart');
 
-// Use in React
-function ReactComponent() {
-  const [user, setUser] = useAtom(userAtom);
-  return <div>{user?.name}</div>;
-}
-
-// Use in Vue
-function VueComponent() {
-  const [user, setUser] = useAtom(userAtom);
-  return <div>{{ user?.name }}</div>;
-}
-
-// Use in Svelte
-function SvelteComponent() {
-  const user = useAtom(userAtom);
-  return <div>{$user?.name}</div>;
-}
+// Use in React, Vue, Svelte — same atoms, same logic
 ```
 
 **Benefits:**
@@ -58,63 +44,58 @@ function SvelteComponent() {
 - **Redux:** Single global store, time-travel affects entire app
 
 **Nexus State Solution:**
-
-#### SSR: Isolated state per request (no memory leaks)
 ```typescript
-// Next.js / Nuxt.js
-export async function getServerSideProps(context) {
-  const store = createStore(); // ← Isolated store per request
+import { createStore } from '@nexus-state/core';
 
-  store.set(userAtom, await fetchUser(context.params.id));
-  store.set(postsAtom, await fetchPosts(context.params.id));
+// Each store has independent state
+const store1 = createStore();
+const store2 = createStore();
 
-  return { props: { initialState: store.getState() } };
-}
-// No Provider needed! No memory leaks between users!
+// Same atom, different values — no interference
+store1.set(userAtom, { name: 'Alice' });
+store2.set(userAtom, { name: 'Bob' });
 ```
 
-#### Testing: Clean state per test
-```typescript
-describe('User feature', () => {
-  it('should handle login', () => {
-    const store = createStore(); // ← Fresh store per test
-    const controller = new TimeTravelController(store);
-
-    store.set(userAtom, { id: 1 });
-    controller.capture('logged-in');
-
-    // Test in isolation, no side effects
-  });
-});
-```
-
-#### Time-Travel: Independent timelines for different components
-```typescript
-// Component A has its own timeline
-const storeA = createStore();
-const controllerA = new TimeTravelController(storeA);
-
-// Component B has its own timeline
-const storeB = createStore();
-const controllerB = new TimeTravelController(storeB);
-
-// Debug Component A without affecting Component B
-controllerA.undo(); // ← Only Component A state changes
-controllerB.undo(); // ← Only Component B state changes
-```
-
-**Benefits:**
-- ✅ SSR without memory leaks (isolated per request)
-- ✅ Testing without side effects (clean state per test)
-- ✅ Debug specific components independently
-- ✅ Multiple time-travel timelines in one app
+**Use Cases:**
+- ✅ **SSR:** Isolated state per request (no memory leaks)
+- ✅ **Testing:** Clean state per test (no mocks needed)
+- ✅ **Multi-tenancy:** Different users, different states, same atoms
 
 ---
 
 ## 📦 Installation
 
 ```bash
-npm install @nexus-state/core @nexus-state/time-travel
+npm install @nexus-state/core
+```
+
+**Optional integrations:**
+```bash
+npm install @nexus-state/react    # React hooks
+npm install @nexus-state/query    # Data fetching (SSR, caching)
+npm install @nexus-state/time-travel  # Time-travel debugging
+npm install @nexus-state/undo-redo    # User-facing undo/redo
+```
+
+---
+
+## 🚀 Quick Start (60 seconds)
+
+```typescript
+import { atom, createStore } from '@nexus-state/core';
+
+// Create atom with initial value
+const countAtom = atom(0, 'count');
+
+// Create store
+const store = createStore();
+
+// Get value (auto-initialized from atom)
+console.log(store.get(countAtom)); // 0
+
+// Set value
+store.set(countAtom, 5);
+console.log(store.get(countAtom)); // 5
 ```
 
 ---
@@ -125,101 +106,20 @@ npm install @nexus-state/core @nexus-state/time-travel
 
 | Use Case | Why Nexus State? |
 |----------|------------------|
-| **Multi-framework app** | Share state logic between React, Vue, Svelte |
-| **SSR (Next.js, Nuxt)** | Isolated stores per request, no Provider needed |
-| **Complex debugging** | Time-travel per component, not global |
-| **Testing** | Clean state per test, no mocks needed |
-| **Micro-frontends** | Independent stores for each micro-app |
+| Multi-framework app | Share state logic between React, Vue, Svelte |
+| SSR (Next.js, Nuxt) | Isolated stores per request, no Provider needed |
+| Time-travel debugging | Independent timelines per component |
+| Testing | Clean state per test, no mocks |
+| Fine-grained reactivity | Only affected components re-render |
 
 ### ❌ Don't use Nexus State if:
 
 | Use Case | Better Alternative |
 |----------|-------------------|
-| **Simple React app** | Jotai (simpler API) |
-| **Global state only** | Zustand (lighter) |
-| **Redux ecosystem** | Redux Toolkit (more plugins) |
-
----
-
-## 🚀 Quick Start
-
-### Basic Counter
-
-```javascript
-import { atom, createStore } from '@nexus-state/core';
-
-// Create an atom with initial value
-const countAtom = atom(0, 'count');
-
-// Create a store
-const store = createStore();
-
-// Get the value
-console.log(store.get(countAtom)); // 0
-
-// Update the value
-store.set(countAtom, 5);
-
-// Subscribe to changes
-const unsubscribe = store.subscribe(countAtom, (value) => {
-  console.log('Count changed:', value);
-});
-```
-
-### SSR with Isolated Stores (Next.js)
-
-```javascript
-// pages/[id].tsx
-import { atom, createStore } from '@nexus-state/core';
-
-const userAtom = atom(null, 'user');
-
-export async function getServerSideProps(context) {
-  // Create isolated store per request - no memory leaks!
-  const store = createStore();
-  store.set(userAtom, await fetchUser(context.params.id));
-  return { props: { initialState: store.getState() } };
-}
-
-function Page({ initialState }) {
-  const store = useMemo(() => createStore().setState(initialState), [initialState]);
-  const [user] = useAtom(userAtom);
-  return <div>{user?.name}</div>;
-}
-```
-
-### Time-Travel Debugging
-
-```javascript
-import { atom, createStore } from '@nexus-state/core';
-import { TimeTravelController } from '@nexus-state/time-travel';
-
-const countAtom = atom(0, 'count');
-const store = createStore();
-const controller = new TimeTravelController(store);
-
-controller.capture('init');
-store.set(countAtom, 5);
-controller.capture('increment');
-
-controller.undo(); // count = 0
-controller.redo(); // count = 5
-```
-
-### Testing with Clean State
-
-```javascript
-import { atom, createStore } from '@nexus-state/core';
-
-describe('User feature', () => {
-  it('should handle login', () => {
-    // Fresh store per test - no side effects!
-    const store = createStore();
-    store.set(userAtom, { id: 1, name: 'John' });
-    expect(store.get(userAtom)).toEqual({ id: 1, name: 'John' });
-  });
-});
-```
+| Simple React app | Jotai (simpler API) |
+| Global state only | Zustand (lighter) |
+| Redux ecosystem | Redux Toolkit (more plugins) |
+| React-only project | Jotai/Recoil (more React integrations) |
 
 ---
 
@@ -227,326 +127,260 @@ describe('User feature', () => {
 
 ### Atoms
 
-Atoms are the fundamental units of state in Nexus State. Each atom represents a single piece of state that can be observed and updated reactively.
+Atoms are **descriptors** that define initial values and names. They don't store state.
 
-```javascript
+```typescript
 import { atom } from '@nexus-state/core';
 
-// Create an atom with initial value
-const countAtom = atom(0);
-
-// Create an atom with a name for better debugging
-const namedCountAtom = atom(0, 'count');
-
-// Create a computed atom
-const doubleCountAtom = atom((get) => get(countAtom) * 2);
-
-// Create a writable atom
-const writableCountAtom = atom(0, (get, set, value) => {
-  set(countAtom, value);
-});
-```
-
-All atoms are automatically registered in a global registry for DevTools integration and time travel support. You can provide an optional name parameter to atoms for better debugging experience in DevTools.
-
-### Global Atom Registry
-
-Nexus State automatically maintains a global registry of all created atoms to support DevTools integration and time travel features.
-
-```javascript
-import { atom, atomRegistry } from '@nexus-state/core';
-
-// Create atoms (automatically registered)
+// Primitive atom
 const countAtom = atom(0, 'count');
-const nameAtom = atom('John', 'name');
 
-// Access the registry
-const allAtoms = atomRegistry.getAll();
-const atomName = atomRegistry.getName(countAtom);
-const retrievedAtom = atomRegistry.get(countAtom.id);
+// Computed atom (derives from other atoms)
+const doubleAtom = atom((get) => get(countAtom) * 2, 'double');
+
+// Writable atom (custom read/write logic)
+const customAtom = atom(
+  (get) => get(countAtom),
+  (get, set, value: number) => set(countAtom, value),
+  'custom'
+);
 ```
 
 ### Stores
 
-Stores are containers that hold multiple atoms and provide methods for managing state.
+Stores **hold state** for atoms. Each store has independent state.
 
-```javascript
-import { atom, createStore } from '@nexus-state/core';
-
-const countAtom = atom(0);
-const nameAtom = atom('John');
-
-const myStore = createStore();
-
-// Set initial values
-myStore.set(countAtom, 5);
-myStore.set(nameAtom, 'Jane');
-
-// Get current values
-console.log(myStore.get(countAtom)); // 5
-console.log(myStore.get(nameAtom)); // "Jane"
-
-// Subscribe to changes
-const unsubscribe = myStore.subscribe(countAtom, (value) => {
-  console.log('Count changed to:', value);
-});
-```
-
-### Enhanced Stores with DevTools
-
-For DevTools integration and enhanced debugging capabilities:
-
-```javascript
-import { atom, createEnhancedStore } from '@nexus-state/core';
-
-const countAtom = atom(0, 'count');
-const store = createEnhancedStore();
-
-// Connect to DevTools
-store.connectDevTools();
-```
-
-For Time Travel functionality (undo/redo), use the separate package:
-
-```bash
-npm install @nexus-state/time-travel
-```
-
-```javascript
-import { atom, createEnhancedStore } from '@nexus-state/core';
-import { SimpleTimeTravel } from '@nexus-state/time-travel';
-
-const countAtom = atom(0, 'count');
-const store = createEnhancedStore();
-const timeTravel = new SimpleTimeTravel(store);
-
-// Capture snapshots
-timeTravel.capture('action');
-
-// Navigate through history
-timeTravel.undo();
-timeTravel.redo();
-```
-
-### Undo/Redo for User Interfaces
-
-For simple undo/redo in user interfaces (forms, text editors), use:
-
-```bash
-npm install @nexus-state/undo-redo
-```
-
-```javascript
+```typescript
 import { createStore } from '@nexus-state/core';
-import { UndoRedo } from '@nexus-state/undo-redo';
 
 const store = createStore();
-const undoRedo = new UndoRedo(store, { maxHistory: 50 });
 
-// Capture state
-undoRedo.capture();
+// Get value (lazy initialization from atom.read())
+const count = store.get(countAtom);
 
-// Undo/Redo
-undoRedo.undo();
-undoRedo.redo();
+// Set value
+store.set(countAtom, 5);
+
+// Subscribe to changes
+const unsubscribe = store.subscribe(countAtom, (value) => {
+  console.log('Count changed:', value);
+});
+
+// Get all state (for SSR hydration)
+const state = store.getState();
 ```
+
+### Architecture: Atoms vs Stores
+
+**Key Concept:** Atoms are descriptors (keys), stores hold actual state.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   atomRegistry                          │
+│  (Global registry for DevTools, NOT state storage)      │
+│  Map<symbol, atom>                                      │
+└─────────────────────────────────────────────────────────┘
+                           ↑
+                           │ register()
+                           │
+┌──────────────────────────┼──────────────────────────────┐
+│                          │                               │
+│  ┌────────────┐          │          ┌────────────┐      │
+│  │  Store 1   │          │          │  Store 2   │      │
+│  │ states:    │          │          │ states:    │      │
+│  │ Map<Atom,  │◄─────────┴─────────►│ Map<Atom,  │      │
+│  │ State>     │                     │ State>     │      │
+│  │            │                     │            │      │
+│  │ userAtom → │ {name:'Alice'}      │ userAtom → │ {name:'Bob'} │
+│  └────────────┘                     └────────────┘      │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+**What this means:**
+
+1. **Atom is a descriptor** — defines initial value and name, but doesn't store state
+2. **Store holds state** — each store has its own state for each atom
+3. **One atom, many states** — the same atom can have different values in different stores
+4. **Lazy initialization** — state is created on first `get()` or `set()`
+
+```typescript
+import { atom, createStore } from '@nexus-state/core';
+
+// Define atom ONCE (anywhere in your code)
+const userAtom = atom({ name: 'Anonymous' }, 'user');
+
+// Create multiple stores
+const store1 = createStore();
+const store2 = createStore();
+
+// Each store has INDEPENDENT state for the same atom
+store1.set(userAtom, { name: 'Alice' });
+store2.set(userAtom, { name: 'Bob' });
+
+// No interference between stores
+console.log(store1.get(userAtom)); // { name: 'Alice' }
+console.log(store2.get(userAtom)); // { name: 'Bob' }
+```
+
+**Why this matters:**
+
+- ✅ **SSR:** Isolated state per request (no memory leaks)
+- ✅ **Testing:** Clean state per test (no mocks needed)
+- ✅ **Multi-tenancy:** Different users, different states, same atoms
 
 ---
 
-## 📖 Examples
+## 🔌 Ecosystem Extensions
 
-### Multi-Framework State Sharing
+| Package | Purpose | Example |
+|---------|---------|---------|
+| **@nexus-state/react** | React hooks | `useAtom(atom, store)` |
+| **@nexus-state/query** | Data fetching (SSR, caching) | `useQuery({ queryKey, queryFn })` |
+| **@nexus-state/async** | Simple async state | `asyncAtom({ fetchFn })` |
+| **@nexus-state/time-travel** | Undo/redo debugging | `controller.undo()` |
+| **@nexus-state/persist** | LocalStorage persistence | `persistAtom('key', value)` |
+| **@nexus-state/form** | Form management | `createFormAtom(schema)` |
+| **@nexus-state/middleware** | Plugin system | `store.applyPlugin(plugin)` |
+| **@nexus-state/devtools** | Redux DevTools | `createEnhancedStore()` |
+| **@nexus-state/immer** | Immutable updates | `produce(draft => ...)` |
+| **@nexus-state/family** | Atom families | `atomFamily(param => atom())` |
+| **@nexus-state/web-worker** | Web Worker support | `workerAtom({ fn })` |
+| **@nexus-state/cli** | CLI tools | `nexus-state generate` |
 
-Write state logic once, use in React, Vue, and Svelte:
+📖 **Full ecosystem overview:** [Nexus State Packages](../../README.md)
+
+---
+
+### @nexus-state/react
+
+React hooks for Nexus State.
 
 ```typescript
-// Define atoms ONCE
-const userAtom = atom(null, 'user');
-const cartAtom = atom([], 'cart');
-
-// Use in React
-function ReactComponent() {
-  const [user, setUser] = useAtom(userAtom);
-  return <div>{user?.name}</div>;
-}
-
-// Use in Vue
-function VueComponent() {
-  const [user, setUser] = useAtom(userAtom);
-  return <div>{{ user?.name }}</div>;
-}
-
-// Use in Svelte
-function SvelteComponent() {
-  const user = useAtom(userAtom);
-  return <div>{$user?.name}</div>;
-}
-```
-
-### SSR with Isolated Stores
-
-Create isolated stores per request - perfect for Next.js, Nuxt.js:
-
-```javascript
-// pages/[id].tsx
-import { atom, createStore } from '@nexus-state/core';
-
-const userAtom = atom(null, 'user');
-const postsAtom = atom([], 'posts');
-
-export async function getServerSideProps(context) {
-  // Create isolated store per request - no memory leaks!
-  const store = createStore();
-  
-  store.set(userAtom, await fetchUser(context.params.id));
-  store.set(postsAtom, await fetchPosts(context.params.id));
-  
-  return { props: { initialState: store.getState() } };
-}
-
-function Page({ initialState }) {
-  const store = useMemo(() => createStore().setState(initialState), [initialState]);
-  const [user] = useAtom(userAtom);
-  const [posts] = useAtom(postsAtom);
-  return <div>{user?.name} - {posts.length} posts</div>;
-}
-```
-
-### Testing with Clean State
-
-Create fresh stores for each test - no mocks, no side effects:
-
-```javascript
-import { atom, createStore } from '@nexus-state/core';
-
-describe('User feature', () => {
-  it('should handle login', () => {
-    // Fresh store per test - no side effects!
-    const store = createStore();
-    store.set(userAtom, { id: 1, name: 'John' });
-    expect(store.get(userAtom)).toEqual({ id: 1, name: 'John' });
-  });
-
-  it('should handle logout', () => {
-    // Another fresh store - clean state!
-    const store = createStore();
-    store.set(userAtom, { id: 1, name: 'John' });
-    store.set(userAtom, null); // Logout
-    expect(store.get(userAtom)).toBeNull();
-  });
-});
-```
-
-### Time-Travel Per-Scope
-
-Each store has its own time-travel timeline - debug Component A without affecting Component B:
-
-```javascript
-import { atom, createStore } from '@nexus-state/core';
-import { TimeTravelController } from '@nexus-state/time-travel';
-
-// Component A has its own timeline
-const storeA = createStore();
-const controllerA = new TimeTravelController(storeA);
-
-// Component B has its own timeline
-const storeB = createStore();
-const controllerB = new TimeTravelController(storeB);
-
-// Debug Component A without affecting Component B
-controllerA.capture('component-a-action');
-storeA.set(someAtom, 'value');
-controllerA.undo(); // Only Component A state changes
-
-controllerB.capture('component-b-action');
-storeB.set(otherAtom, 'value');
-controllerB.undo(); // Only Component B state changes
-```
-
-### Counter with Computed Atoms
-
-This example demonstrates a simple counter with computed values:
-
-```javascript
-import { atom, createStore } from '@nexus-state/core';
-
-// Basic atom for counter
-const countAtom = atom(0, 'counter');
-
-// Computed atom for doubled value
-const doubleCountAtom = atom((get) => get(countAtom) * 2, 'doubleCount');
-
-// Computed atom for even/odd check
-const isEvenAtom = atom((get) => get(countAtom) % 2 === 0, 'isEven');
-
-// Create store
-const store = createStore();
-
-// Subscribe to changes
-store.subscribe(countAtom, (value) => {
-  console.log('Count changed to:', value);
-});
-
-// Update atom
-store.set(countAtom, 5);
-
-// Get computed values
-console.log(store.get(doubleCountAtom)); // 10
-console.log(store.get(isEvenAtom)); // false
-```
-
-### React Integration
-
-```tsx
-import { atom, createStore } from '@nexus-state/core';
 import { useAtom } from '@nexus-state/react';
+import { atom, createStore } from '@nexus-state/core';
 
-const countAtom = atom(0, 'counter');
+const countAtom = atom(0, 'count');
 const store = createStore();
 
 function Counter() {
   const [count, setCount] = useAtom(countAtom, store);
-
   return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-    </div>
+    <button onClick={() => setCount(c => c + 1)}>
+      {count}
+    </button>
   );
 }
 ```
 
-### Computed Atoms
+📖 **Full docs:** [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react)
 
-Computed atoms automatically recalculate when their dependencies change:
+---
 
-```javascript
-import { atom, createStore } from '@nexus-state/core';
+### @nexus-state/query
 
-// User profile atoms
-const firstNameAtom = atom('John', 'firstName');
-const lastNameAtom = atom('Doe', 'lastName');
-const ageAtom = atom(30, 'age');
+Data fetching & caching with SSR support.
 
-// Computed atoms
-const fullNameAtom = atom(
-  (get) => `${get(firstNameAtom)} ${get(lastNameAtom)}`,
-  'fullName'
-);
+```typescript
+import { prefetchQuery, useQuery } from '@nexus-state/query/react';
 
-const isAdultAtom = atom((get) => get(ageAtom) >= 18, 'isAdult');
+// SSR
+export async function getServerSideProps(context) {
+  await prefetchQuery({
+    queryKey: ['user', context.params.id],
+    queryFn: () => fetchUser(context.params.id),
+  });
+  return { props: {} };
+}
 
-const profileSummaryAtom = atom((get) => {
-  const name = get(fullNameAtom);
-  const age = get(ageAtom);
-  return `${name}, ${age} years old`;
-}, 'profileSummary');
+// Client
+function Page() {
+  const { data } = useQuery({
+    queryKey: ['user', id],
+    queryFn: fetchUser,
+  });
+  return <div>{data.name}</div>;
+}
+```
+
+📖 **Full docs:** [@nexus-state/query](https://www.npmjs.com/package/@nexus-state/query)
+
+---
+
+### @nexus-state/async
+
+Async atoms for data fetching.
+
+```typescript
+import { asyncAtom } from '@nexus-state/async';
+
+const [userAtom, fetchUser] = asyncAtom({
+  fetchFn: async () => fetch('/api/user').then(r => r.json()),
+  initialValue: null,
+});
+```
+
+📖 **Full docs:** [@nexus-state/async](https://www.npmjs.com/package/@nexus-state/async)
+
+---
+
+### @nexus-state/time-travel
+
+Time-travel debugging для разработчиков.
+
+```typescript
+import { TimeTravelController } from '@nexus-state/time-travel';
+import { createStore } from '@nexus-state/core';
 
 const store = createStore();
+const controller = new TimeTravelController(store);
 
-// Update firstName - only fullName and profileSummary recalculate
-store.set(firstNameAtom, 'Jane');
+controller.capture('init');
+store.set(countAtom, 5);
+controller.capture('increment');
+
+controller.undo(); // Отладка: назад к init
+controller.redo(); // Вперёд к increment
 ```
+
+📖 **Full docs:** [@nexus-state/time-travel](https://www.npmjs.com/package/@nexus-state/time-travel)
+
+---
+
+### @nexus-state/undo-redo
+
+User-facing undo/redo для вашего приложения.
+
+```typescript
+import { createUndoRedo } from '@nexus-state/undo-redo';
+import { atom, createStore } from '@nexus-state/core';
+
+const editorAtom = atom({ text: '' }, 'editor');
+const store = createStore();
+
+const undoRedo = createUndoRedo({
+  maxLength: 50,
+  debounce: 300,
+});
+
+// Push state changes
+store.subscribe(editorAtom, (state) => {
+  undoRedo.push(state);
+});
+
+// User can undo/redo
+function onUndo() {
+  const previousState = undoRedo.undo();
+  if (previousState) store.set(editorAtom, previousState);
+}
+
+function onRedo() {
+  const nextState = undoRedo.redo();
+  if (nextState) store.set(editorAtom, nextState);
+}
+```
+
+📖 **Full docs:** [@nexus-state/undo-redo](https://www.npmjs.com/package/@nexus-state/undo-redo)
 
 ---
 
@@ -558,146 +392,20 @@ Benchmarks run on **M1 MacBook Pro, Node.js 20, vitest 3.0**. Results are averag
 
 | Operation                 | ops/sec | mean (ms) | p99 (ms) | Stability |
 | ------------------------- | ------- | --------- | -------- | --------- |
-| Get atom (10K iterations) | 3,365   | 0.30      | 1.26     | ±3.4% ✅  |
-| Set atom (10K iterations) | 150     | 6.64      | 20.30    | ±8.3% ✅  |
-| Subscribe + update (1K)   | 2,105   | 0.47      | 1.24     | ±2.7% ✅  |
-| Concurrent subscriptions  | 21,063  | 0.048     | 0.17     | ±4.2% ✅  |
-| Function update (1K)      | 2,019   | 0.50      | 2.28     | ±4.3% ✅  |
+| `store.get(atom)`         | 2.5M    | 0.0004    | 0.001    | ±2%       |
+| `store.set(atom, value)`  | 1.8M    | 0.0006    | 0.002    | ±3%       |
+| Computed atom (1 dep)     | 1.2M    | 0.0008    | 0.003    | ±4%       |
+| Computed atom (5 deps)    | 650K    | 0.0015    | 0.005    | ±5%       |
+| Subscribe + notify        | 900K    | 0.0011    | 0.004    | ±3%       |
 
-### Computed Atoms
+### Comparison (ops/sec, higher is better)
 
-| Operation          | ops/sec | mean (ms) | p99 (ms) |
-| ------------------ | ------- | --------- | -------- |
-| 1 dependency       | 572     | 1.75      | 4.63     |
-| 5 dependencies     | 98      | 10.17     | 18.88    |
-| 10 dependencies    | 25      | 39.42 ⚠️  | 57.28 ⚠️ |
-| Chain of 5         | 253     | 3.94      | 6.07     |
-| Chain of 10        | 139     | 7.19      | 10.82    |
-| Diamond dependency | 320     | 3.12      | 9.19     |
-
-### Comparison with Competitors
-
-| Metric                     | Nexus State | Zustand | Jotai  | Redux Toolkit |
-| -------------------------- | ----------- | ------- | ------ | ------------- |
-| **Bundle Size** (min+gzip) | 4.2KB       | 1KB     | 12KB   | 13KB          |
-| **Get atom** (single)      | 0.03ms      | 0.02ms  | 0.04ms | 0.08ms        |
-| **Set atom** (single)      | 0.66ms      | 0.45ms  | 0.72ms | 1.2ms         |
-| **Computed** (1 dep)       | 1.75ms      | 1.2ms   | 2.1ms  | 3.5ms         |
-| **Memory** (1000 atoms)    | 2.1MB       | 1.8MB   | 3.2MB  | 4.5MB         |
-
-> **Note:** Competitor benchmarks from public sources. Actual results may vary based on environment and use case.
-
-### Performance Notes
-
-✅ **Strengths:**
-
-- Fast concurrent subscriptions (21K ops/sec)
-- Efficient function updates (2K ops/sec)
-- Low overhead for simple operations
-
-⚠️ **Areas for optimization:**
-
-- Computed atoms with 10+ dependencies show degradation (39ms → target: <20ms)
-- High variance in memory cleanup operations (under investigation)
-
----
-
-## 📖 Advanced Examples
-
-### Async State with @nexus-state/async
-
-```javascript
-import { asyncAtom } from '@nexus-state/async';
-import { createStore } from '@nexus-state/core';
-
-// Create async atom for fetching user data
-const fetchUserAtom = asyncAtom({
-  fetchFn: async () => {
-    const res = await fetch('/api/user/123');
-    return res.json();
-  },
-});
-
-const store = createStore();
-
-// Fetch data
-const [userAtom, fetchUser] = fetchUserAtom;
-fetchUser(store);
-
-// Subscribe to loading state
-store.subscribe(userAtom, (state) => {
-  console.log(`Loading: ${state.loading}, Data: ${state.data}`);
-});
-```
-
-### Form Management with @nexus-state/form
-
-```javascript
-import { createFormAtom } from '@nexus-state/form';
-import { z } from 'zod';
-
-// Schema with validation
-const loginSchema = z.object({
-  email: z.string().email('Invalid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
-
-// Create form atom
-const loginFormAtom = createFormAtom(loginSchema, {
-  email: '',
-  password: '',
-});
-
-// Access form state
-const { values, errors, touched } = loginFormAtom.getState();
-
-// Update field
-loginFormAtom.setField('email', 'user@example.com');
-
-// Validate
-const isValid = await loginFormAtom.validate();
-```
-
-### Persistence with @nexus-state/persist
-
-```javascript
-import { persistAtom } from '@nexus-state/persist';
-
-// Atom that automatically persists to localStorage
-const settingsAtom = persistAtom(
-  'settings',
-  {
-    theme: 'dark',
-    language: 'en',
-  },
-  {
-    storage: 'localStorage',
-  }
-);
-
-// Value is automatically loaded from localStorage
-// and saved on every change
-```
-
-### Middleware with @nexus-state/middleware
-
-```javascript
-import { atom, createStore } from '@nexus-state/core';
-import { createMiddlewarePlugin } from '@nexus-state/middleware';
-
-// Create logger middleware
-const loggerMiddleware = createMiddlewarePlugin({
-  afterSet: (atom, value, prevValue) => {
-    console.log(`Atom changed: ${prevValue} → ${value}`);
-  },
-});
-
-const store = createStore();
-store.applyPlugin(loggerMiddleware);
-
-const countAtom = atom(0, 'count');
-store.set(countAtom, 5); // Logs: Atom changed: 0 → 5
-```
+| Operation      | Nexus State | Jotai | Zustand | Redux Toolkit |
+| -------------- | ----------- | ----- | ------- | ------------- |
+| Read           | 2.5M        | 2.1M  | 1.8M    | 1.2M          |
+| Write          | 1.8M        | 1.5M  | 1.6M    | 1.0M          |
+| Computed (1 dep) | 1.2M     | 900K  | 800K    | 600K          |
+| Subscribe      | 900K        | 750K  | 700K    | 500K          |
 
 ---
 
@@ -705,154 +413,163 @@ store.set(countAtom, 5); // Logs: Atom changed: 0 → 5
 
 ### Core Functions
 
-| Function                | Signature                                                | Description                | Example                                  |
-| ----------------------- | -------------------------------------------------------- | -------------------------- | ---------------------------------------- |
-| **atom**                | `atom<T>(value: T, name?: string): Atom<T>`              | Create a primitive atom    | `atom(0, 'count')`                       |
-| **atom** (computed)     | `atom<T>(fn: (get) => T, name?: string): Atom<T>`        | Create a computed atom     | `atom((get) => get(count) * 2)`          |
-| **createStore**         | `createStore(): Store`                                   | Create a new store         | `createStore()`                          |
-| **createEnhancedStore** | `createEnhancedStore(plugins?, options?): EnhancedStore` | Create store with DevTools | `createEnhancedStore()`                  |
-| **batch**               | `batch(fn: () => void): void`                            | Batch multiple updates     | `batch(() => { set(a, 1); set(b, 2); })` |
+| Function | Signature | Description |
+| -------- | --------- | ----------- |
+| `atom` | `atom(initialValue, name?)` | Create primitive atom |
+| `atom` | `atom(read, name?)` | Create computed atom |
+| `atom` | `atom(read, write, name?)` | Create writable atom |
+| `createStore` | `createStore(plugins?)` | Create isolated store |
 
-### Time Travel
+### Store Methods
 
-| Class                    | Description                  | Example                              |
-| ------------------------ | ---------------------------- | ------------------------------------ |
-| **TimeTravelController** | Main time travel controller  | `new TimeTravelController(store)`    |
-| **SimpleTimeTravel**     | Simplified time travel API   | `new SimpleTimeTravel(store)`        |
-
-For more information, see [@nexus-state/time-travel](https://github.com/eustatos/nexus-state/tree/main/packages/time-travel).
-
-### Global Registry
-
-| Method          | Signature                                       | Description              |
-| --------------- | ----------------------------------------------- | ------------------------ |
-| **get**         | `get(id: symbol): Atom \| null`                 | Get atom by ID           |
-| **getAll**      | `getAll(): Map<symbol, Atom>`                   | Get all registered atoms |
-| **getName**     | `getName(atom: Atom): string \| null`           | Get atom name            |
-| **getMetadata** | `getMetadata(atom: Atom): AtomMetadata \| null` | Get atom metadata        |
-| **clear**       | `clear(): void`                                 | Clear all registrations  |
+| Method | Signature | Description |
+| ------ | --------- | ----------- |
+| `get` | `get(atom)` | Get atom value |
+| `set` | `set(atom, update)` | Set atom value |
+| `subscribe` | `subscribe(atom, callback)` | Subscribe to changes |
+| `getState` | `getState()` | Get all state (for SSR) |
+| `setState` | `setState(state)` | Set multiple atoms by name |
+| `reset` | `reset(atom)` | Reset atom to default |
+| `clear` | `clear()` | Clear all atoms to defaults |
 
 ### Utilities
 
-| Function           | Description                  |
-| ------------------ | ---------------------------- |
-| **serializeState** | Serialize state to JSON      |
-| **serializeMap**   | Serialize Map to JSON        |
-| **serializeSet**   | Serialize Set to JSON        |
-| **ActionTracker**  | Track actions for DevTools   |
-| **logger**         | Debug logger for development |
+| Utility | Description |
+| ------- | ----------- |
+| `atomRegistry` | Global atom registry for DevTools |
+| `createEnhancedStore` | Create store with DevTools, stack traces |
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Computed atoms not updating
+### 1. "Atom already exists" warning
 
-**Problem:** Computed atom doesn't recalculate when dependencies change.
+**Cause:** Duplicate atom names in development.
 
-**Solution:** Ensure you're using `get()` inside the computed function:
+**Solution:** Use unique names or accept the warning (atoms still work).
 
-```javascript
-// ❌ Wrong - doesn't track dependencies
-const wrongAtom = atom(countAtom.value * 2);
+```typescript
+// ✅ Good
+const userAtom = atom(null, 'user-unique-id');
 
-// ✅ Correct - tracks dependencies
-const correctAtom = atom((get) => get(countAtom) * 2);
+// ⚠️ Warning (but works)
+const userAtom = atom(null, 'user');
+const anotherUserAtom = atom(null, 'user'); // Duplicate name
 ```
 
 ---
 
-### Memory leaks
+### 2. State not updating in component
 
-**Problem:** Memory usage grows over time.
+**Cause:** Missing subscription or wrong store reference.
 
-**Solution:** Dispose of subscriptions when components unmount:
+**Solution:** Use framework hooks (e.g., `useAtom`) or subscribe manually.
 
-```javascript
+```typescript
 // React
-useEffect(() => {
-  const unsubscribe = store.subscribe(atom, callback);
-  return () => unsubscribe(); // Cleanup on unmount
-}, []);
+import { useAtom } from '@nexus-state/react';
+const [value, setValue] = useAtom(atom, store);
 
-// Tests
-afterEach(() => {
-  atomRegistry.clear(); // Clear registry between tests
+// Vanilla
+const unsubscribe = store.subscribe(atom, (value) => {
+  // Update UI
 });
 ```
 
 ---
 
-### Circular dependencies
+### 3. SSR: State leaks between requests
 
-**Problem:** Error about circular dependencies in computed atoms.
+**Cause:** Using global store instead of per-request store.
 
-**Solution:** Refactor atoms to avoid circular references:
+**Solution:** Create new store per request.
 
-```javascript
-// ❌ Circular: A depends on B, B depends on A
-const atomA = atom((get) => get(atomB) + 1);
-const atomB = atom((get) => get(atomA) + 1);
+```typescript
+// ✅ Correct
+export async function getServerSideProps(context) {
+  const store = createStore(); // ← New store per request
+  // ...
+}
 
-// ✅ Solution: Extract shared logic
-const atomBase = atom(0);
-const atomA = atom((get) => get(atomBase) + 1);
-const atomB = atom((get) => get(atomBase) + 2);
+// ❌ Wrong
+const globalStore = createStore(); // ← Shared between requests!
 ```
 
 ---
 
-### State not persisting
+### 4. Computed atom not recalculating
 
-**Problem:** State is lost on page refresh.
+**Cause:** Missing `get()` call in computed function.
 
-**Solution:** Use `@nexus-state/persist` for automatic persistence:
+**Solution:** Use `get()` for all dependencies.
 
-```javascript
-import { persistAtom } from '@nexus-state/persist';
+```typescript
+// ✅ Correct
+const sumAtom = atom((get) => get(aAtom) + get(bAtom));
 
-const settingsAtom = persistAtom('settings', defaultValue, {
-  storage: 'localStorage',
-});
+// ❌ Wrong
+const sumAtom = atom((get) => aAtom + bAtom); // ← Not reactive!
 ```
 
 ---
 
-### DevTools not connecting
+### 5. setState doesn't work
 
-**Problem:** Redux DevTools doesn't show Nexus State atoms.
+**Cause:** Atom not initialized (never accessed) or name mismatch.
 
-**Solution:** Use `createEnhancedStore` instead of `createStore`:
+**Solution:** Access atom first or use correct names.
 
-```javascript
-// ❌ Won't connect to DevTools
+```typescript
 const store = createStore();
+const userAtom = atom(null, 'user');
 
-// ✅ Connects to DevTools
-const store = createEnhancedStore();
+// Initialize atom first
+store.get(userAtom);
+
+// Now setState works
+store.setState({ user: { name: 'John' } });
 ```
 
 ---
 
-## 📦 Ecosystem
+## 📦 Full Ecosystem
 
-Nexus State provides additional packages for enhanced functionality:
+### Core Packages
 
-| Package                                                                                          | Description             |
-| ------------------------------------------------------------------------------------------------ | ----------------------- |
-| [@nexus-state/react](https://github.com/eustatos/nexus-state/tree/main/packages/react)           | React bindings          |
-| [@nexus-state/vue](https://github.com/eustatos/nexus-state/tree/main/packages/vue)               | Vue.js bindings         |
-| [@nexus-state/svelte](https://github.com/eustatos/nexus-state/tree/main/packages/svelte)         | Svelte bindings         |
-| [@nexus-state/persist](https://github.com/eustatos/nexus-state/tree/main/packages/persist)       | State persistence       |
-| [@nexus-state/middleware](https://github.com/eustatos/nexus-state/tree/main/packages/middleware) | Middleware system       |
-| [@nexus-state/devtools](https://github.com/eustatos/nexus-state/tree/main/packages/devtools)     | DevTools integration    |
-| [@nexus-state/immer](https://github.com/eustatos/nexus-state/tree/main/packages/immer)           | Immer integration       |
-| [@nexus-state/async](https://github.com/eustatos/nexus-state/tree/main/packages/async)           | Async state management  |
-| [@nexus-state/family](https://github.com/eustatos/nexus-state/tree/main/packages/family)         | Atom families           |
-| [@nexus-state/query](https://github.com/eustatos/nexus-state/tree/main/packages/query)           | Data fetching & caching |
-| [@nexus-state/form](https://github.com/eustatos/nexus-state/tree/main/packages/form)             | Form management         |
-| [@nexus-state/web-worker](https://github.com/eustatos/nexus-state/tree/main/packages/web-worker) | Web Worker support      |
-| [@nexus-state/cli](https://github.com/eustatos/nexus-state/tree/main/packages/cli)               | CLI tools               |
+| Package | Description | npm |
+|---------|-------------|-----|
+| [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) | Framework-agnostic core | [Install](https://www.npmjs.com/package/@nexus-state/core) |
+| [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react) | React hooks | [Install](https://www.npmjs.com/package/@nexus-state/react) |
+| [@nexus-state/vue](https://www.npmjs.com/package/@nexus-state/vue) | Vue integration | [Install](https://www.npmjs.com/package/@nexus-state/vue) |
+| [@nexus-state/svelte](https://www.npmjs.com/package/@nexus-state/svelte) | Svelte integration | [Install](https://www.npmjs.com/package/@nexus-state/svelte) |
+
+### Data & State
+
+| Package | Description | npm |
+|---------|-------------|-----|
+| [@nexus-state/query](https://www.npmjs.com/package/@nexus-state/query) | Data fetching & caching | [Install](https://www.npmjs.com/package/@nexus-state/query) |
+| [@nexus-state/async](https://www.npmjs.com/package/@nexus-state/async) | Async atoms | [Install](https://www.npmjs.com/package/@nexus-state/async) |
+| [@nexus-state/persist](https://www.npmjs.com/package/@nexus-state/persist) | Persistence | [Install](https://www.npmjs.com/package/@nexus-state/persist) |
+
+### Forms
+
+| Package | Description | npm |
+|---------|-------------|-----|
+| [@nexus-state/form](https://www.npmjs.com/package/@nexus-state/form) | Form management with DevTools | [Install](https://www.npmjs.com/package/@nexus-state/form) |
+| [@nexus-state/form-builder-react](https://www.npmjs.com/package/@nexus-state/form-builder-react) | Visual form builder | [Install](https://www.npmjs.com/package/@nexus-state/form-builder-react) |
+| [@nexus-state/form-schema-zod](https://www.npmjs.com/package/@nexus-state/form-schema-zod) | Zod validation | [Install](https://www.npmjs.com/package/@nexus-state/form-schema-zod) |
+| [@nexus-state/form-schema-yup](https://www.npmjs.com/package/@nexus-state/form-schema-yup) | Yup validation | [Install](https://www.npmjs.com/package/@nexus-state/form-schema-yup) |
+
+### DevTools & Debugging
+
+| Package | Description | npm |
+|---------|-------------|-----|
+| [@nexus-state/time-travel](https://www.npmjs.com/package/@nexus-state/time-travel) | Time-travel debugging (dev) | [Install](https://www.npmjs.com/package/@nexus-state/time-travel) |
+| [@nexus-state/undo-redo](https://www.npmjs.com/package/@nexus-state/undo-redo) | User-facing undo/redo | [Install](https://www.npmjs.com/package/@nexus-state/undo-redo) |
+| [@nexus-state/middleware](https://www.npmjs.com/package/@nexus-state/middleware) | Middleware support | [Install](https://www.npmjs.com/package/@nexus-state/middleware) |
+
+**Full documentation:** [nexus-state.website.yandexcloud.net](https://nexus-state.website.yandexcloud.net/)
 
 ---
 

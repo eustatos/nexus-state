@@ -1,488 +1,316 @@
 # @nexus-state/query
 
-Powerful data fetching and caching for Nexus State.
+> Powerful data fetching and caching for Nexus State — with SSR prefetch, automatic caching, and optimistic updates
+>
+> [![npm version](https://img.shields.io/npm/v/@nexus-state/query)](https://www.npmjs.com/package/@nexus-state/query)
+> [![Coverage for query package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=query)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
+> [![npm downloads](https://img.shields.io/npm/dw/@nexus-state/query)](https://www.npmjs.com/package/@nexus-state/query)
+> [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
 
-## Installation
+[Documentation](https://nexus-state.website.yandexcloud.net/) • [Repository](https://github.com/eustatos/nexus-state)
+
+---
+
+## 🚀 Quick Start (SSR Prefetch)
+
+```tsx
+import { prefetchQuery } from '@nexus-state/query/react';
+import { useQuery } from '@nexus-state/query/react';
+
+// Server (Next.js getServerSideProps)
+export async function getServerSideProps(context) {
+  await prefetchQuery({
+    queryKey: ['user', context.params.id],
+    queryFn: () => fetchUser(context.params.id),
+  });
+  return { props: {} };
+}
+
+// Client (data already cached!)
+function Page() {
+  const { data: user } = useQuery({
+    queryKey: ['user', id],
+    queryFn: () => fetchUser(id),
+  });
+  return <div>{user.name}</div>;
+}
+```
+
+**Like TanStack Query, but built on Nexus State's atomic architecture**
+
+---
+
+## 🎯 Why Nexus State Query?
+
+### Comparison with Alternatives
+
+| Feature | @nexus-state/query | TanStack Query | SWR |
+|---------|-------------------|----------------|-----|
+| **Bundle size** | 8KB | 13KB | 6KB |
+| **SSR prefetch** | ✅ Built-in | ⚠️ Complex | ⚠️ Complex |
+| **Atomic integration** | ✅ Shares atoms | ❌ Separate | ❌ Separate |
+| **Fine-grained updates** | ✅ Per-atom | ⚠️ Per-query | ⚠️ Per-key |
+| **Multi-framework** | ✅ React/Vue/Svelte | ⚠️ React-focused | ⚠️ React-focused |
+| **DevTools** | ✅ Redux DevTools | ✅ Own DevTools | ❌ |
+
+### ✅ Choose Nexus State Query if you need:
+
+- SSR prefetch with automatic hydration
+- Automatic caching with configurable stale time
+- Optimistic updates for mutations
+- Integration with Nexus State atoms
+- Multi-framework support (React, Vue, Svelte)
+
+### ❌ Use alternatives if:
+
+- React-only project → **TanStack Query** (more plugins)
+- Simple fetch → **@nexus-state/async** (lighter, 2KB)
+- Minimal bundle → **SWR** (6KB)
+
+---
+
+## 📦 Installation
 
 ```bash
 npm install @nexus-state/query
 ```
 
-For React integration:
-
+**For React:**
 ```bash
 npm install @nexus-state/query @nexus-state/react
 ```
 
-## Quick Start
+---
 
-### React Hooks (Recommended)
+## 📖 Core Features
+
+### Queries
 
 ```tsx
-import { useQuery, useMutation, QueryClientProvider, createQueryClient } from '@nexus-state/query/react';
-
-// Create query client
-const queryClient = createQueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 3,
-    },
-  },
-});
-
-// Wrap your app
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <YourApp />
-    </QueryClientProvider>
-  );
-}
-
-// Use in components
-function UserProfile({ userId }: { userId: number }) {
-  const { data, isLoading, error, refetch } = useQuery(
-    `user-${userId}`,
-    async () => {
->
-> [![Coverage for query package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=query)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
-      const response = await fetch(`/api/users/${userId}`);
-      return response.json();
-    },
-    {
-      staleTime: 5 * 60 * 1000,
-      retry: 3,
-    }
-  );
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  return (
-    <div>
-      <h1>{data.name}</h1>
-      <button onClick={refetch}>Refresh</button>
-    </div>
-  );
-}
-```
-
-### Framework-Agnostic Queries
-
-```typescript
-import { createStore } from '@nexus-state/core';
-import { useQuery } from '@nexus-state/query';
-
-const store = createStore();
-
-const userQuery = useQuery(store, {
-  queryKey: 'user',
-  queryFn: async () => {
-    const response = await fetch('/api/user');
-    return response.json();
-  }
-});
-
-console.log(userQuery.data); // User data
-console.log(userQuery.isLoading); // Loading state
-console.log(userQuery.error); // Error if any
-
-// Refetch
-await userQuery.refetch();
+import { useQuery, useQueries, useSuspenseQuery } from '@nexus-state/query/react';
 ```
 
 ### Mutations
 
-```typescript
-import { mutation } from '@nexus-state/query';
-
-const updateUser = mutation({
-  mutationFn: async (user: { id: number; name: string }) => {
-    const response = await fetch(`/api/users/${user.id}`, {
-      method: 'PUT',
-      body: JSON.stringify(user),
-    });
-    return response.json();
-  },
-  onSuccess: (data) => {
-    console.log('User updated:', data);
-  },
-  onError: (error) => {
-    console.error('Update failed:', error);
-  },
-});
-
-// Fire and forget
-updateUser.mutate({ id: 1, name: 'John' });
-
-// With await
-const result = await updateUser.mutateAsync({ id: 1, name: 'John' });
+```tsx
+import { useMutation } from '@nexus-state/query/react';
 ```
 
-## Features
+### Prefetch
 
-- ✅ Automatic caching
-- ✅ Background refetching (window focus, reconnect, interval)
-- ✅ Retry logic
-- ✅ TypeScript support
-- ✅ Framework agnostic
-- ✅ React hooks with automatic re-renders
-- ✅ Mutations with optimistic updates
-- ✅ Query invalidation
-- ✅ Error boundary integration
-- ✅ SSR compatible
-- ✅ React Suspense support
-- ✅ Advanced prefetching utilities
-- ✅ Infinite Queries for pagination
-- ✅ Built-in DevTools panel
+```tsx
+import { prefetchQuery, usePrefetch } from '@nexus-state/query/react';
+```
 
-## React API
+### Cache Management
+
+```tsx
+import { getQueryData, setQueryData, invalidateQuery } from '@nexus-state/query/react';
+```
+
+---
+
+## 🔌 React API
 
 ### useQuery
-
-Hook for fetching data with automatic caching and re-renders.
 
 ```tsx
 import { useQuery } from '@nexus-state/query/react';
 
-function UserProfile({ userId }: { userId: number }) {
-  const { data, isLoading, error, refetch, isFetching, isStale } = useQuery(
-    `user-${userId}`,
-    async () => {
-      const response = await fetch(`/api/users/${userId}`);
-      return response.json();
+function UserProfile({ userId }) {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: async () => {
+      const res = await fetch(`/api/users/${userId}`);
+      return res.json();
     },
-    {
-      enabled: true, // Enable/disable query
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 3,
-      useErrorBoundary: true, // Throw errors to React Error Boundary
-    }
-  );
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 3,
+  });
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-  return (
-    <div>
-      <h1>{data.name}</h1>
-      <p>{isStale ? 'Data is stale' : 'Data is fresh'}</p>
-      <button onClick={refetch}>Refresh</button>
-    </div>
-  );
+  return <div>{data.name}</div>;
 }
 ```
 
 **Options:**
-- `enabled` - Enable/disable query (default: `true`)
-- `staleTime` - Time in ms before data is considered stale
-- `retry` - Number of retry attempts (default: `3`)
-- `retryDelay` - Delay between retries in ms
-- `useErrorBoundary` - Throw errors to React Error Boundary
-- `suspense` - Enable React Suspense mode
-- `onSuccess` - Callback on success
-- `onError` - Callback on error
+- `enabled` — Enable/disable query (default: `true`)
+- `staleTime` — Time in ms before data is stale
+- `retry` — Number of retry attempts (default: `3`)
+- `useErrorBoundary` — Throw errors to React Error Boundary
+- `suspense` — Enable React Suspense mode
 
 **Result:**
-- `data` - The fetched data
-- `error` - Error if failed
-- `isLoading` - Initial loading state
-- `isSuccess` - Query succeeded
-- `isError` - Query failed
-- `isIdle` - Query hasn't run yet
-- `isFetching` - Currently fetching
-- `isStale` - Data is stale
-- `status` - 'idle' | 'loading' | 'success' | 'error'
-- `refetch()` - Manually refetch
+- `data` — The fetched data
+- `isLoading` — Initial loading state
+- `isSuccess` — Query succeeded
+- `isError` — Query failed
+- `isIdle` — Query hasn't run yet
+- `isFetching` — Currently fetching
+- `error` — Error if failed
+- `refetch()` — Manually refetch
+- `status` — 'idle' | 'loading' | 'success' | 'error'
+
+---
 
 ### useSuspenseQuery
 
-Hook for fetching data with React Suspense for declarative loading states.
-
 ```tsx
-import { Suspense } from 'react';
 import { useSuspenseQuery } from '@nexus-state/query/react';
 
-function UserProfile({ userId }: { userId: number }) {
-  // No loading check needed - Suspense handles it
-  const { data, refetch } = useSuspenseQuery(
-    `user-${userId}`,
-    async () => {
-      const response = await fetch(`/api/users/${userId}`);
-      return response.json();
-    }
-  );
+function UserProfile({ userId }) {
+  const { data } = useSuspenseQuery({
+    queryKey: ['user', userId],
+    queryFn: () => fetchUser(userId),
+  });
 
-  return (
-    <div>
-      <h1>{data.name}</h1>
-      <button onClick={refetch}>Refresh</button>
-    </div>
-  );
+  return <div>{data.name}</div>;
 }
 
-// Wrap with Suspense boundary
+// Wrap with Suspense
 function App() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={<div>Loading...</div>}>
       <UserProfile userId={1} />
     </Suspense>
   );
 }
 ```
 
-**Options:**
-- `staleTime` - Time in ms before data is considered stale (default: `0`)
+---
 
-**Result:**
-- `data` - The fetched data (never undefined when rendered)
-- `error` - Always null (errors thrown to boundary)
-- `isLoading` - Always false (suspends instead)
-- `isSuccess` - Always true when rendered
-- `isFetching` - Currently fetching in background
-- `isStale` - Data is stale
-- `refetch()` - Manually refetch
-- `remove()` - Remove from cache
-
-### useMutation
-
-Hook for executing mutations with state management.
+### useMutation (with Optimistic Updates)
 
 ```tsx
-import { useMutation } from '@nexus-state/query/react';
+import { useMutation, useQueryClient } from '@nexus-state/query/react';
 
-function CreatePost() {
-  const { mutate, mutateAsync, isPending, isError, error, data, reset } = useMutation({
-    mutationFn: async (post: { title: string; content: string }) => {
-      const response = await fetch('/api/posts', {
-        method: 'POST',
-        body: JSON.stringify(post),
-      });
-      return response.json();
+function AddTodo() {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: createTodo,
+    onMutate: async (newTodo) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: 'todos' });
+
+      // Snapshot previous value
+      const previousTodos = queryClient.getQueryData('todos');
+
+      // Optimistically update
+      queryClient.setQueryData('todos', (old) => [...old, newTodo]);
+
+      return { previousTodos };
     },
-    onSuccess: (data) => {
-      console.log('Post created:', data);
+    onError: (err, newTodo, context) => {
+      // Rollback on error
+      queryClient.setQueryData('todos', context.previousTodos);
     },
-    onError: (error) => {
-      console.error('Creation failed:', error);
+    onSettled: () => {
+      // Always refetch after mutation
+      queryClient.invalidateQueries({ queryKey: 'todos' });
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    mutate({ title: 'New Post', content: 'Content here' });
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <button type="submit" disabled={isPending}>
-        {isPending ? 'Creating...' : 'Create Post'}
-      </button>
-      {isError && <div>Error: {error.message}</div>}
-      {data && <div>Created: {data.id}</div>}
-      <button type="button" onClick={reset}>Reset</button>
-    </form>
-  );
+  return <button onClick={() => mutation.mutate({ text: 'New' })}>Add</button>;
 }
 ```
 
-**Options:**
-- `mutationFn` - Function to execute mutation
-- `onSuccess` - Callback on success
-- `onError` - Callback on error
-- `onSettled` - Callback on success or error
-- `onMutate` - Callback for optimistic updates
-- `retry` - Number of retry attempts
-- `invalidateQueries` - Query keys to invalidate after success
-- `refetchQueries` - Query keys to refetch after success
+---
 
-**Result:**
-- `data` - The mutation result
-- `error` - Error if failed
-- `isIdle` - Mutation hasn't run
-- `isPending` - Mutation is executing
-- `isSuccess` - Mutation succeeded
-- `isError` - Mutation failed
-- `status` - 'idle' | 'loading' | 'success' | 'error'
-- `variables` - Variables from last execution
-- `failureCount` - Number of failed attempts
-- `mutate(variables)` - Execute mutation (fire and forget)
-- `mutateAsync(variables)` - Execute mutation (returns promise)
-- `reset()` - Reset to initial state
+## 🌐 SSR Patterns
 
-### useQueries
-
-Execute multiple queries in parallel.
+### Next.js (getServerSideProps)
 
 ```tsx
-import { useQueries } from '@nexus-state/query/react';
+export async function getServerSideProps(context) {
+  await prefetchQuery({
+    queryKey: ['user', context.params.id],
+    queryFn: () => fetchUser(context.params.id),
+  });
+  return { props: {} };
+}
+```
 
-function Dashboard() {
-  const [user, posts, comments] = useQueries([
-    {
+### Remix (loaders)
+
+```tsx
+export async function loader({ params }) {
+  await prefetchQuery({
+    queryKey: ['user', params.id],
+    queryFn: () => fetchUser(params.id),
+  });
+  return json({});
+}
+```
+
+### Nuxt (asyncData)
+
+```vue
+<script setup>
+export default {
+  async asyncData({ app }) {
+    await prefetchQuery({
       queryKey: 'user',
-      queryFn: () => fetch('/api/user').then((r) => r.json()),
-    },
-    {
-      queryKey: 'posts',
-      queryFn: () => fetch('/api/posts').then((r) => r.json()),
-    },
-    {
-      queryKey: 'comments',
-      queryFn: () => fetch('/api/comments').then((r) => r.json()),
-    },
-  ]);
-
-  if (user.isLoading || posts.isLoading || comments.isLoading) {
-    return <div>Loading...</div>;
+      queryFn: fetchUser,
+    });
   }
-
-  return (
-    <div>
-      <h1>{user.data?.name}</h1>
-      <p>Posts: {posts.data?.length}</p>
-      <p>Comments: {comments.data?.length}</p>
-    </div>
-  );
 }
+</script>
 ```
 
-### useIsFetching
+---
 
-Get the number of currently fetching queries.
+## 🔥 Prefetch Strategies
 
-```tsx
-import { useIsFetching } from '@nexus-state/query/react';
-
-function GlobalLoadingIndicator() {
-  const isFetching = useIsFetching();
-
-  return (
-    <div>
-      {isFetching > 0 && (
-        <div className="loading-spinner">
-          Loading {isFetching} query...
-        </div>
-      )}
-    </div>
-  );
-}
-```
-
-### Prefetching
-
-Proactively load data for improved perceived performance.
-
-#### Programmatic Prefetch
-
-```tsx
-import { prefetchQuery, prefetchQueries, setQueryData, getQueryData, invalidateQuery } from '@nexus-state/query/react';
-
-// Prefetch single query
-await prefetchQuery({
-  queryKey: 'user-1',
-  queryFn: () => fetch('/api/users/1').then(r => r.json()),
-  staleTime: 5 * 60 * 1000,
-});
-
-// Prefetch multiple queries in parallel
-await prefetchQueries([
-  { queryKey: 'user', queryFn: fetchUser },
-  { queryKey: 'posts', queryFn: fetchPosts },
-  { queryKey: 'comments', queryFn: fetchComments },
-]);
-
-// Set query data manually (optimistic update)
-setQueryData('user-1', { id: 1, name: 'John' });
-
-// Get query data without suspending
-const userData = getQueryData('user-1');
-
-// Invalidate query cache
-invalidateQuery('users');
-```
-
-**Functions:**
-- `prefetchQuery(options)` - Prefetch single query
-- `prefetchQueries(queries)` - Prefetch multiple queries in parallel
-- `setQueryData(key, data)` - Set query data manually
-- `getQueryData(key)` - Get query data without suspending
-- `invalidateQuery(key)` - Invalidate query cache
-
-#### usePrefetch Hook
+### Manual Prefetch
 
 ```tsx
 import { usePrefetch } from '@nexus-state/query/react';
 
-function UserList() {
-  const prefetchUser = usePrefetch();
-
+function Button() {
+  const prefetch = usePrefetch();
   return (
-    <div>
-      {users.map(user => (
-        <div
-          key={user.id}
-          onMouseEnter={() => prefetchUser({
-            queryKey: `user-${user.id}`,
-            queryFn: () => fetchUser(user.id),
-            staleTime: 5 * 60 * 1000,
-          })}
-        >
-          {user.name}
-        </div>
-      ))}
-    </div>
+    <button onMouseEnter={() => prefetch({
+      queryKey: 'user',
+      queryFn: fetchUser,
+    })}>
+      Load User
+    </button>
   );
 }
 ```
 
-#### Hover Prefetch
+### Hover Prefetch
 
 ```tsx
 import { usePrefetchOnHover } from '@nexus-state/query/react';
 
 function UserLink({ userId }) {
   const { onMouseEnter, onMouseLeave } = usePrefetchOnHover({
-    queryKey: `user-${userId}`,
+    queryKey: ['user', userId],
     queryFn: () => fetchUser(userId),
     delay: 200, // Wait 200ms before prefetching
   });
 
   return (
     <a href={`/users/${userId}`} {...{ onMouseEnter, onMouseLeave }}>
-      View Profile
+      {userId}
     </a>
   );
 }
 ```
 
-#### PrefetchLink Component
-
-```tsx
-import { PrefetchLink } from '@nexus-state/query/react';
-
-<PrefetchLink
-  href="/users/1"
-  prefetch={{
-    queryKey: 'user-1',
-    queryFn: () => fetchUser(1),
-  }}
-  prefetchDelay={150}
->
-  View User
-</PrefetchLink>
-```
-
-#### Viewport Prefetch
+### Viewport Prefetch
 
 ```tsx
 import { usePrefetchOnViewport } from '@nexus-state/query/react';
 
-function LazySection({ sectionId }) {
+function Card({ itemId }) {
   const ref = usePrefetchOnViewport({
-    queryKey: `section-${sectionId}`,
-    queryFn: () => fetchSection(sectionId),
+    queryKey: ['item', itemId],
+    queryFn: () => fetchItem(itemId),
     threshold: 0.5, // Prefetch when 50% visible
   });
 
@@ -490,574 +318,111 @@ function LazySection({ sectionId }) {
 }
 ```
 
-#### Idle Prefetch
+---
+
+## 🔧 Cache Management
+
+### Get/Set Query Data
 
 ```tsx
-import { usePrefetchOnIdle } from '@nexus-state/query/react';
+import { getQueryData, setQueryData } from '@nexus-state/query/react';
 
-function Page() {
-  // Prefetch when browser is idle
-  usePrefetchOnIdle([
-    {
-      queryKey: 'user',
-      queryFn: fetchUser,
-    },
-    {
-      queryKey: 'posts',
-      queryFn: fetchPosts,
-    },
-  ]);
+// Get cached data
+const user = getQueryData(['user', id]);
 
-  return <div>...</div>;
-}
+// Update cached data
+setQueryData(['user', id], (old) => ({
+  ...old,
+  name: 'Updated',
+}));
 ```
 
-#### Focus Prefetch
+### Invalidate Queries
 
 ```tsx
-import { usePrefetchOnFocus } from '@nexus-state/query/react';
+import { invalidateQuery } from '@nexus-state/query/react';
 
-function SearchInput() {
-  const { onFocus } = usePrefetchOnFocus({
-    queryKey: 'search-results',
-    queryFn: fetchSearchResults,
-    delay: 100,
-  });
+// Invalidate specific query
+await invalidateQuery(['user', id]);
 
-  return <input onFocus={onFocus} />;
-}
+// Invalidate all queries
+await invalidateQuery();
 ```
 
-#### PrefetchManager API
+---
+
+## 📚 Async vs Query: When to Use Which?
+
+| Scenario | @nexus-state/async | @nexus-state/query |
+|----------|-------------------|-------------------|
+| **Simple fetch with loading** | ✅ | ⚠️ Overkill |
+| **SSR prefetch** | ❌ | ✅ |
+| **Automatic caching** | ❌ | ✅ |
+| **Background refetch** | ❌ | ✅ |
+| **Optimistic updates** | ❌ | ✅ |
+| **Mutations** | ❌ | ✅ |
+| **Bundle size** | 2KB | 8KB |
+
+**Use @nexus-state/async when:** You need basic async state without caching, prefetch, or SSR.
+
+**Use @nexus-state/query when:** You need caching, SSR prefetch, mutations, or optimistic updates.
+
+📖 **@nexus-state/async docs:** [npm](https://www.npmjs.com/package/@nexus-state/async)
+
+---
+
+## 🔗 Migration from TanStack Query
 
 ```tsx
-import { getPrefetchManager } from '@nexus-state/query';
+// TanStack Query
+import { useQuery } from '@tanstack/react-query';
 
-const manager = getPrefetchManager();
+// @nexus-state/query (almost identical!)
+import { useQuery } from '@nexus-state/query/react';
 
-// Prefetch with priority
-await manager.prefetch({
-  queryKey: 'important-data',
-  queryFn: fetchImportantData,
-  priority: 'high',
-  timeout: 5000,
-});
-
-// Cancel specific prefetch
-manager.cancel('important-data');
-
-// Cancel all prefetches
-manager.cancelAll();
-
-// Get prefetch status
-const status = manager.getPrefetchStatus('important-data');
-console.log(status?.status); // 'pending' | 'success' | 'error' | 'cancelled'
-```
-
-### Infinite Queries
-
-For infinite scrolling and pagination.
-
-#### Cursor-Based Pagination
-
-```tsx
-import { useInfiniteQuery } from '@nexus-state/query/react';
-
-interface PostsResponse {
-  posts: Post[];
-  nextCursor?: string;
-}
-
-function PostList() {
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  } = useInfiniteQuery<PostsResponse, Error, string>({
-    queryKey: 'posts',
-    queryFn: async ({ pageParam }) => {
-      const response = await fetch(`/api/posts?cursor=${pageParam}`);
-      return response.json();
-    },
-    initialPageParam: '',
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-
-  return (
-    <div>
-      {data?.pages.map((page, i) => (
-        <div key={i}>
-          {page.posts.map((post) => (
-            <PostItem key={post.id} post={post} />
-          ))}
-        </div>
-      ))}
-
-      {hasNextPage && (
-        <button
-          onClick={() => fetchNextPage()}
-          disabled={isFetchingNextPage}
-        >
-          {isFetchingNextPage ? 'Loading more...' : 'Load More'}
-        </button>
-      )}
-    </div>
-  );
-}
-```
-
-#### Offset-Based Pagination
-
-```tsx
-interface PostsResponse {
-  posts: Post[];
-  total: number;
-}
-
-function PostList() {
-  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
-    queryKey: 'posts',
-    queryFn: async ({ pageParam }) => {
-      const offset = pageParam as number;
-      const limit = 20;
-
-      const response = await fetch(
-        `/api/posts?offset=${offset}&limit=${limit}`
-      );
-      return response.json();
-    },
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      const loadedItems = allPages.reduce((sum, page) => sum + page.posts.length, 0);
-      return loadedItems < lastPage.total ? loadedItems : undefined;
-    },
-  });
-
-  // ... render
-}
-```
-
-#### Infinite Scroll with Intersection Observer
-
-```tsx
-import { useRef, useCallback } from 'react';
-
-function PostList() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: 'posts',
-    queryFn: async ({ pageParam }) => {
-      const response = await fetch(`/api/posts?cursor=${pageParam}`);
-      return response.json();
-    },
-    initialPageParam: '',
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-  });
-
-  const observerRef = useRef<IntersectionObserver>();
-  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
-    if (isFetchingNextPage) return;
-
-    if (observerRef.current) observerRef.current.disconnect();
-
-    observerRef.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasNextPage) {
-        fetchNextPage();
-      }
-    });
-
-    if (node) observerRef.current.observe(node);
-  }, [isFetchingNextPage, fetchNextPage, hasNextPage]);
-
-  return (
-    <div>
-      {data?.pages.map((page, i) => (
-        <div key={i}>
-          {page.posts.map((post, j) => {
-            if (i === data.pages.length - 1 && j === page.posts.length - 1) {
-              return <div ref={lastElementRef} key={post.id}>{post.title}</div>;
-            }
-            return <div key={post.id}>{post.title}</div>;
-          })}
-        </div>
-      ))}
-    </div>
-  );
-}
-```
-
-#### Bi-directional Scrolling
-
-```tsx
-const {
-  data,
-  fetchNextPage,
-  fetchPreviousPage,
-  hasNextPage,
-  hasPreviousPage,
-} = useInfiniteQuery({
-  queryKey: 'messages',
-  queryFn: async ({ pageParam }) => {
-    // Fetch page
-  },
-  initialPageParam: 0,
-  getNextPageParam: (lastPage) => lastPage.nextCursor,
-  getPreviousPageParam: (firstPage) => firstPage.previousCursor,
-});
-```
-
-**Options:**
-- `queryKey` - Unique key for the infinite query
-- `queryFn` - Function to fetch data for a specific page (receives `pageParam` in context)
-- `initialPageParam` - The initial page parameter for the first page
-- `getNextPageParam` - Function to get the next page parameter from the last page
-- `getPreviousPageParam` - (Optional) Function to get the previous page parameter
-- `staleTime` - Time in ms before data is considered stale
-- `enabled` - Enable/disable the query
-- `retry` - Number of retry attempts
-- `onSuccess` - Callback on success
-- `onError` - Callback on error
-
-**Result:**
-- `data` - Object with `pages` array and `pageParams` array
-- `error` - Error if failed
-- `isLoading` - Initial loading state
-- `isSuccess` - Query succeeded
-- `isError` - Query failed
-- `isFetching` - Currently fetching any page
-- `isFetchingNextPage` - Currently fetching the next page
-- `isFetchingPreviousPage` - Currently fetching the previous page
-- `hasNextPage` - Whether there is a next page available
-- `hasPreviousPage` - Whether there is a previous page available
-- `fetchNextPage()` - Fetch the next page
-- `fetchPreviousPage()` - Fetch the previous page
-- `refetch()` - Refetch all pages
-- `remove()` - Remove the query from cache
-
-### Error Boundaries
-
-Integrate with React Error Boundaries for graceful error handling.
-
-```tsx
-import { ErrorBoundary } from 'react-error-boundary';
-import { useSuspenseQuery } from '@nexus-state/query/react';
-
-function UserProfile({ userId }: { userId: number }) {
-  const { data } = useSuspenseQuery(
-    `user-${userId}`,
-    async () => {
-      const response = await fetch(`/api/users/${userId}`);
-      return response.json();
-    }
-  );
-
-  return <div>{data.name}</div>;
-}
-
-function App() {
-  return (
-    <ErrorBoundary fallback={<ErrorFallback />}>
-      <Suspense fallback={<Loading />}>
-        <UserProfile userId={1} />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-```
-
-### SSR Support
-
-Server-side rendering with data prefetching.
-
-```tsx
-// Server-side prefetch (e.g., Next.js getServerSideProps)
-import { prefetchQuery } from '@nexus-state/query/react';
-
-export async function getServerSideProps() {
-  await prefetchQuery({
-    queryKey: 'user',
-    queryFn: fetchUser,
-  });
-
-  return {
-    props: {},
-  };
-}
-
-// Client hydrates from cache
-function Page() {
-  const { data } = useSuspenseQuery('user', fetchUser);
-  return <div>{data.name}</div>;
-}
-```
-
-### QueryClientProvider
-
-Provider for sharing query client configuration.
-
-```tsx
-import { QueryClientProvider, createQueryClient } from '@nexus-state/query/react';
-
-const queryClient = createQueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      retry: 3,
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <YourApp />
-    </QueryClientProvider>
-  );
-}
-```
-
-### useQueryClient
-
-Access the query client for imperative operations.
-
-```tsx
-import { useQueryClient, useInvalidateQueries } from '@nexus-state/query/react';
-
-function RefreshButton() {
-  const queryClient = useQueryClient();
-  const invalidateQueries = useInvalidateQueries();
-
-  const handleRefresh = () => {
-    queryClient.invalidateQueries('users');
-    invalidateQueries('posts');
-  };
-
-  return <button onClick={handleRefresh}>Refresh</button>;
-}
-```
-
-## Framework-Agnostic API
-
-### Queries
-
-#### `useQuery(store, options)`
-
-Creates a query that automatically fetches and caches data.
-
-```typescript
-import { useQuery } from '@nexus-state/query';
-
-const result = useQuery(store, {
-  queryKey: 'posts',
-  queryFn: async () => fetch('/api/posts').then(r => r.json()),
-  staleTime: 5 * 60 * 1000, // 5 minutes
-  refetchOnWindowFocus: true,
+// Same API:
+const { data, isLoading, error, refetch } = useQuery({
+  queryKey: ['user', id],
+  queryFn: () => fetchUser(id),
+  staleTime: 5 * 60 * 1000,
   retry: 3,
 });
 ```
 
-**Result properties:**
-- `status` - 'idle' | 'loading' | 'success' | 'error'
-- `data` - The fetched data
-- `error` - Error if failed
-- `isLoading`, `isSuccess`, `isError`, `isIdle` - Boolean flags
-- `refetch()` - Manually refetch
-- `remove()` - Remove from cache
+**Key differences:**
+- Query client is optional (uses Nexus State store by default)
+- Smaller bundle size (8KB vs 13KB)
+- Built-in SSR prefetch utilities
+- Multi-framework support (Vue, Svelte coming soon)
 
-### Mutations
+---
 
-#### `mutation(options)`
+## 📦 Related Packages
 
-Creates a mutation for data updates.
+| Package | Description | npm |
+|---------|-------------|-----|
+| [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) | Core concepts | [Install](https://www.npmjs.com/package/@nexus-state/core) |
+| [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react) | React integration | [Install](https://www.npmjs.com/package/@nexus-state/react) |
+| [@nexus-state/async](https://www.npmjs.com/package/@nexus-state/async) | Simple async state | [Install](https://www.npmjs.com/package/@nexus-state/async) |
+| [@nexus-state/persist](https://www.npmjs.com/package/@nexus-state/persist) | Persistence | [Install](https://www.npmjs.com/package/@nexus-state/persist) |
 
-```typescript
-import { mutation } from '@nexus-state/query';
+---
 
-const createPost = mutation({
-  mutationFn: async (post) => {
-    const response = await fetch('/api/posts', {
-      method: 'POST',
-      body: JSON.stringify(post),
-    });
-    return response.json();
-  },
-  onSuccess: (data) => {
-    console.log('Post created:', data);
-  },
-  invalidateQueries: ['posts'], // Invalidate after success
-});
-```
+## 🔗 See Also
 
-**Result properties:**
-- `state` - Atom with mutation state
-- `mutate(variables)` - Fire and forget
-- `mutateAsync(variables)` - Returns promise
-- `reset()` - Reset to initial state
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Framework integration:**
+  - [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react) — React hooks
+  - [@nexus-state/vue](https://www.npmjs.com/package/@nexus-state/vue) — Vue composables
+  - [@nexus-state/svelte](https://www.npmjs.com/package/@nexus-state/svelte) — Svelte stores
+- **Related:**
+  - [@nexus-state/async](https://www.npmjs.com/package/@nexus-state/async) — Simple async state (lighter alternative)
+  - [@nexus-state/persist](https://www.npmjs.com/package/@nexus-state/persist) — LocalStorage persistence
 
-**State properties:**
-- `status` - 'idle' | 'loading' | 'success' | 'error'
-- `data` - The mutation result
-- `error` - Error if failed
-- `variables` - The variables passed to mutate
-- `isPending`, `isSuccess`, `isError`, `isIdle` - Boolean flags
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
 
-### Optimistic Updates
+---
 
-```typescript
-const updateTodo = mutation({
-  mutationFn: async (todo) => {
-    const response = await fetch(`/api/todos/${todo.id}`, {
-      method: 'PUT',
-      body: JSON.stringify(todo),
-    });
-    return response.json();
-  },
-
-  onMutate: async (newTodo) => {
-    // Save current state for rollback
-    const previousTodos = store.get(todosAtom);
-
-    // Optimistically update UI
-    store.set(todosAtom, (todos) =>
-      todos.map((t) => (t.id === newTodo.id ? newTodo : t))
-    );
-
-    return { previousTodos };
-  },
-
-  onError: (error, newTodo, context) => {
-    // Rollback on error
-    if (context?.previousTodos) {
-      store.set(todosAtom, context.previousTodos);
-    }
-  },
-});
-```
-
-### Retry Configuration
-
-```typescript
-const riskyMutation = mutation({
-  mutationFn: async (data) => {
-    return await fetch('/api/risky', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-  retry: 3,
-  retryDelay: (failureCount) => Math.min(1000 * 2 ** failureCount, 30000),
-});
-```
-
-## TypeScript
-
-Full TypeScript support with type inference:
-
-```tsx
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-function UserComponent() {
-  const { data, isLoading, error } = useQuery<User, Error>(
-    'current-user',
-    async () => {
-      const response = await fetch('/api/user');
-      return response.json();
-    }
-  );
-
-  // data is typed as User | undefined
-  // error is typed as Error | null
-}
-```
-
-## DevTools
-
-Visual debugging for queries and mutations with the built-in Query DevTools panel.
-
-### Setup
-
-```tsx
-import { QueryDevTools } from '@nexus-state/query/react';
-
-function App() {
-  return (
-    <>
-      <YourApp />
-      {process.env.NODE_ENV === 'development' && (
-        <QueryDevTools position="bottom-right" />
-      )}
-    </>
-  );
-}
-```
-
-### Features
-
-- **Query List**: See all active queries with their status
-- **State Inspection**: View data, errors, loading states
-- **Cache Control**: Invalidate, refetch, or remove queries
-- **Mutation Tracking**: Monitor mutation state and variables
-- **Network Timeline**: Track fetch timing and status
-- **Search**: Filter queries and mutations by key
-
-### Configuration
-
-```tsx
-<QueryDevTools
-  position="bottom-right" // or 'top-left', 'top-right', 'bottom-left'
-  initialIsOpen={false}
-  panelPosition="bottom" // or 'left', 'right'
-/>
-```
-
-### Programmatic API
-
-```tsx
-import {
-  getQueryDevToolsStore,
-  trackQuery,
-  trackMutation,
-} from '@nexus-state/query/devtools';
-
-// Get store instance
-const store = getQueryDevToolsStore();
-
-// Manually track a query
-trackQuery('my-query', {
-  queryKey: 'my-query',
-  status: 'success',
-  data: { foo: 'bar' },
-  error: null,
-  dataUpdatedAt: Date.now(),
-  errorUpdatedAt: 0,
-  isFetching: false,
-  isStale: false,
-  failureCount: 0,
-});
-
-// Clear cache
-store.clearCache();
-```
-
-### Production
-
-DevTools automatically excluded in production builds when using tree-shaking.
-
-```tsx
-// Only in development
-{process.env.NODE_ENV === 'development' && <QueryDevTools />}
-```
-
-## License
+## 📄 License
 
 MIT

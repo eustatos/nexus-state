@@ -8,6 +8,27 @@
 
 ---
 
+## 🎯 When to Use AJV
+
+### ✅ Choose AJV if you need:
+
+| Use Case | Why AJV |
+|----------|---------|
+| **JSON Schema standard** | Industry standard, cross-language |
+| **Declarative validation** | Describe what, not how |
+| **Performance** | Fastest JSON Schema validator |
+| **Custom keywords** | Extend with your own rules |
+
+### ❌ Use alternatives if:
+
+| Use Case | Better Alternative |
+|----------|-------------------|
+| **TypeScript-first** | [@nexus-state/form-schema-zod](https://www.npmjs.com/package/@nexus-state/form-schema-zod) |
+| **Simple API** | [@nexus-state/form-schema-yup](https://www.npmjs.com/package/@nexus-state/form-schema-yup) |
+| **Simple DSL** | [@nexus-state/form-schema-dsl](https://www.npmjs.com/package/@nexus-state/form-schema-dsl) |
+
+---
+
 ## 🎯 Overview
 
 AJV plugin integrates [AJV](https://ajv.js.org/) (JSON Schema) validation with Nexus State forms. AJV is the fastest and most popular JSON Schema validator for JavaScript.
@@ -40,6 +61,9 @@ npm install @nexus-state/form-schema-ajv ajv
 ```tsx
 import { createForm } from '@nexus-state/form';
 import { useAtom } from '@nexus-state/react';
+import { createStore } from '@nexus-state/core';
+
+const store = createStore();
 
 // Define JSON Schema
 const loginSchema = {
@@ -480,6 +504,21 @@ const config: AjvSchemaConfig = {
 - [JSON Schema Specification](https://json-schema.org/)
 - [Nexus State Form Documentation](https://nexus-state.dev/)
 - [GitHub Repository](https://github.com/eustatos/nexus-state)
+
+---
+
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Forms:**
+  - [@nexus-state/form](https://www.npmjs.com/package/@nexus-state/form) — Form management
+  - [@nexus-state/form-schema-zod](https://www.npmjs.com/package/@nexus-state/form-schema-zod) — Zod validation
+  - [@nexus-state/form-schema-yup](https://www.npmjs.com/package/@nexus-state/form-schema-yup) — Yup validation
+  - [@nexus-state/form-schema-dsl](https://www.npmjs.com/package/@nexus-state/form-schema-dsl) — Custom DSL
+- **Framework integration:**
+  - [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react) — React hooks
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
 
 ---
 

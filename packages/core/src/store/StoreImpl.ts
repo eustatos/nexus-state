@@ -338,4 +338,44 @@ export class StoreImpl implements Store {
   getBatchProcessor(): BatchProcessor {
     return this.batchProcessor;
   }
+
+  /**
+   * Set multiple atoms at once by atom names (for SSR hydration)
+   * @param state Record of atom names to values
+   * @returns The store instance for chaining
+   */
+  setState(state: Record<string, unknown>): Store {
+    Object.entries(state).forEach(([key, value]) => {
+      const atom = Array.from(this.stateManager.getAllStates().keys())
+        .find(a => atomRegistry.getName(a) === key);
+      if (atom) {
+        this.set(atom as any, value);
+      }
+    });
+    return this as unknown as Store;
+  }
+
+  /**
+   * Reset an atom to its default value from atom.read()
+   * @param atom The atom to reset
+   */
+  reset<Value>(atom: Atom<Value>): void {
+    const defaultValue = (atom as any).read();
+    this.set(atom, defaultValue);
+  }
+
+  /**
+   * Clear all atoms to their default values
+   */
+  clear(): void {
+    const states = this.stateManager.getAllStates();
+    states.forEach((_, atom) => {
+      const defaultValue = (atom as any).read();
+      this.stateManager.setValue(atom, defaultValue);
+    });
+    // Notify all subscribers
+    states.forEach((state, atom) => {
+      this.notificationManager.notify(atom, state, state.value);
+    });
+  }
 }

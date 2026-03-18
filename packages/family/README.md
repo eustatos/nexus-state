@@ -1,6 +1,38 @@
 # @nexus-state/family
 
-Utilities for working with state "families" in Nexus State.
+> Utilities for working with state "families" in Nexus State — dynamic atom collections
+>
+> [![npm version](https://img.shields.io/npm/v/@nexus-state/family)](https://www.npmjs.com/package/@nexus-state/family)
+> [![Coverage for family package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=family)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
+> [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
+
+[Documentation](https://nexus-state.website.yandexcloud.net/) • [Repository](https://github.com/eustatos/nexus-state)
+
+---
+
+## 📦 Installation
+
+```bash
+npm install @nexus-state/family
+```
+
+**Required:**
+```bash
+npm install @nexus-state/core
+```
+
+---
+
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Related:**
+  - [@nexus-state/query](https://www.npmjs.com/package/@nexus-state/query) — Data fetching with caching
+  - [@nexus-state/async](https://www.npmjs.com/package/@nexus-state/async) — Simple async state
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
+
+---
 
 ## Description
 

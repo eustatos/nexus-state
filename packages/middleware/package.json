@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/middleware",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Middleware plugin for Nexus State with plugin hooks support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

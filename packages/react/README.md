@@ -1,6 +1,6 @@
 # @nexus-state/react
 
-> React integration for Nexus State — powerful state management with fine-grained reactivity
+> React integration for Nexus State — fine-grained reactivity with split read/write hooks
 >
 > [![npm version](https://img.shields.io/npm/v/@nexus-state/react)](https://www.npmjs.com/package/@nexus-state/react)
 > [![Coverage for react package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=react)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
@@ -11,83 +11,117 @@
 
 ---
 
-## 📦 Installation
+## 🚀 Quick Start (60 seconds)
 
-```bash
-npm install @nexus-state/react
+```tsx
+import { atom, createStore } from '@nexus-state/core';
+import { useAtom } from '@nexus-state/react';
+
+// Create atom and store
+const countAtom = atom(0, 'count');
+const store = createStore();
+
+function Counter() {
+  const [count, setCount] = useAtom(countAtom, store);
+  
+  return (
+    <button onClick={() => setCount(c => c + 1)}>
+      {count}
+    </button>
+  );
+}
 ```
-
----
-
-## 🔧 React Compatibility
-
-| React Version | Support Status |
-|---------------|----------------|
-| 17.x          | ✅ Supported   |
-| 18.x          | ✅ Supported   |
-| 19.x          | ✅ Supported   |
 
 **Minimum required:** React 17.0.0
 
 ---
 
-## ✨ Features
+## 🎯 Why Nexus State for React?
 
-- 🎯 **useAtom Hook** — Easy atom access in React components
-- 📖 **useAtomValue Hook** — Read-only access (optimized for performance)
-- ✍️ **useSetAtom Hook** — Write-only access (no re-renders)
-- 🚀 **Selective Updates** — Components only re-render when their atoms change
-- 🔄 **Computed Atoms Support** — Automatically recalculate when dependencies change
-- 🏪 **Store Integration** — Works with multiple stores
-- 📘 **TypeScript Support** — Full type inference
+### Comparison with Native Solutions
+
+| Feature | Nexus State | Jotai | Zustand | Redux Toolkit |
+|---------|-------------|-------|---------|---------------|
+| **Split hooks** | ✅ useAtomValue + useSetAtom | ⚠️ Limited | ❌ | ❌ |
+| **No Provider required** | ✅ Optional | ❌ Required | ❌ Required | ❌ Required |
+| **Fine-grained updates** | ✅ Per-atom | ✅ | ❌ Store-wide | ❌ Store-wide |
+| **Multi-framework** | ✅ React/Vue/Svelte | ❌ React-only | ✅ | ✅ |
+| **Bundle size** | 2.1KB | 3.2KB | 1KB | 13KB |
+| **DevTools** | ✅ Redux DevTools | ✅ | ✅ Custom | ✅ |
+
+### ✅ Choose Nexus State if you need:
+
+- Fine-grained reactivity (per-atom updates)
+- Split read/write hooks for optimization
+- Multi-framework state sharing
+- Isolated stores (SSR, testing)
+
+### ❌ Use alternatives if:
+
+- Simple global state → **Zustand** (lighter)
+- React-only project → **Jotai** (simpler API)
+- Redux ecosystem → **Redux Toolkit** (more plugins)
 
 ---
 
-## 🤔 When to Use
+## 📖 Core Hooks
 
-### If you need...
+### useAtom(atom, store?)
 
-- ✅ **React integration** — Use Nexus State in React components
-- ✅ **Fine-grained reactivity** — Components update only on relevant changes
-- ✅ **Performance** — Split read/write hooks for optimal rendering
-- ✅ **TypeScript** — Full type inference for hooks and atoms
+Read + write access to an atom.
 
-### If you don't need...
-
-- ❌ **Mandatory providers** — StoreProvider is optional, pass store explicitly if preferred
-- ❌ **Complex setup** — Works out of the box
-- ❌ **React-only state** — Core works with vanilla JS too
-
----
-
-## 🚀 Quick Start
-
-### Basic Counter
-
-```javascript
-import { atom, createStore } from '@nexus-state/core';
+```tsx
 import { useAtom } from '@nexus-state/react';
-
-// Create atom
-const countAtom = atom(0, 'counter');
-const store = createStore();
 
 function Counter() {
   const [count, setCount] = useAtom(countAtom, store);
-
+  
   return (
     <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>+</button>
-      <button onClick={() => setCount(count - 1)}>-</button>
+      <p>{count}</p>
+      <button onClick={() => setCount(c => c + 1)}>+</button>
     </div>
   );
 }
 ```
 
-### Optimized Form with useAtomValue and useSetAtom
+---
 
-```javascript
+### useAtomValue(atom, store?)
+
+Read-only access (optimized — no setter created).
+
+```tsx
+import { useAtomValue } from '@nexus-state/react';
+
+function Display() {
+  const count = useAtomValue(countAtom, store);
+  // Component won't re-render from setter changes
+  return <p>{count}</p>;
+}
+```
+
+---
+
+### useSetAtom(atom, store?)
+
+Write-only access (optimized — no subscription).
+
+```tsx
+import { useSetAtom } from '@nexus-state/react';
+
+function IncrementButton() {
+  const setCount = useSetAtom(countAtom, store);
+  // Component never re-renders from atom changes!
+  return <button onClick={() => setCount(c => c + 1)}>+</button>;
+}
+```
+
+---
+
+### Split Hooks Pattern (Optimized Forms)
+
+```tsx
 import { atom, createStore } from '@nexus-state/core';
 import { useAtomValue, useSetAtom } from '@nexus-state/react';
 
@@ -95,380 +129,243 @@ const nameAtom = atom('', 'name');
 const emailAtom = atom('', 'email');
 const store = createStore();
 
-// Component that only DISPLAYS value (read-only)
-function NameDisplay() {
-  const name = useAtomValue(nameAtom, store);
-  // ✅ Only subscribes to changes, no setter created
-  return <span>{name}</span>;
-}
-
-// Component that only UPDATES value (write-only)
+// Input component — write-only (no re-renders)
 function NameInput() {
   const setName = useSetAtom(nameAtom, store);
-  // ✅ NO subscription, component won't re-render
-  return <input onChange={(e) => setName(e.target.value)} placeholder="Name" />;
+  return <input onChange={e => setName(e.target.value)} />;
 }
 
-// Component that needs both (controlled input)
-function ControlledInput() {
-  const [value, setValue] = useAtom(emailAtom, store);
-  // ✅ Has both read and write
+// Display component — read-only
+function NameDisplay() {
+  const name = useAtomValue(nameAtom, store);
+  return <p>Name: {name}</p>;
+}
+
+// Components update independently!
+function Form() {
   return (
-    <input
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      placeholder="Email"
-    />
-  );
-}
-```
-
-### Performance Comparison
-
-```javascript
-// ❌ WITHOUT split hooks - unnecessary re-renders
-function OldFormInput() {
-  const [_, setName] = useAtom(nameAtom, store);
-  // ❌ Component subscribes even though value not used
-  // ❌ Re-renders on every nameAtom change
-  return <input onChange={(e) => setName(e.target.value)} />;
-}
-
-// ✅ WITH split hooks - NO unnecessary re-renders
-function NewFormInput() {
-  const setName = useSetAtom(nameAtom, store);
-  // ✅ NO subscription
-  // ✅ Never re-renders from atom changes
-  return <input onChange={(e) => setName(e.target.value)} />;
-}
-```
-
-### Computed Atoms
-
-```javascript
-const firstNameAtom = atom('John', 'firstName');
-const lastNameAtom = atom('Doe', 'lastName');
-
-const fullNameAtom = atom(
-  (get) => `${get(firstNameAtom)} ${get(lastNameAtom)}`,
-  'fullName'
-);
-
-function Profile() {
-  const fullName = useAtomValue(fullNameAtom, store);
-
-  return <div>{fullName}</div>;
-}
-```
-
-### Action Buttons with useSetAtom
-
-```javascript
-const countAtom = atom(0, 'count');
-
-// Button that only updates, doesn't need current value
-function IncrementButton() {
-  const setCount = useSetAtom(countAtom, store);
-  // ✅ Never re-renders, stable reference
-  return (
-    <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
-  );
-}
-
-// Display that only reads
-function CountDisplay() {
-  const count = useAtomValue(countAtom, store);
-  // ✅ Re-renders when count changes
-  return <div>Count: {count}</div>;
-}
-```
-
-### Multiple Stores
-
-```javascript
-const store1 = createStore();
-const store2 = createStore();
-
-function Component1() {
-  const [value] = useAtom(atom1, store1);
-  return <div>{value}</div>;
-}
-
-function Component2() {
-  const [value] = useAtom(atom2, store2);
-  return <div>{value}</div>;
-}
-```
-
----
-
-## 📖 Advanced Examples
-
-### Integration with @nexus-state/query
-
-```tsx
-import { useQuery } from '@nexus-state/query/react';
-import { useAtomValue } from '@nexus-state/react';
-import { atom } from '@nexus-state/core';
-
-// Atom for user ID
-const userIdAtom = atom(1, 'userId');
-
-function UserProfile() {
-  const userId = useAtomValue(userIdAtom);
-
-  // Query automatically subscribes to userIdAtom changes
-  const {
-    data: user,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['user', userId],
-    queryFn: async () => {
-      const res = await fetch(`/api/users/${userId}`);
-      return res.json();
-    },
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  return <div>{user.name}</div>;
-}
-```
-
-### Integration with @nexus-state/form
-
-```tsx
-import { createFormAtom } from '@nexus-state/form';
-import { useAtom } from '@nexus-state/react';
-import { z } from 'zod';
-
-// Form schema with validation
-const loginSchema = z.object({
-  email: z.string().email('Invalid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
-
-// Create form atom
-const loginFormAtom = createFormAtom(loginSchema, {
-  email: '',
-  password: '',
-});
-
-function LoginForm() {
-  const [form] = useAtom(loginFormAtom);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const isValid = await form.validate();
-    if (isValid) {
-      console.log('Form values:', form.values);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        value={form.values.email}
-        onChange={(e) => form.setField('email', e.target.value)}
-      />
-      {form.errors.email && <span>{form.errors.email}</span>}
-
-      <input
-        type="password"
-        value={form.values.password}
-        onChange={(e) => form.setField('password', e.target.value)}
-      />
-      {form.errors.password && <span>{form.errors.password}</span>}
-
-      <button type="submit">Login</button>
+    <form>
+      <NameInput />
+      <NameDisplay />
     </form>
   );
 }
 ```
 
-### Persistence with @nexus-state/persist
+---
+
+### useAtomCallback(get, set, store?)
+
+Complex operations with multiple atoms.
 
 ```tsx
-import { persistAtom } from '@nexus-state/persist';
-import { useAtomValue, useSetAtom } from '@nexus-state/react';
+import { useAtomCallback } from '@nexus-state/react';
 
-// Atom that persists to localStorage
-const themeAtom = persistAtom('theme', 'light', {
-  storage: 'localStorage',
-});
-
-function ThemeToggle() {
-  const theme = useAtomValue(themeAtom);
-  const setTheme = useSetAtom(themeAtom);
-
-  return (
-    <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-      Current theme: {theme}
-    </button>
+function TransferButton() {
+  const handleTransfer = useAtomCallback(
+    (get, set, amount: number) => {
+      const balance = get(balanceAtom);
+      if (balance >= amount) {
+        set(balanceAtom, balance - amount);
+        set(logAtom, [...get(logAtom), `Transferred ${amount}`]);
+      }
+    },
+    store
   );
+
+  return <button onClick={() => handleTransfer(100)}>Transfer</button>;
 }
 ```
 
 ---
 
-## ⚡ Performance
-
-### Benchmark: Re-render Optimization
-
-Using split hooks (`useAtomValue` + `useSetAtom`) eliminates unnecessary re-renders:
-
-| Scenario            | `useAtom`     | Split Hooks   | Improvement |
-| ------------------- | ------------- | ------------- | ----------- |
-| Form with 10 fields | 10 re-renders | 0 re-renders  | **∞** ✅    |
-| Button updates      | Re-renders    | No re-renders | **100%** ✅ |
-| Display components  | Re-renders    | Re-renders    | Same        |
-
-### Example: Optimized Form
+### StoreProvider (Optional)
 
 ```tsx
-// ❌ WITHOUT split hooks - 10 unnecessary re-renders
-function OldForm() {
-  const [name, setName] = useAtom(nameAtom);
-  const [email, setEmail] = useAtom(emailAtom);
-  const [phone, setPhone] = useAtom(phoneAtom);
-  // ... 7 more fields
-  // ❌ Each input re-renders on every keystroke
-  return <form>...</form>;
+import { StoreProvider } from '@nexus-state/react';
+
+const store = createStore();
+
+function App() {
+  return (
+    <StoreProvider store={store}>
+      <Counter /> {/* Can use hooks without explicit store */}
+    </StoreProvider>
+  );
 }
 
-// ✅ WITH split hooks - 0 unnecessary re-renders
-function NewForm() {
-  const setName = useSetAtom(nameAtom);
-  const setEmail = useSetAtom(emailAtom);
-  const setPhone = useSetAtom(phoneAtom);
-  // ... 7 more setters
-  // ✅ Inputs NEVER re-render from atom changes
-  return <form>...</form>;
+// In component
+function Counter() {
+  const [count, setCount] = useAtom(countAtom); // store from context
 }
 ```
 
-### Best Practices
+---
 
-1. **Use `useAtomValue` for display components** — Clear intent, optimized reads
-2. **Use `useSetAtom` for inputs/buttons** — No subscriptions, stable references
-3. **Use `useAtom` only for controlled inputs** — When you need both value and setter
-4. **Memoize callbacks with `useAtomCallback`** — For complex multi-atom operations
+## 🔌 Integration with Ecosystem
+
+### Data Fetching (@nexus-state/query)
+
+```tsx
+import { useQuery } from '@nexus-state/query/react';
+import { useAtomValue } from '@nexus-state/react';
+
+function UserProfile() {
+  const userId = useAtomValue(userIdAtom, store);
+  
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: fetchUser,
+  });
+  
+  if (isLoading) return <div>Loading...</div>;
+  return <div>{user.name}</div>;
+}
+```
+
+📖 **Full docs:** [npm](https://www.npmjs.com/package/@nexus-state/query)
+
+---
+
+### Persistence (@nexus-state/persist)
+
+```tsx
+import { persistAtom } from '@nexus-state/persist';
+import { useAtomValue } from '@nexus-state/react';
+
+// Persist atom to localStorage
+const settingsAtom = persistAtom(
+  { theme: 'light' },
+  'settings',
+  { storage: 'localStorage' }
+);
+
+function Settings() {
+  const settings = useAtomValue(settingsAtom, store);
+  return <div>Theme: {settings.theme}</div>;
+}
+```
+
+📖 **Full docs:** [npm](https://www.npmjs.com/package/@nexus-state/persist)
+
+---
+
+### Async Atoms (@nexus-state/async)
+
+```tsx
+import { asyncAtom } from '@nexus-state/async';
+import { useAtomValue } from '@nexus-state/react';
+
+const [userAtom, fetchUser] = asyncAtom({
+  fetchFn: async (id: number) => fetch(`/api/users/${id}`).then(r => r.json()),
+  initialValue: null,
+});
+
+function UserProfile({ userId }) {
+  const { data: user, isLoading } = useAtomValue(userAtom, store);
+  
+  if (isLoading) return <div>Loading...</div>;
+  return <div>{user.name}</div>;
+}
+```
+
+📖 **Full docs:** [npm](https://www.npmjs.com/package/@nexus-state/async)
 
 ---
 
 ## 📚 API Reference
 
-### useAtom(atom, store)
-
-Hook to access atom values in React components (read + write).
-
-- `atom`: The atom to access
-- `store`: The store instance containing the atom
-- Returns: `[value, setValue]` tuple
-
-**Use when:** You need both read and write access (e.g., controlled inputs)
-
-```javascript
-const [count, setCount] = useAtom(countAtom, store);
-```
-
-### useAtomValue(atom, store)
-
-Hook to read an atom value (read-only). Optimized for performance.
-
-- `atom`: The atom to read from
-- `store`: The store instance containing the atom
-- Returns: Current atom value
-
-**Use when:** You only need to read the value (e.g., display components)
-
-```javascript
-const count = useAtomValue(countAtom, store);
-```
-
-**Benefits:**
-
-- ✅ Clear intent (read-only)
-- ✅ Smaller bundle (no setter created)
-- ✅ Better performance (only subscribes)
-
-### useSetAtom(atom, store)
-
-Hook to write to an atom (write-only). Optimized for performance.
-
-- `atom`: The atom to write to
-- `store`: The store instance containing the atom
-- Returns: Setter function `(value) => void`
-
-**Use when:** You only need to update the value (e.g., buttons, form inputs)
-
-```javascript
-const setCount = useSetAtom(countAtom, store);
-```
-
-**Benefits:**
-
-- ✅ Clear intent (write-only)
-- ✅ NO subscription (component won't re-render)
-- ✅ Stable reference (memoized)
-- ✅ Best for forms with many fields
-
-### useAtomCallback(get, set, store)
-
-Advanced hook for complex operations involving multiple atoms.
-
-- `callback`: Function that receives `get`, `set`, and optional arguments
-- `store`: The store instance (optional, uses context if not provided)
-- Returns: Memoized callback function
-
-**Use when:** You need to perform complex operations with multiple atoms
-
-```javascript
-const handleTransfer = useAtomCallback((get, set, amount) => {
-  const balance = get(balanceAtom);
-  if (balance >= amount) {
-    set(balanceAtom, balance - amount);
-    set(historyAtom, [...get(historyAtom), `Transferred ${amount}`]);
-  }
-}, store);
-```
-
-**Benefits:**
-
-- ✅ Access to multiple atoms in single callback
-- ✅ Stable reference (memoized)
-- ✅ Clean API for complex operations
-
-### Comparison Table
-
-| Hook              | Reads | Writes | Subscribes | Re-renders | Use Case             |
-| ----------------- | ----- | ------ | ---------- | ---------- | -------------------- |
-| `useAtom`         | ✅    | ✅     | ✅         | ✅         | Controlled inputs    |
-| `useAtomValue`    | ✅    | ❌     | ✅         | ✅         | Display components   |
-| `useSetAtom`      | ❌    | ✅     | ❌         | ❌         | Buttons, form inputs |
-| `useAtomCallback` | ✅    | ✅     | ❌         | ❌         | Complex operations   |
+| Hook | Signature | Description |
+|------|-----------|-------------|
+| `useAtom` | `useAtom(atom, store?)` | Read + write |
+| `useAtomValue` | `useAtomValue(atom, store?)` | Read only (optimized) |
+| `useSetAtom` | `useSetAtom(atom, store?)` | Write only (no re-render) |
+| `useAtomCallback` | `useAtomCallback(fn, store?)` | Complex operations |
+| `StoreProvider` | `<StoreProvider store>` | Context provider |
+| `useStore` | `useStore()` | Get store from context |
 
 ---
 
-## 📦 Ecosystem
+## 🔧 Troubleshooting
 
-| Package                                                                                          | Description             |
-| ------------------------------------------------------------------------------------------------ | ----------------------- |
-| [@nexus-state/core](https://github.com/eustatos/nexus-state/tree/main/packages/core)             | Core library            |
-| [@nexus-state/query](https://github.com/eustatos/nexus-state/tree/main/packages/query)           | Data fetching & caching |
-| [@nexus-state/form](https://github.com/eustatos/nexus-state/tree/main/packages/form)             | Form management         |
-| [@nexus-state/persist](https://github.com/eustatos/nexus-state/tree/main/packages/persist)       | State persistence       |
-| [@nexus-state/middleware](https://github.com/eustatos/nexus-state/tree/main/packages/middleware) | Middleware system       |
-| [@nexus-state/devtools](https://github.com/eustatos/nexus-state/tree/main/packages/devtools)     | DevTools integration    |
-| [@nexus-state/immer](https://github.com/eustatos/nexus-state/tree/main/packages/immer)           | Immer integration       |
-| [@nexus-state/async](https://github.com/eustatos/nexus-state/tree/main/packages/async)           | Async state management  |
-| [@nexus-state/family](https://github.com/eustatos/nexus-state/tree/main/packages/family)         | Atom families           |
-| [@nexus-state/vue](https://github.com/eustatos/nexus-state/tree/main/packages/vue)               | Vue.js bindings         |
-| [@nexus-state/svelte](https://github.com/eustatos/nexus-state/tree/main/packages/svelte)         | Svelte bindings         |
-| [@nexus-state/web-worker](https://github.com/eustatos/nexus-state/tree/main/packages/web-worker) | Web Worker support      |
+### 1. "useAtom requires a store" error
+
+**Cause:** Store not provided and no StoreProvider.
+
+**Solution:**
+```tsx
+// Option 1: Provide store explicitly
+const [count] = useAtom(countAtom, store);
+
+// Option 2: Use StoreProvider
+<StoreProvider store={store}>
+  <Component />
+</StoreProvider>
+```
+
+---
+
+### 2. Component not re-rendering on atom changes
+
+**Cause:** Using `useSetAtom` (by design — no subscription).
+
+**Solution:** Use `useAtom` or `useAtomValue` for read access.
+
+```tsx
+// ❌ Won't re-render
+const setCount = useSetAtom(countAtom);
+
+// ✅ Will re-render
+const [count, setCount] = useAtom(countAtom);
+```
+
+---
+
+### 3. Stale closure in callbacks
+
+**Cause:** Callback captures old atom values.
+
+**Solution:** Use `useAtomCallback` with get/set.
+
+```tsx
+// ❌ Stale closure
+const handleClick = () => {
+  setCount(count + 1); // May be stale
+};
+
+// ✅ Fresh values
+const handleClick = useAtomCallback((get, set) => {
+  set(countAtom, get(countAtom) + 1);
+});
+```
+
+---
+
+## 📦 Related Packages
+
+| Package | Description | npm |
+|---------|-------------|-----|
+| [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) | Core concepts (atoms, stores) | [Install](https://www.npmjs.com/package/@nexus-state/core) |
+| [@nexus-state/query](https://www.npmjs.com/package/@nexus-state/query) | Data fetching & caching | [Install](https://www.npmjs.com/package/@nexus-state/query) |
+| [@nexus-state/async](https://www.npmjs.com/package/@nexus-state/async) | Simple async state | [Install](https://www.npmjs.com/package/@nexus-state/async) |
+| [@nexus-state/persist](https://www.npmjs.com/package/@nexus-state/persist) | LocalStorage persistence | [Install](https://www.npmjs.com/package/@nexus-state/persist) |
+| [@nexus-state/form](https://www.npmjs.com/package/@nexus-state/form) | Form management | [Install](https://www.npmjs.com/package/@nexus-state/form) |
+| [@nexus-state/devtools](https://www.npmjs.com/package/@nexus-state/devtools) | Redux DevTools integration | [Install](https://www.npmjs.com/package/@nexus-state/devtools) |
+
+---
+
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Atoms, stores, subscriptions
+- **Data fetching:** [@nexus-state/query](https://www.npmjs.com/package/@nexus-state/query) — SSR prefetch, caching
+- **Async:** [@nexus-state/async](https://www.npmjs.com/package/@nexus-state/async) — Simple loading states
+- **Persistence:** [@nexus-state/persist](https://www.npmjs.com/package/@nexus-state/persist) — LocalStorage
+- **Forms:** [@nexus-state/form](https://www.npmjs.com/package/@nexus-state/form) — Schema-based forms
+- **DevTools:** [@nexus-state/devtools](https://www.npmjs.com/package/@nexus-state/devtools) — Debugging
+- **Time-travel:** [@nexus-state/time-travel](https://www.npmjs.com/package/@nexus-state/time-travel) — Undo/redo debugging
+- **Middleware:** [@nexus-state/middleware](https://www.npmjs.com/package/@nexus-state/middleware) — Plugin system
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
 
 ---
 

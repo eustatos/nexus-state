@@ -196,6 +196,21 @@ defaultRegistry.register({
 
 ---
 
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Forms:**
+  - [@nexus-state/form](https://www.npmjs.com/package/@nexus-state/form) — Form management
+  - [@nexus-state/form-builder-react](https://www.npmjs.com/package/@nexus-state/form-builder-react) — Form builder React components
+  - [@nexus-state/form-schema-zod](https://www.npmjs.com/package/@nexus-state/form-schema-zod) — Zod validation
+  - [@nexus-state/form-schema-yup](https://www.npmjs.com/package/@nexus-state/form-schema-yup) — Yup validation
+- **Framework integration:**
+  - [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react) — React hooks
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
+
+---
+
 ## 📄 License
 
 MIT © Nexus State Contributors

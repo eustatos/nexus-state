@@ -1,12 +1,39 @@
 # @nexus-state/time-travel
 
-Time travel debugging for Nexus State
+> Time-travel debugging for Nexus State — undo/redo, snapshots, and state history
+>
+> [![npm version](https://img.shields.io/npm/v/@nexus-state/time-travel)](https://www.npmjs.com/package/@nexus-state/time-travel)
+> [![Coverage for time-travel package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=time-travel)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
+> [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
 
-## Installation
+[Documentation](https://nexus-state.website.yandexcloud.net/) • [Repository](https://github.com/eustatos/nexus-state)
+
+---
+
+## 📦 Installation
 
 ```bash
 npm install @nexus-state/time-travel
 ```
+
+**Required:**
+```bash
+npm install @nexus-state/core
+```
+
+---
+
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Related:**
+  - [@nexus-state/devtools](https://www.npmjs.com/package/@nexus-state/devtools) — Redux DevTools integration
+  - [@nexus-state/undo-redo](https://www.npmjs.com/package/@nexus-state/undo-redo) — User-facing undo/redo
+  - [@nexus-state/middleware](https://www.npmjs.com/package/@nexus-state/middleware) — Plugin system
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
+
+---
 
 ## Usage
 

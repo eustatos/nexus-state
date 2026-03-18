@@ -174,6 +174,24 @@ export interface Store {
    * @returns An array of applied plugins
    */
   getPlugins?: () => Plugin[];
+
+  /**
+   * Set multiple atoms at once by atom names (for SSR hydration)
+   * @param state Record of atom names to values
+   * @returns The store instance for chaining
+   */
+  setState?: (state: Record<string, unknown>) => Store;
+
+  /**
+   * Reset an atom to its default value from atom.read()
+   * @param atom The atom to reset
+   */
+  reset?: <Value>(atom: Atom<Value>) => void;
+
+  /**
+   * Clear all atoms to their default values
+   */
+  clear?: () => void;
 }
 
 // === NEW HIERARCHICAL ATOM TYPES (CORE-002) ===
