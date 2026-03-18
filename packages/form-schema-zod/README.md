@@ -8,6 +8,27 @@
 
 ---
 
+## 🎯 When to Use Zod
+
+### ✅ Choose Zod if you need:
+
+| Use Case | Why Zod |
+|----------|---------|
+| **TypeScript-first** | Automatic type inference from schemas |
+| **Zero dependencies** | Lightweight bundle, no external deps |
+| **Rich validation** | 20+ built-in validators, transforms |
+| **Developer experience** | Best-in-class TypeScript support |
+
+### ❌ Use alternatives if:
+
+| Use Case | Better Alternative |
+|----------|-------------------|
+| **JSON Schema standard** | [@nexus-state/form-schema-ajv](https://www.npmjs.com/package/@nexus-state/form-schema-ajv) |
+| **Simple DSL** | [@nexus-state/form-schema-dsl](https://www.npmjs.com/package/@nexus-state/form-schema-dsl) |
+| **Mature ecosystem** | [@nexus-state/form-schema-yup](https://www.npmjs.com/package/@nexus-state/form-schema-yup) |
+
+---
+
 ## 🎯 Overview
 
 Zod plugin integrates [Zod](https://zod.dev/) schema validation with Nexus State forms. Zod is a TypeScript-first schema declaration library with zero external dependencies.
@@ -137,6 +158,10 @@ type FormData = InferZodType<typeof schema>;
 
 ```tsx
 import { z } from 'zod';
+import { createForm } from '@nexus-state/form';
+import { createStore } from '@nexus-state/core';
+
+const store = createStore();
 
 const registrationSchema = z.object({
   username: z
@@ -144,20 +169,20 @@ const registrationSchema = z.object({
     .min(3, 'Username must be at least 3 characters')
     .max(20, 'Username must be at most 20 characters')
     .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
-  
+
   email: z.string().email('Invalid email format'),
-  
+
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain an uppercase letter')
     .regex(/[a-z]/, 'Password must contain a lowercase letter')
     .regex(/[0-9]/, 'Password must contain a number'),
-  
+
   confirmPassword: z.string(),
-  
+
   age: z.number().min(18, 'You must be at least 18 years old'),
-  
+
   terms: z.boolean().refine((val) => val === true, 'You must accept the terms'),
 })
 .refine((data) => data.password === data.confirmPassword, {
@@ -182,11 +207,13 @@ const registrationForm = createForm(store, {
 ### 2. Optional Fields
 
 ```tsx
+import { z } from 'zod';
+
 const profileSchema = z.object({
   // Required fields
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  
+
   // Optional fields
   bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
   website: z.string().url('Invalid URL').optional().or(z.literal('')),
@@ -197,6 +224,8 @@ const profileSchema = z.object({
 ### 3. Nested Objects
 
 ```tsx
+import { z } from 'zod';
+
 const addressSchema = z.object({
   street: z.string().min(1),
   city: z.string().min(1),
@@ -214,6 +243,8 @@ const userSchema = z.object({
 ### 4. Arrays
 
 ```tsx
+import { z } from 'zod';
+
 const skillsSchema = z.object({
   skills: z.array(
     z.object({
@@ -227,16 +258,18 @@ const skillsSchema = z.object({
 ### 5. Transform and Default Values
 
 ```tsx
+import { z } from 'zod';
+
 const transformSchema = z.object({
   // Trim whitespace
   username: z.string().trim().min(3),
-  
+
   // Transform to lowercase
   email: z.string().email().transform((val) => val.toLowerCase()),
-  
+
   // Transform string to number
   age: z.string().transform((val) => parseInt(val, 10)),
-  
+
   // Default value
   newsletter: z.boolean().default(false),
 });
@@ -245,6 +278,8 @@ const transformSchema = z.object({
 ### 6. Async Validation (Uniqueness Check)
 
 ```tsx
+import { z } from 'zod';
+
 const uniqueEmailSchema = z.object({
   email: z.string().email().refine(
     async (email) => {
@@ -264,6 +299,8 @@ const uniqueEmailSchema = z.object({
 ### Custom Error Messages
 
 ```tsx
+import { z } from 'zod';
+
 const schema = z.object({
   email: z.string().email({
     message: 'Please enter a valid email address',
@@ -277,13 +314,15 @@ const schema = z.object({
 ### Custom Refinements
 
 ```tsx
+import { z } from 'zod';
+
 const passwordSchema = z.object({
   password: z.string().refine((val) => {
     const hasUppercase = /[A-Z]/.test(val);
     const hasLowercase = /[a-z]/.test(val);
     const hasNumber = /[0-9]/.test(val);
     const hasSpecial = /[!@#$%^&*]/.test(val);
-    
+
     return hasUppercase && hasLowercase && hasNumber && hasSpecial;
   }, {
     message: 'Password must contain uppercase, lowercase, number, and special character',
@@ -294,6 +333,8 @@ const passwordSchema = z.object({
 ### Preprocess Values
 
 ```tsx
+import { z } from 'zod';
+
 const schema = z.object({
   email: z.string().preprocess((val) => String(val).trim().toLowerCase(), z.string().email()),
   age: z.string().preprocess((val) => parseInt(String(val), 10), z.number().min(18)),
@@ -348,6 +389,20 @@ z.string().refine((val) => {
 - [Zod Documentation](https://zod.dev/)
 - [Nexus State Form Documentation](https://nexus-state.dev/)
 - [GitHub Repository](https://github.com/eustatos/nexus-state)
+
+---
+
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Forms:**
+  - [@nexus-state/form](https://www.npmjs.com/package/@nexus-state/form) — Form management
+  - [@nexus-state/form-schema-yup](https://www.npmjs.com/package/@nexus-state/form-schema-yup) — Yup validation
+  - [@nexus-state/form-builder-react](https://www.npmjs.com/package/@nexus-state/form-builder-react) — Visual form builder
+- **Framework integration:**
+  - [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react) — React hooks
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
 
 ---
 

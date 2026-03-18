@@ -4,7 +4,7 @@ This example demonstrates Time Travel functionality in Nexus State.
 
 ## Basic Time Travel
 
-```interactive
+```javascript
 const { atom, createEnhancedStore } = NexusState;
 
 // Create store with time travel enabled
@@ -37,7 +37,7 @@ _Try editing the code above and see the results in the preview!_
 
 ## Manual Snapshots
 
-```interactive
+```javascript
 const { atom, createEnhancedStore } = NexusState;
 
 // Create store with manual snapshot control
@@ -68,7 +68,7 @@ if (store.undo) {
 
 ## Time Travel with DevTools
 
-```interactive
+```javascript
 const { atom, createEnhancedStore } = NexusState;
 
 // Create store with both DevTools and time travel
@@ -93,7 +93,7 @@ console.log('State at snapshot:', store.getHistory()?.[2]?.state);
 
 ## Time Travel History Navigation
 
-```interactive
+```javascript
 const { atom, createEnhancedStore } = NexusState;
 
 // Create store

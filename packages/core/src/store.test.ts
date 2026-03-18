@@ -315,3 +315,76 @@ describe('createEnhancedStore', () => {
     expect(enhancedStore.get(countAtom)).toBe(10);
   });
 });
+
+describe('Store setState method', () => {
+  beforeEach(() => {
+    atomRegistry.clear();
+  });
+
+  it('should set multiple atoms by name', () => {
+    const store = createStore();
+    const userAtom = atom({ name: 'Anonymous' }, 'user');
+    const countAtom = atom(0, 'count');
+
+    // Initialize atoms by accessing them first
+    store.get(userAtom);
+    store.get(countAtom);
+
+    // Use setState to update both
+    store.setState({ user: { name: 'John' }, count: 42 });
+
+    expect(store.get(userAtom)).toEqual({ name: 'John' });
+    expect(store.get(countAtom)).toBe(42);
+  });
+
+  it('should return store for chaining', () => {
+    const store = createStore();
+    const userAtom = atom({ name: 'Anonymous' }, 'user');
+
+    store.get(userAtom);
+    const result = store.setState({ user: { name: 'Jane' } });
+
+    expect(result).toBe(store);
+  });
+});
+
+describe('Store reset method', () => {
+  beforeEach(() => {
+    atomRegistry.clear();
+  });
+
+  it('should reset atom to default value', () => {
+    const store = createStore();
+    const countAtom = atom(42, 'count');
+
+    // Change value
+    store.set(countAtom, 100);
+    expect(store.get(countAtom)).toBe(100);
+
+    // Reset to default
+    store.reset(countAtom);
+    expect(store.get(countAtom)).toBe(42);
+  });
+});
+
+describe('Store clear method', () => {
+  beforeEach(() => {
+    atomRegistry.clear();
+  });
+
+  it('should clear all atoms to default values', () => {
+    const store = createStore();
+    const countAtom = atom(0, 'count');
+    const userAtom = atom({ name: 'Anonymous' }, 'user');
+
+    // Change values
+    store.set(countAtom, 100);
+    store.set(userAtom, { name: 'John' });
+
+    // Clear all
+    store.clear();
+
+    expect(store.get(countAtom)).toBe(0);
+    expect(store.get(userAtom)).toEqual({ name: 'Anonymous' });
+  });
+});

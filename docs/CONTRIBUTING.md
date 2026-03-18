@@ -199,7 +199,7 @@ We use [Changesets](https://github.com/changesets/changesets) for versioning.
 ## Questions?
 
 - Check existing issues
-- Read the [README](../README.md)
-- Review [documentation](../docs/)
+- Read the [README](https://github.com/eustatos/nexus-state#readme)
+- Review the [documentation](./)
 
 Thank you for contributing! 🎉

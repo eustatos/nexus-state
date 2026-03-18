@@ -192,6 +192,8 @@ function UsernameField() {
 Control when validation runs:
 
 ```tsx
+import { useForm } from '@nexus-state/form/react';
+
 const form = useForm({
   mode: 'onBlur', // First validation on blur
   reValidateMode: 'onChange', // After error — validate on every change
@@ -412,6 +414,7 @@ const {
 ```tsx
 import { useForm } from '@nexus-state/form/react';
 import { devTools } from '@nexus-state/devtools';
+import { createStore } from '@nexus-state/core';
 
 // Enable DevTools for debugging
 const store = createStore();
@@ -446,6 +449,9 @@ function LoanApplicationForm() {
 ### Form with Async Validation
 
 ```tsx
+import { useForm } from '@nexus-state/form/react';
+import { required, email, minLength } from '@nexus-state/form';
+
 function RegistrationForm() {
   const { register, handleSubmit } = useForm({
     defaultValues: { username: '', email: '' },
@@ -498,6 +504,14 @@ function RegistrationForm() {
 ### Dynamic Form (Form Builder)
 
 ```tsx
+import { useFieldArray } from '@nexus-state/form/react';
+
+interface FormField {
+  id: string;
+  label: string;
+  type: string;
+}
+
 function FormBuilder() {
   const { fields, append, remove } = useFieldArray<FormField>('fields', {
     defaultValue: [],
@@ -622,6 +636,23 @@ Welcome:
 ## 📄 License
 
 MIT © Nexus State Contributors
+
+---
+
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Framework integration:**
+  - [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react) — React hooks
+  - [@nexus-state/vue](https://www.npmjs.com/package/@nexus-state/vue) — Vue composables
+  - [@nexus-state/svelte](https://www.npmjs.com/package/@nexus-state/svelte) — Svelte stores
+- **Related:**
+  - [@nexus-state/persist](https://www.npmjs.com/package/@nexus-state/persist) — LocalStorage persistence
+  - [@nexus-state/devtools](https://www.npmjs.com/package/@nexus-state/devtools) — Redux DevTools integration
+  - [@nexus-state/form-schema-zod](https://www.npmjs.com/package/@nexus-state/form-schema-zod) — Zod validation
+  - [@nexus-state/form-schema-yup](https://www.npmjs.com/package/@nexus-state/form-schema-yup) — Yup validation
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
 
 ---
 

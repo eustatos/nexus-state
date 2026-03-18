@@ -1,6 +1,39 @@
 # @nexus-state/middleware
 
-Middleware plugin for Nexus State with plugin hooks support.
+> Middleware plugin for Nexus State with plugin hooks support
+>
+> [![npm version](https://img.shields.io/npm/v/@nexus-state/middleware)](https://www.npmjs.com/package/@nexus-state/middleware)
+> [![Coverage for middleware package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=middleware)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
+> [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
+
+[Documentation](https://nexus-state.website.yandexcloud.net/) • [Repository](https://github.com/eustatos/nexus-state)
+
+---
+
+## 📦 Installation
+
+```bash
+npm install @nexus-state/middleware
+```
+
+**Required:**
+```bash
+npm install @nexus-state/core
+```
+
+---
+
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Related:**
+  - [@nexus-state/devtools](https://www.npmjs.com/package/@nexus-state/devtools) — Redux DevTools integration
+  - [@nexus-state/time-travel](https://www.npmjs.com/package/@nexus-state/time-travel) — Time-travel debugging
+  - [@nexus-state/immer](https://www.npmjs.com/package/@nexus-state/immer) — Immutable updates
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
+
+---
 
 ## Description
 

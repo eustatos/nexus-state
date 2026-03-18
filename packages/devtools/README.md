@@ -1,14 +1,37 @@
 # @nexus-state/devtools
 
-Developer tools for Nexus State
+> Developer tools for Nexus State — Redux DevTools integration with time-travel debugging
+>
+> [![npm version](https://img.shields.io/npm/v/@nexus-state/devtools)](https://www.npmjs.com/package/@nexus-state/devtools)
+> [![Coverage for devtools package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=devtools)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
+> [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/eustatos/nexus-state/blob/main/LICENSE)
 
 [Documentation](https://nexus-state.website.yandexcloud.net/) • [Repository](https://github.com/eustatos/nexus-state)
 
-## Installation
+---
+
+## 📦 Installation
 
 ```bash
 npm install @nexus-state/devtools @nexus-state/time-travel
 ```
+
+---
+
+## 🔗 See Also
+
+- **Core:** [@nexus-state/core](https://www.npmjs.com/package/@nexus-state/core) — Foundation (atoms, stores)
+- **Framework integration:**
+  - [@nexus-state/react](https://www.npmjs.com/package/@nexus-state/react) — React hooks
+  - [@nexus-state/vue](https://www.npmjs.com/package/@nexus-state/vue) — Vue composables
+  - [@nexus-state/svelte](https://www.npmjs.com/package/@nexus-state/svelte) — Svelte stores
+- **Related:**
+  - [@nexus-state/time-travel](https://www.npmjs.com/package/@nexus-state/time-travel) — Time-travel debugging
+  - [@nexus-state/middleware](https://www.npmjs.com/package/@nexus-state/middleware) — Plugin system
+
+**Full ecosystem:** [Nexus State Packages](https://www.npmjs.com/org/nexus-state)
+
+---
 
 ## Features
 
