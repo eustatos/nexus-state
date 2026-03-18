@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/form-schema-dsl",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Custom DSL schema validator for Nexus State forms",
   "type": "module",
   "main": "dist/index.cjs",
