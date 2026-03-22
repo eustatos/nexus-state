@@ -17,6 +17,7 @@ type TKeyOfType<T, V> = {
  */
 interface FieldArrayWithMeta<TItem> extends FieldArray<TItem> {
   _meta?: {
+    name: string;
     itemAtoms: Array<Atom<any>>;
   };
 }
@@ -76,11 +77,14 @@ export function useFieldInArray<
     ? fieldValue as unknown as TKey extends TKeyOfType<TItem, infer V> ? V : TItem
     : (fieldValue as any)[key] as any;
 
+  // Get array name from meta
+  const arrayName = arrayWithMeta._meta?.name ?? '';
+
   // Create field name
   const name = useMemo(() => {
-    const baseName = `${array.name}[${index}]`;
+    const baseName = `${arrayName}[${index}]`;
     return key !== undefined ? `${baseName}.${String(key)}` : baseName;
-  }, [array.name, index, key]);
+  }, [arrayName, index, key]);
 
   // Create stable onChange handler
   const onChange = useCallback(
@@ -113,7 +117,7 @@ export function useFieldInArray<
         array.replace(newItems);
       }
     },
-    [array, index, key, fieldValue]
+    [array, index, key, fieldValue, arrayName]
   );
 
   // Create stable onBlur handler (no-op for now, as FieldArray doesn't track touched)
@@ -148,7 +152,7 @@ export function useFieldInArray<
         array.replace(newItems);
       }
     },
-    [array, index, key, fieldValue]
+    [array, index, key, fieldValue, arrayName]
   );
 
   // Get field state (simplified for now)

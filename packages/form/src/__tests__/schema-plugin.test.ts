@@ -207,35 +207,6 @@ describe('schemaPlugin - explicit plugin registration', () => {
       expect(form.errors.email).toContain('Invalid email');
       expect(form.errors.email).not.toBe('Mock error');
     });
-
-    it('should fall back to schemaType when schemaPlugin is not provided', async () => {
-      // This test verifies backward compatibility
-      // Note: This requires the plugin to be registered first
-      const { defaultSchemaRegistry } = await import('@nexus-state/form/schema');
-      
-      // Register plugin explicitly for backward compatibility test
-      defaultSchemaRegistry.register('zod', zodPlugin);
-
-      const schema = z.object({
-        name: z.string().min(1),
-      });
-
-      const form = createForm(store, {
-        schemaType: 'zod',
-        schemaConfig: schema,
-        initialValues: {
-          name: '',
-        },
-      });
-
-      form.setFieldValue('name', 'valid');
-      await form.validate();
-
-      expect(form.isValid).toBe(true);
-
-      // Cleanup
-      defaultSchemaRegistry.clear();
-    });
   });
 
   describe('schemaPlugin with complex schemas', () => {

@@ -1,4 +1,5 @@
 import { Atom, Store } from '@nexus-state/core';
+import type { SchemaPlugin, SchemaValidator } from './schema';
 
 /**
  * Validation trigger mode
@@ -137,30 +138,6 @@ export type FormValidator<TValues extends FormValues = FormValues> = (
 ) => FormErrors<TValues> | null;
 
 /**
- * Schema validation adapter interface
- */
-export interface SchemaValidator<TValues extends FormValues = FormValues> {
-  /**
-   * Validate all values
-   */
-  validate(values: TValues): Promise<FormErrors<TValues>> | FormErrors<TValues>;
-
-  /**
-   * Validate single field
-   */
-  validateField?: <K extends keyof TValues>(
-    name: K,
-    value: TValues[K],
-    allValues: TValues
-  ) => Promise<string | null> | string | null;
-
-  /**
-   * Parse and validate (returns typed values or throws)
-   */
-  parse?: (values: unknown) => TValues | Promise<TValues>;
-}
-
-/**
  * Zod schema type helper
  */
 export type ZodSchema<TValues = any> = {
@@ -232,22 +209,38 @@ export interface FormOptions<TValues extends FormValues = FormValues> {
   validate?: FormValidator<TValues>;
 
   /**
+   * Schema plugin instance (recommended API)
+   * 
+   * @example
+   * ```typescript
+   * import { zodPlugin } from '@nexus-state/form-schema-zod';
+   * 
+   * const form = createForm(store, {
+   *   schemaPlugin: zodPlugin,
+   *   schemaConfig: myZodSchema,
+   *   initialValues: { ... },
+   * });
+   * ```
+   */
+  schemaPlugin?: SchemaPlugin<unknown, TValues>;
+
+  /**
+   * Schema configuration (used with schemaPlugin or schemaType)
+   */
+  schemaConfig?: unknown;
+
+  /**
    * Direct schema validator instance (backward compatibility)
-   * @deprecated Use schemaType + schemaConfig for automatic registration via registry
+   * @deprecated Use schemaPlugin + schemaConfig instead
    */
   schema?: SchemaValidator<TValues>;
 
   /**
-   * Schema type for use via registry
+   * Schema type for registry-based resolution
+   * @deprecated Use schemaPlugin + schemaConfig for explicit imports
    * @example 'zod', 'yup', 'ajv', 'dsl'
    */
   schemaType?: string;
-
-  /**
-   * Schema configuration to pass to plugin factory
-   * Interpreted based on schemaType
-   */
-  schemaConfig?: unknown;
 
   onSubmit?: (values: TValues) => void | Promise<void>;
   validateOnChange?: boolean;

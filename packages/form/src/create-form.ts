@@ -40,9 +40,10 @@ export function createForm<TValues extends FormValues>(
 
   // Validation options
   const validationOptions: ValidationOptions<TValues> = {
+    schemaPlugin: options.schemaPlugin,
+    schemaConfig: options.schemaConfig,
     schema: options.schema,
     schemaType: options.schemaType,
-    schemaConfig: options.schemaConfig,
     validate: options.validate,
     validateOnChange: options.validateOnChange,
     validateOnBlur: options.validateOnBlur,

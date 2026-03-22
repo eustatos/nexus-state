@@ -267,52 +267,74 @@ export default {
 ### Manual Prefetch
 
 ```tsx
-import { usePrefetch } from '@nexus-state/query/react';
+import { usePrefetch, prefetchQuery } from '@nexus-state/query/react';
 
 function Button() {
   const prefetch = usePrefetch();
   return (
-    <button onMouseEnter={() => prefetch({
-      queryKey: 'user',
-      queryFn: fetchUser,
-    })}>
+    <button
+      onMouseEnter={() => {
+        prefetchQuery({
+          queryKey: ['user'],
+          queryFn: fetchUser,
+        });
+      }}
+    >
       Load User
     </button>
   );
 }
 ```
 
-### Hover Prefetch
+### Prefetch on Hover (Custom Implementation)
 
 ```tsx
-import { usePrefetchOnHover } from '@nexus-state/query/react';
+import { prefetchQuery } from '@nexus-state/query/react';
 
 function UserLink({ userId }) {
-  const { onMouseEnter, onMouseLeave } = usePrefetchOnHover({
-    queryKey: ['user', userId],
-    queryFn: () => fetchUser(userId),
-    delay: 200, // Wait 200ms before prefetching
-  });
+  const handleMouseEnter = () => {
+    prefetchQuery({
+      queryKey: ['user', userId],
+      queryFn: () => fetchUser(userId),
+    });
+  };
 
   return (
-    <a href={`/users/${userId}`} {...{ onMouseEnter, onMouseLeave }}>
+    <a href={`/users/${userId}`} onMouseEnter={handleMouseEnter}>
       {userId}
     </a>
   );
 }
 ```
 
-### Viewport Prefetch
+### Prefetch on Viewport (Custom Implementation)
 
 ```tsx
-import { usePrefetchOnViewport } from '@nexus-state/query/react';
+import { useEffect, useRef } from 'react';
+import { prefetchQuery } from '@nexus-state/query/react';
 
 function Card({ itemId }) {
-  const ref = usePrefetchOnViewport({
-    queryKey: ['item', itemId],
-    queryFn: () => fetchItem(itemId),
-    threshold: 0.5, // Prefetch when 50% visible
-  });
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          prefetchQuery({
+            queryKey: ['item', itemId],
+            queryFn: () => fetchItem(itemId),
+          });
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [itemId]);
 
   return <div ref={ref}>...</div>;
 }

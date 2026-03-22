@@ -59,9 +59,8 @@ npm install @nexus-state/form-schema-dsl
 
 ```tsx
 import { createForm } from '@nexus-state/form';
-import { useAtom } from '@nexus-state/react';
 import { createStore } from '@nexus-state/core';
-import { required, minLength, email } from '@nexus-state/form-schema-dsl';
+import { dslPlugin, required, minLength, email } from '@nexus-state/form-schema-dsl';
 
 const store = createStore();
 
@@ -71,9 +70,9 @@ const loginSchema = {
   password: [required, minLength(8)],
 };
 
-// Create form
+// Create form with DSL plugin
 const loginForm = createForm(store, {
-  schemaType: 'dsl',
+  schemaPlugin: dslPlugin,
   schemaConfig: loginSchema,
   initialValues: {
     email: '',
@@ -81,36 +80,12 @@ const loginForm = createForm(store, {
   },
 });
 
-// Use in component
-function LoginForm() {
-  const [form] = useAtom(loginForm);
-
-  const handleSubmit = async () => {
-    const result = await loginForm.submit();
-    if (result.success) {
-      console.log('Success:', result.data);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        value={form.values.email}
-        onChange={(e) => loginForm.setField('email', e.target.value)}
-      />
-      {form.errors.email && <span>{form.errors.email}</span>}
-
-      <input
-        type="password"
-        value={form.values.password}
-        onChange={(e) => loginForm.setField('password', e.target.value)}
-      />
-      {form.errors.password && <span>{form.errors.password}</span>}
-
-      <button type="submit">Login</button>
-    </form>
-  );
+// Validate form
+const isValid = await loginForm.validate();
+if (isValid) {
+  console.log('Form is valid!');
+} else {
+  console.log('Errors:', loginForm.errors);
 }
 ```
 

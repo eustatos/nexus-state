@@ -140,30 +140,62 @@ export interface UseFieldReturn<TValue> {
 export interface UseFieldArrayReturn<TItem extends Record<string, unknown>> {
   /** Array fields with unique IDs */
   fields: Array<TItem & { id: string }>;
-  
+
   /** Append item to end */
   append: (item: TItem) => void;
-  
+
   /** Prepend item to start */
   prepend: (item: TItem) => void;
-  
+
   /** Remove item at index */
   remove: (index: number) => void;
-  
+
   /** Insert item at index */
   insert: (index: number, item: TItem) => void;
-  
+
   /** Swap two items */
   swap: (indexA: number, indexB: number) => void;
-  
+
   /** Move item from one index to another */
   move: (from: number, to: number) => void;
-  
+
   /** Update item at index */
   update: (index: number, item: TItem) => void;
-  
+
   /** Replace entire array */
   replace: (items: TItem[]) => void;
+}
+
+/**
+ * Return type for useFieldInArray hook
+ */
+export interface UseFieldInArrayReturn<TValue> {
+  /** Field value */
+  value: TValue;
+
+  /** Field name */
+  name: string;
+
+  /** Change handler */
+  onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+
+  /** Blur handler */
+  onBlur: () => void;
+
+  /** Set field value */
+  setValue: (value: TValue) => void;
+
+  /** Field state */
+  fieldState: {
+    /** Error message */
+    error: string | null;
+    /** Whether field has been modified */
+    isDirty: boolean;
+    /** Whether field has been touched */
+    isTouched: boolean;
+    /** Whether field is currently validating */
+    isValidating: boolean;
+  };
 }
 
 /**
