@@ -60,18 +60,21 @@ npm install @nexus-state/form-schema-yup yup
 
 ```tsx
 import { createForm } from '@nexus-state/form';
-import { useAtom } from '@nexus-state/react';
+import { createStore } from '@nexus-state/core';
 import * as yup from 'yup';
+import { yupPlugin } from '@nexus-state/form-schema-yup';
+
+const store = createStore();
 
 // Define schema
 const loginSchema = yup.object({
-  email: yup.string().email('Invalid email format').required('Email is required'),
+  email: yup.string().email('Invalid email format').required(),
   password: yup.string().min(8, 'Password must be at least 8 characters').required(),
 });
 
-// Create form
+// Create form with Yup plugin
 const loginForm = createForm(store, {
-  schemaType: 'yup',
+  schemaPlugin: yupPlugin,
   schemaConfig: loginSchema,
   initialValues: {
     email: '',
@@ -79,36 +82,12 @@ const loginForm = createForm(store, {
   },
 });
 
-// Use in component
-function LoginForm() {
-  const [form] = useAtom(loginForm);
-
-  const handleSubmit = async () => {
-    const result = await loginForm.submit();
-    if (result.success) {
-      console.log('Success:', result.data);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        value={form.values.email}
-        onChange={(e) => loginForm.setField('email', e.target.value)}
-      />
-      {form.errors.email && <span>{form.errors.email}</span>}
-
-      <input
-        type="password"
-        value={form.values.password}
-        onChange={(e) => loginForm.setField('password', e.target.value)}
-      />
-      {form.errors.password && <span>{form.errors.password}</span>}
-
-      <button type="submit">Login</button>
-    </form>
-  );
+// Validate form
+const isValid = await loginForm.validate();
+if (isValid) {
+  console.log('Form is valid!');
+} else {
+  console.log('Errors:', loginForm.errors);
 }
 ```
 

@@ -1,3 +1,12 @@
+# Migration Guides
+
+## Available Guides
+
+- [Time-Travel Refactoring (v0.2.0)](#migration-guide-time-travel-refactoring)
+- [Schema Validation API (v1.0)](#migration-guide-schema-validation-api)
+
+---
+
 # Migration Guide: Time-Travel Refactoring
 
 ## Обзор
@@ -595,3 +604,79 @@ const atom2 = atom('value2', 'data');  // ⚠️ Warning!
 - Use descriptive names: `userProfile`, `shoppingCart`, `authToken`
 - Add prefixes for namespacing: `auth/user`, `ui/theme`, `api/cache`
 - Avoid generic names: `data`, `state`, `value`
+
+---
+
+# Migration Guide: Schema Validation API (v1.0)
+
+## Overview
+
+The schema validation API has been refactored to use **explicit plugin imports** instead of global registry or direct validators.
+
+**What Changed:**
+- ❌ Removed: `zodValidator`, `yupValidator` from `@nexus-state/form`
+- ❌ Deprecated: `schemaType` + `schemaConfig` (registry-based)
+- ✅ New: `schemaPlugin` + `schemaConfig` (explicit imports)
+
+## Quick Migration
+
+### Before (Deprecated)
+
+```typescript
+// Option 1: Direct validator (REMOVED)
+import { zodValidator } from '@nexus-state/form';
+
+const form = createForm({
+  schema: zodValidator(schema), // ❌ Removed
+});
+
+// Option 2: Registry-based (deprecated)
+import { defaultSchemaRegistry } from '@nexus-state/form/schema';
+defaultSchemaRegistry.register('zod', zodPlugin);
+
+const form = createForm({
+  schemaType: 'zod', // ⚠️ Deprecated
+  schemaConfig: schema,
+});
+```
+
+### After (Recommended)
+
+```typescript
+import { zodPlugin } from '@nexus-state/form-schema-zod';
+
+const form = createForm({
+  schemaPlugin: zodPlugin, // ✅ New API
+  schemaConfig: schema,
+});
+```
+
+## Full Migration Guide
+
+See [packages/form/MIGRATION_SCHEMA.md](./packages/form/MIGRATION_SCHEMA.md) for detailed migration instructions.
+
+## Installation
+
+```bash
+# For Zod
+npm install @nexus-state/form-schema-zod zod
+
+# For Yup
+npm install @nexus-state/form-schema-yup yup
+
+# For JSON Schema
+npm install @nexus-state/form-schema-ajv ajv
+
+# For DSL
+npm install @nexus-state/form-schema-dsl
+```
+
+## Benefits
+
+| Feature | Old API | New API |
+|---------|---------|---------|
+| **Global state** | ✅ Yes (registry) | ❌ No |
+| **Tree-shaking** | ⚠️ Partial | ✅ Full |
+| **SSR-safe** | ⚠️ No | ✅ Yes |
+| **Type inference** | ⚠️ Manual | ✅ Automatic |
+

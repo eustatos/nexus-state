@@ -2,22 +2,24 @@ import { Store, Atom } from '@nexus-state/core';
 import {
   FormValues,
   FormErrors,
-  SchemaValidator,
   FormValidator,
   FieldMeta,
 } from './types';
+import type { SchemaPlugin, SchemaValidator } from './schema';
 import { setFieldError } from './field';
 import { defaultSchemaRegistry } from './schema';
 import { FormCore } from './core';
 import { normalizeFieldPath } from './schema/utils';
 
 export interface ValidationOptions<TValues extends FormValues> {
-  /** Direct schema validator instance */
-  schema?: SchemaValidator<TValues>;
-  /** Schema type for registry */
-  schemaType?: string;
-  /** Schema configuration for registry */
+  /** Schema plugin instance (recommended API) */
+  schemaPlugin?: SchemaPlugin<unknown, TValues>;
+  /** Schema configuration (used with schemaPlugin or schemaType) */
   schemaConfig?: unknown;
+  /** Direct schema validator instance (backward compatibility) */
+  schema?: SchemaValidator<TValues>;
+  /** Schema type for registry-based resolution (deprecated) */
+  schemaType?: string;
   /** Form-level validation function */
   validate?: FormValidator<TValues>;
   /** Validate on change? */
@@ -28,7 +30,7 @@ export interface ValidationOptions<TValues extends FormValues> {
 
 export interface ValidationAPI<TValues extends FormValues> {
   /** Validate all fields */
-  validateAll(): Promise<boolean>;
+  validateAll(): Promise<{ valid: boolean; errors: FormErrors<TValues> }>;
   /** Validate a specific field */
   validateField<K extends keyof TValues>(
     name: K,
@@ -51,8 +53,15 @@ export function createValidation<TValues extends FormValues>(
   const { store, fields, extraErrors } = core;
   let schema: SchemaValidator<TValues> | undefined;
 
-  // Resolve schema from registry or options
-  if (options.schemaType && options.schemaConfig !== undefined) {
+  // Resolve schema with priority:
+  // 1. schemaPlugin + schemaConfig (recommended API)
+  // 2. schemaType + schemaConfig (deprecated, registry-based)
+  // 3. schema (deprecated, direct validator)
+  if (options.schemaPlugin && options.schemaConfig !== undefined) {
+    // Recommended: explicit plugin import, no global state
+    schema = options.schemaPlugin.create(options.schemaConfig) as SchemaValidator<TValues>;
+  } else if (options.schemaType && options.schemaConfig !== undefined) {
+    // Deprecated: registry-based resolution
     const registrySchema = defaultSchemaRegistry.create(
       options.schemaType,
       options.schemaConfig
@@ -67,13 +76,14 @@ export function createValidation<TValues extends FormValues>(
       );
     }
   } else if (options.schema) {
+    // Deprecated: direct validator
     schema = options.schema;
   }
 
   const formValidate = options.validate;
 
   // Validate all fields
-  const validateAll = async (): Promise<boolean> => {
+  const validateAll = async (): Promise<{ valid: boolean; errors: FormErrors<TValues> }> => {
     const values = core.getValues();
     // Clear extra errors before validation
     store.set(extraErrors, {});
@@ -140,9 +150,10 @@ export function createValidation<TValues extends FormValues>(
       }
     }
 
-    // Compute overall validity
+    // Compute overall validity and return errors
     const isValid = core.getIsValid();
-    return isValid;
+    const errors = core.getErrors();
+    return { valid: isValid, errors };
   };
 
   // Validate a single field
@@ -152,7 +163,7 @@ export function createValidation<TValues extends FormValues>(
     allValues: TValues
   ): Promise<string | null> => {
     if (schema?.validateField) {
-      const error = await schema.validateField(name, value, allValues);
+      const error = await schema.validateField(name, value, { values: allValues });
       return error
         ? typeof error === 'string'
           ? error

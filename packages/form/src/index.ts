@@ -1,6 +1,4 @@
 export { createForm } from './create-form';
-export { zodValidator, yupValidator } from './schema-validation';
-export type { InferSchema } from './schema-validation';
 export { createFieldArray, getFieldArray } from './field-array';
 export {
   createField,
@@ -44,7 +42,6 @@ export type {
   FormValidator,
   FieldOptions,
   FieldMeta,
-  SchemaValidator,
   ZodSchema,
   YupSchema,
   FieldArray,
@@ -57,6 +54,9 @@ export type {
   ReValidateMode,
   ValidationConfig,
 } from './types';
+
+// Re-export SchemaValidator from schema module
+export type { SchemaValidator } from './schema';
 
 // Modular exports
 export { createFormCore, FormCore } from './core';

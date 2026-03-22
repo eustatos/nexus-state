@@ -35,8 +35,8 @@ describe('createForm with schema registry', () => {
         initialValues: { name: '' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.name).toBe('Required');
     });
 
@@ -108,8 +108,8 @@ describe('createForm with schema registry', () => {
         initialValues: { email: '', password: '' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.email).toBe('Email required');
       expect(form.errors.password).toBe('Password required');
     });
@@ -128,8 +128,8 @@ describe('createForm with schema registry', () => {
         initialValues: { email: '' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.email).toBe('Required');
     });
 
@@ -153,8 +153,8 @@ describe('createForm with schema registry', () => {
         initialValues: { test: '' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.test).toBe('From registry');
     });
 
@@ -170,8 +170,8 @@ describe('createForm with schema registry', () => {
         initialValues: { name: '' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.name).toBe('Name required');
     });
   });

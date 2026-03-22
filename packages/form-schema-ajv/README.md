@@ -60,8 +60,8 @@ npm install @nexus-state/form-schema-ajv ajv
 
 ```tsx
 import { createForm } from '@nexus-state/form';
-import { useAtom } from '@nexus-state/react';
 import { createStore } from '@nexus-state/core';
+import { ajvPlugin } from '@nexus-state/form-schema-ajv';
 
 const store = createStore();
 
@@ -81,9 +81,9 @@ const loginSchema = {
   required: ['email', 'password'],
 };
 
-// Create form
+// Create form with AJV plugin
 const loginForm = createForm(store, {
-  schemaType: 'ajv',
+  schemaPlugin: ajvPlugin,
   schemaConfig: {
     schema: loginSchema,
   },
@@ -93,36 +93,12 @@ const loginForm = createForm(store, {
   },
 });
 
-// Use in component
-function LoginForm() {
-  const [form] = useAtom(loginForm);
-
-  const handleSubmit = async () => {
-    const result = await loginForm.submit();
-    if (result.success) {
-      console.log('Success:', result.data);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        value={form.values.email}
-        onChange={(e) => loginForm.setField('email', e.target.value)}
-      />
-      {form.errors.email && <span>{form.errors.email}</span>}
-
-      <input
-        type="password"
-        value={form.values.password}
-        onChange={(e) => loginForm.setField('password', e.target.value)}
-      />
-      {form.errors.password && <span>{form.errors.password}</span>}
-
-      <button type="submit">Login</button>
-    </form>
-  );
+// Validate form
+const isValid = await loginForm.validate();
+if (isValid) {
+  console.log('Form is valid!');
+} else {
+  console.log('Errors:', loginForm.errors);
 }
 ```
 

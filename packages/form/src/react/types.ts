@@ -135,35 +135,81 @@ export interface UseFieldReturn<TValue> {
 }
 
 /**
+ * Field item with stable ID - used for React keys
+ * For primitives: { id, value }
+ * For objects: TItem & { id: string }
+ */
+export type FieldItem<TItem> = TItem extends string | number | boolean | null | undefined
+  ? { id: string; value: TItem }
+  : TItem extends Record<string, unknown>
+    ? TItem & { id: string }
+    : { id: string } & TItem;
+
+/**
  * Return type for useFieldArray hook
  */
-export interface UseFieldArrayReturn<TItem extends Record<string, unknown>> {
-  /** Array fields with unique IDs */
-  fields: Array<TItem & { id: string }>;
-  
+export interface UseFieldArrayReturn<TItem> {
+  /** Array fields with unique IDs 
+   * For primitives: { id, value }[]
+   * For objects: (TItem & { id: string })[]
+   */
+  fields: FieldItem<TItem>[];
+
   /** Append item to end */
   append: (item: TItem) => void;
-  
+
   /** Prepend item to start */
   prepend: (item: TItem) => void;
-  
+
   /** Remove item at index */
   remove: (index: number) => void;
-  
+
   /** Insert item at index */
   insert: (index: number, item: TItem) => void;
-  
+
   /** Swap two items */
   swap: (indexA: number, indexB: number) => void;
-  
+
   /** Move item from one index to another */
   move: (from: number, to: number) => void;
-  
+
   /** Update item at index */
   update: (index: number, item: TItem) => void;
-  
+
   /** Replace entire array */
   replace: (items: TItem[]) => void;
+}
+
+/**
+ * Return type for useFieldInArray hook
+ */
+export interface UseFieldInArrayReturn<TValue> {
+  /** Field value */
+  value: TValue;
+
+  /** Field name */
+  name: string;
+
+  /** Change handler */
+  onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+
+  /** Blur handler */
+  onBlur: () => void;
+
+  /** Set field value */
+  setValue: (value: TValue) => void;
+
+  /** Field state */
+  fieldState: {
+    /** Error message */
+    error: string | null;
+    /** Whether field has been modified */
+    isDirty: boolean;
+    /** Whether field has been touched */
+    isTouched: boolean;
+    /** Whether field is currently validating */
+    isValidating: boolean;
+  };
 }
 
 /**

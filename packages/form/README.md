@@ -103,6 +103,8 @@ function RegistrationForm() {
 }
 ```
 
+**Note:** For TypeScript projects, specify generic type parameter: `useForm<RegisterForm>({...})`
+
 ---
 
 ## 🔥 Key Features
@@ -134,6 +136,11 @@ devtools.apply(store);
 // ✅ Time-travel to previous states
 ```
 
+**Note:** `@nexus-state/devtools` is a separate package. Install it with:
+```bash
+npm install @nexus-state/devtools
+```
+
 **Benefit:** Debugging complex forms takes minutes instead of hours.
 
 ---
@@ -143,11 +150,11 @@ devtools.apply(store);
 Uniqueness checks, API validation with debouncing, retry, cache:
 
 ```tsx
-import { createField } from '@nexus-state/form';
 import { useField } from '@nexus-state/form/react';
+import { required } from '@nexus-state/form';
 
 function UsernameField() {
-  const { field, fieldState } = useField('username', {
+  const { field, fieldState, helpers } = useField('username', {
     initialValue: '',
     validators: [required],
     asyncValidators: [
@@ -579,32 +586,72 @@ import { useForm } from 'react-hook-form';
 
 ```tsx
 import { z } from 'zod';
-import { zodValidator } from '@nexus-state/form';
+import { zodPlugin } from '@nexus-state/form-schema-zod';
+import { createForm } from '@nexus-state/form';
+import { createStore } from '@nexus-state/core';
+
+const store = createStore();
 
 const schema = z.object({
-  username: z.string().min(3),
-  email: z.string().email(),
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
-const form = useForm({
-  schema: zodValidator(schema),
+const form = createForm(store, {
+  schemaPlugin: zodPlugin,
+  schemaConfig: schema,
+  initialValues: {
+    username: '',
+    email: '',
+    password: '',
+  },
+  validateOnChange: true,
+  validateOnBlur: true,
 });
+
+// Validate form
+const isValid = await form.validate();
+if (isValid) {
+  console.log('Form is valid!');
+} else {
+  console.log('Errors:', form.errors);
+}
 ```
 
 ### Yup Schemas
 
 ```tsx
 import * as yup from 'yup';
-import { yupValidator } from '@nexus-state/form';
+import { yupPlugin } from '@nexus-state/form-schema-yup';
+import { createForm } from '@nexus-state/form';
+import { createStore } from '@nexus-state/core';
+
+const store = createStore();
 
 const schema = yup.object({
   username: yup.string().min(3).required(),
   email: yup.string().email().required(),
+  password: yup.string().min(8).required(),
 });
 
-const form = useForm({
-  schema: yupValidator(schema),
+const form = createForm(store, {
+  schemaPlugin: yupPlugin,
+  schemaConfig: schema,
+  initialValues: {
+    username: '',
+    email: '',
+    password: '',
+  },
 });
+
+// Validate form
+const isValid = await form.validate();
+if (isValid) {
+  console.log('Form is valid!');
+} else {
+  console.log('Errors:', form.errors);
+}
 ```
 
 ---
@@ -613,12 +660,21 @@ const form = useForm({
 
 | Package     | Size (minified) | Gzip     |
 | ----------- | --------------- | -------- |
-| Core        | ~8KB            | ~3KB     |
-| React hooks | ~4KB            | ~2KB     |
-| Utils       | ~3KB            | ~1KB     |
-| **Total**   | **~15KB**       | **~6KB** |
+| Core        | ~10KB           | ~4KB     |
+| React hooks | ~5KB            | ~2KB     |
+| Utils       | ~4KB            | ~2KB     |
+| **Total**   | **~19KB**       | **~8KB** |
 
-**Tree‑shaking friendly:** The library is built with a modular architecture and supports subpath imports. If you only need specific modules (e.g., core + validation), you can import them directly via `@nexus-state/form/core` and `@nexus-state/form/validation`. This allows bundlers (Webpack, Rollup, Vite) to eliminate unused code, resulting in even smaller final bundles.
+**Tree‑shaking friendly:** The library supports subpath imports. If you only need specific modules (e.g., core + validation), you can import them directly:
+
+```ts
+import { createFormCore } from '@nexus-state/form/core';
+import { createValidation } from '@nexus-state/form/validation';
+import { createSubmission } from '@nexus-state/form/submission';
+import { createFieldArray } from '@nexus-state/form/field-array';
+```
+
+This allows bundlers (Webpack, Rollup, Vite) to eliminate unused code, resulting in smaller final bundles.
 
 ---
 

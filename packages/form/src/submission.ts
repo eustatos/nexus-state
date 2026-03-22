@@ -47,8 +47,8 @@ export function createSubmission<TValues extends FormValues>(
 
     // Validate if needed
     if (validateBeforeSubmit) {
-      const isValid = await validation.validateAll();
-      if (!isValid) {
+      const result = await validation.validateAll();
+      if (!result.valid) {
         return;
       }
     }
