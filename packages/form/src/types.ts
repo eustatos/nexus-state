@@ -396,6 +396,11 @@ export interface FieldArray<TItem = any> extends FieldArrayOperations<TItem> {
    * Total field count
    */
   length: number;
+
+  /**
+   * @internal Internal metadata for useFieldInArray hook
+   */
+  _meta?: FieldArrayMeta<TItem>;
 }
 
 /**

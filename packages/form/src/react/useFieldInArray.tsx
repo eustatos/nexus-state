@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from 'react';
 import { useAtomValue } from '@nexus-state/react';
-import type { FieldArray } from '../types';
+import type { FieldArray, FieldArrayMeta } from '../types';
 import type { UseFieldInArrayReturn } from './types';
 import type { ChangeEvent } from 'react';
 import type { Atom } from '@nexus-state/core';
@@ -11,16 +11,6 @@ import type { Atom } from '@nexus-state/core';
 type TKeyOfType<T, V> = {
   [K in keyof T]: T[K] extends V ? K : never;
 }[keyof T];
-
-/**
- * Internal interface to access field array meta
- */
-interface FieldArrayWithMeta<TItem> extends FieldArray<TItem> {
-  _meta?: {
-    name: string;
-    itemAtoms: Array<Atom<any>>;
-  };
-}
 
 /**
  * Hook for subscribing to individual field within array item
@@ -61,8 +51,7 @@ export function useFieldInArray<
   key?: TKey
 ): UseFieldInArrayReturn<TKey extends TKeyOfType<TItem, infer V> ? V : TItem> {
   // Get the atom for this specific field to subscribe to changes
-  const arrayWithMeta = array as unknown as FieldArrayWithMeta<TItem>;
-  const atom = arrayWithMeta._meta?.itemAtoms?.[index];
+  const atom = array._meta?.itemAtoms?.[index];
 
   // Subscribe to the specific atom for reactivity
   const currentFieldState = atom ? useAtomValue(atom) : null;
@@ -78,7 +67,7 @@ export function useFieldInArray<
     : (fieldValue as any)[key] as any;
 
   // Get array name from meta
-  const arrayName = arrayWithMeta._meta?.name ?? '';
+  const arrayName = array._meta?.name ?? '';
 
   // Create field name
   const name = useMemo(() => {
