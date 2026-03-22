@@ -207,7 +207,10 @@ export function getFieldArray<TItem>(
     swap,
     move,
     replace,
-    clear
+    clear,
+
+    // Internal meta for useFieldInArray
+    _meta: meta
   };
 }
 
