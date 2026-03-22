@@ -30,7 +30,7 @@ export interface ValidationOptions<TValues extends FormValues> {
 
 export interface ValidationAPI<TValues extends FormValues> {
   /** Validate all fields */
-  validateAll(): Promise<boolean>;
+  validateAll(): Promise<{ valid: boolean; errors: FormErrors<TValues> }>;
   /** Validate a specific field */
   validateField<K extends keyof TValues>(
     name: K,
@@ -83,7 +83,7 @@ export function createValidation<TValues extends FormValues>(
   const formValidate = options.validate;
 
   // Validate all fields
-  const validateAll = async (): Promise<boolean> => {
+  const validateAll = async (): Promise<{ valid: boolean; errors: FormErrors<TValues> }> => {
     const values = core.getValues();
     // Clear extra errors before validation
     store.set(extraErrors, {});
@@ -150,9 +150,10 @@ export function createValidation<TValues extends FormValues>(
       }
     }
 
-    // Compute overall validity
+    // Compute overall validity and return errors
     const isValid = core.getIsValid();
-    return isValid;
+    const errors = core.getErrors();
+    return { valid: isValid, errors };
   };
 
   // Validate a single field

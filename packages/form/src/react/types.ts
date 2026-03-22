@@ -135,11 +135,25 @@ export interface UseFieldReturn<TValue> {
 }
 
 /**
+ * Field item with stable ID - used for React keys
+ * For primitives: { id, value }
+ * For objects: TItem & { id: string }
+ */
+export type FieldItem<TItem> = TItem extends string | number | boolean | null | undefined
+  ? { id: string; value: TItem }
+  : TItem extends Record<string, unknown>
+    ? TItem & { id: string }
+    : { id: string } & TItem;
+
+/**
  * Return type for useFieldArray hook
  */
-export interface UseFieldArrayReturn<TItem extends Record<string, unknown>> {
-  /** Array fields with unique IDs */
-  fields: Array<TItem & { id: string }>;
+export interface UseFieldArrayReturn<TItem> {
+  /** Array fields with unique IDs 
+   * For primitives: { id, value }[]
+   * For objects: (TItem & { id: string })[]
+   */
+  fields: FieldItem<TItem>[];
 
   /** Append item to end */
   append: (item: TItem) => void;

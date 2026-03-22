@@ -34,8 +34,8 @@ describe('E2E: DSL Plugin Integration', () => {
         initialValues: { name: '', email: '' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.name).toBeDefined();
       expect(form.errors.email).toBeDefined();
     });
@@ -51,8 +51,8 @@ describe('E2E: DSL Plugin Integration', () => {
         initialValues: { name: 'John', email: 'john@example.com' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(true);
+      const result = await form.validate();
+      expect(result.valid).toBe(true);
       expect(form.errors.name).toBeUndefined();
       expect(form.errors.email).toBeUndefined();
     });
@@ -69,8 +69,8 @@ describe('E2E: DSL Plugin Integration', () => {
         initialValues: { username: 'ab' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.username).toBeDefined();
     });
 
@@ -84,8 +84,8 @@ describe('E2E: DSL Plugin Integration', () => {
         initialValues: { phone: 'invalid' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.phone).toBeDefined();
     });
   });
@@ -101,8 +101,8 @@ describe('E2E: DSL Plugin Integration', () => {
         initialValues: { age: 10 },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.age).toBeDefined();
     });
   });
@@ -118,8 +118,8 @@ describe('E2E: DSL Plugin Integration', () => {
         initialValues: { role: 'invalid' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.role).toBeDefined();
     });
   });
@@ -142,8 +142,8 @@ describe('E2E: DSL Plugin Integration', () => {
         },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.confirmPassword).toBeDefined();
     });
 
@@ -161,8 +161,8 @@ describe('E2E: DSL Plugin Integration', () => {
         },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(true);
+      const result = await form.validate();
+      expect(result.valid).toBe(true);
       expect(form.errors.confirmPassword).toBeUndefined();
     });
   });
@@ -185,8 +185,8 @@ describe('E2E: DSL Plugin Integration', () => {
         initialValues: { accountType: 'business', company: '' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.company).toBeDefined();
     });
 
@@ -207,8 +207,8 @@ describe('E2E: DSL Plugin Integration', () => {
         initialValues: { accountType: 'personal', company: '' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(true);
+      const result = await form.validate();
+      expect(result.valid).toBe(true);
       expect(form.errors.company).toBeUndefined();
     });
   });
@@ -236,8 +236,8 @@ describe('E2E: DSL Plugin Integration', () => {
         initialValues: { color: 'invalid' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.color).toBeDefined();
     });
 
@@ -263,8 +263,8 @@ describe('E2E: DSL Plugin Integration', () => {
         initialValues: { color: '#FF5733' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(true);
+      const result = await form.validate();
+      expect(result.valid).toBe(true);
       expect(form.errors.color).toBeUndefined();
     });
   });
@@ -352,8 +352,8 @@ describe('E2E: DSL Plugin Integration', () => {
         },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.username).toBeDefined();
       expect(form.errors.email).toBeDefined();
       expect(form.errors.password).toBeDefined();
@@ -391,8 +391,8 @@ describe('E2E: DSL Plugin Integration', () => {
         },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(true);
+      const result = await form.validate();
+      expect(result.valid).toBe(true);
       expect(form.errors.username).toBeUndefined();
       expect(form.errors.email).toBeUndefined();
       expect(form.errors.password).toBeUndefined();

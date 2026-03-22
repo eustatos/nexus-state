@@ -1,4 +1,5 @@
 import { atom, Store } from '@nexus-state/core';
+import type { ChangeEvent } from 'react';
 import type {
   FieldArray,
   FieldArrayMeta,
@@ -13,6 +14,23 @@ import {
   setFieldError,
   resetField
 } from './field';
+
+/**
+ * Generate a unique ID for array items
+ */
+function generateId(): string {
+  return `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/**
+ * Extract ID from item if it exists, otherwise return undefined
+ */
+function getItemId<TItem>(item: TItem): string | undefined {
+  if (item && typeof item === 'object' && 'id' in item) {
+    return (item as any).id;
+  }
+  return undefined;
+}
 
 /**
  * Create field array metadata
@@ -30,10 +48,18 @@ export function createFieldArray<TItem>(
     return fieldMeta.atom;
   });
 
+  // Generate stable IDs for initial items
+  const itemIds = initialItems.map(item => {
+    const existingId = getItemId(item);
+    return existingId ?? generateId();
+  });
+
   return {
     name,
     itemAtoms,
-    defaultItem
+    itemIds,
+    defaultItem,
+    idCounter: itemIds.length
   };
 }
 
@@ -88,12 +114,51 @@ export function getFieldArray<TItem>(
       },
 
       inputProps: {
+        name: `${meta.name}[${index}]`,
         value: fieldState.value,
         onChange: (value: TItem) => {
           setFieldValue(store, fieldMeta, value);
         },
         onBlur: () => {
           setFieldTouched(store, fieldMeta, true);
+        }
+      },
+
+      // Checkbox/switch props
+      switchProps: {
+        name: `${meta.name}[${index}]`,
+        checked: !!fieldState.value,
+        onChange: (checked: boolean) => {
+          setFieldValue(store, fieldMeta, checked as TItem);
+        }
+      },
+
+      // Checkbox props (with event)
+      checkboxProps: {
+        name: `${meta.name}[${index}]`,
+        checked: !!fieldState.value,
+        onChange: (e: ChangeEvent<HTMLInputElement>) => {
+          setFieldValue(store, fieldMeta, e.target.checked as TItem);
+        }
+      },
+
+      // Radio props
+      radioProps: {
+        name: `${meta.name}[${index}]`,
+        value: fieldState.value,
+        checked: true,
+        onChange: (e: ChangeEvent<HTMLInputElement>) => {
+          setFieldValue(store, fieldMeta, e.target.value as unknown as TItem);
+        }
+      },
+
+      // Select props
+      selectProps: {
+        name: `${meta.name}[${index}]`,
+        value: fieldState.value,
+        onChange: (e: ChangeEvent<HTMLSelectElement> | { target: { value: any } }) => {
+          const value = e?.target?.value ?? e;
+          setFieldValue(store, fieldMeta, value as TItem);
         }
       }
     };
@@ -107,6 +172,9 @@ export function getFieldArray<TItem>(
     ).atom;
 
     meta.itemAtoms.push(newAtom);
+    // Generate stable ID for new item
+    const existingId = getItemId(item);
+    meta.itemIds.push(existingId ?? generateId());
   };
 
   const prepend = (item: TItem): void => {
@@ -117,9 +185,9 @@ export function getFieldArray<TItem>(
     ).atom;
 
     meta.itemAtoms.unshift(newAtom);
-
-    // Update field names for shifted items
-    updateFieldNames(meta);
+    // Generate stable ID for new item
+    const existingId = getItemId(item);
+    meta.itemIds.unshift(existingId ?? generateId());
   };
 
   const insert = (index: number, item: TItem): void => {
@@ -130,9 +198,9 @@ export function getFieldArray<TItem>(
     ).atom;
 
     meta.itemAtoms.splice(index, 0, newAtom);
-
-    // Update field names for shifted items
-    updateFieldNames(meta);
+    // Generate stable ID for new item
+    const existingId = getItemId(item);
+    meta.itemIds.splice(index, 0, existingId ?? generateId());
   };
 
   const remove = (index: number): void => {
@@ -141,9 +209,8 @@ export function getFieldArray<TItem>(
     }
 
     meta.itemAtoms.splice(index, 1);
-
-    // Update field names for shifted items
-    updateFieldNames(meta);
+    // Remove corresponding ID
+    meta.itemIds.splice(index, 1);
   };
 
   const swap = (indexA: number, indexB: number): void => {
@@ -154,9 +221,15 @@ export function getFieldArray<TItem>(
       return;
     }
 
-    const temp = meta.itemAtoms[indexA];
+    // Swap atoms
+    const tempAtom = meta.itemAtoms[indexA];
     meta.itemAtoms[indexA] = meta.itemAtoms[indexB];
-    meta.itemAtoms[indexB] = temp;
+    meta.itemAtoms[indexB] = tempAtom;
+    
+    // Swap IDs to keep them with their atoms
+    const tempId = meta.itemIds[indexA];
+    meta.itemIds[indexA] = meta.itemIds[indexB];
+    meta.itemIds[indexB] = tempId;
   };
 
   const move = (from: number, to: number): void => {
@@ -167,21 +240,30 @@ export function getFieldArray<TItem>(
       return;
     }
 
-    const [item] = meta.itemAtoms.splice(from, 1);
-    meta.itemAtoms.splice(to, 0, item);
+    // Move atom
+    const [atom] = meta.itemAtoms.splice(from, 1);
+    meta.itemAtoms.splice(to, 0, atom);
+    
+    // Move ID to keep it with the atom
+    const [id] = meta.itemIds.splice(from, 1);
+    meta.itemIds.splice(to, 0, id);
   };
 
   const replace = (items: TItem[]): void => {
     // Clear existing
     meta.itemAtoms.length = 0;
+    meta.itemIds.length = 0;
 
-    // Add new items
+    // Add new items with new IDs
     items.forEach((item, index) => {
       const newAtom = createField(
         store,
         `${meta.name}[${index}]`,
         { initialValue: item }
       ).atom;
+      
+      const existingId = getItemId(item);
+      meta.itemIds.push(existingId ?? generateId());
 
       meta.itemAtoms.push(newAtom);
     });
@@ -197,6 +279,37 @@ export function getFieldArray<TItem>(
     },
     get length() {
       return meta.itemAtoms.length;
+    },
+
+    // Error tracking
+    get errors() {
+      return meta.itemAtoms.map(atom => {
+        const state = store.get(atom);
+        return state.error;
+      });
+    },
+
+    getError: (index: number): string | null => {
+      const fieldMeta = getFieldMeta(index);
+      if (!fieldMeta) return null;
+      const state = store.get(fieldMeta.atom);
+      return state.error;
+    },
+
+    isValid: (index?: number): boolean => {
+      if (index !== undefined) {
+        const fieldMeta = getFieldMeta(index);
+        if (!fieldMeta) return true;
+        const state = store.get(fieldMeta.atom);
+        return state.error === null;
+      }
+      // Check all items
+      return meta.itemAtoms.every(atom => store.get(atom).error === null);
+    },
+
+    // Alias for isValid (lowercase for convenience)
+    get isvalid() {
+      return meta.itemAtoms.every(atom => store.get(atom).error === null);
     },
 
     field,

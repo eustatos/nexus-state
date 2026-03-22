@@ -1,24 +1,19 @@
 import { useCallback, useRef, useEffect, useState } from 'react';
 import { useStore, useAtomValue } from '@nexus-state/react';
-import { createField } from '../field';
-import type { FieldOptions } from '../types';
 import type { UseFieldReturn } from './types';
 import type { ChangeEvent } from 'react';
+import type { Form, Field } from '../types';
 
 /**
- * Hook for standalone field with full control
+ * Hook for field in form with full control
+ * @param form - Form instance
  * @param name - Field name
- * @param options - Field options including initial value and validators
  * @returns Field props, state, and helpers
- * 
+ *
  * @example
  * ```tsx
- * const { field, fieldState, helpers } = useField('username', {
- *   initialValue: '',
- *   validators: [required, minLength(3)],
- *   validateOn: 'onBlur',
- * });
- * 
+ * const { field, fieldState, helpers } = useField(form, 'username');
+ *
  * return (
  *   <div>
  *     <input {...field} />
@@ -27,72 +22,77 @@ import type { ChangeEvent } from 'react';
  * );
  * ```
  */
-export function useField<TValue>(
-  name: string,
-  options: FieldOptions<TValue>
-): UseFieldReturn<TValue> {
+export function useField<TFormValues extends Record<string, unknown>, K extends keyof TFormValues>(
+  form: Form<TFormValues>,
+  name: K
+): UseFieldReturn<TFormValues[K]> {
   const store = useStore();
-  const fieldRef = useRef<ReturnType<typeof createField<TValue>> | null>(null);
+  const fieldName = String(name);
+  
+  // Get field atom for subscription - this is the key to granular reactivity
+  const fieldAtom = form.getFieldAtom(name);
+  
+  // Get field API for mutations - keep stable reference
+  const fieldApiRef = useRef<Field<TFormValues[K]>>(form.field(name));
+  fieldApiRef.current = form.field(name);
+  const fieldApi = fieldApiRef.current;
+
+  // Subscribe to field state changes - only this field's atom
   const [forceUpdate, setForceUpdate] = useState(0);
-
-  // Create field instance once
-  if (!fieldRef.current) {
-    fieldRef.current = createField<TValue>(store, name, options);
-  }
-
-  const field = fieldRef.current;
-
-  // Subscribe to field state changes
+  
   useEffect(() => {
-    const unsubscribe = store.subscribe(field.atom, () => {
+    const unsubscribe = store.subscribe(fieldAtom, () => {
       setForceUpdate((prev: number) => prev + 1);
     });
     return unsubscribe;
-  }, [store, field.atom]);
+  }, [store, fieldAtom]);
 
-  // Get field state
-  const state = useAtomValue(field.atom);
-  const error = useAtomValue(field.error);
+  // Get current field state from atom
+  const state = useAtomValue(fieldAtom);
 
-  // Field props for input binding
+  // Stable handlers - use ref to avoid recreation
+  const handlersRef = useRef({
+    onChange: (e: ChangeEvent<any>) => {
+      const value = e.target.type === 'checkbox'
+        ? e.target.checked
+        : e.target.value;
+      fieldApi.setValue(value as TFormValues[K]);
+    },
+    onBlur: () => {
+      fieldApi.setTouched(true);
+    },
+    setValue: (value: TFormValues[K]) => {
+      fieldApi.setValue(value);
+    },
+    setTouched: (touched: boolean) => {
+      fieldApi.setTouched(touched);
+    },
+    setError: (error: string | null) => {
+      fieldApi.setError(error);
+    },
+  });
+
+  // Field props for input binding - stable references
   const fieldProps = {
-    name,
+    name: fieldName,
     value: state.value,
-    onChange: useCallback(
-      (e: ChangeEvent<any>) => {
-        const value = e.target.type === 'checkbox'
-          ? e.target.checked
-          : e.target.value;
-        field.setValue(value as TValue);
-      },
-      [field]
-    ),
-    onBlur: useCallback(() => {
-      field.setTouched(true);
-    }, [field]),
+    onChange: handlersRef.current.onChange,
+    onBlur: handlersRef.current.onBlur,
   };
 
   // Field state
   const fieldState = {
-    error,
+    error: state.error,
     isDirty: state.dirty,
     isTouched: state.touched,
     isValidating: state.validating,
   };
 
-  // Helpers
+  // Helpers - stable references
   const helpers = {
-    setValue: useCallback((value: TValue) => {
-      field.setValue(value);
-    }, [field]),
-
-    setTouched: useCallback((touched: boolean) => {
-      field.setTouched(touched);
-    }, [field]),
-
-    setError: useCallback((error: string | null) => {
-      field.setError(error);
-    }, [field]),
+    setValue: handlersRef.current.setValue,
+    setTouched: handlersRef.current.setTouched,
+    setError: handlersRef.current.setError,
   };
 
   return {

@@ -1,27 +1,27 @@
-import { useCallback, useRef, useEffect, useState, useMemo } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import { useStore, useAtomValue } from '@nexus-state/react';
 import { createFieldArray, getFieldArray } from '../field-array';
-import type { UseFieldArrayReturn } from './types';
+import type { UseFieldArrayReturn, FieldItem } from './types';
 
 /**
  * Hook for managing dynamic field arrays
  * @param name - Field array name
  * @param options - Options including default items
- * @returns Array fields and manipulation methods
- * 
+ * @returns Array fields with stable IDs and manipulation methods
+ *
  * @example
  * ```tsx
  * function TodoList() {
  *   const { fields, append, remove } = useFieldArray<TodoItem>('todos', {
  *     defaultValue: [],
  *   });
- * 
+ *
  *   return (
  *     <div>
- *       {fields.map((field, index) => (
+ *       {fields.map((field) => (
  *         <div key={field.id}>
  *           <input value={field.text} />
- *           <button onClick={() => remove(index)}>Remove</button>
+ *           <button onClick={() => remove(field.id)}>Remove</button>
  *         </div>
  *       ))}
  *       <button onClick={() => append({ text: '' })}>Add</button>
@@ -30,7 +30,7 @@ import type { UseFieldArrayReturn } from './types';
  * }
  * ```
  */
-export function useFieldArray<TItem extends Record<string, unknown>>(
+export function useFieldArray<TItem>(
   name: string,
   options: { defaultValue?: TItem[] } = {}
 ): UseFieldArrayReturn<TItem> {
@@ -51,25 +51,38 @@ export function useFieldArray<TItem extends Record<string, unknown>>(
   const meta = fieldArrayMetaRef.current;
   const fieldArray = getFieldArray(store, meta);
 
-  // Subscribe to field array changes - subscribe to first atom or use dummy subscription
+  // Subscribe to all item atoms for changes
   useEffect(() => {
-    if (meta.itemAtoms.length > 0) {
-      const unsubscribe = store.subscribe(meta.itemAtoms[0], () => {
+    const unsubscribers: Array<() => void> = [];
+    for (const atom of meta.itemAtoms) {
+      unsubscribers.push(store.subscribe(atom, () => {
         setForceUpdate((prev: number) => prev + 1);
-      });
-      return unsubscribe;
+      }));
     }
-    return undefined;
+    return () => {
+      unsubscribers.forEach((unsub) => unsub());
+    };
   }, [store, meta.itemAtoms]);
 
-  // Get items
+  // Get items and their stable IDs
   const items = fieldArray.fields;
+  const itemIds = meta.itemIds;
 
-  // Add unique IDs to items for React keys
-  const fields = useMemo(
-    () => items.map((item: TItem, index: number) => ({ ...item, id: `${name}.${index}` })),
-    [items, name]
-  );
+  // Build fields with stable IDs
+  // For primitives: { id, value }
+  // For objects with existing id: use existing id
+  // For objects without id: use generated stable id
+  const fields = items.map((item, index) => {
+    const id = itemIds[index];
+
+    // Check if item is a primitive
+    if (item === null || typeof item !== 'object') {
+      return { id, value: item } as FieldItem<TItem>;
+    }
+
+    // For objects, spread the item and ensure id is present
+    return { ...item, id } as FieldItem<TItem>;
+  });
 
   // Array manipulation methods
   const append = useCallback((item: TItem) => {
@@ -103,10 +116,22 @@ export function useFieldArray<TItem extends Record<string, unknown>>(
   }, [fieldArray]);
 
   const update = useCallback((index: number, item: TItem) => {
-    const newItems = items.map((existing: TItem, i: number) => (i === index ? item : existing));
+    // Get current items and IDs
+    const currentItems = fieldArray.fields;
+    const currentIds = meta.itemIds;
+    
+    // Preserve the existing ID when updating
+    const existingId = currentIds[index];
+    const itemWithId = existingId 
+      ? { ...item, id: existingId } as TItem
+      : item;
+    
+    const newItems = currentItems.map((existing: TItem, i: number) => 
+      i === index ? itemWithId : existing
+    );
     fieldArray.replace(newItems);
     setForceUpdate((prev: number) => prev + 1);
-  }, [fieldArray, items]);
+  }, [fieldArray, meta.itemIds]);
 
   const replace = useCallback((items: TItem[]) => {
     fieldArray.replace(items);

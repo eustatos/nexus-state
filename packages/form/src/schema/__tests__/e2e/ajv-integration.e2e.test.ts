@@ -28,8 +28,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { name: '', email: '' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.name).toBeDefined();
       expect(form.errors.email).toBeDefined();
     });
@@ -51,8 +51,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { name: 'John', email: 'john@example.com' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(true);
+      const result = await form.validate();
+      expect(result.valid).toBe(true);
       expect(form.errors.name).toBeUndefined();
       expect(form.errors.email).toBeUndefined();
     });
@@ -86,8 +86,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { user: { profile: { name: '', bio: '' } } },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors['user.profile.name']).toBeDefined();
     });
 
@@ -109,8 +109,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { tags: ['valid', ''] },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors['tags.1']).toBeDefined();
     });
   });
@@ -132,8 +132,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { role: 'invalid' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.role).toBeDefined();
     });
   });
@@ -155,8 +155,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { phone: 'invalid' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.phone).toBeDefined();
     });
   });
@@ -178,8 +178,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { age: 10 },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.age).toBeDefined();
     });
 
@@ -199,8 +199,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { age: 25 },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(true);
+      const result = await form.validate();
+      expect(result.valid).toBe(true);
     });
   });
 
@@ -223,8 +223,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { name: 'John', nickname: undefined, bio: null },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(true);
+      const result = await form.validate();
+      expect(result.valid).toBe(true);
     });
   });
 
@@ -310,8 +310,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { accountType: 'business', company: '' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.company).toBeDefined();
     });
   });
@@ -337,8 +337,8 @@ describe('E2E: AJV Plugin Integration', () => {
         initialValues: { website: 'not-a-url' },
       });
 
-      const isValid = await form.validate();
-      expect(isValid).toBe(false);
+      const result = await form.validate();
+      expect(result.valid).toBe(false);
       expect(form.errors.website).toBeDefined();
     });
   });
