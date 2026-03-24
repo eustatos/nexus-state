@@ -283,6 +283,41 @@ If you see warnings about atoms failing to initialize during `capture()`:
 
 Simplified wrapper with the same methods as TimeTravelController.
 
+## Effect Suppression
+
+Time-travel operations automatically suppress side effects during undo/redo:
+
+```typescript
+store.subscribe(cartAtom, (cart) => {
+  api.syncCart(cart); // ✅ Only called on real user actions
+});
+
+timeTravel.undo(); // No side effects triggered
+```
+
+**How it works:**
+1. Internal `isTimeTraveling` flag tracks undo/redo operations
+2. `setSilently()` is used instead of `set()` during restoration
+3. Subscribers are NOT called during time-travel
+4. Computed atoms are re-evaluated after restore
+
+**Manual suppression pattern:**
+
+```typescript
+import { debugContext } from '@nexus-state/core';
+
+store.subscribe(atom, (value) => {
+  if (debugContext.isTraveling()) {
+    return; // Skip effect during time-travel
+  }
+  api.sync(value);
+});
+```
+
+For more details, see the [Time Travel Suppression Guide](https://nexus-state.website.yandexcloud.net/guides/time-travel-suppression).
+
+---
+
 ## License
 
 MIT

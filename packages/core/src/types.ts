@@ -1,5 +1,7 @@
 // Types for nexus-state core
 
+import type { AtomContext } from './reactive';
+
 /**
  * Function to get the current value of an atom
  * @template Value The type of value the atom holds
@@ -13,10 +15,12 @@ export type Getter = <Value>(atom: Atom<Value>) => Value;
  * @template Value The type of value the atom holds
  * @param atom The atom to set the value for
  * @param update The new value or a function to compute the new value
+ * @param context Optional operation metadata (Phase 11: Signal-Ready Architecture)
  */
 export type Setter = <Value>(
   atom: Atom<Value>,
-  update: Value | ((prev: Value) => Value)
+  update: Value | ((prev: Value) => Value),
+  context?: AtomContext
 ) => void;
 
 /**
@@ -36,17 +40,19 @@ export interface PluginHooks {
    * @template T The type of the atom's value
    * @param atom The atom being set
    * @param value The new value (or computed value from function update)
+   * @param context Optional operation metadata (Phase 11: Signal-Ready Architecture)
    * @returns Modified value or void to keep original
    */
-  onSet?: <T>(atom: Atom<T>, value: T) => T | void;
+  onSet?: <T>(atom: Atom<T>, value: T, context?: AtomContext) => T | void;
 
   /**
    * Hook called after a value is set. Side effects only.
    * @template T The type of the atom's value
    * @param atom The atom that was set
    * @param value The final value that was set
+   * @param context Optional operation metadata (Phase 11: Signal-Ready Architecture)
    */
-  afterSet?: <T>(atom: Atom<T>, value: T) => void;
+  afterSet?: <T>(atom: Atom<T>, value: T, context?: AtomContext) => void;
 
   /**
    * Hook called when a value is read. Can modify the returned value.
@@ -101,8 +107,21 @@ export interface Store {
    * @template Value The type of value the atom holds
    * @param atom The atom to set the value for
    * @param update The new value or a function to compute the new value
+   * @param context Optional operation metadata (Phase 11: Signal-Ready Architecture)
    */
   set: <Value>(
+    atom: Atom<Value>,
+    update: Value | ((prev: Value) => Value),
+    context?: AtomContext
+  ) => void;
+
+  /**
+   * Set atom value silently (without notifications)
+   * @template Value The type of value the atom holds
+   * @param atom The atom to update
+   * @param update The new value or a function to compute the new value
+   */
+  setSilently?: <Value>(
     atom: Atom<Value>,
     update: Value | ((prev: Value) => Value)
   ) => void;

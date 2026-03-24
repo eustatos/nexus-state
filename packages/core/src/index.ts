@@ -130,3 +130,19 @@ export { logger, storeLogger, atomLogger, reactLogger } from './debug';
 
 // Batching utility
 export { batch, batcher, isBatching, type Batcher } from './batching';
+
+// Reactive abstractions (Phase 11: Signal-Ready Architecture)
+export type {
+  IReactiveValue,
+  AtomContext,
+  Unsubscribe,
+  ReactiveConfig,
+} from './reactive';
+export { BaseReactive } from './reactive';
+export {
+  REACTIVE_CONFIG,
+  updateReactiveConfig,
+  resetReactiveConfig,
+  getReactiveConfig,
+  loadConfigFromEnv,
+} from './reactive';

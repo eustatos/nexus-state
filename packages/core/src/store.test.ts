@@ -7,6 +7,7 @@ import { createStore, createEnhancedStore } from './store';
 import { atom } from './atom';
 import { atomRegistry } from './atom-registry';
 import type { Plugin } from './types';
+import type { AtomContext } from './reactive';
 
 describe('createStore', () => {
   beforeEach(() => {
@@ -386,5 +387,125 @@ describe('Store clear method', () => {
 
     expect(store.get(countAtom)).toBe(0);
     expect(store.get(userAtom)).toEqual({ name: 'Anonymous' });
+  });
+});
+
+describe('SR-009: Store set method with AtomContext', () => {
+  beforeEach(() => {
+    atomRegistry.clear();
+  });
+
+  describe('basic context passing', () => {
+    it('should accept context parameter in set()', () => {
+      const store = createStore();
+      const testAtom = atom(0, 'test');
+
+      const context: AtomContext = {
+        source: 'test-case',
+        metadata: { userId: 123 },
+      };
+
+      expect(() => {
+        store.set(testAtom, 10, context);
+      }).not.toThrow();
+
+      expect(store.get(testAtom)).toBe(10);
+    });
+
+    it('should maintain backward compatibility without context', () => {
+      const store = createStore();
+      const testAtom = atom(0, 'test');
+
+      expect(() => {
+        store.set(testAtom, 10);
+      }).not.toThrow();
+
+      expect(store.get(testAtom)).toBe(10);
+    });
+
+    it('should accept partial context', () => {
+      const store = createStore();
+      const testAtom = atom(0, 'test');
+
+      // Only source
+      store.set(testAtom, 10, { source: 'test' });
+      expect(store.get(testAtom)).toBe(10);
+
+      // Only metadata
+      store.set(testAtom, 20, { metadata: { key: 'value' } });
+      expect(store.get(testAtom)).toBe(20);
+
+      // Only silent
+      store.set(testAtom, 30, { silent: true });
+      expect(store.get(testAtom)).toBe(30);
+    });
+
+    it('should handle function updates with context', () => {
+      const store = createStore();
+      const testAtom = atom(0, 'test');
+
+      store.set(
+        testAtom,
+        (prev) => prev + 10,
+        { source: 'function-update' }
+      );
+
+      expect(store.get(testAtom)).toBe(10);
+    });
+  });
+
+  describe('silent context', () => {
+    it('should handle silent context', () => {
+      const store = createStore();
+      const testAtom = atom(0, 'test');
+      const subscriber = vi.fn();
+
+      store.subscribe(testAtom, subscriber);
+
+      store.set(testAtom, 10, { silent: true });
+
+      expect(subscriber).not.toHaveBeenCalled();
+      expect(store.get(testAtom)).toBe(10);
+    });
+
+    it('should notify subscribers when silent is false', () => {
+      const store = createStore();
+      const testAtom = atom(0, 'test');
+      const subscriber = vi.fn();
+
+      store.subscribe(testAtom, subscriber);
+
+      store.set(testAtom, 10, { silent: false });
+
+      expect(subscriber).toHaveBeenCalledWith(10);
+    });
+  });
+
+  describe('setSilently with context', () => {
+    it('should set value silently without context', () => {
+      const store = createStore();
+      const testAtom = atom(0, 'test');
+      const subscriber = vi.fn();
+
+      store.subscribe(testAtom, subscriber);
+
+      store.setSilently?.(testAtom, 10);
+
+      expect(subscriber).not.toHaveBeenCalled();
+      expect(store.get(testAtom)).toBe(10);
+    });
+
+    it('should set value silently with context', () => {
+      const store = createStore();
+      const testAtom = atom(0, 'test');
+      const subscriber = vi.fn();
+
+      store.subscribe(testAtom, subscriber);
+
+      store.setSilently?.(testAtom, 10, { source: 'silent-set' });
+
+      expect(subscriber).not.toHaveBeenCalled();
+      expect(store.get(testAtom)).toBe(10);
+    });
   });
 });

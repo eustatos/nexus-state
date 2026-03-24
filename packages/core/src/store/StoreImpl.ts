@@ -20,6 +20,7 @@ import type {
   Plugin,
   ActionMetadata,
 } from '../types';
+import type { AtomContext } from '../reactive';
 import { isWritableAtom } from '../types';
 import { atomRegistry } from '../atom-registry';
 import { storeLogger as logger } from '../debug';
@@ -110,13 +111,16 @@ export class StoreImpl implements Store {
   private createSetter(get: Getter): Setter {
     return <Value>(
       atom: Atom<Value>,
-      update: Value | ((prev: Value) => Value)
+      update: Value | ((prev: Value) => Value),
+      context?: AtomContext
     ): void => {
       logger.log(
         '[StoreImpl] Setting atom:',
         atom.name || 'unnamed',
         'to:',
-        update
+        update,
+        'context:',
+        context
       );
 
       // Register atom with registry
@@ -130,7 +134,11 @@ export class StoreImpl implements Store {
       // For writable atoms with write function, call write directly
       if (isWritableAtom(atom) && atom.write) {
         const write = atom.write;
-        const storeSetter: Setter = (a, u) => this.createSetter(get)(a, u);
+        const storeSetter: Setter = (a, u, ctx?: AtomContext) => {
+          // Merge contexts (child context takes precedence)
+          const mergedContext = ctx ? { ...context, ...ctx } : context;
+          this.createSetter(get)(a, u, mergedContext);
+        };
         write(get, storeSetter, update as Value);
         return;
       }
@@ -146,10 +154,11 @@ export class StoreImpl implements Store {
           ? (update as (prev: Value) => Value)(atomState.value)
           : update;
 
-      // Apply onSet hooks
+      // Apply onSet hooks with context (even in silent mode)
       const processedValue = this.pluginSystem.executeOnSetHooks(
         atom,
-        newValue
+        newValue,
+        context
       );
 
       // Update value
@@ -165,6 +174,20 @@ export class StoreImpl implements Store {
         processedValue
       );
 
+      // Silent mode - skip notifications but still execute hooks
+      if (context?.silent) {
+        logger.log(
+          '[StoreImpl] Silent update:',
+          atom.name || 'unnamed',
+          'from:',
+          previousValue,
+          'to:',
+          processedValue
+        );
+        return;
+      }
+
+      // Normal update with side effects
       // Notify subscribers
       this.notificationManager.notify(atom, atomState, processedValue);
 
@@ -176,11 +199,23 @@ export class StoreImpl implements Store {
         (a) => this.evaluator.recompute(a, get)
       );
 
-      // Execute afterSet hooks
-      this.pluginSystem.executeAfterSetHooks(atom, processedValue);
+      // Execute afterSet hooks with context (only in normal mode)
+      if (!context?.silent) {
+        this.pluginSystem.executeAfterSetHooks(atom, processedValue, context);
+      }
 
-      // Track for DevTools
-      this.devTools.trackStateChange(atom, processedValue);
+      // Track for DevTools (only in normal mode)
+      if (!context?.silent) {
+        if (context?.source) {
+          this.devTools.trackStateChange(atom, {
+            value: processedValue,
+            source: context.source,
+            timestamp: Date.now(),
+          });
+        } else {
+          this.devTools.trackStateChange(atom, processedValue);
+        }
+      }
     };
   }
 
@@ -194,8 +229,24 @@ export class StoreImpl implements Store {
   /**
    * Set atom value
    */
-  set<Value>(atom: Atom<Value>, update: Value | ((prev: Value) => Value)): void {
-    this.createSetter(this.createGetter())(atom, update);
+  set<Value>(
+    atom: Atom<Value>,
+    update: Value | ((prev: Value) => Value),
+    context?: AtomContext
+  ): void {
+    this.createSetter(this.createGetter())(atom, update, context);
+  }
+
+  /**
+   * Set atom value silently (without notifications)
+   * @param atom Atom to update
+   * @param update New value or updater function
+   */
+  setSilently<Value>(
+    atom: Atom<Value>,
+    update: Value | ((prev: Value) => Value)
+  ): void {
+    this.set(atom, update, { silent: true });
   }
 
   /**

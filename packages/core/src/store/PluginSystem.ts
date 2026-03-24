@@ -5,6 +5,7 @@
  */
 
 import type { Store, Plugin, PluginHooks, Atom, ActionMetadata } from '../types';
+import type { AtomContext } from '../reactive';
 import { storeLogger as logger } from '../debug';
 
 /**
@@ -40,14 +41,15 @@ export class PluginSystem {
    * Execute onSet hooks
    * @param atom Atom being set
    * @param value Value to set
+   * @param context Optional operation metadata
    * @returns Processed value
    */
-  executeOnSetHooks<T>(atom: Atom<any>, value: T): T {
+  executeOnSetHooks<T>(atom: Atom<any>, value: T, context?: AtomContext): T {
     let processedValue = value;
 
     for (const hooks of this.hooks) {
       if (hooks.onSet) {
-        const result = hooks.onSet(atom, processedValue);
+        const result = hooks.onSet(atom, processedValue, context);
         if (result !== undefined) {
           processedValue = result;
         }
@@ -61,11 +63,12 @@ export class PluginSystem {
    * Execute afterSet hooks
    * @param atom Atom that was set
    * @param value Final value
+   * @param context Optional operation metadata
    */
-  executeAfterSetHooks<T>(atom: Atom<any>, value: T): void {
+  executeAfterSetHooks<T>(atom: Atom<any>, value: T, context?: AtomContext): void {
     for (const hooks of this.hooks) {
       if (hooks.afterSet) {
-        hooks.afterSet(atom, value);
+        hooks.afterSet(atom, value, context);
       }
     }
   }

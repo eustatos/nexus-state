@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/form-schema-ajv",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "AJV (JSON Schema) validator plugin for Nexus State forms",
   "type": "module",
   "main": "dist/index.cjs",

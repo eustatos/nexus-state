@@ -1,9 +1,15 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "dist/esm",
     "rootDir": "src",
     "lib": ["ES2020", "DOM"],
+    "module": "ESNext",
+    "target": "ES2019",
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "downlevelIteration": true
   },
   "include": ["src/**/*.ts"],

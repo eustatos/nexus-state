@@ -56,6 +56,11 @@ export interface TimeTravelAPI {
   importState(state: Record<string, unknown>): boolean;
   subscribe(event: TimeTravelEventType, callback: () => void): TimeTravelUnsubscribe;
   subscribeToSnapshots(callback: () => void): TimeTravelUnsubscribe;
+
+  /**
+   * Проверить, выполняется ли операция time-travel
+   */
+  getIsTimeTraveling?(): boolean;
 }
 
 export interface TimeTravelStats {

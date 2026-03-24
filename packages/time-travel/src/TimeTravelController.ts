@@ -2,7 +2,7 @@
  * TimeTravelController - Main time travel controller
  */
 
-import type { Snapshot, SnapshotStateEntry, Store, TimeTravelAPI, TimeTravelOptions, TimeTravelEventType, TimeTravelUnsubscribe } from './types';
+import type { Snapshot, SnapshotStateEntry, Store, TimeTravelAPI, TimeTravelEventType, TimeTravelOptions, TimeTravelUnsubscribe } from './types';
 import { atomRegistry } from '@nexus-state/core';
 
 export class TimeTravelController implements TimeTravelAPI {
@@ -14,6 +14,7 @@ export class TimeTravelController implements TimeTravelAPI {
   private currentIndex: number = -1;
   private subscribers: Map<TimeTravelEventType, Set<() => void>> = new Map();
   private snapshotSubscribers: Set<() => void> = new Set();
+  private isTimeTraveling: boolean = false;
 
   constructor(store: Store, options?: TimeTravelOptions) {
     this.store = store;
@@ -154,18 +155,53 @@ export class TimeTravelController implements TimeTravelAPI {
   }
 
   private restoreSnapshot(snapshot: Snapshot): void {
-    Object.entries(snapshot.state).forEach(([key, entry]) => {
-      const atom = atomRegistry.getByName(key);
-      if (atom) {
-        try {
-          (this.store as any).set(atom as never, entry.value as never);
-        } catch (error) {
-          console.warn(`restoreSnapshot: failed to restore atom ${key}:`, error);
+    this.isTimeTraveling = true;
+
+    try {
+      Object.entries(snapshot.state).forEach(([key, entry]) => {
+        const atom = atomRegistry.getByName(key);
+        if (atom) {
+          try {
+            if (typeof (this.store as any).setSilently === 'function') {
+              (this.store as any).setSilently(atom as never, entry.value as never);
+            } else {
+              console.warn(
+                `[TimeTravelController] setSilently not available, using set() for atom ${key}`
+              );
+              (this.store as any).set(atom as never, entry.value as never);
+            }
+          } catch (error) {
+            console.warn(`restoreSnapshot: failed to restore atom ${key}:`, error);
+          }
+        } else {
+          console.warn(`restoreSnapshot: atom ${key} not found in registry`);
         }
-      } else {
-        console.warn(`restoreSnapshot: atom ${key} not found in registry`);
+      });
+
+      this.flushComputed();
+    } finally {
+      this.isTimeTraveling = false;
+    }
+  }
+
+  /**
+   * Force re-evaluation of computed atoms
+   */
+  private flushComputed(): void {
+    const allAtoms = atomRegistry.getAll();
+    for (const atom of allAtoms.values()) {
+      const metadata = atomRegistry.getMetadata(atom as { id: symbol });
+      if (metadata?.type === 'computed') {
+        try {
+          this.store.get(atom as any);
+        } catch (error) {
+          console.warn(
+            `[TimeTravelController] Failed to flush computed atom:`,
+            error
+          );
+        }
       }
-    });
+    }
   }
 
   getHistoryStats(): { length: number; currentIndex: number; canUndo: boolean; canRedo: boolean } {
@@ -206,5 +242,13 @@ export class TimeTravelController implements TimeTravelAPI {
     if (event === 'snapshot') {
       this.snapshotSubscribers.forEach(cb => cb());
     }
+  }
+
+  /**
+   * Проверить, выполняется ли операция time-travel
+   * @returns True, если состояние восстанавливается из snapshot
+   */
+  getIsTimeTraveling(): boolean {
+    return this.isTimeTraveling;
   }
 }

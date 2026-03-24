@@ -1,7 +1,9 @@
 // Tests for plugin hooks functionality
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { atom, createStore } from './index';
+import { atomRegistry } from './atom-registry';
 import type { PluginHooks } from './types';
+import type { AtomContext } from './reactive';
 
 describe('Plugin Hooks', () => {
   describe('onSet hook', () => {
@@ -18,7 +20,7 @@ describe('Plugin Hooks', () => {
       store.set(testAtom, 10);
 
       expect(onSetSpy).toHaveBeenCalledTimes(1);
-      expect(onSetSpy).toHaveBeenCalledWith(testAtom, 10);
+      expect(onSetSpy).toHaveBeenCalledWith(testAtom, 10, undefined);
     });
 
     it('should allow onSet hook to modify the value', () => {
@@ -91,7 +93,7 @@ describe('Plugin Hooks', () => {
       store.applyPlugin!(plugin);
       store.set(testAtom, (prev) => prev + 5);
 
-      expect(onSetSpy).toHaveBeenCalledWith(testAtom, 5);
+      expect(onSetSpy).toHaveBeenCalledWith(testAtom, 5, undefined);
       expect(store.get(testAtom)).toBe(5);
     });
   });
@@ -110,7 +112,7 @@ describe('Plugin Hooks', () => {
       store.set(testAtom, 10);
 
       expect(afterSetSpy).toHaveBeenCalledTimes(1);
-      expect(afterSetSpy).toHaveBeenCalledWith(testAtom, 10);
+      expect(afterSetSpy).toHaveBeenCalledWith(testAtom, 10, undefined);
     });
 
     it('should call afterSet with the final processed value', () => {
@@ -359,7 +361,7 @@ describe('Plugin Hooks', () => {
       const store = createStore([plugin]);
       store.set(testAtom, 10);
 
-      expect(onSetSpy).toHaveBeenCalledWith(testAtom, 10);
+      expect(onSetSpy).toHaveBeenCalledWith(testAtom, 10, undefined);
       expect(store.get(testAtom)).toBe(10);
     });
   });
@@ -420,10 +422,10 @@ describe('Plugin Hooks', () => {
       store.set(nullAtom, null);
       store.set(undefinedAtom, undefined);
 
-      expect(onSetSpy).toHaveBeenCalledWith(nullAtom, null);
-      expect(onSetSpy).toHaveBeenCalledWith(undefinedAtom, undefined);
-      expect(afterSetSpy).toHaveBeenCalledWith(nullAtom, null);
-      expect(afterSetSpy).toHaveBeenCalledWith(undefinedAtom, undefined);
+      expect(onSetSpy).toHaveBeenCalledWith(nullAtom, null, undefined);
+      expect(onSetSpy).toHaveBeenCalledWith(undefinedAtom, undefined, undefined);
+      expect(afterSetSpy).toHaveBeenCalledWith(nullAtom, null, undefined);
+      expect(afterSetSpy).toHaveBeenCalledWith(undefinedAtom, undefined, undefined);
     });
 
     it('should work with object values', () => {
@@ -464,6 +466,331 @@ describe('Plugin Hooks', () => {
       expect(plugins).toHaveLength(2);
       expect(plugins).toContain(plugin1);
       expect(plugins).toContain(plugin2);
+    });
+  });
+});
+
+describe('SR-009: Plugin Hooks with AtomContext', () => {
+  beforeEach(() => {
+    atomRegistry.clear();
+  });
+
+  describe('onSet hook with context', () => {
+    it('should receive context in onSet hook', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+      let capturedContext: AtomContext | undefined;
+
+      const plugin = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          capturedContext = context;
+          return value;
+        },
+      });
+
+      store.applyPlugin!(plugin);
+
+      const myContext: AtomContext = {
+        source: 'user-action',
+        metadata: { action: 'increment' },
+      };
+
+      store.set(testAtom, 10, myContext);
+
+      expect(capturedContext).toBeDefined();
+      expect(capturedContext?.source).toBe('user-action');
+      expect(capturedContext?.metadata?.action).toBe('increment');
+    });
+
+    it('should handle undefined context in onSet', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+      let contextWasUndefined = false;
+
+      const plugin = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          if (context === undefined) {
+            contextWasUndefined = true;
+          }
+          return value;
+        },
+      });
+
+      store.applyPlugin!(plugin);
+      store.set(testAtom, 10);
+
+      expect(contextWasUndefined).toBe(true);
+    });
+
+    it('should handle timeTravel flag in onSet', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+      let timeTravelFlag: boolean | undefined;
+
+      const plugin = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          timeTravelFlag = context?.timeTravel;
+          return value;
+        },
+      });
+
+      store.applyPlugin!(plugin);
+      store.set(testAtom, 10, { timeTravel: true });
+
+      expect(timeTravelFlag).toBe(true);
+    });
+
+    it('should handle silent flag in onSet', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+      let silentFlag: boolean | undefined;
+
+      const plugin = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          silentFlag = context?.silent;
+          return value;
+        },
+      });
+
+      store.applyPlugin!(plugin);
+      store.set(testAtom, 10, { silent: true });
+
+      expect(silentFlag).toBe(true);
+    });
+  });
+
+  describe('afterSet hook with context', () => {
+    it('should receive context in afterSet hook', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+      let capturedContext: AtomContext | undefined;
+
+      const plugin = (): PluginHooks => ({
+        afterSet: (atom, value, context) => {
+          capturedContext = context;
+        },
+      });
+
+      store.applyPlugin!(plugin);
+
+      const myContext: AtomContext = {
+        source: 'after-set-test',
+        metadata: { test: true },
+      };
+
+      store.set(testAtom, 10, myContext);
+
+      expect(capturedContext).toBeDefined();
+      expect(capturedContext?.source).toBe('after-set-test');
+    });
+
+    it('should handle undefined context in afterSet', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+      let contextWasUndefined = false;
+
+      const plugin = (): PluginHooks => ({
+        afterSet: (atom, value, context) => {
+          if (context === undefined) {
+            contextWasUndefined = true;
+          }
+        },
+      });
+
+      store.applyPlugin!(plugin);
+      store.set(testAtom, 10);
+
+      expect(contextWasUndefined).toBe(true);
+    });
+
+    it('should pass final value with context to afterSet', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+      let capturedValue: number | undefined;
+      let capturedContext: AtomContext | undefined;
+
+      const plugin1 = (): PluginHooks => ({
+        onSet: (atom, value) => value * 2,
+      });
+
+      const plugin2 = (): PluginHooks => ({
+        afterSet: (atom, value, context) => {
+          capturedValue = value;
+          capturedContext = context;
+        },
+      });
+
+      store.applyPlugin!(plugin1);
+      store.applyPlugin!(plugin2);
+
+      store.set(testAtom, 5, { source: 'test' });
+
+      expect(capturedValue).toBe(10);
+      expect(capturedContext?.source).toBe('test');
+    });
+  });
+
+  describe('multiple plugins with context', () => {
+    it('should pass context to all plugins', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+
+      const contexts: Array<AtomContext | undefined> = [];
+
+      const createPlugin = (id: number) => (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          contexts.push(context);
+          return value;
+        },
+      });
+
+      store.applyPlugin!(createPlugin(1));
+      store.applyPlugin!(createPlugin(2));
+      store.applyPlugin!(createPlugin(3));
+
+      const context: AtomContext = { source: 'multi-plugin' };
+      store.set(testAtom, 10, context);
+
+      expect(contexts.length).toBe(3);
+      contexts.forEach((ctx) => {
+        expect(ctx?.source).toBe('multi-plugin');
+      });
+    });
+
+    it('should maintain context order across plugins', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+
+      const pluginCalls: string[] = [];
+
+      const plugin1 = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          pluginCalls.push(`plugin1-${context?.source || 'none'}`);
+          return value;
+        },
+      });
+
+      const plugin2 = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          pluginCalls.push(`plugin2-${context?.source || 'none'}`);
+          return value;
+        },
+      });
+
+      store.applyPlugin!(plugin1);
+      store.applyPlugin!(plugin2);
+
+      store.set(testAtom, 10, { source: 'ordered' });
+
+      expect(pluginCalls).toEqual(['plugin1-ordered', 'plugin2-ordered']);
+    });
+  });
+
+  describe('context metadata propagation', () => {
+    it('should pass metadata through the plugin chain', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+
+      const metadata = {
+        userId: 123,
+        action: 'increment',
+        timestamp: Date.now(),
+      };
+
+      let capturedMetadata: typeof metadata | undefined;
+
+      const plugin = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          capturedMetadata = context?.metadata as typeof metadata;
+          return value;
+        },
+      });
+
+      store.applyPlugin!(plugin);
+      store.set(testAtom, 10, { metadata });
+
+      expect(capturedMetadata).toEqual(metadata);
+    });
+
+    it('should handle complex metadata objects', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+
+      const complexMetadata = {
+        user: { id: 1, name: 'Test' },
+        action: { type: 'UPDATE', payload: { field: 'value' } },
+        nested: { deep: { value: [1, 2, 3] } },
+      };
+
+      let receivedMetadata: typeof complexMetadata | undefined;
+
+      const plugin = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          receivedMetadata = context?.metadata as typeof complexMetadata;
+          return value;
+        },
+      });
+
+      store.applyPlugin!(plugin);
+      store.set(testAtom, 10, { metadata: complexMetadata });
+
+      expect(receivedMetadata).toEqual(complexMetadata);
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle empty context object', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+
+      const plugin = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          expect(context).toEqual({});
+          return value;
+        },
+      });
+
+      store.applyPlugin!(plugin);
+
+      expect(() => {
+        store.set(testAtom, 10, {});
+      }).not.toThrow();
+    });
+
+    it('should handle context with only source', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+      let capturedSource: string | undefined;
+
+      const plugin = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          capturedSource = context?.source;
+          return value;
+        },
+      });
+
+      store.applyPlugin!(plugin);
+      store.set(testAtom, 10, { source: 'custom-source' });
+
+      expect(capturedSource).toBe('custom-source');
+    });
+
+    it('should handle context with only metadata', () => {
+      const store = createStore();
+      const testAtom = atom(0);
+      let capturedMetadata: Record<string, unknown> | undefined;
+
+      const plugin = (): PluginHooks => ({
+        onSet: (atom, value, context) => {
+          capturedMetadata = context?.metadata;
+          return value;
+        },
+      });
+
+      store.applyPlugin!(plugin);
+      store.set(testAtom, 10, { metadata: { key: 'value' } });
+
+      expect(capturedMetadata).toEqual({ key: 'value' });
     });
   });
 });
