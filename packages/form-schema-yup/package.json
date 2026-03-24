@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/form-schema-yup",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Yup schema validator plugin for Nexus State forms",
   "type": "module",
   "main": "dist/index.cjs",
