@@ -40,8 +40,6 @@ reactive.getValue();
 reactive.setValue(10, { silent: true }); // Same API!
 ```
 
-**Expected Performance Gains:** 30-50% faster with Signals backend
-
 ---
 
 ## 🎯 What Makes Nexus State Unique?
@@ -253,7 +251,7 @@ console.log(store2.get(userAtom)); // { name: 'Bob' }
 | Package                      | Purpose                      | Example                           |
 | ---------------------------- | ---------------------------- | --------------------------------- |
 | **@nexus-state/react**       | React hooks                  | `useAtom(atom, store)`            |
-| **@nexus-state/query**       | Data fetching (SSR, caching) | `useQuery({ queryKey, queryFn })` |
+| **@nexus-state/query**       | Data fetching (SSR, caching) | `useSuspenseQuery({ queryKey, queryFn })` |
 | **@nexus-state/async**       | Simple async state           | `asyncAtom({ fetchFn })`          |
 | **@nexus-state/time-travel** | Undo/redo debugging          | `controller.undo()`               |
 | **@nexus-state/persist**     | LocalStorage persistence     | `persistAtom('key', value)`       |
@@ -299,9 +297,10 @@ function Counter() {
 Data fetching & caching with SSR support.
 
 ```typescript
-import { prefetchQuery, useQuery } from '@nexus-state/query/react';
+import { prefetchQuery } from '@nexus-state/query/react';
+import { useSuspenseQuery } from '@nexus-state/query/react';
 
-// SSR
+// SSR - prefetch data before rendering
 export async function getServerSideProps(context) {
   await prefetchQuery({
     queryKey: ['user', context.params.id],
@@ -310,9 +309,9 @@ export async function getServerSideProps(context) {
   return { props: {} };
 }
 
-// Client
+// Client - useSuspenseQuery for Suspense integration
 function Page() {
-  const { data } = useQuery({
+  const { data } = useSuspenseQuery({
     queryKey: ['user', id],
     queryFn: fetchUser,
   });
@@ -330,11 +329,23 @@ Async atoms for data fetching.
 
 ```typescript
 import { asyncAtom } from '@nexus-state/async';
+import { createStore } from '@nexus-state/core';
+
+const store = createStore();
 
 const [userAtom, fetchUser] = asyncAtom({
-  fetchFn: async () => fetch('/api/user').then((r) => r.json()),
+  fetchFn: async (store) => {
+    const response = await fetch('/api/user');
+    return response.json();
+  },
   initialValue: null,
 });
+
+// Fetch data
+fetchUser(store);
+
+// Get state: { loading, error, data }
+const state = store.get(userAtom);
 ```
 
 📖 **Full docs:** [@nexus-state/async](https://www.npmjs.com/package/@nexus-state/async)
@@ -403,26 +414,88 @@ function onRedo() {
 
 ## ⚡ Performance
 
-Benchmarks run on **M1 MacBook Pro, Node.js 20, vitest 3.0**. Results are averages of 10+ runs.
+Nexus State provides fine-grained reactivity with minimal overhead. Benchmarks run on **M1 MacBook Pro, Node.js 20, vitest 3.0**.
 
-### Core Operations
+### Core Operations (10,000 iterations)
 
-| Operation                | ops/sec | mean (ms) | p99 (ms) | Stability |
-| ------------------------ | ------- | --------- | -------- | --------- |
-| `store.get(atom)`        | 2.5M    | 0.0004    | 0.001    | ±2%       |
-| `store.set(atom, value)` | 1.8M    | 0.0006    | 0.002    | ±3%       |
-| Computed atom (1 dep)    | 1.2M    | 0.0008    | 0.003    | ±4%       |
-| Computed atom (5 deps)   | 650K    | 0.0015    | 0.005    | ±5%       |
-| Subscribe + notify       | 900K    | 0.0011    | 0.004    | ±3%       |
+| Operation | ops/sec | mean (ms) | Stability |
+|-----------|---------|-----------|-----------|
+| `store.get()` | **1,728** | 0.58 | ±2.73% |
+| `store.set()` + 1 subscriber | **16.7** | 59.8 | ±3.14% |
+| Computed atom (1 dep) | **17.1** | 58.6 | ±8.36% |
+| Computed atom (5 deps) | **3.1** | 321 | ±2.51% |
 
-### Comparison (ops/sec, higher is better)
+> **Note:** `set()` is slower due to dependency tracking, notifications, and DevTools integration. Use `batch()` for bulk updates.
 
-| Operation        | Nexus State | Jotai | Zustand | Redux Toolkit |
-| ---------------- | ----------- | ----- | ------- | ------------- |
-| Read             | 2.5M        | 2.1M  | 1.8M    | 1.2M          |
-| Write            | 1.8M        | 1.5M  | 1.6M    | 1.0M          |
-| Computed (1 dep) | 1.2M        | 900K  | 800K    | 600K          |
-| Subscribe        | 900K        | 750K  | 700K    | 500K          |
+### Batching Benefits
+
+Batching reduces notification overhead for multiple updates:
+
+| Scenario | ops/sec | Speedup |
+|----------|---------|---------|
+| Batch: 100 sets | **6.8** | **1.4x faster** |
+| No batch: 100 sets | **4.9** | Baseline |
+
+```typescript
+import { batch } from '@nexus-state/core';
+
+// Batch multiple updates
+batch(() => {
+  store.set(atom1, value1);
+  store.set(atom2, value2);
+  // Single notification cycle instead of 100
+});
+```
+
+### Silent Mode (for time-travel, undo/redo)
+
+Silent mode suppresses notifications for better performance:
+
+| Mode | Time (10K ops) | Speedup |
+|------|----------------|---------|
+| Silent | 6.14ms | **49% faster** |
+| Normal | 11.95ms | Baseline |
+
+```typescript
+// Silent update (no notifications)
+store.set(atom, value, { silent: true });
+
+// Or use setSilently
+store.setSilently(atom, value);
+```
+
+### Plugin Overhead
+
+Plugins add minimal overhead:
+
+| Plugins | Overhead |
+|---------|----------|
+| 3 plugins | **+8%** |
+
+### Dependency Patterns
+
+Performance varies by dependency graph complexity:
+
+| Pattern | ops/sec | mean (ms) |
+|---------|---------|-----------|
+| Diamond (2 deps → 1) | **13.7** | 73 |
+| Chain of 5 | **14.4** | 70 |
+| Chain of 10 | **12.3** | 82 |
+| Complex graph (6 atoms) | **6.5** | 154 |
+
+> **Key finding:** Linear dependencies scale better than deep graphs.
+
+### Running Benchmarks
+
+```bash
+# Core store benchmarks
+npx vitest bench __benchmarks__/store.bench.ts
+
+# IReactiveValue abstraction benchmarks
+pnpm test -- src/reactive/__tests__/benchmarks.test.ts
+```
+
+> **Note:** Results vary by hardware and environment. For accurate comparisons, run benchmarks on your target machine.
 
 ---
 
@@ -547,125 +620,6 @@ store.get(userAtom);
 // Now setState works
 store.setState({ user: { name: 'John' } });
 ```
-
----
-
-## 📊 Performance Benchmarks
-
-### Latest Results (2026-03-24)
-
-#### Basic Operations (10,000 iterations)
-
-| Operation         | Ops/sec   | Mean Time | Notes                  |
-| ----------------- | --------- | --------- | ---------------------- |
-| `store.get()`     | **1,720** | 0.58ms    | Fast read              |
-| `store.set()`     | **1.9**   | 515ms     | Includes notifications |
-| Create 1000 atoms | **679**   | 1.47ms    | One-time cost          |
-
-**Note:** `set()` is slower due to dependency, dependency tracking, notifications, and DevTools integration.
-
-#### Computed Atoms (1,000 iterations)
-
-| Dependencies    | Ops/sec  | Mean Time | P99   |
-| --------------- | -------- | --------- | ----- |
-| 1 dependency    | **16.9** | 59ms      | 84ms  |
-| 5 dependencies  | **3.0**  | 337ms     | 368ms |
-| 10 dependencies | **1.3**  | 751ms     | 938ms |
-| Chain of 5      | **14.5** | 69ms      | 71ms  |
-| Chain of 10     | **10.5** | 95ms      | 165ms |
-| Diamond pattern | **13.7** | 73ms      | 76ms  |
-
-**Key Finding:** Linear dependencies scale better than deep chains.
-
-#### Batching Performance
-
-| Operation          | Ops/sec | Mean Time | Speedup         |
-| ------------------ | ------- | --------- | --------------- |
-| Batch: 100 sets    | **6.6** | 152ms     | **1.5x faster** |
-| No batch: 100 sets | **4.4** | 226ms     | Baseline        |
-
-**Recommendation:** Always use `batch()` for bulk updates.
-
-```typescript
-import { batch } from '@nexus-state/core';
-
-// Batch multiple updates
-batch(() => {
-  store.set(atom1, value1);
-  store.set(atom2, value2);
-  // Single notification cycle
-});
-```
-
-#### Subscription Patterns
-
-| Pattern               | Ops/sec  | Mean Time | Use Case       |
-| --------------------- | -------- | --------- | -------------- |
-| 1000 subs, 1 update   | **16.2** | 62ms      | Many listeners |
-| 100 subs, 100 updates | **74.9** | 13ms      | Distributed    |
-
-#### Memory Performance
-
-| Operation                   | Ops/sec | Mean Time | Impact   |
-| --------------------------- | ------- | --------- | -------- |
-| Create/cleanup 1000 atoms   | **1.1** | 886ms     | High GC  |
-| Subscribe/unsubscribe 1000x | **3.6** | 275ms     | Moderate |
-| Dynamic atoms (100)         | **8.1** | 124ms     | Low      |
-
-### IReactiveValue Abstraction Overhead
-
-| Operation       | Baseline | With Abstraction | Overhead          |
-| --------------- | -------- | ---------------- | ----------------- |
-| `getValue()`    | 8.5ms    | 2.6ms            | **-69%** (faster) |
-| `setValue()`    | 2.6ms    | 2.6ms            | ~0%               |
-| `setValue(ctx)` | 3.0ms    | 3.0ms            | < 35%             |
-
-### Silent Mode Performance
-
-| Mode   | Speed    | Notifications | Use Case               |
-| ------ | -------- | ------------- | ---------------------- |
-| Normal | 1.0x     | ✅ Yes        | Regular updates        |
-| Silent | 1.0-1.2x | ❌ No         | Time-travel, undo/redo |
-
-```typescript
-// Silent update (no notifications)
-store.set(atom, value, { silent: true });
-
-// Or use setSilently
-store.setSilently(atom, value);
-```
-
-### Context Propagation
-
-| Scenario                  | Overhead | Status  |
-| ------------------------- | -------- | ------- |
-| Writable atom propagation | < 400%   | ✅ Pass |
-| Nested (2 levels)         | < 500%   | ✅ Pass |
-| Multi-plugin (3)          | < 100%   | ✅ Pass |
-
-**Note:** Higher tolerances account for CI variability and context merging complexity.
-
-### Running Benchmarks
-
-```bash
-# Store benchmarks
-npx vitest bench __benchmarks__/store.bench.ts
-
-# IReactiveValue abstraction benchmarks
-pnpm test -- src/reactive/__tests__/benchmarks.test.ts
-```
-
-### Future: TC39 Signals Migration
-
-Expected performance improvements with Signals backend:
-
-| Operation          | Current | Signals (Expected) | Improvement |
-| ------------------ | ------- | ------------------ | ----------- |
-| `getValue()`       | 0.58ms  | ~0.35ms            | 40% faster  |
-| `setValue()`       | 515ms   | ~300ms             | 42% faster  |
-| Computed (10 deps) | 751ms   | ~450ms             | 40% faster  |
-
-See [SR-010-benchmark-analysis.md](../../planning/phase-11-signal-ready-architecture/SR-010-benchmark-analysis.md) for detailed analysis.
 
 ---
 
