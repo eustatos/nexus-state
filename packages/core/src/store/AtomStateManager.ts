@@ -98,6 +98,17 @@ export class AtomStateManager {
    */
   private createGetter(): <V>(atom: Atom<V>) => V {
     return <V>(atom: Atom<V>): V => {
+      // Ensure atom is registered (lazy registration)
+      const lazyMeta = atom._lazyRegistration;
+      if (lazyMeta && !lazyMeta.registered) {
+        lazyMeta.registered = true;
+        lazyMeta.registeredAt = Date.now();
+        lazyMeta.accessCount = 1;
+        atomRegistry.register(atom, atom.name);
+      } else if (lazyMeta) {
+        lazyMeta.accessCount++;
+      }
+
       const state = this.getOrCreateState(atom, () => {
         if (isPrimitiveAtom(atom)) {
           return (atom as PrimitiveAtom<V>).read();

@@ -78,10 +78,46 @@ export class StoreImpl implements Store {
   }
 
   /**
+   * Ensure atom is registered on first access
+   * @param atom The atom to register
+   */
+  private ensureAtomRegistered<Value>(atom: Atom<Value>): void {
+    const lazyMeta = atom._lazyRegistration;
+
+    if (lazyMeta && !lazyMeta.registered) {
+      // Mark as registered BEFORE calling register to prevent re-entrancy
+      lazyMeta.registered = true;
+      lazyMeta.registeredAt = Date.now();
+      lazyMeta.accessCount = 1;
+
+      // Register with the global registry
+      atomRegistry.register(atom, atom.name);
+
+      // Also register in current store's local registry
+      if (!this.registry.atoms.has(atom.id)) {
+        this.registry.atoms.add(atom.id);
+      }
+
+      logger.log(
+        '[StoreImpl] Lazy registered atom:',
+        atom.name || 'unnamed',
+        'id:',
+        atom.id.toString()
+      );
+    } else if (lazyMeta) {
+      // Increment access count for debugging/monitoring
+      lazyMeta.accessCount++;
+    }
+  }
+
+  /**
    * Create getter function
    */
   private createGetter(): Getter {
     return <Value>(atom: Atom<Value>): Value => {
+      // Trigger lazy registration on first access
+      this.ensureAtomRegistered(atom);
+
       const previousAtom = this.stateManager.getCurrentAtom();
       this.stateManager.setCurrentAtom(atom);
 
@@ -119,6 +155,9 @@ export class StoreImpl implements Store {
       update: Value | ((prev: Value) => Value),
       context?: AtomContext
     ): void => {
+      // Trigger lazy registration on first access
+      this.ensureAtomRegistered(atom);
+
       logger.log(
         '[StoreImpl] Setting atom:',
         atom.name || 'unnamed',
@@ -263,10 +302,8 @@ export class StoreImpl implements Store {
       atom.name || 'unnamed'
     );
 
-    // Register atom only in current store (O(1))
-    if (!this.registry.atoms.has(atom.id)) {
-      this.registry.atoms.add(atom.id);
-    }
+    // Trigger lazy registration on subscribe
+    this.ensureAtomRegistered(atom);
 
     // Get or create state
     const atomState = this.stateManager.getOrCreateState(atom, () => {
