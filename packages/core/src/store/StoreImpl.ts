@@ -19,6 +19,7 @@ import type {
   Setter,
   Plugin,
   ActionMetadata,
+  StoreRegistry,
 } from '../types';
 import type { AtomContext } from '../reactive';
 import { isWritableAtom } from '../types';
@@ -44,6 +45,7 @@ export class StoreImpl implements Store {
   private evaluator: ComputedEvaluator;
   private devTools: DevToolsIntegration;
   private batchProcessor: BatchProcessor;
+  private registry: StoreRegistry;
 
   constructor(plugins: Plugin[] = []) {
     // Initialize components
@@ -59,15 +61,18 @@ export class StoreImpl implements Store {
     const get = this.createGetter();
     const set = this.createSetter(get);
 
+    // Auto-attach to registry and get store registry reference
+    if (typeof atomRegistry.attachStore === 'function') {
+      atomRegistry.attachStore(this as unknown as Store, 'global');
+    }
+    // Get the registry for this store
+    const storesMap = atomRegistry.getStoresMap();
+    this.registry = storesMap.get(this as unknown as Store)!;
+
     // Apply plugins
     plugins.forEach((plugin) => {
       this.pluginSystem.applyPlugin(plugin, this as unknown as Store);
     });
-
-    // Auto-attach to registry
-    if (typeof atomRegistry.attachStore === 'function') {
-      atomRegistry.attachStore(this as unknown as Store, 'global');
-    }
 
     logger.log('[StoreImpl] Created with', plugins.length, 'plugins');
   }
@@ -123,12 +128,9 @@ export class StoreImpl implements Store {
         context
       );
 
-      // Register atom with registry
-      const storesMap = atomRegistry.getStoresMap();
-      for (const registry of storesMap.values()) {
-        if (!registry.atoms.has(atom.id)) {
-          registry.atoms.add(atom.id);
-        }
+      // Register atom only in current store (O(1))
+      if (!this.registry.atoms.has(atom.id)) {
+        this.registry.atoms.add(atom.id);
       }
 
       // For writable atoms with write function, call write directly
@@ -261,12 +263,9 @@ export class StoreImpl implements Store {
       atom.name || 'unnamed'
     );
 
-    // Register atom with registry
-    const storesMap = atomRegistry.getStoresMap();
-    for (const registry of storesMap.values()) {
-      if (!registry.atoms.has(atom.id)) {
-        registry.atoms.add(atom.id);
-      }
+    // Register atom only in current store (O(1))
+    if (!this.registry.atoms.has(atom.id)) {
+      this.registry.atoms.add(atom.id);
     }
 
     // Get or create state

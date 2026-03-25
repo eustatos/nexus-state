@@ -50,14 +50,6 @@ export class AtomStateManager {
         atom.type
       );
 
-      // Register atom with the global registry
-      const storesMap = atomRegistry.getStoresMap();
-      for (const registry of storesMap.values()) {
-        if (!registry.atoms.has(atom.id)) {
-          registry.atoms.add(atom.id);
-        }
-      }
-
       // Get initial value
       const initialValue = this.evaluateAtom(atom, getter);
 
