@@ -173,6 +173,10 @@ docs/.vitepress/cache/
 # Qwen Code settings
 .qwen/
 
+# Benchmark results (generated files)
+bench-result.json
+bench-result-converted.json
+
 "packages/*/src/*.d.ts"
 "packages/*/src/*.js"
 "packages/*/src/**/*.d.ts.map"

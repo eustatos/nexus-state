@@ -117,6 +117,9 @@ importers:
       '@nexus-state/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@nexus-state/time-travel':
+        specifier: workspace:*
+        version: link:../../packages/time-travel
       react:
         specifier: ^18.2.0
         version: 18.3.1
