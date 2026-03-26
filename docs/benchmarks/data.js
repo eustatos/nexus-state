@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774521281460,
+  "lastUpdate": 1774528892107,
   "repoUrl": "https://github.com/eustatos/nexus-state",
   "entries": {
     "Benchmark": [
@@ -673,6 +673,229 @@ window.BENCHMARK_DATA = {
             "range": "3.17",
             "unit": "ops/sec",
             "extra": "Samples: 1138\nMean: 0.439671ms\nP99: 1.362456ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "eustatos",
+            "username": "eustatos"
+          },
+          "committer": {
+            "name": "eustatos",
+            "username": "eustatos"
+          },
+          "id": "02d0bc6cab04c3b469ad1f2e17393b3f6366afe7",
+          "message": "feat(core): Add public methods getRegistryAtoms() and getRegistry()",
+          "timestamp": "2026-03-26T11:23:55Z",
+          "url": "https://github.com/eustatos/nexus-state/pull/73/commits/02d0bc6cab04c3b469ad1f2e17393b3f6366afe7"
+        },
+        "date": 1774528891217,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "packages/core/__benchmarks__/registry-overhead.bench.ts > atomRegistry Overhead Analysis - current: set() with atomRegistry lookup",
+            "value": 2714.5881915441564,
+            "range": "1.71",
+            "unit": "ops/sec",
+            "extra": "Samples: 1358\nMean: 0.368380ms\nP99: 0.737792ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/registry-overhead.bench.ts > atomRegistry Overhead Analysis - proposed: state-in-atom direct access",
+            "value": 358209.7922383682,
+            "range": "0.58",
+            "unit": "ops/sec",
+            "extra": "Samples: 179105\nMean: 0.002792ms\nP99: 0.004558ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/registry-overhead.bench.ts > atomRegistry.getStoresMap() overhead - direct Map access",
+            "value": 172170.10888354343,
+            "range": "0.33",
+            "unit": "ops/sec",
+            "extra": "Samples: 86086\nMean: 0.005808ms\nP99: 0.010781ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/registry-overhead.bench.ts > Memory comparison - current: atomRegistry + store state",
+            "value": 85.34638003993965,
+            "range": "7.34",
+            "unit": "ops/sec",
+            "extra": "Samples: 43\nMean: 11.716959ms\nP99: 24.966743ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/registry-overhead.bench.ts > Memory comparison - proposed: state-in-atom only",
+            "value": 104007.25634811424,
+            "range": "2.73",
+            "unit": "ops/sec",
+            "extra": "Samples: 52004\nMean: 0.009615ms\nP99: 0.032702ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Batching Performance - batch with computed atoms",
+            "value": 65412.710061336635,
+            "range": "14.62",
+            "unit": "ops/sec",
+            "extra": "Samples: 32707\nMean: 0.015288ms\nP99: 0.118322ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Batching Performance - batch: 100 sets, single notification",
+            "value": 1365.048782136704,
+            "range": "10.62",
+            "unit": "ops/sec",
+            "extra": "Samples: 683\nMean: 0.732575ms\nP99: 4.864389ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Batching Performance - nested batch calls",
+            "value": 5390.876186192578,
+            "range": "15.32",
+            "unit": "ops/sec",
+            "extra": "Samples: 2716\nMean: 0.185499ms\nP99: 5.902166ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Batching Performance - no batch: 100 sets, multiple notifications",
+            "value": 1343.7145977069451,
+            "range": "11.27",
+            "unit": "ops/sec",
+            "extra": "Samples: 672\nMean: 0.744206ms\nP99: 5.078644ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Edge Cases - atom with function update",
+            "value": 2325.2826503022484,
+            "range": "4.36",
+            "unit": "ops/sec",
+            "extra": "Samples: 1163\nMean: 0.430055ms\nP99: 1.784027ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Edge Cases - concurrent subscriptions to same atom",
+            "value": 29810.426607425088,
+            "range": "8.24",
+            "unit": "ops/sec",
+            "extra": "Samples: 14919\nMean: 0.033545ms\nP99: 0.049392ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Edge Cases - rapid set/get cycles",
+            "value": 1917.8118933382027,
+            "range": "6.22",
+            "unit": "ops/sec",
+            "extra": "Samples: 959\nMean: 0.521428ms\nP99: 2.586435ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Memory Performance - create and cleanup 1000 atoms",
+            "value": 447.78821785532784,
+            "range": "20.22",
+            "unit": "ops/sec",
+            "extra": "Samples: 228\nMean: 2.233199ms\nP99: 9.457435ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Memory Performance - dynamic atoms with subscriptions",
+            "value": 3344.583761875383,
+            "range": "12.62",
+            "unit": "ops/sec",
+            "extra": "Samples: 1674\nMean: 0.298991ms\nP99: 5.836502ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Memory Performance - subscribe and unsubscribe 1000 times",
+            "value": 5666.721451639635,
+            "range": "3.99",
+            "unit": "ops/sec",
+            "extra": "Samples: 2834\nMean: 0.176469ms\nP99: 1.388692ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - 100 subscribers, 100 updates",
+            "value": 5599.355178257777,
+            "range": "3.06",
+            "unit": "ops/sec",
+            "extra": "Samples: 2800\nMean: 0.178592ms\nP99: 0.797453ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - 1000 subscribers, single update",
+            "value": 4422.190138040381,
+            "range": "12.51",
+            "unit": "ops/sec",
+            "extra": "Samples: 2215\nMean: 0.226132ms\nP99: 4.372381ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - complex dependency graph",
+            "value": 341.2447237354443,
+            "range": "1.84",
+            "unit": "ops/sec",
+            "extra": "Samples: 171\nMean: 2.930448ms\nP99: 4.676419ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - computed atom with 1 dependency",
+            "value": 1332.105862688579,
+            "range": "0.88",
+            "unit": "ops/sec",
+            "extra": "Samples: 667\nMean: 0.750691ms\nP99: 1.033977ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - computed atom with 10 dependencies",
+            "value": 96.98671692093424,
+            "range": "0.90",
+            "unit": "ops/sec",
+            "extra": "Samples: 49\nMean: 10.310690ms\nP99: 11.878350ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - computed atom with 5 dependencies",
+            "value": 227.48132347404862,
+            "range": "0.55",
+            "unit": "ops/sec",
+            "extra": "Samples: 114\nMean: 4.395965ms\nP99: 4.602662ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - create 1000 primitive atoms",
+            "value": 12086.379699937528,
+            "range": "1.82",
+            "unit": "ops/sec",
+            "extra": "Samples: 6044\nMean: 0.082738ms\nP99: 0.219200ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - diamond dependency pattern",
+            "value": 717.776048130773,
+            "range": "1.25",
+            "unit": "ops/sec",
+            "extra": "Samples: 359\nMean: 1.393192ms\nP99: 1.944022ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - get primitive atom - 10000 iterations",
+            "value": 3286.464944807699,
+            "range": "1.55",
+            "unit": "ops/sec",
+            "extra": "Samples: 1644\nMean: 0.304278ms\nP99: 0.567974ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - nested computed atoms (chain of 10)",
+            "value": 273.6098274610616,
+            "range": "1.12",
+            "unit": "ops/sec",
+            "extra": "Samples: 137\nMean: 3.654839ms\nP99: 4.472828ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - nested computed atoms (chain of 5)",
+            "value": 554.1925541870038,
+            "range": "1.49",
+            "unit": "ops/sec",
+            "extra": "Samples: 278\nMean: 1.804427ms\nP99: 2.522846ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - set primitive atom - 10000 iterations",
+            "value": 293.7751703368404,
+            "range": "0.62",
+            "unit": "ops/sec",
+            "extra": "Samples: 147\nMean: 3.403964ms\nP99: 3.727803ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - subscribe and update - 1000 iterations",
+            "value": 2843.489138741226,
+            "range": "0.95",
+            "unit": "ops/sec",
+            "extra": "Samples: 1422\nMean: 0.351681ms\nP99: 0.595766ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Writable Atom Performance - writable atom with multiple operations",
+            "value": 2044.8539022340242,
+            "range": "6.18",
+            "unit": "ops/sec",
+            "extra": "Samples: 1026\nMean: 0.489032ms\nP99: 2.663209ms"
           }
         ]
       }
