@@ -250,6 +250,6 @@ const mutation2 = useMutation<void, Error, number>({
 
 ## Additional Resources
 
-- [API Reference: useMutation](../api/useMutation.md)
-- [Axios Helpers](./axios-helpers.md)
-- [Optimistic Updates](./optimistic-updates.md)
+- [Query Package API](../api/index.md#query)
+- [Async Atoms](../api/async.md)
+- [Core API Reference](../api/core.md)

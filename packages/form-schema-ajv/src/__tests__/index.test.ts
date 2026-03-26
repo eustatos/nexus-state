@@ -232,7 +232,7 @@ describe('ajvPlugin', () => {
   });
 
   describe('validateField()', () => {
-    it('should return null (AJV limitation)', async () => {
+    it('should return error for invalid email', async () => {
       const config = {
         schema: {
           type: 'object',
@@ -243,15 +243,15 @@ describe('ajvPlugin', () => {
       };
       const validator = ajvPlugin.create(config);
 
-      // Note: validateField returns null due to interface limitation
-      // AJV requires all values context
       const error = await validator.validateField(
         'email',
         'invalid',
         undefined
       );
 
-      expect(error).toBeNull();
+      expect(error).not.toBeNull();
+      expect(error?.code).toBe('format');
+      expect(error?.message).toContain('email');
     });
 
     it('should return null for valid field', async () => {
@@ -274,7 +274,7 @@ describe('ajvPlugin', () => {
       expect(error).toBeNull();
     });
 
-    it('should return null for all fields (limitation)', async () => {
+    it('should return errors for invalid fields', async () => {
       const config = {
         schema: {
           type: 'object',
@@ -292,7 +292,8 @@ describe('ajvPlugin', () => {
         undefined
       );
 
-      expect(emailError).toBeNull();
+      expect(emailError).not.toBeNull();
+      expect(emailError?.code).toBe('format');
 
       const passwordError = await validator.validateField(
         'password',
@@ -300,7 +301,8 @@ describe('ajvPlugin', () => {
         undefined
       );
 
-      expect(passwordError).toBeNull();
+      expect(passwordError).not.toBeNull();
+      expect(passwordError?.code).toBe('minLength');
     });
 
     it('should return null when field is valid', async () => {

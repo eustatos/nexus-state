@@ -19,6 +19,10 @@ export default defineConfig({
         __dirname,
         "../../packages/devtools/dist/esm/index.js"
       ),
+      "@nexus-state/time-travel": path.resolve(
+        __dirname,
+        "../../packages/time-travel/dist/index.js"
+      ),
     },
   },
 });

@@ -168,7 +168,16 @@ docs/.vitepress/dist/
 docs/.vitepress/cache/
 
 # Changesets
-.changeset/pre.json"packages/*/src/*.d.ts"  
-"packages/*/src/*.js"  
-"packages/*/src/**/*.d.ts.map"  
-"packages/*/src/**/*.js.map"  
+.changeset/pre.json
+
+# Qwen Code settings
+.qwen/
+
+# Benchmark results (generated files)
+bench-result.json
+bench-result-converted.json
+
+"packages/*/src/*.d.ts"
+"packages/*/src/*.js"
+"packages/*/src/**/*.d.ts.map"
+"packages/*/src/**/*.js.map"

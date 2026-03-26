@@ -6,17 +6,18 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      // Use source files directly for tests (no build required)
       "@nexus-state/core": path.resolve(
         __dirname,
-        "../../packages/core/dist/index.js"
+        "../../packages/core/src/index.ts"
       ),
       "@nexus-state/react": path.resolve(
         __dirname,
-        "../../packages/react/dist/index.js"
+        "../../packages/react/src/index.ts"
       ),
       "@nexus-state/family": path.resolve(
         __dirname,
-        "../../packages/family/dist/index.js"
+        "../../packages/family/src/index.ts"
       ),
     },
   },

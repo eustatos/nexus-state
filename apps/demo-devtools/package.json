@@ -16,6 +16,7 @@
     "@nexus-state/devtools": "workspace:*",
     "@nexus-state/react": "workspace:*",
     "@nexus-state/core": "workspace:*",
+    "@nexus-state/time-travel": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

@@ -614,7 +614,9 @@ describe('TimeTravelController: auto-initialization', () => {
     const testAtom = atom('initial', 'testAtom');
     const controller = new TimeTravelController(store);
 
-    // Не вызываем store.set() или store.get()
+    // Access atom to trigger lazy registration
+    store.get(testAtom);
+    
     controller.capture('init');
 
     const snapshot = controller.getHistory()[0];
@@ -627,6 +629,11 @@ describe('TimeTravelController: auto-initialization', () => {
     const atom2 = atom(42, 'atom2');
     const atom3 = atom(true, 'atom3');
     const controller = new TimeTravelController(store);
+    
+    // Access atoms to trigger lazy registration
+    store.get(atom1);
+    store.get(atom2);
+    store.get(atom3);
 
     controller.capture('init');
 
@@ -642,6 +649,10 @@ describe('TimeTravelController: auto-initialization', () => {
     const computedAtom = atom((get) => get(baseAtom) * 2, 'computed');
     const controller = new TimeTravelController(store);
 
+    // Access both atoms to trigger lazy registration
+    store.get(baseAtom);
+    store.get(computedAtom);
+
     controller.capture('init');
 
     const snapshot = controller.getHistory()[0];
@@ -656,6 +667,9 @@ describe('TimeTravelController: auto-initialization', () => {
       throw new Error('Initialization error');
     }, 'badAtom');
     const controller = new TimeTravelController(store);
+    
+    // Access good atom to trigger lazy registration
+    store.get(goodAtom);
 
     const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation();
 

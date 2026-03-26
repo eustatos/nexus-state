@@ -124,8 +124,20 @@ export function atom<Value>(...args: any[]): Atom<Value> {
     throw new Error('Invalid arguments for atom function');
   }
 
-  // Register atom with the global registry
-  atomRegistry.register(atomInstance, name);
+  // Initialize lazy registration metadata
+  // Atom will be registered on first access (get/set)
+  atomInstance._lazyRegistration = {
+    registered: false,
+    accessCount: 0,
+  };
+
+  // Named atoms are registered immediately to support time-travel and DevTools
+  // Anonymous atoms remain lazy-registered to avoid unnecessary overhead
+  if (name) {
+    atomRegistry.register(atomInstance, name);
+    atomInstance._lazyRegistration.registered = true;
+    atomInstance._lazyRegistration.registeredAt = Date.now();
+  }
 
   return atomInstance;
 }

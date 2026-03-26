@@ -117,6 +117,9 @@ importers:
       '@nexus-state/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@nexus-state/time-travel':
+        specifier: workspace:*
+        version: link:../../packages/time-travel
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -512,40 +515,6 @@ importers:
         specifier: ^5.4.21
         version: 5.4.21(@types/node@20.19.37)
 
-  apps/form-builder-examples:
-    dependencies:
-      '@nexus-state/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@nexus-state/form-builder-react':
-        specifier: workspace:*
-        version: link:../../packages/form-builder-react
-      '@nexus-state/react':
-        specifier: workspace:*
-        version: link:../../packages/react
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.2.0
-        version: 18.3.28
-      '@types/react-dom':
-        specifier: ^18.2.0
-        version: 18.3.7(@types/react@18.3.28)
-      '@vitejs/plugin-react':
-        specifier: ^4.0.0
-        version: 4.7.0(vite@5.4.21(@types/node@20.19.37))
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      vite:
-        specifier: ^5.4.21
-        version: 5.4.21(@types/node@20.19.37)
-
   packages/async:
     dependencies:
       '@nexus-state/core':
@@ -673,6 +642,9 @@ importers:
         specifier: workspace:*
         version: link:../react
     devDependencies:
+      '@testing-library/react':
+        specifier: ^16.3.2
+        version: 16.3.2(@testing-library/dom@9.3.4)(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.37

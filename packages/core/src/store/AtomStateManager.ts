@@ -50,14 +50,6 @@ export class AtomStateManager {
         atom.type
       );
 
-      // Register atom with the global registry
-      const storesMap = atomRegistry.getStoresMap();
-      for (const registry of storesMap.values()) {
-        if (!registry.atoms.has(atom.id)) {
-          registry.atoms.add(atom.id);
-        }
-      }
-
       // Get initial value
       const initialValue = this.evaluateAtom(atom, getter);
 
@@ -106,6 +98,17 @@ export class AtomStateManager {
    */
   private createGetter(): <V>(atom: Atom<V>) => V {
     return <V>(atom: Atom<V>): V => {
+      // Ensure atom is registered (lazy registration)
+      const lazyMeta = atom._lazyRegistration;
+      if (lazyMeta && !lazyMeta.registered) {
+        lazyMeta.registered = true;
+        lazyMeta.registeredAt = Date.now();
+        lazyMeta.accessCount = 1;
+        atomRegistry.register(atom, atom.name);
+      } else if (lazyMeta) {
+        lazyMeta.accessCount++;
+      }
+
       const state = this.getOrCreateState(atom, () => {
         if (isPrimitiveAtom(atom)) {
           return (atom as PrimitiveAtom<V>).read();

@@ -21,6 +21,9 @@ describe('TimeTravelController - Auto-initialization', () => {
   describe('Basic auto-initialization', () => {
     it('should auto-initialize primitive atoms on first capture', () => {
       const testAtom = atom('initial', 'testAtom');
+      
+      // Access atom to trigger lazy registration
+      store.get(testAtom);
 
       controller.capture('init');
 
@@ -34,6 +37,12 @@ describe('TimeTravelController - Auto-initialization', () => {
       const atom2 = atom(42, 'atom2');
       const atom3 = atom(true, 'atom3');
       const atom4 = atom(null, 'atom4');
+      
+      // Access atoms to trigger lazy registration
+      store.get(atom1);
+      store.get(atom2);
+      store.get(atom3);
+      store.get(atom4);
 
       controller.capture('init');
 
@@ -47,6 +56,10 @@ describe('TimeTravelController - Auto-initialization', () => {
     it('should auto-initialize atoms with complex objects', () => {
       const objAtom = atom({ key: 'value', nested: { data: 123 } }, 'objAtom');
       const arrAtom = atom([1, 2, 3], 'arrAtom');
+      
+      // Access atoms to trigger lazy registration
+      store.get(objAtom);
+      store.get(arrAtom);
 
       controller.capture('init');
 
@@ -60,6 +73,9 @@ describe('TimeTravelController - Auto-initialization', () => {
     it('should auto-initialize computed atoms', () => {
       const baseAtom = atom(10, 'base');
       const computedAtom = atom((get) => get(baseAtom) * 2, 'computed');
+      
+      // Access computed atom to trigger lazy registration
+      store.get(computedAtom);
 
       controller.capture('init');
 
@@ -73,6 +89,10 @@ describe('TimeTravelController - Auto-initialization', () => {
       const atom2 = atom(10, 'atom2');
       const sumAtom = atom((get) => get(atom1) + get(atom2), 'sum');
       const productAtom = atom((get) => get(atom1) * get(atom2), 'product');
+      
+      // Access computed atoms to trigger lazy registration
+      store.get(sumAtom);
+      store.get(productAtom);
 
       controller.capture('init');
 
@@ -87,6 +107,9 @@ describe('TimeTravelController - Auto-initialization', () => {
       const baseAtom = atom(2, 'base');
       const doubleAtom = atom((get) => get(baseAtom) * 2, 'double');
       const quadAtom = atom((get) => get(doubleAtom) * 2, 'quad');
+      
+      // Access computed atom to trigger lazy registration
+      store.get(quadAtom);
 
       controller.capture('init');
 
@@ -104,6 +127,10 @@ describe('TimeTravelController - Auto-initialization', () => {
         throw new Error('Initialization error');
       }, 'badAtom');
       const anotherGoodAtom = atom('also-good', 'anotherGoodAtom');
+      
+      // Access good atoms to trigger lazy registration
+      store.get(goodAtom);
+      store.get(anotherGoodAtom);
 
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation();
 
@@ -123,15 +150,18 @@ describe('TimeTravelController - Auto-initialization', () => {
     });
 
     it('should handle circular dependencies gracefully', () => {
-      // Создаём циклическую зависимость через writable atoms
+      // Create cyclic dependency via writable atoms
       const atom1 = atom(0, 'atom1');
       const atom2 = atom(
         (get) => get(atom1) + 1,
         (get, set, value: number) => set(atom1, value),
         'atom2'
       );
+      
+      // Access atom to trigger lazy registration
+      store.get(atom1);
 
-      // Store должен обработать это корректно
+      // Store should handle this correctly
       expect(() => controller.capture('init')).not.toThrow();
     });
   });
@@ -140,31 +170,37 @@ describe('TimeTravelController - Auto-initialization', () => {
     it('should work with explicitly initialized atoms', () => {
       const testAtom = atom('initial', 'testAtom');
 
-      // Явная инициализация (старый способ)
+      // Explicit initialization (old way)
       store.set(testAtom, 'changed');
 
       controller.capture('snapshot');
 
       const snapshot = controller.getHistory()[0];
-      expect(snapshot.state.testAtom.value).toBe('changed');  // Использует значение из store
+      expect(snapshot.state.testAtom.value).toBe('changed');  // Uses value from store
     });
 
     it('should preserve store state over initialValue', () => {
       const atom1 = atom('initial1', 'atom1');
       const atom2 = atom('initial2', 'atom2');
+      
+      // Access atoms to trigger lazy registration
+      store.get(atom2);
 
-      // Изменяем только atom1
+      // Modify only atom1
       store.set(atom1, 'modified');
 
       controller.capture('snapshot');
 
       const snapshot = controller.getHistory()[0];
-      expect(snapshot.state.atom1.value).toBe('modified');  // Из store
-      expect(snapshot.state.atom2.value).toBe('initial2');   // Авто-инициализирован
+      expect(snapshot.state.atom1.value).toBe('modified');  // From store
+      expect(snapshot.state.atom2.value).toBe('initial2');   // Auto-initialized
     });
 
     it('should work with existing time-travel workflow', () => {
       const countAtom = atom(0, 'count');
+      
+      // Access atom to trigger lazy registration
+      store.get(countAtom);
 
       controller.capture('init');
 
@@ -190,31 +226,36 @@ describe('TimeTravelController - Auto-initialization', () => {
   describe('Multiple stores', () => {
     it('should auto-initialize atoms independently in different stores', () => {
       const sharedAtom = atom('initial', 'shared');
-
+      
       const store1 = createStore();
       const controller1 = new TimeTravelController(store1);
-
+      
       const store2 = createStore();
       const controller2 = new TimeTravelController(store2);
+      
+      // Access atom in store1 to trigger lazy registration
+      store1.get(sharedAtom);
 
-      // Изменяем только в store1
+      // Modify only in store1
       store1.set(sharedAtom, 'store1-value');
 
       controller1.capture('store1-snapshot');
       controller2.capture('store2-snapshot');
 
       expect(controller1.getHistory()[0].state.shared.value).toBe('store1-value');
-
-      expect(controller2.getHistory()[0].state.shared.value).toBe('initial');  // Авто-инициализирован с initialValue
+      expect(controller2.getHistory()[0].state.shared.value).toBe('initial');  // Auto-initialized with initialValue
     });
   });
 
   describe('Performance', () => {
     it('should handle large number of atoms efficiently', () => {
-      // Создаём 100 атомов
+      // Create 100 atoms
       const atoms = Array.from({ length: 100 }, (_, i) =>
         atom(`value-${i}`, `atom-${i}`)
       );
+      
+      // Access atoms to trigger lazy registration
+      atoms.forEach(a => store.get(a));
 
       const startTime = performance.now();
       controller.capture('large-snapshot');
@@ -223,14 +264,14 @@ describe('TimeTravelController - Auto-initialization', () => {
       const snapshot = controller.getHistory()[0];
       expect(Object.keys(snapshot.state)).toHaveLength(100);
 
-      // Должно выполниться быстро (< 1 секунды)
+      // Should complete quickly (< 1 second)
       expect(endTime - startTime).toBeLessThan(1000);
     });
 
     it('should handle deeply nested computed atoms', () => {
       let currentAtom = atom(1, 'base');
 
-      // Создаём цепочку из 20 computed атомов
+      // Create chain of 20 computed atoms
       for (let i = 1; i <= 20; i++) {
         const prevAtom = currentAtom;
         currentAtom = atom(
@@ -238,6 +279,9 @@ describe('TimeTravelController - Auto-initialization', () => {
           `computed-${i}`
         );
       }
+      
+      // Access last computed atom to trigger lazy registration
+      store.get(currentAtom);
 
       expect(() => controller.capture('deep-chain')).not.toThrow();
 

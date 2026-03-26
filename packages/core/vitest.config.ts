@@ -1,6 +1,14 @@
 import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 export default defineConfig({
+  // Resolve @nexus-state/core imports from src/ for development
+  // This avoids needing to rebuild after every change
+  resolve: {
+    alias: {
+      '@nexus-state/core': path.resolve(__dirname, './src'),
+    },
+  },
   test: {
     globals: true,
     isolate: true,

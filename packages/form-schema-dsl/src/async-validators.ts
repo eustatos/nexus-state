@@ -570,12 +570,19 @@ export function withTimeout<T extends (...args: any[]) => Promise<any>>(
   timeout: number
 ): T {
   return (async (...args: unknown[]) => {
-    return Promise.race([
-      fn(...args),
-      new Promise<unknown>((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout')), timeout)
-      ),
-    ]);
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const timeoutPromise = new Promise<unknown>((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error('Timeout')), timeout);
+    });
+
+    try {
+      return await Promise.race([fn(...args), timeoutPromise]);
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }
   }) as T;
 }
 
@@ -592,12 +599,16 @@ export function withOptions<T extends (...args: any[]) => Promise<string | null>
 ): T {
   let wrapped = fn;
 
-  if (options?.timeout) {
-    wrapped = withTimeout(wrapped, options.timeout);
-  }
-
+  // Apply in order: debounce -> retry -> timeout
+  // Debounce wraps everything to prevent rapid calls
+  // Retry wraps the core function to handle failures
+  // Timeout wraps retry to prevent infinite hangs
   if (options?.retry) {
     wrapped = withRetry(wrapped, options.retry);
+  }
+
+  if (options?.timeout) {
+    wrapped = withTimeout(wrapped, options.timeout);
   }
 
   if (options?.debounce) {

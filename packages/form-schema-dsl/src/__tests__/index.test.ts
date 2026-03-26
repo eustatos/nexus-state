@@ -227,15 +227,14 @@ describe('dslPlugin', () => {
   });
 
   describe('validateField()', () => {
-    it('should return null (DSL limitation)', async () => {
+    it('should return error for invalid email', async () => {
       const validator = dslPlugin.create({
         email: { validate: (v) => (v?.includes('@') ? null : 'Invalid') },
       });
 
-      // Note: validateField returns null due to interface limitation
-      // DSL requires all values context
       const error = await validator.validateField('email', 'invalid', { email: 'invalid' });
-      expect(error).toBeNull();
+      expect(error).not.toBeNull();
+      expect(error?.message).toBe('Invalid');
     });
 
     it('should return null for valid field', async () => {
@@ -256,7 +255,7 @@ describe('dslPlugin', () => {
       expect(error).toBeNull();
     });
 
-    it('should return null for cross-field validation', async () => {
+    it('should return error for cross-field validation', async () => {
       const validator = dslPlugin.create({
         password: {
           validate: (v, allValues) => {
@@ -270,7 +269,8 @@ describe('dslPlugin', () => {
         'pass123',
         { password: 'pass123', confirmPassword: 'pass456' }
       );
-      expect(error).toBeNull();
+      expect(error).not.toBeNull();
+      expect(error?.message).toBe('Passwords do not match');
     });
   });
 

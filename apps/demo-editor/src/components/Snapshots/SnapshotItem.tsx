@@ -177,7 +177,7 @@ export function SnapshotItem({
         ${compareMode ? 'snapshot-item--compare-mode' : ''}
         ${changeClass}
       `}
-      data-testid="snapshot-item"
+      data-testid={`snapshot-item-${index}`}
       data-snapshot-index={index}
       data-is-current={isCurrent}
       data-is-selected-for-compare={isSelectedForCompare}
