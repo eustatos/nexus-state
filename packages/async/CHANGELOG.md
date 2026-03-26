@@ -1,5 +1,14 @@
 # @nexus-state/async
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @nexus-state/core@0.1.19
+
 ## 0.1.3
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @nexus-state/core@0.1.19
+
 All notable changes to `@nexus-state/undo-redo` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -12,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Initial Release** - Lightweight undo/redo functionality for user interfaces
 
 #### Core Features
+
 - `UndoRedo` class for undo/redo management
 - `withUndoRedo` HOC for store integration
 - `createUndoRedo` factory function
@@ -19,12 +29,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Debounce support for rapid changes
 
 #### Store Integration
+
 - Automatic snapshot capture on state changes
 - Ignore specific atoms
 - Batch operations support
 - Event emission on undo/redo
 
 #### React Integration
+
 - `useUndoRedo` hook for React components
 - `UndoRedoProvider` context provider
 - `useCanUndo` and `useCanRedo` hooks
@@ -38,15 +50,15 @@ interface UndoRedo {
   capture(metadata?: string): void;
   undo(): void;
   redo(): void;
-  
+
   // State checks
   canUndo(): boolean;
   canRedo(): boolean;
-  
+
   // Management
   clear(): void;
   batch(fn: () => void): void;
-  
+
   // History
   getHistory(): Array<{ state: any; timestamp: number }>;
   getPosition(): number;
@@ -57,12 +69,13 @@ interface UndoRedo {
 ### Use Cases
 
 #### Text Editor
+
 ```typescript
 import { UndoRedo } from '@nexus-state/undo-redo';
 
 const undoRedo = new UndoRedo(editorStore, {
   maxHistory: 100,
-  autoCapture: true
+  autoCapture: true,
 });
 
 // User types - auto captured
@@ -71,12 +84,13 @@ const undoRedo = new UndoRedo(editorStore, {
 ```
 
 #### Forms
+
 ```typescript
 import { withUndoRedo } from '@nexus-state/undo-redo';
 
 const store = createStore();
 const undoRedo = withUndoRedo(store, {
-  ignoreAtoms: ['isDirty', 'touchedFields']
+  ignoreAtoms: ['isDirty', 'touchedFields'],
 });
 
 // Form changes tracked
@@ -85,9 +99,11 @@ const undoRedo = withUndoRedo(store, {
 ```
 
 ### Dependencies
+
 - `@nexus-state/core@^0.1.12`
 
 ### Bundle Size
+
 - ~150 KB (uncompressed)
 - ~45 KB (gzipped)
 
@@ -96,6 +112,7 @@ const undoRedo = withUndoRedo(store, {
 For simple undo/redo that was using `SimpleTimeTravel`:
 
 **Before:**
+
 ```typescript
 import { SimpleTimeTravel } from '@nexus-state/core';
 
@@ -105,6 +122,7 @@ timeTravel.redo();
 ```
 
 **After:**
+
 ```typescript
 import { UndoRedo } from '@nexus-state/undo-redo';
 

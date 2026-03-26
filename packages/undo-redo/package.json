@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/undo-redo",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Undo/Redo functionality for Nexus State",
   "type": "module",
   "main": "dist/index.js",

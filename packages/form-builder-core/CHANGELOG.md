@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @nexus-state/core@0.1.19
+  - @nexus-state/form@0.1.6
+
 All notable changes to this project will be documented in this file.
 
 ## [0.1.0] - 2026-03-16
@@ -41,23 +52,39 @@ All notable changes to this project will be documented in this file.
 To migrate to the new architecture:
 
 1. Update your package.json dependencies:
+
    ```bash
    npm uninstall @nexus-state/form-builder
    npm install @nexus-state/form-builder-react @nexus-state/form-builder-core
    ```
 
 2. Update import statements:
+
    ```typescript
    // Old
-   import { builderAtom, builderActions, defaultRegistry, builtInComponents } from '@nexus-state/form-builder';
+   import {
+     builderAtom,
+     builderActions,
+     defaultRegistry,
+     builtInComponents,
+   } from '@nexus-state/form-builder';
 
    // New
-   import { builderAtom, builderActions, defaultRegistry, builtInComponents } from '@nexus-state/form-builder-react';
+   import {
+     builderAtom,
+     builderActions,
+     defaultRegistry,
+     builtInComponents,
+   } from '@nexus-state/form-builder-react';
    ```
 
 3. For framework-agnostic usage (e.g., Vue/Svelte adapters):
    ```typescript
-   import { builderAtom, builderActions, defaultRegistry } from '@nexus-state/form-builder-core';
+   import {
+     builderAtom,
+     builderActions,
+     defaultRegistry,
+   } from '@nexus-state/form-builder-core';
    ```
 
 ## Previous Versions

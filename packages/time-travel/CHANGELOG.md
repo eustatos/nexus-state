@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.4
+
+### Patch Changes
+
+- perf: eliminate O(n) overhead и добавить ленивую регистрацию атомов
+  - Register atoms only in current store instead of iterating all stores (O(1) registration)
+  - Add lazy atom registration on first get()/set() call
+  - Memory savings: ~30% for unused atoms
+  - Update TimeTravelController to force-register atoms in capture()
+
+  Fixes #55, #56
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @nexus-state/core@0.1.19
+
 All notable changes to `@nexus-state/time-travel` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -12,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Initial Release** - Time travel debugging functionality extracted from `@nexus-state/core`
 
 #### Core Features
+
 - `SimpleTimeTravel` class for time travel debugging
 - `TimeTravelController` for advanced control
 - Snapshot management with compression strategies
@@ -19,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - History navigation (undo/redo/jumpTo)
 
 #### Advanced Features
+
 - Deep delta compression
 - Snapshot reconstruction from delta chains
 - Value comparison with circular reference detection
@@ -31,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Strategy factory
 
 #### Atom Tracking
+
 - Automatic atom tracking
 - Computed atom handling
 - Dependency tracking
@@ -39,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LRU cleanup strategy
 
 #### Performance Optimizations
+
 - Delta snapshots for reduced memory usage
 - Configurable full snapshot intervals
 - Batch change detection
@@ -46,12 +67,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cache-friendly architecture
 
 #### DevTools Integration
+
 - Automatic detection by DevTools plugin
 - State serialization for DevTools
 - Action tracking with timestamps
 - Stack trace capture
 
 ### Dependencies
+
 - `@nexus-state/core@^0.1.12`
 
 ### Migration
@@ -59,11 +82,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 If you were using time-travel from `@nexus-state/core`:
 
 **Before:**
+
 ```typescript
 import { SimpleTimeTravel } from '@nexus-state/core';
 ```
 
 **After:**
+
 ```typescript
 import { SimpleTimeTravel } from '@nexus-state/time-travel';
 ```

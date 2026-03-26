@@ -1,5 +1,16 @@
 # @nexus-state/devtools
 
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @nexus-state/core@0.1.19
+  - @nexus-state/time-travel@0.1.4
+  - @nexus-state/undo-redo@0.1.2
+
 ## 0.1.6 - 2026-03-16
 
 ### Patch Changes

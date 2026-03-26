@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @nexus-state/core@0.1.19
+  - @nexus-state/form@0.1.6
+  - @nexus-state/form-schema-dsl@0.1.3
+  - @nexus-state/form-builder-core@0.1.2
+
 All notable changes to this project will be documented in this file.
 
 ## [0.1.0] - 2026-03-16
@@ -28,6 +41,7 @@ All notable changes to this project will be documented in this file.
 To migrate to the new package name:
 
 1. Update your package.json:
+
    ```bash
    npm uninstall @nexus-state/form-builder
    npm install @nexus-state/form-builder-react
@@ -36,7 +50,12 @@ To migrate to the new package name:
 2. Update import statements:
    ```typescript
    // All imports remain the same, only package name changed
-   import { builderAtom, builderActions, defaultRegistry, builtInComponents } from '@nexus-state/form-builder-react';
+   import {
+     builderAtom,
+     builderActions,
+     defaultRegistry,
+     builtInComponents,
+   } from '@nexus-state/form-builder-react';
    ```
 
 ## Previous Versions

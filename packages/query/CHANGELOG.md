@@ -1,5 +1,15 @@
 # @nexus-state/query
 
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @nexus-state/core@0.1.19
+  - @nexus-state/react@0.1.14
+
 ## 0.1.0
 
 ### Minor Changes
