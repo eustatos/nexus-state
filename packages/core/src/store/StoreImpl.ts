@@ -23,7 +23,7 @@ import type {
 } from '../types';
 import type { AtomContext } from '../reactive';
 import { isWritableAtom } from '../types';
-import { atomRegistry } from '../atom-registry';
+import { atomRegistry, AtomRegistry } from '../atom-registry';
 import { storeLogger as logger } from '../debug';
 
 import { AtomStateManager } from './AtomStateManager';
@@ -46,8 +46,9 @@ export class StoreImpl implements Store {
   private devTools: DevToolsIntegration;
   private batchProcessor: BatchProcessor;
   private registry: StoreRegistry;
+  private atomRegistry: AtomRegistry;
 
-  constructor(plugins: Plugin[] = []) {
+  constructor(plugins: Plugin[] = [], registry?: AtomRegistry) {
     // Initialize components
     this.stateManager = new AtomStateManager();
     this.dependencyTracker = new DependencyTracker();
@@ -61,12 +62,15 @@ export class StoreImpl implements Store {
     const get = this.createGetter();
     const set = this.createSetter(get);
 
+    // Use provided registry or global registry
+    this.atomRegistry = registry || atomRegistry;
+
     // Auto-attach to registry and get store registry reference
-    if (typeof atomRegistry.attachStore === 'function') {
-      atomRegistry.attachStore(this as unknown as Store, 'global');
+    if (typeof this.atomRegistry.attachStore === 'function') {
+      this.atomRegistry.attachStore(this as unknown as Store, registry ? 'isolated' : 'global');
     }
     // Get the registry for this store
-    const storesMap = atomRegistry.getStoresMap();
+    const storesMap = this.atomRegistry.getStoresMap();
     this.registry = storesMap.get(this as unknown as Store)!;
 
     // Apply plugins
@@ -74,7 +78,7 @@ export class StoreImpl implements Store {
       this.pluginSystem.applyPlugin(plugin, this as unknown as Store);
     });
 
-    logger.log('[StoreImpl] Created with', plugins.length, 'plugins');
+    logger.log('[StoreImpl] Created with', plugins.length, 'plugins', registry ? '(isolated registry)' : '(global registry)');
   }
 
   /**
@@ -90,8 +94,8 @@ export class StoreImpl implements Store {
       lazyMeta.registeredAt = Date.now();
       lazyMeta.accessCount = 1;
 
-      // Register with the global registry
-      atomRegistry.register(atom, atom.name);
+      // Register with the atom registry (global or isolated)
+      this.atomRegistry.register(atom, atom.name);
 
       // Also register in current store's local registry
       if (!this.registry.atoms.has(atom.id)) {
@@ -438,9 +442,9 @@ export class StoreImpl implements Store {
     const localAtoms = this.registry.atoms; // ← Only this store's atoms
     Object.entries(state).forEach(([key, value]) => {
       const atomId = Array.from(localAtoms)
-        .find(id => atomRegistry.getName({ id }) === key);
+        .find(id => this.atomRegistry.getName({ id }) === key);
       if (atomId) {
-        const atom = atomRegistry.get(atomId);
+        const atom = this.atomRegistry.get(atomId);
         if (atom) {
           this.set(atom as any, value);
         }
