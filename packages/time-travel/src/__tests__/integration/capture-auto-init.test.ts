@@ -289,4 +289,93 @@ describe('TimeTravelController - Auto-initialization', () => {
       expect(snapshot.state['computed-20'].value).toBe(21);
     });
   });
+
+  describe('Store Isolation (SSR Safety)', () => {
+    it('should capture only atoms accessed in current store', () => {
+      atomRegistry.clear();
+      
+      const store1 = createStore();
+      const store2 = createStore();
+
+      const atom1 = atom('store1-value', 'atom1');
+      const atom2 = atom('store2-value', 'atom2');
+
+      // Access atoms in different stores
+      store1.get(atom1);
+      store2.get(atom2);
+
+      const controller1 = new TimeTravelController(store1);
+      const controller2 = new TimeTravelController(store2);
+
+      // Capture in both stores
+      controller1.capture('store1');
+      controller2.capture('store2');
+
+      const snapshot1 = controller1.getHistory()[0];
+      const snapshot2 = controller2.getHistory()[0];
+
+      // Each snapshot should contain the atoms that were accessed in that store
+      expect(snapshot1.state.atom1.value).toBe('store1-value');
+      expect(snapshot2.state.atom2.value).toBe('store2-value');
+      
+      // Verify store values directly
+      expect(store1.get(atom1)).toBe('store1-value');
+      expect(store2.get(atom2)).toBe('store2-value');
+    });
+
+    it('should isolate stores with same atom names', () => {
+      atomRegistry.clear();
+      
+      const store1 = createStore();
+      const store2 = createStore();
+
+      // Use different atom instances for each store
+      const userAtomStore1 = atom({ name: 'Alice' }, 'user-store1');
+      const userAtomStore2 = atom({ name: 'Bob' }, 'user-store2');
+
+      store1.set(userAtomStore1, { name: 'Alice' });
+      store2.set(userAtomStore2, { name: 'Bob' });
+
+      const controller1 = new TimeTravelController(store1);
+      const controller2 = new TimeTravelController(store2);
+
+      controller1.capture('store1');
+      controller2.capture('store2');
+
+      const snapshot1 = controller1.getHistory()[0];
+      const snapshot2 = controller2.getHistory()[0];
+
+      expect(snapshot1.state['user-store1'].value.name).toBe('Alice');
+      expect(snapshot2.state['user-store2'].value.name).toBe('Bob');
+    });
+
+    it('should not leak atoms between stores during flushComputed', () => {
+      atomRegistry.clear();
+      
+      const store1 = createStore();
+      const store2 = createStore();
+
+      const baseAtom1 = atom(10, 'base1');
+      const baseAtom2 = atom(20, 'base2');
+      
+      const computed1 = atom((get) => get(baseAtom1) * 2, 'computed1');
+      const computed2 = atom((get) => get(baseAtom2) * 2, 'computed2');
+
+      store1.get(computed1);
+      store2.get(computed2);
+
+      const controller1 = new TimeTravelController(store1);
+      const controller2 = new TimeTravelController(store2);
+
+      controller1.capture('store1');
+      controller2.capture('store2');
+
+      // Verify computed values are correct
+      const snapshot1 = controller1.getHistory()[0];
+      const snapshot2 = controller2.getHistory()[0];
+
+      expect(snapshot1.state.computed1.value).toBe(20);
+      expect(snapshot2.state.computed2.value).toBe(40);
+    });
+  });
 });

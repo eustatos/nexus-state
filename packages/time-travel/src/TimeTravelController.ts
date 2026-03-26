@@ -33,32 +33,20 @@ export class TimeTravelController implements TimeTravelAPI {
   }
 
   capture(action?: string): void {
-    // Force-register all atoms that have been accessed
-    // This ensures snapshot includes all used atoms
-    const allAtoms = atomRegistry.getAll();
-    for (const atom of allAtoms.values()) {
-      const atomObj = atom as any;
-      const lazyMeta = atomObj._lazyRegistration;
-      
-      // Force registration for atoms that were accessed but not yet registered
-      if (lazyMeta && !lazyMeta.registered) {
-        try {
-          // Access the atom to trigger registration
-          this.store.get(atomObj);
-        } catch (error) {
-          // Ignore errors for computed atoms with missing dependencies
-          console.warn(
-            `[TimeTravelController] Failed to register atom during capture:`,
-            error
-          );
-        }
-      }
-    }
-
     // Auto-initialize all atoms from registry if enabled
+    // Use global registry to ensure all atoms are initialized, but filter by store
     if (this.autoInitializeAtoms) {
-      const registeredAtoms = atomRegistry.getAll();
-      for (const atom of registeredAtoms.values()) {
+      const allAtoms = atomRegistry.getAll();
+      const storeAtoms = this.store.getRegistryAtoms?.() || [];
+      const storeAtomsSet = new Set(storeAtoms);
+      
+      for (const atom of allAtoms.values()) {
+        // Only initialize atoms that belong to this store
+        // If store doesn't support getRegistryAtoms, initialize all (backward compatibility)
+        if (storeAtoms.length > 0 && !storeAtomsSet.has((atom as any).id)) {
+          continue;
+        }
+        
         try {
           this.store.get(atom as any);
         } catch (error) {
@@ -210,17 +198,22 @@ export class TimeTravelController implements TimeTravelAPI {
    * Force re-evaluation of computed atoms
    */
   private flushComputed(): void {
-    const allAtoms = atomRegistry.getAll();
-    for (const atom of allAtoms.values()) {
-      const metadata = atomRegistry.getMetadata(atom as { id: symbol });
-      if (metadata?.type === 'computed') {
-        try {
-          this.store.get(atom as any);
-        } catch (error) {
-          console.warn(
-            `[TimeTravelController] Failed to flush computed atom:`,
-            error
-          );
+    // Use store-specific registry to ensure isolation
+    const storeAtoms = this.store.getRegistryAtoms?.() || [];
+
+    for (const atomId of storeAtoms) {
+      const atom = atomRegistry.get(atomId);
+      if (atom) {
+        const metadata = atomRegistry.getMetadata(atom as { id: symbol });
+        if (metadata?.type === 'computed') {
+          try {
+            this.store.get(atom as any);
+          } catch (error) {
+            console.warn(
+              `[TimeTravelController] Failed to flush computed atom:`,
+              error
+            );
+          }
         }
       }
     }
