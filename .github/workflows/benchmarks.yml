@@ -51,10 +51,11 @@ jobs:
           tool: 'customSmallerIsBetter'
           output-file-path: bench-result-converted.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          # Публикация результатов в виде комментария к PR
+          auto-push: true
+          # Публикация результатов в комментариях к PR
           comment-always: true
           # Предупреждение о регрессии >10%
           alert-threshold: '110%'
           fail-on-alert: false
-          # Сохранение артефактов для последующего анализа
-          save-data-file: false
+          # Хранение исторических данных
+          benchmark-data-dir-path: "docs/benchmarks"
