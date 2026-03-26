@@ -1,0 +1,61 @@
+name: Benchmarks
+
+on:
+  pull_request:
+    paths:
+      - "packages/**/src/**"
+      - "packages/**/__benchmarks__/**"
+  push:
+    branches: [main, master]
+    paths:
+      - "packages/**/src/**"
+      - "packages/**/__benchmarks__/**"
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --shamefully-hoist
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Run benchmarks
+        run: pnpm bench
+        env:
+          CI: true
+
+      - name: Convert benchmark results
+        run: pnpm bench:convert
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'customSmallerIsBetter'
+          output-file-path: bench-result-converted.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          # Publish results as a comment on PR
+          comment-on-alert: true
+          # Alert on regression > 10%
+          alert-threshold: '110%'
+          fail-on-alert: false
+          # Save historical data
+          benchmark-data-dir-path: "docs/benchmarks"

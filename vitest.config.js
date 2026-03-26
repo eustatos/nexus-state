@@ -11,6 +11,11 @@ export default defineConfig({
     ],
     testTimeout: 30000, // 30 секунд timeout
     hookTimeout: 30000, // 30 секунд timeout для хуков
+    benchmark: {
+      outputJson: "bench-result.json",
+      reporters: ["default", "verbose"],
+      // В CI режиме не запускаем watch mode
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
