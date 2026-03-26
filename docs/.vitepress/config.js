@@ -25,6 +25,8 @@ export default {
           items: [
             { text: "Best Practices", link: "/guides/best-practices" },
             { text: "Debugging with DevTools", link: "/guides/debugging" },
+            { text: "Time Travel Debugging", link: "/guides/time-travel" },
+            { text: "TypeScript Support", link: "/guides/typescript" },
           ],
         },
       ],
@@ -79,7 +81,11 @@ export default {
       "/performance/": [
         {
           text: "Performance",
-          items: [{ text: "Overview", link: "/performance/" }],
+          items: [
+            { text: "Overview", link: "/performance/" },
+            { text: "Best Practices", link: "/performance/best-practices" },
+            { text: "Benchmarks", link: "/performance/benchmarks" },
+          ],
         },
       ],
     },

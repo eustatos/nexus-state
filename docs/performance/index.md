@@ -2,7 +2,83 @@
 
 Learn how to optimize your Nexus State applications for maximum performance.
 
-## Metrics and Benchmarks
+## Quick Links
+
+- **[Best Practices](./best-practices.md)** - Comprehensive guide with patterns and anti-patterns
+- **[Benchmarks](./benchmarks.md)** - Detailed performance metrics and comparisons
+- **[Common Pitfalls](./best-practices.md#common-pitfalls)** - Mistakes to avoid
+
+---
+
+## ⚡ Quick Start
+
+| Operation | ops/sec | mean (ms) | p99 (ms) |
+|-----------|---------|-----------|----------|
+| Get atom (10K) | 3,365 | 0.30 | 1.26 |
+| Set atom (10K) | 150 | 6.64 | 20.30 |
+| Subscribe (1K) | 2,105 | 0.47 | 1.24 |
+
+[View full benchmarks](./benchmarks.md)
+
+---
+
+## Key Optimization Strategies
+
+### 1. Batch Multiple Updates
+
+Use `batch()` to group multiple state updates into a single notification cycle.
+
+```typescript
+// ❌ Bad - 3 separate notifications
+store.set(a, 1);
+store.set(b, 2);
+store.set(c, 3);
+
+// ✅ Good - Single notification
+batch(() => {
+  store.set(a, 1);
+  store.set(b, 2);
+  store.set(c, 3);
+});
+```
+
+[Learn more about batching](./best-practices.md#batching-updates)
+
+### 2. Use Selective Subscriptions
+
+Subscribe only to the state you actually need.
+
+```typescript
+// ❌ Bad - Re-renders on any store change
+const Component = () => {
+  const store = useStore();
+  return <div>{store.get(userAtom).name}</div>;
+};
+
+// ✅ Good - Only re-renders when userAtom changes
+const Component = () => {
+  const [user] = useAtom(userAtom);
+  return <div>{user.name}</div>;
+};
+```
+
+[Learn more about subscriptions](./best-practices.md#efficient-subscriptions)
+
+### 3. Limit Computed Dependencies
+
+Keep computed atoms focused with fewer dependencies.
+
+| Dependencies | mean (ms) | Recommendation |
+|--------------|-----------|----------------|
+| 1 | 1.75 | ✅ Excellent |
+| 5 | 10.17 | ⚠️ Acceptable |
+| 10 | 39.42 | ❌ Split into smaller atoms |
+
+[Learn more about computed optimization](./best-practices.md#computed-atoms-optimization)
+
+---
+
+## Performance Metrics
 
 ### Store Creation Time
 
@@ -262,6 +338,7 @@ Use browser developer tools to profile memory usage:
 
 ## Next Steps
 
-- [Best Practices Guide](../guides/best-practices.md)
+- [Best Practices Guide](./best-practices.md) - Detailed patterns and anti-patterns
+- [Detailed Benchmarks](./benchmarks.md) - Full performance metrics
 - [Debugging Guide](../guides/debugging.md)
 - [Examples](../examples/index.md)
