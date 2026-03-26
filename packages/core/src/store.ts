@@ -8,7 +8,7 @@
 // Implementation of createStore function
 
 import type { Store, Plugin } from './types';
-import { atomRegistry } from './atom-registry';
+import { atomRegistry, type AtomRegistry } from './atom-registry';
 import { storeLogger as logger } from './debug';
 
 // Import refactored components
@@ -28,15 +28,24 @@ export type StoreEnhancementOptions = {
 
 /**
  * Create a new store to hold atoms
- * @param plugins Array of plugins to apply to the store
+ * @param pluginsOrRegistry Array of plugins to apply to the store, or an AtomRegistry for isolated SSR
  * @returns A new store instance
  * @example
  * const store = createStore();
  * const storeWithPlugins = createStore([loggerPlugin, devToolsPlugin]);
+ * 
+ * // SSR with isolated registry
+ * const registry = createIsolatedRegistry();
+ * const store = createStore(registry);
  */
-export function createStore(plugins: Plugin[] = []): Store {
-  logger.log('[createStore] Creating store with', plugins.length, 'plugins');
-  return new StoreImpl(plugins);
+export function createStore(pluginsOrRegistry: Plugin[] | AtomRegistry = []): Store {
+  if (Array.isArray(pluginsOrRegistry)) {
+    logger.log('[createStore] Creating store with', pluginsOrRegistry.length, 'plugins');
+    return new StoreImpl(pluginsOrRegistry);
+  } else {
+    logger.log('[createStore] Creating store with isolated registry');
+    return new StoreImpl([], pluginsOrRegistry);
+  }
 }
 
 /**

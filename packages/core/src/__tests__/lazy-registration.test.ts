@@ -158,26 +158,39 @@ describe('Lazy Atom Registration', () => {
     });
   });
 
-  describe('Named atom (immediate registration)', () => {
-    it('should register named atom immediately on creation', () => {
+  describe('Named atom (deferred registration)', () => {
+    it('should register named atom on first store access (not on creation)', () => {
       const store = createStore();
       const countAtom = atom(0, 'count');
+
+      // Registration is deferred until first access
+      expect(atomRegistry.isRegistered(countAtom.id)).toBe(false);
+      expect(atomRegistry.size()).toBe(0);
+
+      // Access triggers registration
+      store.get(countAtom);
 
       expect(atomRegistry.isRegistered(countAtom.id)).toBe(true);
       expect(atomRegistry.size()).toBe(1);
     });
 
-    it('should register named computed atom immediately on creation', () => {
+    it('should register named computed atom on first access', () => {
       const store = createStore();
       const countAtom = atom(0, 'count');
       const doubleAtom = atom((get) => get(countAtom) * 2, 'double');
 
+      // Registration is deferred
+      expect(atomRegistry.isRegistered(countAtom.id)).toBe(false);
+      expect(atomRegistry.isRegistered(doubleAtom.id)).toBe(false);
+
+      // Access triggers registration
+      store.get(doubleAtom);
+
       expect(atomRegistry.isRegistered(countAtom.id)).toBe(true);
       expect(atomRegistry.isRegistered(doubleAtom.id)).toBe(true);
-      expect(atomRegistry.size()).toBe(2);
     });
 
-    it('should register named writable atom immediately on creation', () => {
+    it('should register named writable atom on first access', () => {
       const store = createStore();
       const baseAtom = atom(0, 'base');
       const writableAtom = atom(
@@ -185,6 +198,12 @@ describe('Lazy Atom Registration', () => {
         (get, set, val: number) => set(baseAtom, val),
         'writable'
       );
+
+      // Registration is deferred
+      expect(atomRegistry.isRegistered(writableAtom.id)).toBe(false);
+      expect(atomRegistry.isRegistered(baseAtom.id)).toBe(false);
+
+      store.get(writableAtom);
 
       expect(atomRegistry.isRegistered(writableAtom.id)).toBe(true);
       expect(atomRegistry.isRegistered(baseAtom.id)).toBe(true);
@@ -194,8 +213,8 @@ describe('Lazy Atom Registration', () => {
       const store = createStore();
       const unicodeAtom = atom(0, 'unicode-测试🚀');
 
-      // Named atoms are registered immediately
-      expect(atomRegistry.isRegistered(unicodeAtom.id)).toBe(true);
+      // Registration is deferred until first access
+      expect(atomRegistry.isRegistered(unicodeAtom.id)).toBe(false);
 
       store.get(unicodeAtom);
 
@@ -206,8 +225,8 @@ describe('Lazy Atom Registration', () => {
       const store = createStore();
       const specialAtom = atom(0, 'atom@#$%');
 
-      // Named atoms are registered immediately
-      expect(atomRegistry.isRegistered(specialAtom.id)).toBe(true);
+      // Registration is deferred until first access
+      expect(atomRegistry.isRegistered(specialAtom.id)).toBe(false);
 
       store.get(specialAtom);
 
@@ -227,12 +246,12 @@ describe('Lazy Atom Registration', () => {
       expect(atomRegistry.isRegistered(countAtom.id)).toBe(true);
     });
 
-    it('should register named atom immediately (before subscribe)', () => {
+    it('should register named atom on subscribe (deferred registration)', () => {
       const store = createStore();
       const countAtom = atom(0, 'count');
 
-      // Already registered on creation
-      expect(atomRegistry.isRegistered(countAtom.id)).toBe(true);
+      // Not registered until first access
+      expect(atomRegistry.isRegistered(countAtom.id)).toBe(false);
 
       store.subscribe(countAtom, () => {});
 

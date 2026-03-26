@@ -58,7 +58,7 @@ export { atom } from './atom';
  * // Get the name of an atom
  * const name = atomRegistry.getName(atom);
  */
-export { atomRegistry } from './atom-registry';
+export { atomRegistry, createIsolatedRegistry } from './atom-registry';
 export type { AtomRegistry } from './atom-registry';
 
 /**

@@ -29,7 +29,7 @@ export class AtomRegistry {
   private stores: Map<Store, StoreRegistry> = new Map();
   private globalRegistry: Map<symbol, unknown> = new Map();
 
-  private constructor() {
+  constructor() {
     this.registry = new Map();
     this.metadata = new Map();
     this.counter = 0;
@@ -347,3 +347,18 @@ export class AtomRegistry {
 
 // Export singleton instance
 export const atomRegistry = AtomRegistry.getInstance();
+
+/**
+ * Create an isolated atom registry for SSR
+ * @returns A new AtomRegistry instance not tied to the global singleton
+ * @example
+ * // Usage in SSR
+ * export async function handleRequest() {
+ *   const registry = createIsolatedRegistry();
+ *   const store = createStore(registry);
+ *   // ...
+ * }
+ */
+export function createIsolatedRegistry(): AtomRegistry {
+  return new AtomRegistry();
+}
