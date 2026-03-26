@@ -211,6 +211,18 @@ export interface Store {
    * Clear all atoms to their default values
    */
   clear?: () => void;
+
+  /**
+   * Get all atom IDs associated with this store
+   * @returns Array of atom IDs associated with the store
+   */
+  getRegistryAtoms?: () => symbol[];
+
+  /**
+   * Get the store registry for internal use
+   * @returns The store registry
+   */
+  getRegistry?: () => StoreRegistry;
 }
 
 // === NEW HIERARCHICAL ATOM TYPES (CORE-002) ===
