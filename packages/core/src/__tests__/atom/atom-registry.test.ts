@@ -330,7 +330,7 @@ describe('Atom Registry', () => {
     it('should return first atom when multiple atoms have same name', () => {
       const atom1 = atom('value1', 'shared');
       const atom2 = atom('value2', 'shared');
-      
+
       const store = createStore();
       // Trigger lazy registration
       store.get(atom1);
@@ -341,6 +341,97 @@ describe('Atom Registry', () => {
       // Should return first registered atom
       expect(found).toBe(atom1);
       expect(found).not.toBe(atom2);
+    });
+  });
+
+  describe('getRegistryAtoms', () => {
+    it('should return only atoms registered in this store', () => {
+      const store1 = createStore();
+      const store2 = createStore();
+
+      const atom1 = atom(1, 'atom-1');
+      const atom2 = atom(2, 'atom-2');
+
+      // Access atoms in different stores
+      store1.get(atom1);
+      store2.get(atom2);
+
+      const store1Atoms = store1.getRegistryAtoms!();
+      const store2Atoms = store2.getRegistryAtoms!();
+
+      expect(store1Atoms).toHaveLength(1);
+      expect(store1Atoms[0]).toBe(atom1.id);
+      expect(store2Atoms).toHaveLength(1);
+      expect(store2Atoms[0]).toBe(atom2.id);
+    });
+
+    it('should return empty array for new store', () => {
+      const store = createStore();
+      const atoms = store.getRegistryAtoms!();
+
+      expect(atoms).toHaveLength(0);
+    });
+
+    it('should update when new atoms are accessed', () => {
+      const store = createStore();
+      const atom1 = atom(1);
+      const atom2 = atom(2);
+
+      expect(store.getRegistryAtoms!()).toHaveLength(0);
+
+      store.get(atom1);
+      expect(store.getRegistryAtoms!()).toHaveLength(1);
+
+      store.get(atom2);
+      expect(store.getRegistryAtoms!()).toHaveLength(2);
+    });
+
+    it('should include all atom types', () => {
+      const store = createStore();
+      const primitiveAtom = atom(42);
+      const computedAtom = atom((get: any) => get(primitiveAtom) * 2);
+      const writableAtom = atom(
+        (get: any) => get(primitiveAtom),
+        (get: any, set: any, value: number) => set(primitiveAtom, value)
+      );
+
+      store.get(primitiveAtom);
+      store.get(computedAtom);
+      store.get(writableAtom);
+
+      const atoms = store.getRegistryAtoms!();
+      expect(atoms).toHaveLength(3);
+      expect(atoms).toContain(primitiveAtom.id);
+      expect(atoms).toContain(computedAtom.id);
+      expect(atoms).toContain(writableAtom.id);
+    });
+  });
+
+  describe('getRegistry', () => {
+    it('should return store registry object', () => {
+      const store = createStore();
+      const registry = store.getRegistry!();
+
+      expect(registry).toBeDefined();
+      expect(registry.store).toBe(store);
+      expect(registry.atoms).toBeInstanceOf(Set);
+    });
+
+    it('should track atoms in registry', () => {
+      const store = createStore();
+      const atom1 = atom(1);
+      const atom2 = atom(2);
+
+      const registry = store.getRegistry!();
+      expect(registry.atoms.size).toBe(0);
+
+      store.get(atom1);
+      expect(registry.atoms.size).toBe(1);
+      expect(registry.atoms.has(atom1.id)).toBe(true);
+
+      store.get(atom2);
+      expect(registry.atoms.size).toBe(2);
+      expect(registry.atoms.has(atom2.id)).toBe(true);
     });
   });
 });

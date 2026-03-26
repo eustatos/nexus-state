@@ -468,4 +468,20 @@ export class StoreImpl implements Store {
       this.notificationManager.notify(atom, state, state.value);
     });
   }
+
+  /**
+   * Get all atom IDs associated with this store
+   * @returns Array of atom IDs associated with the store
+   */
+  getRegistryAtoms(): symbol[] {
+    return Array.from(this.registry.atoms);
+  }
+
+  /**
+   * Get the store registry for internal use
+   * @returns The store registry
+   */
+  getRegistry(): StoreRegistry {
+    return this.registry;
+  }
 }
