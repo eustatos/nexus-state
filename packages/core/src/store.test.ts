@@ -347,6 +347,50 @@ describe('Store setState method', () => {
 
     expect(result).toBe(store);
   });
+
+  it('should search atoms only in current store registry (SSR hydration isolation)', () => {
+    // Create two separate stores for simulating concurrent SSR requests
+    const store1 = createStore();
+    const store2 = createStore();
+
+    // Create atoms with same names in different stores
+    const userAtom1 = atom({ name: 'Store1' }, 'user');
+    const userAtom2 = atom({ name: 'Store2' }, 'user');
+
+    // Initialize atoms in different stores
+    store1.get(userAtom1);
+    store2.get(userAtom2);
+
+    // Hydrate store1 with setState - should only affect store1's atom
+    store1.setState({ user: { name: 'Hydrated1' } });
+
+    // Verify store1 was hydrated
+    expect(store1.get(userAtom1)).toEqual({ name: 'Hydrated1' });
+
+    // Verify store2 was NOT affected (isolation)
+    expect(store2.get(userAtom2)).toEqual({ name: 'Store2' });
+  });
+
+  it('should not hydrate atoms from other stores', () => {
+    const store1 = createStore();
+    const store2 = createStore();
+
+    const atom1 = atom('initial1', 'shared-name');
+    const atom2 = atom('initial2', 'shared-name');
+
+    // Register atoms in different stores
+    store1.get(atom1);
+    store2.get(atom2);
+
+    // Try to hydrate store2 - should only find atom2
+    store2.setState({ 'shared-name': 'hydrated-value' });
+
+    // store2 should be hydrated
+    expect(store2.get(atom2)).toBe('hydrated-value');
+
+    // store1 should NOT be affected
+    expect(store1.get(atom1)).toBe('initial1');
+  });
 });
 
 describe('Store reset method', () => {
