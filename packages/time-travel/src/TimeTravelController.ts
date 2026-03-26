@@ -200,9 +200,9 @@ export class TimeTravelController implements TimeTravelAPI {
   private flushComputed(): void {
     // Use store-specific registry to ensure isolation
     const storeAtoms = this.store.getRegistryAtoms?.() || [];
-    
+
     for (const atomId of storeAtoms) {
-      const atom = this.getAtomById(atomId);
+      const atom = atomRegistry.get(atomId);
       if (atom) {
         const metadata = atomRegistry.getMetadata(atom as { id: symbol });
         if (metadata?.type === 'computed') {
