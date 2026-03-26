@@ -131,5 +131,13 @@ export function atom<Value>(...args: any[]): Atom<Value> {
     accessCount: 0,
   };
 
+  // Named atoms are registered immediately to support time-travel and DevTools
+  // Anonymous atoms remain lazy-registered to avoid unnecessary overhead
+  if (name) {
+    atomRegistry.register(atomInstance, name);
+    atomInstance._lazyRegistration.registered = true;
+    atomInstance._lazyRegistration.registeredAt = Date.now();
+  }
+
   return atomInstance;
 }

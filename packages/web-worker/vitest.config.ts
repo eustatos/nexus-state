@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 export default defineConfig({
   test: {
@@ -9,7 +10,6 @@ export default defineConfig({
       include: ['**/*.ts'],
       exclude: [
         'apps/**',
-        // Тестовые файлы и директории
         '**/__tests__/**',
         '**/__fixtures__/**',
         '**/__mocks__/**',
@@ -20,19 +20,26 @@ export default defineConfig({
         '**/*.spec.ts',
         '**/*.bench.ts',
         '**/*.test-d.ts',
-        // Файлы деклараций и конфигурации
         '**/*.d.ts',
         '**/*.config.ts',
         '**/*.config.js',
-        // Скомпилированные файлы и зависимости
         '**/node_modules/**',
         '**/dist/**',
         '**/build/**',
         '**/coverage/**',
-        // Прочее
         '**/*.md',
         '**/*.json',
       ]
     }
-  }
+  },
+  // Enable TypeScript transformation for tests
+  esbuild: {
+    target: 'es2020',
+  },
+  // Resolve @nexus-state/core to source files for proper dependency tracking
+  resolve: {
+    alias: {
+      '@nexus-state/core': path.resolve(__dirname, '../core/src/index.ts'),
+    },
+  },
 });

@@ -366,7 +366,9 @@ describe('Async Validators', () => {
       expect(result).toBe('Success');
     });
 
-    it('should reject if function takes too long', async () => {
+    it.skip('should reject if function takes too long (fake timers)', async () => {
+      // Skipped due to fake timers issue with unhandled rejections
+      // Use real timers test instead
       vi.useFakeTimers();
 
       const fn = vi.fn().mockImplementation(
@@ -382,8 +384,23 @@ describe('Async Validators', () => {
       await vi.advanceTimersByTimeAsync(150);
 
       await expect(promise).rejects.toThrow('Timeout');
-
+      
+      await vi.runAllTimersAsync();
       vi.useRealTimers();
+    });
+    
+    it('should handle timeout with real timers', async () => {
+      // Use real timers to test timeout behavior
+      const fn = vi.fn().mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            setTimeout(() => resolve('Success'), 200);
+          })
+      );
+
+      const timeoutFn = withTimeout(fn, 50);
+
+      await expect(timeoutFn()).rejects.toThrow('Timeout');
     });
   });
 
@@ -398,15 +415,26 @@ describe('Async Validators', () => {
     });
 
     it('should apply retry', async () => {
+      vi.useFakeTimers();
+
       const fn = vi
         .fn()
         .mockRejectedValueOnce(new Error('First'))
+        .mockRejectedValueOnce(new Error('Second'))
         .mockResolvedValue('Success');
 
-      const wrapped = withOptions(fn, { retry: 3 });
-      const result = await wrapped();
+      const wrapped = withOptions(fn, { retry: 3, timeout: undefined });
+      const resultPromise = wrapped();
+
+      // Fast-forward through retries
+      await vi.advanceTimersByTimeAsync(3000);
+
+      const result = await resultPromise;
 
       expect(result).toBe('Success');
+      expect(fn).toHaveBeenCalledTimes(3);
+
+      vi.useRealTimers();
     });
 
     it('should apply debounce', async () => {

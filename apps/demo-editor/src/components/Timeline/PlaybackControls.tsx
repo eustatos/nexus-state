@@ -1,6 +1,15 @@
 import { usePlayback } from '@/hooks/usePlayback'
-import { Play, Pause, Square, Repeat } from 'lucide-react'
+import { Play, Pause, Square, Repeat, RotateCcw, SkipBack, SkipForward } from 'lucide-react'
 import './PlaybackControls.css'
+
+/**
+ * Get speed label
+ */
+function getSpeedLabel(speed: number): string {
+  if (speed <= 500) return 'Fast'
+  if (speed >= 1500) return 'Slow'
+  return 'Normal'
+}
 
 export interface PlaybackControlsProps {
   /** Class для customization */
@@ -32,6 +41,8 @@ export function PlaybackControls({
     position,
     total,
     progress,
+    direction,
+    setDirection,
     play,
     pause,
     resume,

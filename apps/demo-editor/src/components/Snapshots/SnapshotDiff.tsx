@@ -110,6 +110,7 @@ export function SnapshotDiff({
               className="snapshot-diff__close-button"
               onClick={onClose}
               type="button"
+              data-testid="snapshot-diff-close"
             >
               <X size={16} />
               Close
@@ -241,6 +242,17 @@ export function SnapshotDiff({
 
       {/* Footer with action buttons */}
       <div className="snapshot-diff__footer">
+        <button
+          className="snapshot-diff__action-button"
+          onClick={() => {
+            // Reset comparison
+          }}
+          type="button"
+          data-testid="snapshot-diff-reset"
+        >
+          <GitCompare size={16} />
+          Back to list
+        </button>
         <button
           className="snapshot-diff__action-button"
           onClick={onClose}

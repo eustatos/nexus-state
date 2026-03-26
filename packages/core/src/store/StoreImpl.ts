@@ -118,6 +118,11 @@ export class StoreImpl implements Store {
       // Trigger lazy registration on first access
       this.ensureAtomRegistered(atom);
 
+      // Register atom in current store's local registry for tracking
+      if (!this.registry.atoms.has(atom.id)) {
+        this.registry.atoms.add(atom.id);
+      }
+
       const previousAtom = this.stateManager.getCurrentAtom();
       this.stateManager.setCurrentAtom(atom);
 
@@ -127,13 +132,11 @@ export class StoreImpl implements Store {
         });
 
         // Track dependency
-        if (
-          this.stateManager.getCurrentAtom() &&
-          this.stateManager.getCurrentAtom() !== atom
-        ) {
+        // Use previousAtom (the dependent) instead of getCurrentAtom() (which is the current atom being evaluated)
+        if (previousAtom && previousAtom !== atom) {
           this.dependencyTracker.addDependency(
             atomState,
-            this.stateManager.getCurrentAtom()!
+            previousAtom
           );
         }
 
