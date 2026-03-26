@@ -435,11 +435,15 @@ export class StoreImpl implements Store {
    * @returns The store instance for chaining
    */
   setState(state: Record<string, unknown>): Store {
+    const localAtoms = this.registry.atoms; // ← Only this store's atoms
     Object.entries(state).forEach(([key, value]) => {
-      const atom = Array.from(this.stateManager.getAllStates().keys())
-        .find(a => atomRegistry.getName(a) === key);
-      if (atom) {
-        this.set(atom as any, value);
+      const atomId = Array.from(localAtoms)
+        .find(id => atomRegistry.getName({ id }) === key);
+      if (atomId) {
+        const atom = atomRegistry.get(atomId);
+        if (atom) {
+          this.set(atom as any, value);
+        }
       }
     });
     return this as unknown as Store;
