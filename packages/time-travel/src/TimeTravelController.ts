@@ -33,10 +33,32 @@ export class TimeTravelController implements TimeTravelAPI {
   }
 
   capture(action?: string): void {
+    // Force-register all atoms that have been accessed
+    // This ensures snapshot includes all used atoms
+    const allAtoms = atomRegistry.getAll();
+    for (const atom of allAtoms.values()) {
+      const atomObj = atom as any;
+      const lazyMeta = atomObj._lazyRegistration;
+      
+      // Force registration for atoms that were accessed but not yet registered
+      if (lazyMeta && !lazyMeta.registered) {
+        try {
+          // Access the atom to trigger registration
+          this.store.get(atomObj);
+        } catch (error) {
+          // Ignore errors for computed atoms with missing dependencies
+          console.warn(
+            `[TimeTravelController] Failed to register atom during capture:`,
+            error
+          );
+        }
+      }
+    }
+
     // Auto-initialize all atoms from registry if enabled
     if (this.autoInitializeAtoms) {
-      const allAtoms = atomRegistry.getAll();
-      for (const atom of allAtoms.values()) {
+      const registeredAtoms = atomRegistry.getAll();
+      for (const atom of registeredAtoms.values()) {
         try {
           this.store.get(atom as any);
         } catch (error) {

@@ -109,6 +109,9 @@ describe('Time Travel Suppression Edge Cases', () => {
     const testAtom = createTestAtom(0, 'test');
 
     timeTravel = new SimpleTimeTravel(store, { autoCapture: false });
+    
+    // Access atom to trigger lazy registration
+    store.get(testAtom);
 
     timeTravel.capture('s0');
     store.set(testAtom, 1);
@@ -193,6 +196,9 @@ describe('Time Travel Suppression Edge Cases', () => {
     );
 
     timeTravel = new SimpleTimeTravel(store, { autoCapture: false });
+    
+    // Access atom to trigger lazy registration
+    store.get(complexAtom);
 
     timeTravel.capture('initial');
 
@@ -309,6 +315,10 @@ describe('Time Travel Suppression Edge Cases', () => {
     const setAtom = createTestAtom(new Set([1, 2, 3]), 'set');
 
     timeTravel = new SimpleTimeTravel(store, { autoCapture: false });
+    
+    // Access atoms to trigger lazy registration
+    store.get(mapAtom);
+    store.get(setAtom);
 
     timeTravel.capture('initial');
 
@@ -340,6 +350,11 @@ describe('Time Travel Suppression Edge Cases', () => {
     const atom3 = createTestAtom(0, 'atom3');
 
     timeTravel = new SimpleTimeTravel(store, { autoCapture: false });
+    
+    // Access atoms to trigger lazy registration
+    store.get(atom1);
+    store.get(atom2);
+    store.get(atom3);
 
     timeTravel.capture('initial');
 

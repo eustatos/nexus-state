@@ -91,6 +91,9 @@ describe('Atom Creation', () => {
 
     it('should register atom with registry when created with name', () => {
       const testAtom = atom(42, 'test-atom');
+      const store = createStore();
+      store.get(testAtom); // Trigger lazy registration
+      
       const registeredAtom = atomRegistry.get(testAtom.id);
       expect(registeredAtom).toBe(testAtom);
     });

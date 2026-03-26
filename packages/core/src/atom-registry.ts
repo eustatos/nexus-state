@@ -182,6 +182,15 @@ export class AtomRegistry {
     return this.registry.size;
   }
 
+  /**
+   * Check if atom is registered
+   * @param atomId Symbol ID of the atom
+   * @returns True if atom is registered
+   */
+  isRegistered(atomId: symbol): boolean {
+    return this.registry.has(atomId);
+  }
+
   // New methods for CORE-001 implementation
 
   /**

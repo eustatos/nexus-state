@@ -216,6 +216,18 @@ export interface Store {
 // === NEW HIERARCHICAL ATOM TYPES (CORE-002) ===
 
 /**
+ * Lazy registration metadata for tracking atom registration state
+ */
+export interface LazyRegistrationMetadata {
+  /** Whether the atom has been registered */
+  registered: boolean;
+  /** Timestamp when the atom was first registered */
+  registeredAt?: number;
+  /** Number of times the atom has been accessed */
+  accessCount: number;
+}
+
+/**
  * Base interface for all atom types
  * @template _Value The type of value the atom holds
  */
@@ -226,6 +238,8 @@ export interface BaseAtom<_Value> {
   readonly type: 'primitive' | 'computed' | 'writable';
   /** Optional name for debugging and DevTools */
   readonly name?: string;
+  /** Lazy registration metadata (internal use) */
+  _lazyRegistration?: LazyRegistrationMetadata;
 }
 
 /**

@@ -26,7 +26,11 @@ export function workerAtom<T>(options: WorkerAtomOptions<T>): Atom<T> {
   const { worker, initialValue } = options;
 
   // Create a regular atom to hold the value
+  // Use a read function that always returns the current value from workerAtomValues
   const internalAtom = atom(initialValue);
+
+  // Override the read function to use workerAtomValues
+  (internalAtom as any).read = () => workerAtomValues.get(internalAtom);
 
   // Store the initial value
   workerAtomValues.set(internalAtom, initialValue);
