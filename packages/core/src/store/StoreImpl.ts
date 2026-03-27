@@ -82,35 +82,30 @@ export class StoreImpl implements Store {
   }
 
   /**
-   * Ensure atom is registered on first access
+   * Ensure atom is registered on first access (used by setter)
    * @param atom The atom to register
    */
   private ensureAtomRegistered<Value>(atom: Atom<Value>): void {
-    const lazyMeta = atom._lazyRegistration;
-
-    if (lazyMeta && !lazyMeta.registered) {
-      // Mark as registered BEFORE calling register to prevent re-entrancy
-      lazyMeta.registered = true;
-      lazyMeta.registeredAt = Date.now();
-      lazyMeta.accessCount = 1;
-
-      // Register with the atom registry (global or isolated)
-      this.atomRegistry.register(atom, atom.name);
-
-      // Also register in current store's local registry
-      if (!this.registry.atoms.has(atom.id)) {
-        this.registry.atoms.add(atom.id);
+    const atomId = atom.id;
+    
+    // Fast path: check Set.has() first
+    if (!this.registry.atoms.has(atomId)) {
+      this.registry.atoms.add(atomId);
+      
+      // Lazy registration in global registry
+      const lazyMeta = atom._lazyRegistration;
+      if (lazyMeta && !lazyMeta.registered) {
+        lazyMeta.registered = true;
+        lazyMeta.registeredAt = Date.now();
+        lazyMeta.accessCount = 1;
+        this.atomRegistry.register(atom as Atom<unknown>, atom.name);
       }
-
-      logger.log(
-        '[StoreImpl] Lazy registered atom:',
-        atom.name || 'unnamed',
-        'id:',
-        atom.id.toString()
-      );
-    } else if (lazyMeta) {
-      // Increment access count for debugging/monitoring
-      lazyMeta.accessCount++;
+    } else {
+      // Atom already in store registry, increment access count
+      const lazyMeta = atom._lazyRegistration;
+      if (lazyMeta) {
+        lazyMeta.accessCount++;
+      }
     }
   }
 
@@ -119,12 +114,23 @@ export class StoreImpl implements Store {
    */
   private createGetter(): Getter {
     return <Value>(atom: Atom<Value>): Value => {
-      // Trigger lazy registration on first access
-      this.ensureAtomRegistered(atom);
-
       // Register atom in current store's local registry for tracking
-      if (!this.registry.atoms.has(atom.id)) {
-        this.registry.atoms.add(atom.id);
+      // Fast path: check Set.has() before Map operations
+      const atomId = atom.id;
+      if (!this.registry.atoms.has(atomId)) {
+        this.registry.atoms.add(atomId);
+        
+        // Lazy registration in global registry (only on first access)
+        const lazyMeta = atom._lazyRegistration;
+        if (lazyMeta && !lazyMeta.registered) {
+          lazyMeta.registered = true;
+          lazyMeta.registeredAt = Date.now();
+          lazyMeta.accessCount = 1;
+          this.atomRegistry.register(atom as Atom<unknown>, atom.name);
+        }
+      } else if (atom._lazyRegistration) {
+        // Fast path: just increment counter, no registry check
+        atom._lazyRegistration.accessCount++;
       }
 
       const previousAtom = this.stateManager.getCurrentAtom();
