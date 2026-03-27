@@ -2,19 +2,18 @@
 /**
  * Global registry for atoms to support DevTools integration and time travel
  *
- * Requirements:
- * - Global Registry Singleton
- * - Thread-safe for SSR environments
- * - O(1) lookup performance
- * - Automatic registration of all created atoms
- * - Store-aware registry for DevTools integration
+ * ARCHITECTURE: Atom reference registry (not state)
+ * - Stores atom REFERENCES for lookup by name
+ * - Does NOT store atom values (states are in Store)
+ * - Supports SSR isolation via createIsolatedRegistry()
+ * - Uses WeakRef to allow GC of unused atoms (optional optimization)
  */
 
-import type { Store, StoreRegistry } from './types';
+import type { Store, StoreRegistry, Atom } from './types';
 
 type AtomType = 'primitive' | 'computed' | 'writable';
 
-interface AtomMetadata {
+export interface AtomMetadata {
   name: string;
   createdAt: number;
   type: AtomType;
@@ -22,16 +21,17 @@ interface AtomMetadata {
 
 export class AtomRegistry {
   private static instance: AtomRegistry;
-  private registry: Map<symbol, unknown>;
+  private atoms: Map<symbol, Atom<unknown>>;
   private metadata: Map<symbol, AtomMetadata>;
+  private nameToId: Map<string, symbol>;
   private counter: number;
-  // Store tracking for CORE-001
+  // Store tracking for SSR isolation
   private stores: Map<Store, StoreRegistry> = new Map();
-  private globalRegistry: Map<symbol, unknown> = new Map();
 
   constructor() {
-    this.registry = new Map();
+    this.atoms = new Map();
     this.metadata = new Map();
+    this.nameToId = new Map();
     this.counter = 0;
   }
 
@@ -43,15 +43,17 @@ export class AtomRegistry {
   }
 
   /**
-   * Register an atom with optional name
+   * Register atom reference and metadata for lookup by name
+   * Called on first store access (store.get/set/subscribe)
+   * 
    * @param atom The atom to register
    * @param name Optional display name for DevTools
    */
-  register(atom: { id: symbol; type?: AtomType; read?: unknown; write?: unknown }, name?: string): void {
+  register(atom: Atom<unknown>, name?: string): void {
     const id = atom.id;
 
-    // Handle duplicate registrations gracefully
-    if (this.registry.has(id)) {
+    // Handle duplicate registrations gracefully (same ID registered twice)
+    if (this.atoms.has(id)) {
       // Atom already registered, update metadata if name provided
       if (name) {
         const existingMetadata = this.metadata.get(id);
@@ -60,6 +62,8 @@ export class AtomRegistry {
             ...existingMetadata,
             name
           });
+          // Update nameToId for same ID re-registration (allows name changes)
+          this.nameToId.set(name, id);
         }
       }
       return;
@@ -68,63 +72,89 @@ export class AtomRegistry {
     // Generate fallback name if not provided
     const displayName = name || `atom-${++this.counter}`;
 
-    // Check for duplicate names (only when explicit name is provided)
-    if (name && this.getByName(name)) {
+    // Check for duplicate names (different IDs with same name)
+    const isDuplicateName = name && this.nameToId.has(name);
+    if (isDuplicateName) {
       console.warn(
         `[nexus-state] Atom with name "${name}" already exists. ` +
         `Using duplicate names may cause issues with DevTools and time-travel. ` +
         `Consider using unique names for all atoms.`
       );
+      // Don't add duplicate name to nameToId - keep first registration
+      // But still register the atom with its ID
     }
 
-    // Determine atom type - use type property if available, otherwise infer from methods
+    // Determine atom type - use explicit type if available, otherwise infer from read/write
     let type: AtomType;
     if (atom.type) {
       type = atom.type;
-    } else if (atom.read) {
-      type = atom.write ? 'writable' : 'computed';
+    } else if ('read' in atom) {
+      // Infer type from read/write properties
+      type = 'write' in atom ? 'writable' : 'computed';
     } else {
       type = 'primitive';
     }
 
-    // Store atom and metadata
-    this.registry.set(id, atom);
+    // Store atom reference and metadata
+    this.atoms.set(id, atom);
     this.metadata.set(id, {
       name: displayName,
       createdAt: Date.now(),
       type
     });
+
+    // Add to name lookup map only if not a duplicate
+    // For duplicates, keep the first registration
+    if (!isDuplicateName) {
+      this.nameToId.set(displayName, id);
+    }
   }
 
   /**
-   * Get atom by symbol ID
+   * Get atom reference by symbol ID
    * @param id Symbol ID of the atom
-   * @returns The atom or undefined if not found
+   * @returns Atom reference or undefined if not found
    */
-  get(id: symbol): unknown | undefined {
-    return this.registry.get(id);
+  get(id: symbol): Atom<unknown> | undefined {
+    return this.atoms.get(id);
   }
 
   /**
-   * Get atom by symbol ID (alias for get)
+   * Get atom metadata by symbol ID
    * @param id Symbol ID of the atom
-   * @returns The atom or undefined if not found
+   * @returns Metadata or undefined if not found
    */
-  getAtom(id: symbol): unknown | undefined {
-    return this.get(id);
+  getMetadata(id: symbol): AtomMetadata | undefined;
+  
+  /**
+   * Get atom metadata by atom object (convenience overload)
+   * @param atom Atom object
+   * @returns Metadata or undefined if not found
+   */
+  getMetadata(atom: { id: symbol }): AtomMetadata | undefined;
+  
+  /**
+   * Get atom metadata by symbol ID or atom object
+   * @param idOrAtom Symbol ID or atom object
+   * @returns Metadata or undefined if not found
+   */
+  getMetadata(idOrAtom: symbol | { id: symbol }): AtomMetadata | undefined {
+    const id = typeof idOrAtom === 'symbol' ? idOrAtom : idOrAtom.id;
+    return this.metadata.get(id);
   }
 
   /**
-   * Get atom by name
+   * Get atom reference by name
+   * 
+   * Returns the atom reference, which can then be used with store.get/set()
+   * 
    * @param name The atom name
-   * @returns The atom or undefined if not found
+   * @returns Atom reference or undefined if not found
    */
-  getByName(name: string): unknown | undefined {
-    for (const [id, atom] of this.registry) {
-      const metadata = this.metadata.get(id);
-      if (metadata && metadata.name === name) {
-        return atom;
-      }
+  getByName(name: string): Atom<unknown> | undefined {
+    const id = this.nameToId.get(name);
+    if (id) {
+      return this.atoms.get(id);
     }
     return undefined;
   }
@@ -147,101 +177,56 @@ export class AtomRegistry {
   }
 
   /**
-   * Get all registered atoms
-   * @returns Map of all registered atoms
+   * Get all registered atom references
+   * @returns Map of atom ID to atom reference
    */
-  getAll(): Map<symbol, unknown> {
-    return new Map(this.registry);
+  getAll(): Map<symbol, Atom<unknown>> {
+    return new Map(this.atoms);
   }
 
   /**
-   * Get metadata for atom
-   * @param atom The atom
-   * @returns Metadata for the atom
+   * Get all registered atom metadata
+   * @returns Map of atom ID to metadata
    */
-  getMetadata(atom: { id: symbol }): AtomMetadata | undefined {
-    return this.metadata.get(atom.id);
+  getAllMetadata(): Map<symbol, AtomMetadata> {
+    return new Map(this.metadata);
   }
 
   /**
-   * Clear registry (for testing)
+   * Get all registered atom names
+   * @returns Array of atom names
    */
-  clear(): void {
-    this.registry.clear();
-    this.metadata.clear();
-    this.counter = 0;
-    this.stores = new Map();
-    this.globalRegistry.clear();
+  getAllNames(): string[] {
+    return Array.from(this.nameToId.keys());
   }
 
   /**
-   * Get registry size
-   * @returns Number of registered atoms
+   * Get atom by symbol ID (alias for get)
+   * @param id Symbol ID of the atom
+   * @returns Atom reference or undefined if not found
    */
-  size(): number {
-    return this.registry.size;
+  getAtom(id: symbol): Atom<unknown> | undefined {
+    return this.atoms.get(id);
   }
 
   /**
-   * Check if atom is registered
-   * @param atomId Symbol ID of the atom
-   * @returns True if atom is registered
+   * Get all atom IDs
+   * @returns Array of all atom IDs
    */
-  isRegistered(atomId: symbol): boolean {
-    return this.registry.has(atomId);
+  getAllAtomIds(): string[] {
+    return Array.from(this.atoms.keys()).map(id => id.toString());
   }
 
-  // New methods for CORE-001 implementation
-
   /**
-   * Attach a store to the registry with specified mode
-   * @param store The store to attach
-   * @param _mode Registry mode - 'global' or 'isolated'
+   * Get all atoms (alias for getAll for compatibility)
+   * @returns Map of all atoms with string IDs
    */
-  attachStore(store: Store, _mode: "global" | "isolated" = "global"): void {
-    if (!this.stores.has(store)) {
-      this.stores.set(store, {
-        store,
-        atoms: new Set()
-      });
+  getAllAtoms(): Map<string, Atom<unknown>> {
+    const allAtoms = new Map<string, Atom<unknown>>();
+    for (const [id, atom] of this.atoms) {
+      allAtoms.set(id.toString(), atom);
     }
-
-    // For global mode, register the store but keep global registry behavior
-    // For isolated mode, atoms will be tracked per store
-  }
-
-  /**
-   * Get the store that owns the specified atom
-   * @param atomId Symbol ID of the atom
-   * @returns The store that owns the atom, or undefined if not found
-   */
-  getStoreForAtom(atomId: symbol): Store | undefined {
-    // Check isolated registries first
-    for (const [store, registry] of this.stores) {
-      if (registry.atoms.has(atomId)) {
-        return store;
-      }
-    }
-    
-    // If not found in isolated registries, atom belongs to global registry
-    if (this.globalRegistry.has(atomId)) {
-      return undefined; // Global registry has no specific store owner
-    }
-    
-    return undefined;
-  }
-
-  /**
-   * Get all atoms associated with a specific store
-   * @param store The store
-   * @returns Array of atom IDs associated with the store
-   */
-  getAtomsForStore(store: Store): symbol[] {
-    const registry = this.stores.get(store);
-    if (registry) {
-      return Array.from(registry.atoms);
-    }
-    return [];
+    return allAtoms;
   }
 
   /**
@@ -250,7 +235,7 @@ export class AtomRegistry {
    * @returns The atom value or undefined if not found
    */
   getAtomValue(atomId: symbol): unknown | undefined {
-    const atom = this.registry.get(atomId);
+    const atom = this.atoms.get(atomId);
     if (!atom) return undefined;
 
     // Find which store owns this atom and get its value
@@ -266,6 +251,115 @@ export class AtomRegistry {
 
     // If no store owns this atom, return the atom itself
     return atom;
+  }
+
+  /**
+   * Get the store that owns the specified atom
+   * @param atomId Symbol ID of the atom
+   * @returns The store that owns the atom, or undefined if not found
+   */
+  getStoreForAtom(atomId: symbol): Store | undefined {
+    // Check isolated registries first
+    for (const [store, registry] of this.stores) {
+      if (registry.atoms.has(atomId)) {
+        return store;
+      }
+    }
+
+    // If not found in isolated registries, atom belongs to global registry
+    // Global registry has no specific store owner
+    return undefined;
+  }
+
+  /**
+   * Get all computed atoms
+   * @returns Map of computed atoms with their IDs
+   */
+  getAllComputedAtoms(): Map<string, Atom<unknown>> {
+    const computedAtoms = new Map<string, Atom<unknown>>();
+    for (const [id, atom] of this.atoms) {
+      const metadata = this.metadata.get(id);
+      if (metadata && metadata.type === 'computed') {
+        computedAtoms.set(id.toString(), atom);
+      }
+    }
+    return computedAtoms;
+  }
+
+  /**
+   * Get computed atom by ID string
+   * @param atomId The atom ID as string
+   * @returns The computed atom or undefined if not found or not computed
+   */
+  getComputedAtom(atomId: string): Atom<unknown> | undefined {
+    // Try to find atom by string ID
+    for (const [id, atom] of this.atoms) {
+      if (id.toString() === atomId) {
+        const metadata = this.metadata.get(id);
+        if (metadata && metadata.type === 'computed') {
+          return atom;
+        }
+        return undefined; // Found but not computed
+      }
+    }
+    return undefined; // Not found
+  }
+
+  /**
+   * Clear registry (for testing)
+   */
+  clear(): void {
+    this.atoms.clear();
+    this.metadata.clear();
+    this.nameToId.clear();
+    this.counter = 0;
+    this.stores.clear();
+  }
+
+  /**
+   * Get registry size
+   * @returns Number of registered atoms
+   */
+  size(): number {
+    return this.atoms.size;
+  }
+
+  /**
+   * Check if atom is registered
+   * @param atomId Symbol ID of the atom
+   * @returns True if atom is registered
+   */
+  isRegistered(atomId: symbol): boolean {
+    return this.atoms.has(atomId);
+  }
+
+  // Store tracking methods for SSR isolation
+
+  /**
+   * Attach a store to the registry with specified mode
+   * @param store The store to attach
+   * @param _mode Registry mode - 'global' or 'isolated'
+   */
+  attachStore(store: Store, _mode: "global" | "isolated" = "global"): void {
+    if (!this.stores.has(store)) {
+      this.stores.set(store, {
+        store,
+        atoms: new Set()
+      });
+    }
+  }
+
+  /**
+   * Get all atoms associated with a specific store
+   * @param store The store
+   * @returns Array of atom IDs associated with the store
+   */
+  getAtomsForStore(store: Store): symbol[] {
+    const registry = this.stores.get(store);
+    if (registry) {
+      return Array.from(registry.atoms);
+    }
+    return [];
   }
 
   /**
@@ -289,59 +383,6 @@ export class AtomRegistry {
    */
   getStoresMap(): Map<Store, StoreRegistry> {
     return this.stores;
-  }
-
-  // Additional methods for time-travel functionality
-
-  /**
-   * Get all computed atoms
-   * @returns Map of computed atoms with their IDs
-   */
-  getAllComputedAtoms(): Map<string, unknown> {
-    const computedAtoms = new Map<string, unknown>();
-    for (const [id, atom] of this.registry) {
-      const metadata = this.metadata.get(id);
-      if (metadata && metadata.type === 'computed') {
-        computedAtoms.set(id.toString(), atom);
-      }
-    }
-    return computedAtoms;
-  }
-
-  /**
-   * Get computed atom by ID
-   * @param atomId The atom ID
-   * @returns The computed atom or undefined if not found
-   */
-  getComputedAtom(atomId: string): unknown | undefined {
-    const atom = this.registry.get(Symbol.for(atomId));
-    if (atom) {
-      const metadata = this.metadata.get(Symbol.for(atomId));
-      if (metadata && metadata.type === 'computed') {
-        return atom;
-      }
-    }
-    return undefined;
-  }
-
-  /**
-   * Get all atom IDs
-   * @returns Array of all atom IDs
-   */
-  getAllAtomIds(): string[] {
-    return Array.from(this.registry.keys()).map(id => id.toString());
-  }
-
-  /**
-   * Get all atoms (alias for getAll for compatibility)
-   * @returns Map of all atoms with their IDs
-   */
-  getAllAtoms(): Map<string, unknown> {
-    const allAtoms = new Map<string, unknown>();
-    for (const [id, atom] of this.registry) {
-      allAtoms.set(id.toString(), atom);
-    }
-    return allAtoms;
   }
 }
 

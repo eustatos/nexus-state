@@ -1,5 +1,11 @@
 /**
  * TimeTravelController - Main time travel controller
+ *
+ * ARCHITECTURE: Store-specific time travel
+ * - Tracks only atoms accessed in the specific store
+ * - Snapshots contain only initialized atom states
+ * - Unaccessed atoms are excluded from snapshots (no state to save)
+ * - DevTools can show unaccessed atoms with "not initialized" status
  */
 
 import type { Snapshot, SnapshotStateEntry, Store, TimeTravelAPI, TimeTravelEventType, TimeTravelOptions, TimeTravelUnsubscribe } from './types';
@@ -32,33 +38,16 @@ export class TimeTravelController implements TimeTravelAPI {
     // This is a simplified implementation
   }
 
+  /**
+   * Capture current store state as a snapshot
+   * 
+   * Only includes atoms that have been accessed via store.get()/set()/subscribe()
+   * Unaccessed atoms are excluded because they have no state in this store
+   * 
+   * @param action Optional action name for the snapshot
+   */
   capture(action?: string): void {
-    // Auto-initialize all atoms from registry if enabled
-    // Use global registry to ensure all atoms are initialized, but filter by store
-    if (this.autoInitializeAtoms) {
-      const allAtoms = atomRegistry.getAll();
-      const storeAtoms = this.store.getRegistryAtoms?.() || [];
-      const storeAtomsSet = new Set(storeAtoms);
-      
-      for (const atom of allAtoms.values()) {
-        // Only initialize atoms that belong to this store
-        // If store doesn't support getRegistryAtoms, initialize all (backward compatibility)
-        if (storeAtoms.length > 0 && !storeAtomsSet.has((atom as any).id)) {
-          continue;
-        }
-        
-        try {
-          this.store.get(atom as any);
-        } catch (error) {
-          // Ignore errors for computed atoms with missing dependencies
-          console.warn(
-            `[TimeTravelController] Failed to initialize atom during capture:`,
-            error
-          );
-        }
-      }
-    }
-
+    // Get state - only includes accessed atoms
     const state = this.store.getState();
     const snapshotState: Record<string, SnapshotStateEntry> = {};
 
@@ -94,7 +83,39 @@ export class TimeTravelController implements TimeTravelAPI {
       this.currentIndex--;
     }
 
+    // Warn about unaccessed named atoms in DEV mode
+    if (process.env.NODE_ENV !== 'production') {
+      this.warnAboutUnaccessedAtoms();
+    }
+
     this.notify('snapshot');
+  }
+
+  /**
+   * Warn about named atoms that haven't been accessed in this store
+   * Helps developers understand why some atoms don't appear in snapshots
+   */
+  private warnAboutUnaccessedAtoms(): void {
+    const allAtoms = atomRegistry.getAll();
+    const storeAtoms = this.store.getRegistryAtoms?.() || [];
+    const storeAtomsSet = new Set(storeAtoms);
+
+    const unaccessed: string[] = [];
+    for (const [atomId, atom] of allAtoms) {
+      if (!storeAtomsSet.has(atomId)) {
+        const metadata = atomRegistry.getMetadata(atomId);
+        if (metadata?.name) {
+          unaccessed.push(metadata.name);
+        }
+      }
+    }
+
+    if (unaccessed.length > 0) {
+      console.warn(
+        `[TimeTravel] ${unaccessed.length} atom(s) not accessed in this store: ${unaccessed.join(', ')}. ` +
+        `They won't be included in snapshots. Access them via store.get() or store.set() before capture().`
+      );
+    }
   }
 
   undo(): boolean {
@@ -196,15 +217,19 @@ export class TimeTravelController implements TimeTravelAPI {
 
   /**
    * Force re-evaluation of computed atoms
+   *
+   * Optimization: Only iterate atoms from current store's registry instead of
+   * all atoms in global registry. This reduces overhead during time-travel
+   * operations, especially with many atoms across multiple stores.
    */
   private flushComputed(): void {
-    // Use store-specific registry to ensure isolation
+    // Use store-specific registry to ensure isolation and optimal performance
     const storeAtoms = this.store.getRegistryAtoms?.() || [];
 
     for (const atomId of storeAtoms) {
       const atom = atomRegistry.get(atomId);
       if (atom) {
-        const metadata = atomRegistry.getMetadata(atom as { id: symbol });
+        const metadata = atomRegistry.getMetadata(atomId);
         if (metadata?.type === 'computed') {
           try {
             this.store.get(atom as any);

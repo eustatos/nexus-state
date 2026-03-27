@@ -22,7 +22,12 @@ describe('End-to-End Integration Tests', () => {
     const store = createStore();
     const controller = new TimeTravelController(store);
 
-    // 3. Первый snapshot (авто-инициализация)
+    // 3. Инициализация атомов (явный доступ перед capture)
+    store.get(userAtom);
+    store.get(countAtom);
+    store.get(themeAtom);
+
+    // Первый snapshot
     controller.capture('app-init');
 
     let snapshot = controller.getHistory()[0];
@@ -86,6 +91,14 @@ describe('End-to-End Integration Tests', () => {
     const store = createStore();
     const controller = new TimeTravelController(store);
 
+    // Инициализация атомов (явный доступ перед capture)
+    store.get(priceAtom);
+    store.get(quantityAtom);
+    store.get(taxRateAtom);
+    store.get(subtotalAtom);
+    store.get(taxAtom);
+    store.get(totalAtom);
+
     // Первый snapshot
     controller.capture('init');
 
@@ -118,6 +131,9 @@ describe('End-to-End Integration Tests', () => {
     const controller1 = new TimeTravelController(store, { maxHistory: 5 });
     const controller2 = new TimeTravelController(store, { maxHistory: 10 });
 
+    // Инициализация атома перед capture
+    store.get(atom1);
+
     controller1.capture('c1-init');
     controller2.capture('c2-init');
 
@@ -148,7 +164,10 @@ describe('End-to-End Integration Tests', () => {
     const store = createStore();
     const controller = new TimeTravelController(store);
 
-    // Auto-initialization должна сработать
+    // Инициализация атомов (оба будут зарегистрированы)
+    store.get(atom1);
+    store.get(atom2);
+
     controller.capture('init');
 
     // Проверяем, что оба атома зарегистрированы (по id)
@@ -167,6 +186,10 @@ describe('End-to-End Integration Tests', () => {
     const store = createStore();
     const controller = new TimeTravelController(store);
 
+    // Инициализация атомов перед capture
+    store.get(baseAtom);
+    store.get(doubleAtom);
+
     controller.capture('init');
     store.set(baseAtom, 20);
     controller.capture('modified');
@@ -182,6 +205,9 @@ describe('End-to-End Integration Tests', () => {
 
     const store = createStore();
     const controller = new TimeTravelController(store);
+
+    // Инициализация атома
+    store.get(atom1);
 
     controller.capture('init');
     store.set(atom1, 'changed');
@@ -206,6 +232,10 @@ describe('End-to-End Integration Tests', () => {
 
     const store = createStore();
     const controller = new TimeTravelController(store);
+
+    // Инициализация атомов
+    store.get(atom1);
+    store.get(atom2);
 
     controller.capture('step-0');
     store.set(atom1, 1);
@@ -233,6 +263,10 @@ describe('End-to-End Integration Tests', () => {
 
     const store2 = createStore();
     const controller2 = new TimeTravelController(store2);
+
+    // Инициализация атома в каждом сторе
+    store1.get(sharedAtom);
+    store2.get(sharedAtom);
 
     controller1.capture('init');
     controller2.capture('init');

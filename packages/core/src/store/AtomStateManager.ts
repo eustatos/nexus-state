@@ -104,7 +104,7 @@ export class AtomStateManager {
         lazyMeta.registered = true;
         lazyMeta.registeredAt = Date.now();
         lazyMeta.accessCount = 1;
-        atomRegistry.register(atom, atom.name);
+        atomRegistry.register(atom as Atom<unknown>, atom.name);
       } else if (lazyMeta) {
         lazyMeta.accessCount++;
       }

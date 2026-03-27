@@ -125,7 +125,7 @@ export function atom<Value>(...args: any[]): Atom<Value> {
   }
 
   // Initialize lazy registration metadata
-  // Atom will be registered on first access via store.get() or store.set()
+  // Atom will be registered on first access via store.get(), store.set(), or store.subscribe()
   // This ensures atoms are registered in the correct registry (global or isolated per-store)
   atomInstance._lazyRegistration = {
     registered: false,
@@ -135,6 +135,12 @@ export function atom<Value>(...args: any[]): Atom<Value> {
   // Note: Registration is deferred until first store access.
   // This allows proper SSR isolation - atoms are registered in the store's registry,
   // not in a global singleton. See ensureAtomRegistered() in StoreImpl.
+  // 
+  // For DevTools/Time-travel support, atoms are registered in atomRegistry
+  // on first access, not on creation. This means:
+  // - Unaccessed atoms won't appear in DevTools until first store.get()/set()
+  // - Time-travel capture() only includes accessed atoms
+  // - SSR isolation is preserved - no global state contamination
 
   return atomInstance;
 }
