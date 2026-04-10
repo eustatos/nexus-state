@@ -5,10 +5,7 @@
  * Provides the createStore function for creating store instances.
  */
 
-// Implementation of createStore function
-
 import type { Store, Plugin } from './types';
-import { atomRegistry, type AtomRegistry } from './atom-registry';
 import { storeLogger as logger } from './debug';
 
 // Import refactored components
@@ -28,32 +25,38 @@ export type StoreEnhancementOptions = {
 
 /**
  * Create a new store to hold atoms
- * @param pluginsOrRegistry Array of plugins to apply to the store, or an AtomRegistry for isolated SSR
+ * @param plugins Array of plugins to apply to the store
  * @returns A new store instance
  * @example
  * const store = createStore();
  * const storeWithPlugins = createStore([loggerPlugin, devToolsPlugin]);
- * 
- * // SSR with isolated registry
- * const registry = createIsolatedRegistry();
- * const store = createStore(registry);
+ *
+ * // SSR: each request creates an independent store
+ * async function handleRequest() {
+ *   const store = createStore(); // Already isolated!
+ *   // ...
+ * }
  */
-export function createStore(pluginsOrRegistry: Plugin[] | AtomRegistry = []): Store {
-  if (Array.isArray(pluginsOrRegistry)) {
-    logger.log('[createStore] Creating store with', pluginsOrRegistry.length, 'plugins');
-    return new StoreImpl(pluginsOrRegistry);
-  } else {
-    logger.log('[createStore] Creating store with isolated registry');
-    return new StoreImpl([], pluginsOrRegistry);
-  }
+export function createStore(plugins: Plugin[] = []): Store {
+  logger.log('[createStore] Creating store with', plugins.length, 'plugins');
+  return new StoreImpl(plugins);
 }
 
 /**
  * Create a store with enhancement options
- * @param _options Enhancement options
+ * @param pluginsOrOptions Array of plugins OR enhancement options (for backward compatibility)
+ * @param _options Enhancement options (deprecated — use plugins only)
  * @returns A new store instance
  */
-export function createEnhancedStore(_options?: StoreEnhancementOptions): Store {
+export function createEnhancedStore(
+  pluginsOrOptions?: Plugin[] | StoreEnhancementOptions,
+  _options?: StoreEnhancementOptions
+): Store {
+  // Backward compat: if first arg is an object (not array), treat as options
+  if (pluginsOrOptions !== undefined && !Array.isArray(pluginsOrOptions)) {
+    logger.log('[createStore] Creating enhanced store (options ignored)');
+    return new StoreImpl([]);
+  }
   logger.log('[createStore] Creating enhanced store');
-  return new StoreImpl([]);
+  return new StoreImpl(pluginsOrOptions || []);
 }

@@ -19,7 +19,7 @@
  * ```
  */
 
-import { atom, createStore, atomRegistry } from '../index';
+import { atom, createStore } from '../index';
 import { batcher } from '../batching';
 import type { Atom, Store, Setter } from '../types';
 
@@ -30,11 +30,12 @@ import type { Atom, Store, Setter } from '../types';
 /**
  * Clean up all global state between tests
  * This ensures test isolation by clearing:
- * - Atom registry
  * - Batcher queues and state
+ *
+ * Note: Atom registry is now per-store (ScopedRegistry),
+ * so no global cleanup needed for atoms.
  */
 export function cleanupGlobalState(): void {
-  atomRegistry.clear();
   batcher.reset();
 }
 

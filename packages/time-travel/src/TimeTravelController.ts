@@ -9,7 +9,6 @@
  */
 
 import type { Snapshot, SnapshotStateEntry, Store, TimeTravelAPI, TimeTravelEventType, TimeTravelOptions, TimeTravelUnsubscribe } from './types';
-import { atomRegistry } from '@nexus-state/core';
 
 export class TimeTravelController implements TimeTravelAPI {
   private store: Store;
@@ -96,17 +95,19 @@ export class TimeTravelController implements TimeTravelAPI {
    * Helps developers understand why some atoms don't appear in snapshots
    */
   private warnAboutUnaccessedAtoms(): void {
-    const allAtoms = atomRegistry.getAll();
     const storeAtoms = this.store.getRegistryAtoms?.() || [];
-    const storeAtomsSet = new Set(storeAtoms);
+    const accessedNames = new Set<string>();
 
+    // Collect names of accessed atoms from store state
+    const state = this.store.getState();
+    Object.keys(state).forEach(key => accessedNames.add(key));
+
+    // Check which registered atoms haven't been accessed
     const unaccessed: string[] = [];
-    for (const [atomId, atom] of allAtoms) {
-      if (!storeAtomsSet.has(atomId)) {
-        const metadata = atomRegistry.getMetadata(atomId);
-        if (metadata?.name) {
-          unaccessed.push(metadata.name);
-        }
+    for (const atomId of storeAtoms) {
+      const metadata = this.store.getAtomMetadata?.(atomId);
+      if (metadata?.name && !accessedNames.has(metadata.name)) {
+        unaccessed.push(metadata.name);
       }
     }
 
@@ -174,9 +175,8 @@ export class TimeTravelController implements TimeTravelAPI {
   importState(state: Record<string, unknown>): boolean {
     try {
       Object.entries(state).forEach(([key, value]) => {
-        const atom = atomRegistry.getByName(key);
-        if (atom) {
-          (this.store as any).set(atom as never, value as never);
+        if (this.store.setByName) {
+          this.store.setByName(key, value);
         }
       });
       return true;
@@ -190,22 +190,24 @@ export class TimeTravelController implements TimeTravelAPI {
 
     try {
       Object.entries(snapshot.state).forEach(([key, entry]) => {
-        const atom = atomRegistry.getByName(key);
-        if (atom) {
-          try {
-            if (typeof (this.store as any).setSilently === 'function') {
-              (this.store as any).setSilently(atom as never, entry.value as never);
+        try {
+          if (typeof (this.store as any).setSilently === 'function') {
+            const atom = this.store.getByName?.(key);
+            if (atom) {
+              (this.store as any).setSilently(atom, entry.value);
             } else {
-              console.warn(
-                `[TimeTravelController] setSilently not available, using set() for atom ${key}`
-              );
-              (this.store as any).set(atom as never, entry.value as never);
+              console.warn(`restoreSnapshot: atom ${key} not found in store`);
             }
-          } catch (error) {
-            console.warn(`restoreSnapshot: failed to restore atom ${key}:`, error);
+          } else {
+            console.warn(
+              `[TimeTravelController] setSilently not available, using setByName() for atom ${key}`
+            );
+            if (this.store.setByName) {
+              this.store.setByName(key, entry.value);
+            }
           }
-        } else {
-          console.warn(`restoreSnapshot: atom ${key} not found in registry`);
+        } catch (error) {
+          console.warn(`restoreSnapshot: failed to restore atom ${key}:`, error);
         }
       });
 
@@ -227,18 +229,18 @@ export class TimeTravelController implements TimeTravelAPI {
     const storeAtoms = this.store.getRegistryAtoms?.() || [];
 
     for (const atomId of storeAtoms) {
-      const atom = atomRegistry.get(atomId);
-      if (atom) {
-        const metadata = atomRegistry.getMetadata(atomId);
-        if (metadata?.type === 'computed') {
-          try {
+      const metadata = this.store.getAtomMetadata?.(atomId);
+      if (metadata?.type === 'computed') {
+        try {
+          const atom = this.store.getByName?.(metadata.name!);
+          if (atom) {
             this.store.get(atom as any);
-          } catch (error) {
-            console.warn(
-              `[TimeTravelController] Failed to flush computed atom:`,
-              error
-            );
           }
+        } catch (error) {
+          console.warn(
+            `[TimeTravelController] Failed to flush computed atom:`,
+            error
+          );
         }
       }
     }

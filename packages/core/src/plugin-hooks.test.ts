@@ -1,7 +1,6 @@
 // Tests for plugin hooks functionality
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { atom, createStore } from './index';
-import { atomRegistry } from './atom-registry';
 import type { PluginHooks } from './types';
 import type { AtomContext } from './reactive';
 
@@ -471,10 +470,6 @@ describe('Plugin Hooks', () => {
 });
 
 describe('SR-009: Plugin Hooks with AtomContext', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   describe('onSet hook with context', () => {
     it('should receive context in onSet hook', () => {
       const store = createStore();

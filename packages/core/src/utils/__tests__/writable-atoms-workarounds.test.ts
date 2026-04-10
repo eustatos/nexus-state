@@ -292,22 +292,20 @@ describe('Writable Atoms - Workarounds', () => {
   describe('Anti-Patterns (What NOT to do)', () => {
     it('should NOT use self-referential set (will fail)', () => {
       const store = createStore();
-      let count = 0;
 
-      // This pattern causes stack overflow
+      // ❌ DON'T DO THIS: writable atom that only updates closure
+      // The store caches the value, so closure updates are ignored
       const badCounter = atom(
-        () => count,
+        () => 0, // Always returns 0
         (get, set) => {
-          // ❌ DON'T DO THIS
-          // set(badCounter, count + 1);
-          // Instead use direct assignment:
-          count = count + 1;
+          // This pattern doesn't work — store state isn't updated
+          // Use internal state atom or call set() to update store
         }
       );
 
-      // Using correct pattern
+      // The atom always returns 0 because read() is pure
       store.set(badCounter, undefined as any);
-      expect(store.get(badCounter)).toBe(1);
+      expect(store.get(badCounter)).toBe(0);
     });
 
     it('should NOT create circular dependencies', () => {

@@ -5,7 +5,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { atom, createStore } from '@nexus-state/core';
 import { TimeTravelController } from '../../TimeTravelController';
-import { atomRegistry } from '@nexus-state/core';
 
 describe('TimeTravelController - Auto-initialization', () => {
   let store: ReturnType<typeof createStore>;
@@ -14,8 +13,6 @@ describe('TimeTravelController - Auto-initialization', () => {
   beforeEach(() => {
     store = createStore();
     controller = new TimeTravelController(store);
-    // Очистка registry между тестами
-    atomRegistry.clear();
   });
 
   describe('Basic auto-initialization', () => {
@@ -297,8 +294,6 @@ describe('TimeTravelController - Auto-initialization', () => {
 
   describe('Store Isolation (SSR Safety)', () => {
     it('should capture only atoms accessed in current store', () => {
-      atomRegistry.clear();
-      
       const store1 = createStore();
       const store2 = createStore();
 
@@ -329,8 +324,6 @@ describe('TimeTravelController - Auto-initialization', () => {
     });
 
     it('should isolate stores with same atom names', () => {
-      atomRegistry.clear();
-      
       const store1 = createStore();
       const store2 = createStore();
 
@@ -355,8 +348,6 @@ describe('TimeTravelController - Auto-initialization', () => {
     });
 
     it('should not leak atoms between stores during flushComputed', () => {
-      atomRegistry.clear();
-      
       const store1 = createStore();
       const store2 = createStore();
 

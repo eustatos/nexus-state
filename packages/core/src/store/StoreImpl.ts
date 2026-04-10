@@ -2,7 +2,7 @@
  * StoreImpl - Store implementation (Facade pattern)
  *
  * This class is a facade that coordinates all store components:
- * - AtomStateManager: State storage
+ * - ScopedRegistry: Unified per-store atom registry (atoms + state + metadata)
  * - DependencyTracker: Dependency management
  * - NotificationManager: Subscription management
  * - PluginSystem: Plugin management
@@ -23,7 +23,6 @@ import type {
 } from '../types';
 import type { AtomContext } from '../reactive';
 import { isWritableAtom } from '../types';
-import { atomRegistry, AtomRegistry } from '../atom-registry';
 import { storeLogger as logger } from '../debug';
 
 import { AtomStateManager } from './AtomStateManager';
@@ -33,11 +32,14 @@ import { PluginSystem } from './PluginSystem';
 import { ComputedEvaluator } from './ComputedEvaluator';
 import { DevToolsIntegration } from './DevToolsIntegration';
 import { BatchProcessor } from './BatchProcessor';
+import { ScopedRegistry } from './ScopedRegistry';
+import type { AtomEntry, AtomState } from './types';
 
 /**
  * StoreImpl provides the store implementation
  */
 export class StoreImpl implements Store {
+  private registry: ScopedRegistry;
   private stateManager: AtomStateManager;
   private dependencyTracker: DependencyTracker;
   private notificationManager: NotificationManager;
@@ -45,12 +47,16 @@ export class StoreImpl implements Store {
   private evaluator: ComputedEvaluator;
   private devTools: DevToolsIntegration;
   private batchProcessor: BatchProcessor;
-  private registry: StoreRegistry;
-  private atomRegistry: AtomRegistry;
+  private storeRegistry: StoreRegistry;
 
-  constructor(plugins: Plugin[] = [], registry?: AtomRegistry) {
-    // Initialize components
+  constructor(plugins: Plugin[] = []) {
+    // Initialize unified registry
+    this.registry = new ScopedRegistry(this as unknown as Store);
+
+    // Initialize state manager (pure state storage, no registration)
     this.stateManager = new AtomStateManager();
+
+    // Initialize other components
     this.dependencyTracker = new DependencyTracker();
     this.notificationManager = new NotificationManager();
     this.pluginSystem = new PluginSystem();
@@ -58,55 +64,41 @@ export class StoreImpl implements Store {
     this.devTools = new DevToolsIntegration();
     this.batchProcessor = new BatchProcessor();
 
-    // Create getter and setter
-    const get = this.createGetter();
-    const set = this.createSetter(get);
-
-    // Use provided registry or global registry
-    this.atomRegistry = registry || atomRegistry;
-
-    // Auto-attach to registry and get store registry reference
-    if (typeof this.atomRegistry.attachStore === 'function') {
-      this.atomRegistry.attachStore(this as unknown as Store, registry ? 'isolated' : 'global');
-    }
-    // Get the registry for this store
-    const storesMap = this.atomRegistry.getStoresMap();
-    this.registry = storesMap.get(this as unknown as Store)!;
+    // Create StoreRegistry adapter for backward compatibility
+    this.storeRegistry = {
+      store: this as unknown as Store,
+      atoms: new Set<symbol>(),
+    };
 
     // Apply plugins
     plugins.forEach((plugin) => {
       this.pluginSystem.applyPlugin(plugin, this as unknown as Store);
     });
 
-    logger.log('[StoreImpl] Created with', plugins.length, 'plugins', registry ? '(isolated registry)' : '(global registry)');
+    logger.log('[StoreImpl] Created with', plugins.length, 'plugins');
   }
 
   /**
-   * Ensure atom is registered on first access (used by setter)
-   * @param atom The atom to register
+   * Get or create atom entry via ScopedRegistry.
+   * Single entry point for atom registration — replaces duplicated logic.
    */
-  private ensureAtomRegistered<Value>(atom: Atom<Value>): void {
-    const atomId = atom.id;
-    
-    // Fast path: check Set.has() first
-    if (!this.registry.atoms.has(atomId)) {
-      this.registry.atoms.add(atomId);
-      
-      // Lazy registration in global registry
-      const lazyMeta = atom._lazyRegistration;
-      if (lazyMeta && !lazyMeta.registered) {
-        lazyMeta.registered = true;
-        lazyMeta.registeredAt = Date.now();
-        lazyMeta.accessCount = 1;
-        this.atomRegistry.register(atom as Atom<unknown>, atom.name);
-      }
-    } else {
-      // Atom already in store registry, increment access count
-      const lazyMeta = atom._lazyRegistration;
-      if (lazyMeta) {
-        lazyMeta.accessCount++;
-      }
-    }
+  private getOrCreateEntry<Value>(
+    atom: Atom<Value>,
+    getter: Getter
+  ): AtomEntry<Value> {
+    return this.registry.ensure(atom, () => {
+      // Track in backward-compatible registry
+      this.storeRegistry.atoms.add(atom.id);
+
+      // Create initial state via evaluation
+      const value = this.evaluator.evaluate(atom, getter);
+      const state: AtomState<Value> = {
+        value: value,
+        subscribers: new Set(),
+        dependents: new Set(),
+      };
+      return state;
+    });
   }
 
   /**
@@ -114,44 +106,19 @@ export class StoreImpl implements Store {
    */
   private createGetter(): Getter {
     return <Value>(atom: Atom<Value>): Value => {
-      // Register atom in current store's local registry for tracking
-      // Fast path: check Set.has() before Map operations
-      const atomId = atom.id;
-      if (!this.registry.atoms.has(atomId)) {
-        this.registry.atoms.add(atomId);
-        
-        // Lazy registration in global registry (only on first access)
-        const lazyMeta = atom._lazyRegistration;
-        if (lazyMeta && !lazyMeta.registered) {
-          lazyMeta.registered = true;
-          lazyMeta.registeredAt = Date.now();
-          lazyMeta.accessCount = 1;
-          this.atomRegistry.register(atom as Atom<unknown>, atom.name);
-        }
-      } else if (atom._lazyRegistration) {
-        // Fast path: just increment counter, no registry check
-        atom._lazyRegistration.accessCount++;
-      }
-
       const previousAtom = this.stateManager.getCurrentAtom();
       this.stateManager.setCurrentAtom(atom);
 
       try {
-        const atomState = this.stateManager.getOrCreateState(atom, () => {
-          return this.evaluator.evaluate(atom, this.createGetter());
-        });
+        const entry = this.getOrCreateEntry(atom, this.createGetter());
 
         // Track dependency
-        // Use previousAtom (the dependent) instead of getCurrentAtom() (which is the current atom being evaluated)
         if (previousAtom && previousAtom !== atom) {
-          this.dependencyTracker.addDependency(
-            atomState,
-            previousAtom
-          );
+          this.dependencyTracker.addDependency(entry.state, previousAtom);
         }
 
         // Apply onGet hooks
-        const value = this.pluginSystem.executeOnGetHooks(atom, atomState.value);
+        const value = this.pluginSystem.executeOnGetHooks(atom, entry.state.value);
         return value;
       } finally {
         this.stateManager.setCurrentAtom(previousAtom);
@@ -168,8 +135,12 @@ export class StoreImpl implements Store {
       update: Value | ((prev: Value) => Value),
       context?: AtomContext
     ): void => {
-      // Trigger lazy registration on first access
-      this.ensureAtomRegistered(atom);
+      // Track current atom for dependency tracking during registration
+      const prevAtom = this.stateManager.getCurrentAtom();
+      this.stateManager.setCurrentAtom(atom);
+
+      try {
+        const entry = this.getOrCreateEntry(atom, get);
 
       logger.log(
         '[StoreImpl] Setting atom:',
@@ -179,11 +150,6 @@ export class StoreImpl implements Store {
         'context:',
         context
       );
-
-      // Register atom only in current store (O(1))
-      if (!this.registry.atoms.has(atom.id)) {
-        this.registry.atoms.add(atom.id);
-      }
 
       // For writable atoms with write function, call write directly
       if (isWritableAtom(atom) && atom.write) {
@@ -197,15 +163,10 @@ export class StoreImpl implements Store {
         return;
       }
 
-      // Get or create state
-      const atomState = this.stateManager.getOrCreateState(atom, () => {
-        return this.evaluator.evaluate(atom, get);
-      });
-
       // Calculate new value
       const newValue =
         typeof update === 'function'
-          ? (update as (prev: Value) => Value)(atomState.value)
+          ? (update as (prev: Value) => Value)(entry.state.value)
           : update;
 
       // Apply onSet hooks with context (even in silent mode)
@@ -216,7 +177,10 @@ export class StoreImpl implements Store {
       );
 
       // Update value
-      const previousValue = atomState.value;
+      const previousValue = entry.state.value;
+      entry.state.value = processedValue;
+
+      // Also update state manager for compatibility
       this.stateManager.setValue(atom, processedValue);
 
       logger.log(
@@ -243,13 +207,13 @@ export class StoreImpl implements Store {
 
       // Normal update with side effects
       // Notify subscribers
-      this.notificationManager.notify(atom, atomState, processedValue);
+      this.notificationManager.notify(atom, entry.state, processedValue);
 
       // Notify dependents
       this.dependencyTracker.notifyDependents(
         atom,
-        (a) => this.stateManager.getState(a)!,
-        (a) => this.stateManager.getValue(a),
+        (a) => this.getAtomState(a),
+        (a) => this.getAtomValue(a),
         (a) => this.evaluator.recompute(a, get)
       );
 
@@ -270,7 +234,26 @@ export class StoreImpl implements Store {
           this.devTools.trackStateChange(atom, processedValue);
         }
       }
+      } finally {
+        this.stateManager.setCurrentAtom(prevAtom);
+      }
     };
+  }
+
+  /**
+   * Get atom state from registry
+   */
+  private getAtomState<Value>(atom: Atom<Value>): AtomState<Value> {
+    const entry = this.registry.get<Value>(atom.id);
+    return entry ? entry.state : undefined as unknown as AtomState<Value>;
+  }
+
+  /**
+   * Get atom value from registry
+   */
+  private getAtomValue<Value>(atom: Atom<Value>): Value | undefined {
+    const entry = this.registry.get<Value>(atom.id);
+    return entry ? entry.state.value : undefined;
   }
 
   /**
@@ -298,9 +281,10 @@ export class StoreImpl implements Store {
    */
   setSilently<Value>(
     atom: Atom<Value>,
-    update: Value | ((prev: Value) => Value)
+    update: Value | ((prev: Value) => Value),
+    context?: AtomContext
   ): void {
-    this.set(atom, update, { silent: true });
+    this.set(atom, update, { silent: true, ...context });
   }
 
   /**
@@ -315,23 +299,22 @@ export class StoreImpl implements Store {
       atom.name || 'unnamed'
     );
 
-    // Trigger lazy registration on subscribe
-    this.ensureAtomRegistered(atom);
+    const prevAtom = this.stateManager.getCurrentAtom();
+    this.stateManager.setCurrentAtom(atom);
 
-    // Get or create state
-    const atomState = this.stateManager.getOrCreateState(atom, () => {
-      return this.evaluator.evaluate(atom, this.createGetter());
-    });
-
-    // Subscribe
-    return this.notificationManager.subscribe(atom, atomState, subscriber);
+    try {
+      const entry = this.getOrCreateEntry(atom, this.createGetter());
+      return this.notificationManager.subscribe(atom, entry.state, subscriber);
+    } finally {
+      this.stateManager.setCurrentAtom(prevAtom);
+    }
   }
 
   /**
    * Get state of all atoms
    */
   getState(): Record<string, unknown> {
-    return this.stateManager.getStateAsRecord();
+    return this.registry.getStateAsRecord();
   }
 
   /**
@@ -445,17 +428,13 @@ export class StoreImpl implements Store {
    * @returns The store instance for chaining
    */
   setState(state: Record<string, unknown>): Store {
-    const localAtoms = this.registry.atoms; // ← Only this store's atoms
-    Object.entries(state).forEach(([key, value]) => {
-      const atomId = Array.from(localAtoms)
-        .find(id => this.atomRegistry.getName({ id }) === key);
-      if (atomId) {
-        const atom = this.atomRegistry.get(atomId);
-        if (atom) {
-          this.set(atom as any, value);
-        }
+    const entries = this.registry.getAll();
+    for (const [key, value] of Object.entries(state)) {
+      const entry = this.registry.getByName(key);
+      if (entry !== undefined) {
+        this.set(entry.atom, value);
       }
-    });
+    }
     return this as unknown as Store;
   }
 
@@ -472,13 +451,17 @@ export class StoreImpl implements Store {
    * Clear all atoms to their default values
    */
   clear(): void {
-    const states = this.stateManager.getAllStates();
-    states.forEach((_, atom) => {
-      const defaultValue = (atom as any).read();
-      this.stateManager.setValue(atom, defaultValue);
+    const entries = this.registry.getAll();
+    const states: Array<{ atom: Atom<any>; state: AtomState<any> }> = [];
+
+    entries.forEach((entry) => {
+      const defaultValue = (entry.atom as any).read();
+      entry.state.value = defaultValue;
+      states.push({ atom: entry.atom, state: entry.state });
     });
+
     // Notify all subscribers
-    states.forEach((state, atom) => {
+    states.forEach(({ atom, state }) => {
       this.notificationManager.notify(atom, state, state.value);
     });
   }
@@ -488,7 +471,7 @@ export class StoreImpl implements Store {
    * @returns Array of atom IDs associated with the store
    */
   getRegistryAtoms(): symbol[] {
-    return Array.from(this.registry.atoms);
+    return this.registry.getAllIds();
   }
 
   /**
@@ -496,6 +479,31 @@ export class StoreImpl implements Store {
    * @returns The store registry
    */
   getRegistry(): StoreRegistry {
-    return this.registry;
+    return this.storeRegistry;
+  }
+
+  /**
+   * Set atom value by name (for SSR hydration and time-travel)
+   */
+  setByName(name: string, value: unknown, context?: unknown): boolean {
+    const entry = this.registry.getByName(name);
+    if (entry === undefined) return false;
+    this.set(entry.atom, value as never, context as never);
+    return true;
+  }
+
+  /**
+   * Get atom by name from the store's registry
+   */
+  getByName(name: string): Atom<unknown> | undefined {
+    const entry = this.registry.getByName(name);
+    return entry?.atom;
+  }
+
+  /**
+   * Get metadata for a registered atom by its ID
+   */
+  getAtomMetadata(id: symbol): import('../types').AtomMetadata | undefined {
+    return this.registry.getMetadata(id);
   }
 }

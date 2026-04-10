@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { atom, createStore, atomRegistry } from '../../index';
+import { atom, createStore } from '../../index';
 import type { Getter } from '../../types';
 
 describe('Atom Creation', () => {
@@ -89,13 +89,13 @@ describe('Atom Creation', () => {
       expect(writableAtom.name).toBe('writable-count');
     });
 
-    it('should register atom with registry when created with name', () => {
-      const testAtom = atom(42, 'test-atom');
+    it('should register atom in store registry when accessed', () => {
       const store = createStore();
+      const testAtom = atom(42, 'test-atom');
       store.get(testAtom); // Trigger lazy registration
-      
-      const registeredAtom = atomRegistry.get(testAtom.id);
-      expect(registeredAtom).toBe(testAtom);
+
+      const atoms = store.getRegistryAtoms();
+      expect(atoms).toContain(testAtom.id);
     });
   });
 

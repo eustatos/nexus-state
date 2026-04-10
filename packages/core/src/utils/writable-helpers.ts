@@ -141,11 +141,13 @@ export function createValidatedAtom<T>(
     name = 'validated',
   } = options;
 
-  let currentValue = initial;
+  // Internal primitive atom holds the actual state
+  const stateAtom = atom(initial, `${name}-state`);
 
   return atom(
-    () => currentValue,
-    (_get, _set, newValue) => {
+    (get) => get(stateAtom),
+    (get, set, newValue) => {
+      const currentValue = get(stateAtom);
       const result = validator(newValue);
 
       // Handle different validator return types
@@ -170,11 +172,12 @@ export function createValidatedAtom<T>(
         if (throwOnError) {
           throw new Error(error || 'Validation failed');
         }
-        // Silently ignore invalid value
+        // Silently ignore invalid value — keep current value
         return;
       }
 
-      currentValue = validatedValue;
+      // Update internal state atom — this is a primitive atom, no recursion
+      set(stateAtom, validatedValue);
     },
     name
   );
@@ -262,20 +265,22 @@ export function createTransformedWritableAtom<I, O>(
 ): { source: Atom<I>; transformed: Atom<O> } {
   const { initial, transform, inverse, name = 'transformed' } = options;
 
-  let sourceValue = initial;
+  // Internal primitive atom holds the actual source state
+  const stateAtom = atom(initial, `${name}-state`);
 
   const sourceAtom = atom(
-    () => sourceValue,
-    (_get, _set, newValue: I) => {
-      sourceValue = newValue;
+    (get) => get(stateAtom),
+    (_get, set, newValue: I) => {
+      set(stateAtom, newValue);
     },
     `${name}-source`
   );
 
   const transformedAtom = atom(
-    () => transform(sourceValue),
-    (_get, _set, newValue: O) => {
-      sourceValue = inverse(newValue);
+    (get) => transform(get(stateAtom)),
+    (_get, set, newValue: O) => {
+      const sourceValue = inverse(newValue);
+      set(stateAtom, sourceValue);
     },
     name
   );
@@ -368,35 +373,35 @@ export function createSyncedAtoms<T>(options: {
 } {
   const { initial, slaveCount, name = 'sync' } = options;
 
-  let value = initial;
   const slaves: Atom<T>[] = [];
 
-  // Create slave atoms
+  // Master atom holds the state via internal state atom
+  const stateAtom = atom(initial, `${name}-state`);
+
+  const master = atom(
+    (get) => get(stateAtom),
+    (_get, set, newValue) => {
+      set(stateAtom, newValue);
+    },
+    `${name}-master`
+  );
+
+  // Slave atoms also read/write from the same state atom
   for (let i = 0; i < slaveCount; i++) {
     slaves.push(
       atom(
-        () => value,
-        (_get, _set, newValue) => {
-          value = newValue;
+        (get) => get(stateAtom),
+        (_get, set, newValue) => {
+          set(stateAtom, newValue);
         },
         `${name}-slave-${i}`
       )
     );
   }
 
-  // Create master atom
-  const master = atom(
-    () => value,
-    (_get, _set, newValue) => {
-      value = newValue;
-    },
-    `${name}-master`
-  );
-
-  // Helper to set all atoms
+  // Helper to set all atoms (sets master, which syncs to all slaves via shared state)
   const setAll = (store: any, newValue: T) => {
     store.set(master, newValue);
-    slaves.forEach((slave) => store.set(slave, newValue));
   };
 
   return { master, slaves, setAll };

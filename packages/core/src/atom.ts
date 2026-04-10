@@ -8,7 +8,6 @@ import type {
   ComputedAtom,
   WritableAtom,
 } from './types';
-import { atomRegistry } from './atom-registry';
 
 /**
  * Create a computed atom that derives its value from other atoms

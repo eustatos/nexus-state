@@ -2,15 +2,11 @@
  * End-to-End Integration Tests for TimeTravelController
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { atom, createStore } from '@nexus-state/core';
 import { TimeTravelController } from '../../TimeTravelController';
-import { atomRegistry } from '@nexus-state/core';
 
 describe('End-to-End Integration Tests', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
 
   it('should handle complete user workflow', () => {
     // 1. Создание атомов
@@ -171,10 +167,7 @@ describe('End-to-End Integration Tests', () => {
     controller.capture('init');
 
     // Проверяем, что оба атома зарегистрированы (по id)
-    expect(atomRegistry.size()).toBe(2);
-
-    // getByName вернёт первый атом
-    expect(atomRegistry.getByName('shared')).toBe(atom1);
+    expect(store.getRegistryAtoms().length).toBe(2);
 
     consoleWarnSpy.mockRestore();
   });

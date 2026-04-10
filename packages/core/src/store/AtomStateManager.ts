@@ -1,12 +1,14 @@
 /**
  * AtomStateManager - Manages atom state storage and retrieval
  *
- * Handles storage, creation, and retrieval of atom states.
+ * Pure state storage — no atom registration logic.
+ * Registration is handled by ScopedRegistry.
+ *
+ * @packageDocumentation
  */
 
 import type { Atom, PrimitiveAtom, ComputedAtom, WritableAtom } from '../types';
 import { isPrimitiveAtom, isComputedAtom, isWritableAtom } from '../types';
-import { atomRegistry } from '../atom-registry';
 import { storeLogger as logger } from '../debug';
 
 /**
@@ -94,21 +96,11 @@ export class AtomStateManager {
   }
 
   /**
-   * Create getter function for atom evaluation
+   * Create getter function for atom evaluation (used only during AtomStateManager.evaluateAtom)
+   * This getter handles primitive atoms that are dependencies of computed atoms.
    */
   private createGetter(): <V>(atom: Atom<V>) => V {
     return <V>(atom: Atom<V>): V => {
-      // Ensure atom is registered (lazy registration)
-      const lazyMeta = atom._lazyRegistration;
-      if (lazyMeta && !lazyMeta.registered) {
-        lazyMeta.registered = true;
-        lazyMeta.registeredAt = Date.now();
-        lazyMeta.accessCount = 1;
-        atomRegistry.register(atom as Atom<unknown>, atom.name);
-      } else if (lazyMeta) {
-        lazyMeta.accessCount++;
-      }
-
       const state = this.getOrCreateState(atom, () => {
         if (isPrimitiveAtom(atom)) {
           return (atom as PrimitiveAtom<V>).read();
@@ -172,9 +164,8 @@ export class AtomStateManager {
     const state: Record<string, unknown> = {};
 
     this.states.forEach((atomState, atom) => {
-      const atomName = atomRegistry.getName(atom);
-      const key = atomName || atom.toString();
-      state[key] = atomState.value;
+      const atomName = atom.name || atom.id.toString();
+      state[atomName] = atomState.value;
     });
 
     return state;

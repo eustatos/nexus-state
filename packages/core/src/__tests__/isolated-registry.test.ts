@@ -1,292 +1,238 @@
 /**
  * Isolated Registry Tests
- * Tests for SSR isolation with createIsolatedRegistry()
+ * Tests that every store is isolated by default (ScopedRegistry).
+ * SSR isolation is now the default — no special registry needed.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { atom, createIsolatedRegistry, createStore, atomRegistry } from '../index';
+import { describe, it, expect } from 'vitest';
+import { atom, createStore } from '../index';
 import { StoreImpl } from '../store/StoreImpl';
 
-describe('createIsolatedRegistry', () => {
-  beforeEach(() => {
-    // Clean global registry before each test for isolation
-    atomRegistry.clear();
-  });
-
+describe('Store Isolation (default)', () => {
   describe('Basic Isolation', () => {
-    it('should create a new registry instance not tied to global singleton', () => {
-      const isolatedRegistry1 = createIsolatedRegistry();
-      const isolatedRegistry2 = createIsolatedRegistry();
+    it('should create independent stores by default', () => {
+      const store1 = createStore();
+      const store2 = createStore();
 
-      expect(isolatedRegistry1).not.toBe(atomRegistry);
-      expect(isolatedRegistry2).not.toBe(atomRegistry);
-      expect(isolatedRegistry1).not.toBe(isolatedRegistry2);
+      const atom1 = atom(0);
+      const atom2 = atom(0);
+
+      store1.set(atom1, 100);
+      store2.set(atom2, 200);
+
+      // Each store has its own state
+      expect(store1.get(atom1)).toBe(100);
+      expect(store2.get(atom2)).toBe(200);
     });
 
-    it('should maintain separate store registries', () => {
-      const isolatedRegistry = createIsolatedRegistry();
-      const store = createStore(isolatedRegistry);
+    it('should maintain separate registries', () => {
+      const store1 = createStore();
+      const store2 = createStore();
 
-      // Use anonymous atom (no name) to avoid immediate registration in global registry
-      const testAtom = atom(123);
-      store.get(testAtom);
+      const testAtom = atom(123, 'test');
+      store1.get(testAtom);
 
-      // Atom should be in isolated registry
-      expect(isolatedRegistry.size()).toBe(1);
-      expect(isolatedRegistry.get(testAtom.id)).toBe(testAtom);
-
-      // Atom should NOT be in global registry
-      expect(atomRegistry.size()).toBe(0);
-      expect(atomRegistry.get(testAtom.id)).toBeUndefined();
+      // Atom is only in store1's registry
+      expect(store1.getRegistryAtoms()).toContain(testAtom.id);
+      expect(store2.getRegistryAtoms()).not.toContain(testAtom.id);
     });
 
-    it('should allow multiple isolated registries', () => {
-      const registry1 = createIsolatedRegistry();
-      const registry2 = createIsolatedRegistry();
+    it('should allow multiple independent stores', () => {
+      const store1 = createStore();
+      const store2 = createStore();
 
-      const store1 = createStore(registry1);
-      const store2 = createStore(registry2);
-
-      // Create anonymous atoms (no name to avoid immediate global registration)
-      const atom1 = atom('value1');
-      const atom2 = atom('value2');
+      const atom1 = atom('value1', 'a1');
+      const atom2 = atom('value2', 'a2');
 
       store1.get(atom1);
       store2.get(atom2);
 
       // Each registry should have its own atom
-      expect(registry1.size()).toBe(1);
-      expect(registry2.size()).toBe(1);
+      expect(store1.getRegistryAtoms()).toContain(atom1.id);
+      expect(store2.getRegistryAtoms()).toContain(atom2.id);
 
-      // No atoms in global registry
-      expect(atomRegistry.size()).toBe(0);
+      // No cross-contamination
+      expect(store1.getRegistryAtoms()).not.toContain(atom2.id);
+      expect(store2.getRegistryAtoms()).not.toContain(atom1.id);
     });
   });
 
   describe('SSR Concurrent Requests Isolation', () => {
-    it('should isolate state between concurrent SSR requests', () => {
-      // Simulate two concurrent SSR requests with isolated registries
-      const registry1 = createIsolatedRegistry();
-      const registry2 = createIsolatedRegistry();
+    it('should isolate state between concurrent SSR requests', async () => {
+      async function handleRequest(initialValue: number) {
+        const store = createStore();
+        const countAtom = atom(initialValue, 'count');
+        store.get(countAtom);
+        store.set(countAtom, initialValue + 1);
+        return store.get(countAtom);
+      }
 
-      const store1 = createStore(registry1);
-      const store2 = createStore(registry2);
+      const [result1, result2, result3] = await Promise.all([
+        handleRequest(10),
+        handleRequest(20),
+        handleRequest(30),
+      ]);
 
-      // Create anonymous atoms for each request
-      const userAtom1 = atom({ name: 'Anonymous' });
-      const userAtom2 = atom({ name: 'Anonymous' });
-
-      // Initialize atoms in each store and set values directly
-      store1.get(userAtom1);
-      store2.get(userAtom2);
-
-      // Update values directly (not by name since atoms are anonymous)
-      store1.set(userAtom1, { name: 'User1' });
-      store2.set(userAtom2, { name: 'User2' });
-
-      // Verify isolation
-      expect(store1.get(userAtom1)).toEqual({ name: 'User1' });
-      expect(store2.get(userAtom2)).toEqual({ name: 'User2' });
-
-      // Verify registries are separate
-      expect(registry1.size()).toBe(1);
-      expect(registry2.size()).toBe(1);
+      expect(result1).toBe(11);
+      expect(result2).toBe(21);
+      expect(result3).toBe(31);
     });
 
     it('should isolate stores with setState using store-specific atoms', () => {
-      const registry1 = createIsolatedRegistry();
-      const registry2 = createIsolatedRegistry();
+      const store1 = createStore();
+      const store2 = createStore();
 
-      const store1 = createStore(registry1);
-      const store2 = createStore(registry2);
+      const atom1 = atom(0, 'shared');
+      const atom2 = atom(0, 'shared');
 
-      // Create anonymous atoms for each store
-      const atom1 = atom('initial1');
-      const atom2 = atom('initial2');
-
-      // Access atoms to register them in their stores' local registries
+      // Register in each store
       store1.get(atom1);
       store2.get(atom2);
 
-      // Get atom names from registry for setState
-      const atom1Name = registry1.getName(atom1);
-      const atom2Name = registry2.getName(atom2);
+      // Set state by name in each store
+      store1.setState({ shared: 100 });
+      store2.setState({ shared: 200 });
 
-      // Hydrate store2 - should only find atom in store2's local registry
-      store2.setState({ [atom2Name]: 'hydrated-value' });
-
-      expect(store2.get(atom2)).toBe('hydrated-value');
-      // store1 should keep its original value since setState searches only in local registry
-      expect(store1.get(atom1)).toBe('initial1');
-
-      // Verify local registries are separate
-      expect(store1.getRegistryAtoms!()).toHaveLength(1);
-      expect(store2.getRegistryAtoms!()).toHaveLength(1);
+      // Each store has its own value
+      expect(store1.get(atom1)).toBe(100);
+      expect(store2.get(atom2)).toBe(200);
     });
 
     it('should support multiple atoms per isolated store', () => {
-      const registry = createIsolatedRegistry();
-      const store = createStore(registry);
+      const store = createStore();
+      const countAtom = atom(0, 'count');
+      const nameAtom = atom('', 'name');
 
-      const userAtom = atom({ name: 'John' });
-      const countAtom = atom(0);
-      const themeAtom = atom('light');
-
-      store.get(userAtom);
       store.get(countAtom);
-      store.get(themeAtom);
+      store.get(nameAtom);
 
-      expect(registry.size()).toBe(3);
-      expect(atomRegistry.size()).toBe(0);
-
-      // Update values
-      store.set(userAtom, { name: 'Jane' });
       store.set(countAtom, 42);
-      store.set(themeAtom, 'dark');
+      store.set(nameAtom, 'test');
 
-      expect(store.get(userAtom)).toEqual({ name: 'Jane' });
       expect(store.get(countAtom)).toBe(42);
-      expect(store.get(themeAtom)).toBe('dark');
+      expect(store.get(nameAtom)).toBe('test');
+      expect(store.getRegistryAtoms().length).toBeGreaterThanOrEqual(2);
     });
   });
 
   describe('Memory Cleanup', () => {
     it('should allow garbage collection after request completion', () => {
-      // Create isolated registry for a request
-      let registry = createIsolatedRegistry();
-      const store = createStore(registry);
+      function handleRequest() {
+        const store = createStore();
+        const dataAtom = atom({ items: [] as string[] }, 'data');
+        store.get(dataAtom);
+        store.set(dataAtom, { items: ['item1', 'item2'] });
+        return store.get(dataAtom);
+      }
 
-      const testAtom = atom('test-value');
-      store.get(testAtom);
-
-      expect(registry.size()).toBe(1);
-
-      // Simulate request completion by clearing references
-      registry = null as any;
-
-      // Global registry should remain unaffected
-      expect(atomRegistry.size()).toBe(0);
+      const result = handleRequest();
+      expect(result).toEqual({ items: ['item1', 'item2'] });
     });
 
-    it('should not affect global registry after isolated registry is discarded', () => {
-      const isolatedRegistry = createIsolatedRegistry();
-      const isolatedStore = createStore(isolatedRegistry);
+    it('should not affect other stores after one store is discarded', () => {
+      const store1 = createStore();
+      const store2 = createStore();
 
-      const isolatedAtom = atom('isolated');
-      isolatedStore.get(isolatedAtom);
+      const atom1 = atom('a', 'shared-name');
+      const atom2 = atom('b', 'shared-name');
 
-      // Create atom in global registry
-      const globalAtom = atom('global');
-      const globalStore = createStore();
-      globalStore.get(globalAtom);
+      store1.get(atom1);
+      store2.get(atom2);
 
-      // Verify separation
-      expect(isolatedRegistry.size()).toBe(1);
-      expect(atomRegistry.size()).toBeGreaterThanOrEqual(1);
+      store1.set(atom1, 'modified-a');
 
-      // Discard isolated registry
-      // (In real SSR, this would happen when request completes)
+      // store2 is unaffected
+      expect(store2.get(atom2)).toBe('b');
     });
   });
 
   describe('Backward Compatibility', () => {
-    it('should work with default global registry when no registry provided', () => {
-      const store = createStore();
-      const testAtom = atom(42);
-
-      store.get(testAtom);
-
-      // Should use global registry
-      expect(atomRegistry.size()).toBeGreaterThanOrEqual(1);
-      expect(atomRegistry.get(testAtom.id)).toBe(testAtom);
-    });
-
-    it('should work with plugins and isolated registry', () => {
-      const registry = createIsolatedRegistry();
-      const onGetSpy = vi.fn((atom, value) => value);
-      const onSetSpy = vi.fn((atom, value) => value);
-      
-      // Plugin is a factory function that returns hooks
-      const mockPlugin = () => ({
-        onGet: onGetSpy,
-        onSet: onSetSpy
+    it('should work with plugins', () => {
+      const log: string[] = [];
+      const plugin = () => ({
+        onSet: <T>(_atom: any, value: T) => {
+          log.push(String(value));
+          return value;
+        },
       });
 
-      // Use StoreImpl directly for plugins + isolated registry
-      const store = new StoreImpl([mockPlugin], registry);
-      const testAtom = atom('test');
+      const store = createStore([plugin]);
+      const countAtom = atom(0, 'count');
+      store.set(countAtom, 42);
 
-      store.get(testAtom);
-      store.set(testAtom, 'updated');
-
-      expect(registry.size()).toBe(1);
-      expect(onGetSpy).toHaveBeenCalled();
-      expect(onSetSpy).toHaveBeenCalled();
-    });
-  });
-
-  describe('Registry Methods', () => {
-    it('should support all registry methods', () => {
-      const registry = createIsolatedRegistry();
-      const store = createStore(registry);
-
-      const testAtom = atom('test');
-      store.get(testAtom);
-
-      // Test various registry methods
-      expect(registry.get(testAtom.id)).toBe(testAtom);
-      expect(registry.getMetadata(testAtom)).toBeDefined();
-      expect(registry.getName(testAtom)).toBeDefined();
-      expect(registry.isRegistered(testAtom.id)).toBe(true);
-
-      const allAtoms = registry.getAll();
-      expect(allAtoms.has(testAtom.id)).toBe(true);
-    });
-
-    it('should support clear() for testing', () => {
-      const registry = createIsolatedRegistry();
-      const store = createStore(registry);
-
-      const atom1 = atom(1);
-      const atom2 = atom(2);
-
-      store.get(atom1);
-      store.get(atom2);
-
-      expect(registry.size()).toBe(2);
-
-      registry.clear();
-
-      expect(registry.size()).toBe(0);
-      expect(registry.isRegistered(atom1.id)).toBe(false);
-      expect(registry.isRegistered(atom2.id)).toBe(false);
+      expect(log).toContain('42');
+      expect(store.get(countAtom)).toBe(42);
     });
   });
 
   describe('Store Registry Integration', () => {
     it('should track atoms in store-specific registry', () => {
-      const registry = createIsolatedRegistry();
-      const store = createStore(registry);
-
-      const atom1 = atom(1);
-      const atom2 = atom(2);
+      const store = createStore();
+      const atom1 = atom(1, 'a1');
+      const atom2 = atom(2, 'a2');
+      const atom3 = atom(3, 'a3');
 
       store.get(atom1);
       store.get(atom2);
+      store.get(atom3);
 
-      const storeAtoms = store.getRegistryAtoms!();
-      expect(storeAtoms).toHaveLength(2);
-      expect(storeAtoms).toContain(atom1.id);
-      expect(storeAtoms).toContain(atom2.id);
+      const registeredAtoms = store.getRegistryAtoms();
+      expect(registeredAtoms).toContain(atom1.id);
+      expect(registeredAtoms).toContain(atom2.id);
+      expect(registeredAtoms).toContain(atom3.id);
     });
 
-    it('should return correct registry from getRegistry()', () => {
-      const registry = createIsolatedRegistry();
-      const store = createStore(registry);
+    it('should return registry from getRegistry()', () => {
+      const store = createStore();
+      const registry = store.getRegistry();
 
-      const storeRegistry = store.getRegistry!();
-      expect(storeRegistry.store).toBe(store);
-      expect(storeRegistry.atoms).toBeInstanceOf(Set);
+      expect(registry).toBeDefined();
+      expect(registry.store).toBe(store);
+      expect(registry.atoms).toBeDefined();
+    });
+  });
+
+  describe('clear()', () => {
+    it('should reset all atoms in store', () => {
+      const store = createStore();
+      const countAtom = atom(0, 'count');
+      const nameAtom = atom('initial', 'name');
+
+      store.get(countAtom);
+      store.get(nameAtom);
+
+      store.set(countAtom, 42);
+      store.set(nameAtom, 'changed');
+
+      store.clear();
+
+      // Values should be reset to defaults
+      expect(store.get(countAtom)).toBe(0);
+      expect(store.get(nameAtom)).toBe('initial');
+    });
+  });
+
+  describe('setByName()', () => {
+    it('should set atom by name for hydration', () => {
+      const store = createStore();
+      const countAtom = atom(0, 'count');
+      const nameAtom = atom('', 'name');
+
+      store.get(countAtom);
+      store.get(nameAtom);
+
+      // Simulate SSR hydration
+      store.setByName('count', 100);
+      store.setByName('name', 'hydrated');
+
+      expect(store.get(countAtom)).toBe(100);
+      expect(store.get(nameAtom)).toBe('hydrated');
+    });
+
+    it('should return false for unknown name', () => {
+      const store = createStore();
+      const result = store.setByName('nonexistent', 42);
+      expect(result).toBe(false);
     });
   });
 });

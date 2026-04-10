@@ -81,3 +81,7 @@ export const reactLogger = new DebugLogger('[Nexus:React]');
 
 // Export class for testing
 export { DebugLogger };
+
+// DevTools plugin (tree-shakeable — only in bundle when imported from here)
+export { devtools, DevToolsPlugin } from './plugins/devtools';
+export type { DevToolsOptions } from './plugins/devtools';

@@ -2,19 +2,17 @@
  * Test utilities for cleaning up global state between tests
  */
 
-import { atomRegistry } from './atom-registry';
 import { batcher } from './batching';
 
 /**
  * Clean up all global state between tests
  * This ensures test isolation by clearing:
- * - Atom registry
  * - Batcher queues and state
+ *
+ * Note: Atom registry is now per-store (ScopedRegistry),
+ * so no global cleanup needed for atoms.
  */
 export function cleanupGlobalState(): void {
-  // Clear atom registry
-  atomRegistry.clear();
-  
   // Reset batcher (clears queues and resets depth)
   batcher.reset();
 }

@@ -1,4 +1,4 @@
-import { atom, atomRegistry, createStore } from '@nexus-state/core';
+import { atom, createStore } from '@nexus-state/core';
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { SimpleTimeTravel } from '../../SimpleTimeTravel';
 
@@ -8,7 +8,6 @@ describe('TT-005: restoreSnapshot silent updates', () => {
   let atomCounter = 0;
 
   beforeEach(() => {
-    atomRegistry.clear();
     store = createStore();
     atomCounter = 0;
   });

@@ -7,15 +7,10 @@
  * - Verify copy-paste works
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { atom, createStore } from '../index';
-import { atomRegistry } from '../atom-registry';
 
 describe('README: Quick Start', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('basic example should work', () => {
     // Exact code from README Quick Start section
     const countAtom = atom(0, 'count');
@@ -28,10 +23,6 @@ describe('README: Quick Start', () => {
 });
 
 describe('README: Architecture (Atoms vs Stores)', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('one atom can have different values in different stores', () => {
     // Test key concept: atoms are descriptors, stores hold state
     const userAtom = atom({ name: 'Anonymous' }, 'user');
@@ -68,10 +59,6 @@ describe('README: Architecture (Atoms vs Stores)', () => {
 });
 
 describe('README: Isolated Stores (SSR)', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('setState for hydration should work', () => {
     const store = createStore();
     const userAtom = atom(null, 'user');
@@ -104,10 +91,6 @@ describe('README: Isolated Stores (SSR)', () => {
 });
 
 describe('README: Time-Travel Per-Scope', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('independent timelines should work', () => {
     // Note: This test verifies core API works
     // TimeTravelController tests are in time-travel package
@@ -135,10 +118,6 @@ describe('README: Time-Travel Per-Scope', () => {
 });
 
 describe('README: Testing Pattern', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('fresh store per test should work', () => {
     const userAtom = atom(null, 'user');
 
@@ -158,10 +137,6 @@ describe('README: Testing Pattern', () => {
 });
 
 describe('README: reset and clear methods', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('reset should restore default value', () => {
     const countAtom = atom(0, 'count');
     const store = createStore();
