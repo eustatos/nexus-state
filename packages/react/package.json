@@ -1,26 +1,23 @@
 {
   "name": "@nexus-state/react",
-  "version": "0.1.14",
-  "main": "dist/cjs/index.js",
+  "version": "0.2.0",
+  "main": "dist/esm/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/esm/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": "./dist/esm/index.js"
     },
     "./context": {
       "types": "./dist/esm/context.d.ts",
-      "import": "./dist/esm/context.js",
-      "require": "./dist/cjs/context.js"
+      "import": "./dist/esm/context.js"
     }
   },
   "scripts": {
-    "build": "npm run build:esm && npm run build:cjs",
+    "build": "npm run build:esm",
     "build:esm": "tsc -p tsconfig.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
     "clean": "rm -rf dist && mkdir dist",
     "dev": "tsc -w",
     "test": "vitest run index.test.ts",

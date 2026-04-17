@@ -1,5 +1,13 @@
 # demo-vanilla
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @nexus-state/core@0.2.0
+  - @nexus-state/devtools@0.2.0
+
 ## 0.0.1
 
 ### Patch Changes

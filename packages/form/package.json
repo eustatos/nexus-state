@@ -1,50 +1,42 @@
 {
   "name": "@nexus-state/form",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "Type-safe form management with field-level granularity for Nexus State",
-  "main": "dist/cjs/index.js",
+  "main": "dist/esm/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/esm/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": "./dist/esm/index.js"
     },
     "./react": {
       "types": "./dist/esm/react/index.d.ts",
-      "import": "./dist/esm/react/index.js",
-      "require": "./dist/cjs/react/index.js"
+      "import": "./dist/esm/react/index.js"
     },
     "./schema": {
       "types": "./dist/esm/schema/index.d.ts",
-      "import": "./dist/esm/schema/index.js",
-      "require": "./dist/cjs/schema/index.js"
+      "import": "./dist/esm/schema/index.js"
     },
     "./core": {
       "types": "./dist/esm/core.d.ts",
-      "import": "./dist/esm/core.js",
-      "require": "./dist/cjs/core.js"
+      "import": "./dist/esm/core.js"
     },
     "./validation": {
       "types": "./dist/esm/validation.d.ts",
-      "import": "./dist/esm/validation.js",
-      "require": "./dist/cjs/validation.js"
+      "import": "./dist/esm/validation.js"
     },
     "./submission": {
       "types": "./dist/esm/submission.d.ts",
-      "import": "./dist/esm/submission.js",
-      "require": "./dist/cjs/submission.js"
+      "import": "./dist/esm/submission.js"
     },
     "./field-array": {
       "types": "./dist/esm/field-array.d.ts",
-      "import": "./dist/esm/field-array.js",
-      "require": "./dist/cjs/field-array.js"
+      "import": "./dist/esm/field-array.js"
     },
     "./testing": {
       "types": "./dist/esm/testing/index.d.ts",
-      "import": "./dist/esm/testing/index.js",
-      "require": "./dist/cjs/testing/index.js"
+      "import": "./dist/esm/testing/index.js"
     }
   },
   "files": [
@@ -54,9 +46,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run build:esm && npm run build:cjs",
+    "build": "npm run build:esm",
     "build:esm": "tsc -p tsconfig.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
     "dev": "tsc -w",
     "test": "vitest run",
     "test:watch": "vitest",

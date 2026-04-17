@@ -1,66 +1,55 @@
 {
   "name": "@nexus-state/form-schema-dsl",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Custom DSL schema validator for Nexus State forms",
   "type": "module",
-  "main": "dist/index.cjs",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     },
     "./validators": {
       "types": "./dist/validators/index.d.ts",
-      "import": "./dist/validators/index.js",
-      "require": "./dist/validators/index.cjs"
+      "import": "./dist/validators/index.js"
     },
     "./validators/required": {
       "types": "./dist/validators/required.d.ts",
-      "import": "./dist/validators/required.js",
-      "require": "./dist/validators/required.cjs"
+      "import": "./dist/validators/required.js"
     },
     "./validators/minLength": {
       "types": "./dist/validators/minLength.d.ts",
-      "import": "./dist/validators/minLength.js",
-      "require": "./dist/validators/minLength.cjs"
+      "import": "./dist/validators/minLength.js"
     },
     "./validators/maxLength": {
       "types": "./dist/validators/maxLength.d.ts",
-      "import": "./dist/validators/maxLength.js",
-      "require": "./dist/validators/maxLength.cjs"
+      "import": "./dist/validators/maxLength.js"
     },
     "./validators/email": {
       "types": "./dist/validators/email.d.ts",
-      "import": "./dist/validators/email.js",
-      "require": "./dist/validators/email.cjs"
+      "import": "./dist/validators/email.js"
     },
     "./validators/pattern": {
       "types": "./dist/validators/pattern.d.ts",
-      "import": "./dist/validators/pattern.js",
-      "require": "./dist/validators/pattern.cjs"
+      "import": "./dist/validators/pattern.js"
     },
     "./validators/equalTo": {
       "types": "./dist/validators/equalTo.d.ts",
-      "import": "./dist/validators/equalTo.js",
-      "require": "./dist/validators/equalTo.cjs"
+      "import": "./dist/validators/equalTo.js"
     },
     "./validators/unique": {
       "types": "./dist/validators/unique.d.ts",
-      "import": "./dist/validators/unique.js",
-      "require": "./dist/validators/unique.cjs"
+      "import": "./dist/validators/unique.js"
     },
     "./async-validators": {
       "types": "./dist/async-validators.d.ts",
-      "import": "./dist/async-validators.js",
-      "require": "./dist/async-validators.cjs"
+      "import": "./dist/async-validators.js"
     },
     "./parser": {
       "types": "./dist/parser.d.ts",
-      "import": "./dist/parser.js",
-      "require": "./dist/parser.cjs"
+      "import": "./dist/parser.js"
     }
   },
   "sideEffects": false,

@@ -46,31 +46,73 @@ npm install @nexus-state/web-worker
 
 ## Key Features
 
-- Moving state logic to Web Workers
-- Asynchronous processing of heavy operations
-- Communication between main thread and Web Worker
+- Offload heavy computations to Web Workers
+- Automatic sync of worker state to main thread stores
+- Zero-config store tracking with `createWorkerStore()`
 
-## Usage Example
+## Quick Start
+
+### Main Thread
 
 ```javascript
-import { createWorkerStore } from '@nexus-state/web-worker';
+import { workerAtom, createWorkerStore, ensureWorkerTracking } from '@nexus-state/web-worker';
 
-const workerStore = createWorkerStore({
-  calculations: []
+// Create a Web Worker
+const worker = new Worker('./my-worker.js');
+
+// Create a worker-managed atom
+const [counterAtom, setCounter] = workerAtom({
+  worker,
+  initialValue: 0,
 });
 
-// Performing heavy computations in Web Worker
-workerStore.dispatch({
-  type: 'CALCULATE',
-  payload: largeDataSet
+// Create a store that tracks worker atoms
+const store = createWorkerStore();
+
+// Or use ensureWorkerTracking with an existing store
+// import { createStore } from '@nexus-state/core';
+// const store = createStore();
+// ensureWorkerTracking(store);
+
+// Subscribe to worker atom changes
+store.subscribe(counterAtom, (value) => {
+  console.log('Counter updated:', value);
 });
 
-// Subscribing to results
-workerStore.subscribe((state) => {
->
-> [![Coverage for web-worker package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=web-worker)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
-  console.log('Calculation results:', state.calculations);
-});
+// Get current value
+console.log(store.get(counterAtom)); // 0
+```
+
+### Web Worker (my-worker.js)
+
+```javascript
+// In the worker, handle messages from main thread
+self.onmessage = (event) => {
+  const { type, value } = event.data;
+
+  switch (type) {
+    case 'INCREMENT':
+      const newValue = value + 1;
+      // Send updated value back to main thread
+      self.postMessage({ type: 'UPDATE', value: newValue });
+      break;
+
+    case 'HEAVY_CALCULATION':
+      const result = performHeavyCalculation(value);
+      self.postMessage({ type: 'UPDATE', value: result });
+      break;
+  }
+};
+```
+
+### Communication Pattern
+
+```javascript
+// Main thread: send message to worker
+worker.postMessage({ type: 'INCREMENT', value: store.get(counterAtom) });
+
+// The worker processes and sends back UPDATE
+// Main thread automatically syncs via workerAtom tracking
 ```
 
 ## License

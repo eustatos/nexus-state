@@ -1,128 +1,137 @@
 import { DevToolsPlugin } from "../devtools-plugin";
-import { atomRegistry } from "@nexus-state/core";
+import type { BasicAtom } from "../types";
+import { createStore, atom, Atom, type Store } from "@nexus-state/core";
 import { vi } from "vitest";
 
-// Define proper types for mock atom
-interface MockAtom {
-  id: symbol;
-  toString: () => string;
-}
-
-// Mock atom for testing
-const createMockAtom = (id: string, name?: string): MockAtom => {
-  const atomId = Symbol(id);
-  const atom: MockAtom = {
-    id: atomId,
-    toString: () => `Atom(${id})`,
-  };
-
-  // Register atom if name provided
-  if (name) {
-    atomRegistry.register(atom, name);
-  }
-
-  return atom;
-};
-
 describe("DevToolsPlugin Atom Name Display", () => {
+  let realStore: ReturnType<typeof createStore>;
+  let mockStore: Store;
+
   beforeEach(() => {
-    // Clear registry before each test
-    atomRegistry.clear();
+    realStore = createStore();
+    mockStore = {
+      get: vi.fn(),
+      set: vi.fn(),
+      getState: vi.fn().mockReturnValue({}),
+      setWithMetadata: vi.fn(),
+      serializeState: vi.fn().mockReturnValue({}),
+    } as unknown as Store;
   });
 
+  function registerAtomInStore<T>(
+    a: BasicAtom,
+    _name: string,
+    value: T
+  ): BasicAtom {
+    realStore.set(a as Atom<T>, value);
+    (mockStore as any).getRegistry = () => realStore.getRegistry?.();
+    (mockStore as any).getAtomMetadata = (id: symbol) =>
+      realStore.getAtomMetadata?.(id);
+    return a;
+  }
+
+  function makeAtom(name: string): BasicAtom {
+    return {
+      id: Symbol(name),
+      type: "primitive" as const,
+      name,
+      read: () => null as unknown as never,
+    } as unknown as BasicAtom;
+  }
+
   it("should display atom names when showAtomNames is enabled", () => {
-    const atom = createMockAtom("test-atom", "TestAtom");
+    const atomObj = registerAtomInStore(makeAtom("TestAtom"), "TestAtom", null);
     const plugin = new DevToolsPlugin({ showAtomNames: true });
 
-    // Access private method through reflection for testing
     const getAtomName = (
-      plugin as unknown as { getAtomName: (atom: MockAtom) => string }
+      plugin as unknown as { getAtomName: (a: BasicAtom) => string }
     ).getAtomName.bind(plugin);
-    const name = getAtomName(atom);
+
+    // Need to apply plugin so currentStore is set for registry lookups
+    plugin.apply(mockStore);
+    const name = getAtomName(atomObj);
 
     expect(name).toBe("TestAtom");
   });
 
   it("should use atom toString method when showAtomNames is disabled", () => {
-    const atomId = Symbol("test-atom");
-    const atom: MockAtom = {
-      id: atomId,
-      toString: () => `Atom(test-atom)`,
-    };
-    // Do not register the atom to test fallback behavior
+    const atomObj: BasicAtom = {
+      id: Symbol("test-atom"),
+      type: "primitive" as const,
+      name: undefined,
+      read: () => null as unknown as never,
+      toString: () => "Atom(test-atom)",
+    } as unknown as BasicAtom;
     const plugin = new DevToolsPlugin({ showAtomNames: false });
 
-    // Access private method through reflection for testing
     const getAtomName = (
-      plugin as unknown as { getAtomName: (atom: MockAtom) => string }
+      plugin as unknown as { getAtomName: (a: BasicAtom) => string }
     ).getAtomName.bind(plugin);
-    const name = getAtomName(atom);
+    const name = getAtomName(atomObj);
 
     expect(name).toBe("Atom(test-atom)");
   });
 
   it("should use custom atom name formatter when provided", () => {
-    const atom = createMockAtom("test-atom", "TestAtom");
+    const atomObj = registerAtomInStore(makeAtom("TestAtom"), "TestAtom", null);
     const formatter = vi.fn().mockReturnValue("CustomName");
     const plugin = new DevToolsPlugin({
       showAtomNames: true,
       atomNameFormatter: formatter,
     });
 
-    // Access private method through reflection for testing
+    plugin.apply(mockStore);
     const getAtomName = (
-      plugin as unknown as { getAtomName: (atom: MockAtom) => string }
+      plugin as unknown as { getAtomName: (a: BasicAtom) => string }
     ).getAtomName.bind(plugin);
-    const name = getAtomName(atom);
+    const name = getAtomName(atomObj);
 
     expect(name).toBe("CustomName");
-    expect(formatter).toHaveBeenCalledWith(atom, "TestAtom");
+    expect(formatter).toHaveBeenCalledWith(atomObj, "TestAtom");
   });
 
   it("should provide fallback name for unregistered atoms", () => {
-    const atomId = Symbol("test-atom");
-    const atom: MockAtom = {
-      id: atomId,
-      toString: () => `Symbol(test-atom)`,
-    };
-    // Do not register the atom to test fallback behavior
+    const atomObj: BasicAtom = {
+      id: Symbol("test-atom"),
+      type: "primitive" as const,
+      name: undefined,
+      read: () => null as unknown as never,
+    } as unknown as BasicAtom;
     const plugin = new DevToolsPlugin({ showAtomNames: true });
 
-    // Access private method through reflection for testing
+    plugin.apply(mockStore);
     const getAtomName = (
-      plugin as unknown as { getAtomName: (atom: MockAtom) => string }
+      plugin as unknown as { getAtomName: (a: BasicAtom) => string }
     ).getAtomName.bind(plugin);
-    const name = getAtomName(atom);
+    const name = getAtomName(atomObj);
 
-    // The name should contain the atom's symbol identifier
-    // Since the atom is not registered, it will use toString() result
-    expect(name).toBe("Symbol(test-atom)");
+    // Fallback: uses atom.id.toString() → "test-atom" (stripped from Symbol)
+    expect(name).toBe("test-atom");
   });
 
   it("should handle error in atom name resolution", () => {
-    const atom: MockAtom = { id: Symbol("test"), toString: () => "Atom(test)" };
-    // Mock registry to throw error
-    const originalGetName = atomRegistry.getName;
-    atomRegistry.getName = () => {
-      throw new Error("Registry error");
-    };
+    const atomObj: BasicAtom = {
+      id: Symbol("test"),
+      type: "primitive" as const,
+      name: undefined,
+      read: () => null as unknown as never,
+      toString: () => "Atom(test)",
+    } as unknown as BasicAtom;
 
     const plugin = new DevToolsPlugin({ showAtomNames: true });
+    plugin.apply(mockStore);
 
-    // Access private method through reflection for testing
     const getAtomName = (
-      plugin as unknown as { getAtomName: (atom: MockAtom) => string }
+      plugin as unknown as { getAtomName: (a: BasicAtom) => string }
     ).getAtomName.bind(plugin);
-    const name = getAtomName(atom);
+    const name = getAtomName(atomObj);
 
-    expect(name).toContain("atom-");
-
-    // Restore original method
-    atomRegistry.getName = originalGetName;
+    // Fallback: uses atom.name (undefined) → atom.id.toString() → "test"
+    expect(name).toBe("test");
   });
 
   it("should include atom name in metadata when setWithMetadata is used", () => {
-    const atom = createMockAtom("test-atom", "TestAtom");
+    const atomObj = registerAtomInStore(makeAtom("TestAtom"), "TestAtom", null);
     const plugin = new DevToolsPlugin({ showAtomNames: true });
 
     // Mock DevTools connection
@@ -133,7 +142,6 @@ describe("DevToolsPlugin Atom Name Display", () => {
       unsubscribe: vi.fn(),
     };
 
-    // Mock window with DevTools extension and addEventListener
     const originalWindow = global.window;
     global.window = {
       ...global.window,
@@ -154,30 +162,25 @@ describe("DevToolsPlugin Atom Name Display", () => {
 
     const store = {
       get: vi.fn(),
-      set: null, // Will be overridden by plugin
+      set: null,
       getState: vi.fn().mockReturnValue({}),
       setWithMetadata: vi.fn(),
       serializeState: vi.fn(),
     };
 
-    // Apply plugin
-    plugin.apply(store);
+    plugin.apply(store as unknown as Store);
 
-    // Call set method which should use setWithMetadata
-    store.set(atom, "test-value");
+    store.set(atomObj, "test-value");
 
-    // Verify that setWithMetadata was called with metadata containing atom name
-    // Note: Default action naming strategy is 'auto', which generates "atomName operation"
     expect(store.setWithMetadata).toHaveBeenCalledWith(
-      atom,
+      atomObj,
       "test-value",
       expect.objectContaining({
-        type: "TestAtom SET", // Auto strategy: atomName + " " + operation
+        type: "TestAtom SET",
         atomName: "TestAtom",
       }),
     );
 
-    // Restore original window
     global.window = originalWindow;
   });
 });

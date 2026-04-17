@@ -6,7 +6,7 @@ export default defineConfig({
     validators: 'src/validators.ts',
     'async-validators': 'src/async-validators.ts',
   },
-  format: ['cjs', 'esm'],
+  format: ['esm'],
   dts: true,
   minify: true,
   treeshake: true,

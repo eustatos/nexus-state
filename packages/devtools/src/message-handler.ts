@@ -8,9 +8,9 @@
 
 import type {
   DevToolsMessage,
-  EnhancedStore,
   DevToolsConfig,
 } from "./types";
+import type { Store } from "@nexus-state/core";
 import { CommandHandler } from "./command-handler";
 import { StateSerializer, createStateSerializer } from "./state-serializer";
 import type { SnapshotMapper } from "./snapshot-mapper";
@@ -26,7 +26,7 @@ export interface MessageHandlerOptions {
   /** Whether to log message handling (default: false) */
   debug?: boolean;
   /** Custom handlers for specific message types */
-  customHandlers?: Record<string, (message: DevToolsMessage, store: EnhancedStore) => void>;
+  customHandlers?: Record<string, (message: DevToolsMessage, store: Store) => void>;
   /** Callback when state is updated after time-travel command */
   onStateUpdate?: (state: Record<string, unknown>) => void;
 }
@@ -53,7 +53,7 @@ export class MessageHandler {
   private commandHandler: CommandHandler | null = null;
   private stateSerializer: StateSerializer;
   private snapshotMapper: SnapshotMapper | null = null;
-  private store: EnhancedStore | null = null;
+  private store: Store | null = null;
   private isTracking = true;
 
   constructor(options: MessageHandlerOptions = {}) {
@@ -78,7 +78,7 @@ export class MessageHandler {
    * Set the store instance
    * @param store The store to handle messages for
    */
-  setStore(store: EnhancedStore): void {
+  setStore(store: Store): void {
     console.log('[MessageHandler.setStore] Store received:', {
       hasTimeTravel: 'timeTravel' in store,
       timeTravelType: typeof (store as any).timeTravel,
@@ -157,7 +157,7 @@ export class MessageHandler {
    * @param store The store to apply commands to
    * @returns Message handling result
    */
-  handle(message: DevToolsMessage, store?: EnhancedStore): MessageHandlerResult {
+  handle(message: DevToolsMessage, store?: Store): MessageHandlerResult {
     console.log('[MessageHandler.handle] Handling message:', message.type);
     const targetStore = store || this.store;
     
@@ -213,7 +213,7 @@ export class MessageHandler {
   /**
    * Handle DISPATCH messages (time travel commands)
    */
-  private handleDispatch(message: DevToolsMessage, store: EnhancedStore): MessageHandlerResult {
+  private handleDispatch(message: DevToolsMessage, store: Store): MessageHandlerResult {
     const payload = message.payload as { type: string; [key: string]: unknown };
     
     if (!payload || typeof payload !== "object") {
@@ -273,7 +273,7 @@ export class MessageHandler {
    */
   private handleTimeTravel(
     _payload: { type: string; [key: string]: unknown },
-    _store: EnhancedStore,
+    _store: Store,
   ): MessageHandlerResult {
     if (!this.options.enableTimeTravel || !this.commandHandler) {
       return {
@@ -303,7 +303,7 @@ export class MessageHandler {
    */
   private handleReset(
     _payload: { type: string; [key: string]: unknown },
-    _store: EnhancedStore,
+    _store: Store,
   ): MessageHandlerResult {
     // Reset to initial state would require storing the initial state
     if (this.options.debug) {
@@ -322,7 +322,7 @@ export class MessageHandler {
    */
   private handleImportState(
     payload: { type: string; [key: string]: unknown },
-    store: EnhancedStore,
+    store: Store,
   ): MessageHandlerResult {
     if (!this.options.enableImportExport) {
       return {
@@ -381,7 +381,7 @@ export class MessageHandler {
    */
   private importStateIntoStore(
     state: Record<string, unknown>,
-    store: EnhancedStore,
+    store: Store,
   ): void {
     // Check if store has importState method
     if (typeof (store as any).importState === "function") {
@@ -409,7 +409,7 @@ export class MessageHandler {
   /**
    * Handle ACTION messages
    */
-  private handleAction(_message: DevToolsMessage, _store: EnhancedStore): MessageHandlerResult {
+  private handleAction(_message: DevToolsMessage, _store: Store): MessageHandlerResult {
     // ACTION messages are typically sent from DevTools to dispatch actions
     // This would require integration with the store's action system
 
@@ -427,7 +427,7 @@ export class MessageHandler {
   /**
    * Handle START messages
    */
-  private handleStart(_message: DevToolsMessage, _store: EnhancedStore): MessageHandlerResult {
+  private handleStart(_message: DevToolsMessage, _store: Store): MessageHandlerResult {
     this.isTracking = true;
     return {
       success: true,
@@ -439,7 +439,7 @@ export class MessageHandler {
   /**
    * Handle STOP messages
    */
-  private handleStop(_message: DevToolsMessage, _store: EnhancedStore): MessageHandlerResult {
+  private handleStop(_message: DevToolsMessage, _store: Store): MessageHandlerResult {
     this.isTracking = false;
     return {
       success: true,
@@ -451,7 +451,7 @@ export class MessageHandler {
   /**
    * Handle custom messages
    */
-  private handleCustom(message: DevToolsMessage, store: EnhancedStore): MessageHandlerResult {
+  private handleCustom(message: DevToolsMessage, store: Store): MessageHandlerResult {
     const handler = this.options.customHandlers[message.type];
 
     try {

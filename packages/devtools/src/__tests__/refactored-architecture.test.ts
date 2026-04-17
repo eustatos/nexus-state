@@ -13,7 +13,8 @@ import { StackTraceService } from "../stack-trace-service";
 import { AtomNameResolver } from "../atom-name-resolver";
 import { PollingService } from "../polling-service";
 import { StateSerializer } from "../state-serializer";
-import type { EnhancedStore, BasicAtom, DevToolsConfig } from "../types";
+import type { BasicAtom, DevToolsConfig } from "../types";
+import type { Store } from "@nexus-state/core";
 
 // Mock store for testing
 const createMockStore = () => ({
@@ -31,11 +32,11 @@ const createMockAtom = (id: string) => ({
 
 describe("Refactored DevTools Architecture", () => {
   let plugin: DevToolsPluginRefactored;
-  let mockStore: EnhancedStore;
+  let mockStore: Store;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockStore = createMockStore() as EnhancedStore;
+    mockStore = createMockStore() as Store;
     plugin = new DevToolsPluginRefactored();
   });
 

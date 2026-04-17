@@ -19,8 +19,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@nexus-state/core': path.resolve(__dirname, '../../packages/core/dist/cjs/index.js'),
-      '@nexus-state/react': path.resolve(__dirname, '../../packages/react/dist/cjs/index.js'),
+      '@nexus-state/core': path.resolve(__dirname, '../../packages/core/dist/esm/index.js'),
+      '@nexus-state/react': path.resolve(__dirname, '../../packages/react/dist/esm/index.js'),
       '@nexus-state/time-travel': path.resolve(__dirname, '../../packages/time-travel/dist/index.js'),
       '@nexus-state/devtools': path.resolve(__dirname, '../../packages/devtools/dist/esm/index.js'),
     },

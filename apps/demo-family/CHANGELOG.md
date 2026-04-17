@@ -1,5 +1,14 @@
 # demo-family
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @nexus-state/core@0.2.0
+  - @nexus-state/react@0.2.0
+  - @nexus-state/family@0.1.6
+
 ## 0.0.1
 
 ### Patch Changes

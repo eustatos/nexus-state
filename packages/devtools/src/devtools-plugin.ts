@@ -9,7 +9,6 @@ import type {
   DevToolsConfig,
   DevToolsConnection,
   DevToolsMessage,
-  EnhancedStore,
   BasicAtom,
   DevToolsMode,
   DevToolsFeatureDetectionResult,
@@ -17,11 +16,11 @@ import type {
 } from './types';
 import type { SnapshotMapper } from './snapshot-mapper';
 import type { SimpleTimeTravel } from '@nexus-state/time-travel';
+import type { Store, Atom } from '@nexus-state/core';
 import {
   captureStackTrace,
   formatStackTraceForDevTools,
 } from './utils/stack-tracer';
-import { atomRegistry } from '@nexus-state/core';
 import { createSnapshotMapper } from './snapshot-mapper';
 import {
   StateSerializer,
@@ -177,7 +176,7 @@ export class DevToolsPlugin {
   private actionGrouper: ActionGrouper;
   private batchUpdater: BatchUpdater;
   private currentBatchId: string | null = null;
-  private currentStore: EnhancedStore | null = null;
+  private currentStore: Store | null = null;
   /** Last lazy-serialized state (when serialization.lazy is enabled) for incremental updates */
   private lastLazyState: Record<string, unknown> | null = null;
   private timeTravel: SimpleTimeTravel | null = null;
@@ -224,7 +223,7 @@ export class DevToolsPlugin {
       maxUpdatesPerSecond: batchOpts.maxUpdatesPerSecond ?? 0,
       onFlush: (store, action) => {
         const targetStore = (store ??
-          this.currentStore) as EnhancedStore | null;
+          this.currentStore) as Store | null;
         if (targetStore) {
           this.doSendStateUpdate(targetStore, action);
         }
@@ -298,7 +297,7 @@ export class DevToolsPlugin {
    * Apply the plugin to a store.
    * @param store The store to apply the plugin to
    */
-  apply(store: EnhancedStore): void {
+  apply(store: Store): void {
     this.currentStore = store;
     // Runtime production guard: no-op when NODE_ENV is production (e.g. bundler did not use conditional exports)
     if (process.env.NODE_ENV === 'production') {
@@ -386,14 +385,14 @@ export class DevToolsPlugin {
 
       // Use custom formatter if provided
       if (this.config.atomNameFormatter) {
-        const defaultName = atomRegistry.getName(atom as { id: symbol });
+        const defaultName = this.getAtomNameFromStore(atom);
         return this.config.atomNameFormatter(atom, defaultName);
       }
 
-      // Use registry name if available
-      const registryName = atomRegistry.getName(atom as { id: symbol });
-      if (registryName) {
-        return registryName;
+      // Use store's ScopedRegistry if available
+      const storeName = this.getAtomNameFromStore(atom);
+      if (storeName) {
+        return storeName;
       }
 
       // Fallback to atom's toString method
@@ -402,6 +401,47 @@ export class DevToolsPlugin {
       // Fallback for any errors
       return `atom-${atom.id?.toString() || 'unknown'}`;
     }
+  }
+
+  /**
+   * Get atom name from the current store's ScopedRegistry
+   */
+  private getAtomNameFromStore(atom: BasicAtom): string {
+    // Try via store.getRegistry()
+    if (this.currentStore && this.currentStore.getRegistry && typeof atom.id === 'symbol') {
+      const registry = this.currentStore.getRegistry();
+      if (registry && registry.getMetadata) {
+        const metadata = registry.getMetadata(atom.id);
+        if (metadata && metadata.name) {
+          return metadata.name;
+        }
+      }
+    }
+
+    // Fallback: try store.getAtomMetadata directly
+    if (this.currentStore && (this.currentStore as any).getAtomMetadata && typeof atom.id === 'symbol') {
+      const metadata = (this.currentStore as any).getAtomMetadata(atom.id);
+      if (metadata && metadata.name) {
+        return metadata.name;
+      }
+    }
+
+    // Fallback: use atom.name property
+    if ((atom as any).name && typeof (atom as any).name === 'string') {
+      return (atom as any).name;
+    }
+
+    // Fallback: use atom.id.toString()
+    if (atom.id && typeof atom.id.toString === 'function') {
+      const idStr = atom.id.toString();
+      // Strip 'Symbol(' prefix and ')' suffix for cleaner names
+      if (idStr.startsWith('Symbol(') && idStr.endsWith(')')) {
+        return idStr.substring(7, idStr.length - 1);
+      }
+      return idStr;
+    }
+
+    return atom.toString();
   }
 
   /**
@@ -423,7 +463,7 @@ export class DevToolsPlugin {
    * Sends to all connections for scenarios like multiple DevTools windows.
    * @param store The store to get initial state from
    */
-  private sendInitialState(store: EnhancedStore): void {
+  private sendInitialState(store: Store): void {
     try {
       const state = store.serializeState?.() || store.getState();
       const sanitized = this.config.stateSanitizer(state) as Record<
@@ -465,7 +505,7 @@ export class DevToolsPlugin {
    * @param connection The connection to listen on (default: main connection)
    */
   private setupMessageListeners(
-    store: EnhancedStore,
+    store: Store,
     connection?: DevToolsConnection
   ): void {
     const conn = connection || this.connection;
@@ -494,7 +534,7 @@ export class DevToolsPlugin {
    * @param extension The DevTools extension instance
    * @param store The store to apply to new connections
    */
-  private setupConnectionListener(extension: any, store: EnhancedStore): void {
+  private setupConnectionListener(extension: any, store: Store): void {
     // Store reference for later use
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const plugin = this;
@@ -535,7 +575,7 @@ export class DevToolsPlugin {
    */
   private handleDevToolsMessage(
     message: DevToolsMessage,
-    store: EnhancedStore
+    store: Store
   ): void {
     if (message.type === 'DISPATCH') {
       const payload = message.payload as
@@ -590,7 +630,7 @@ export class DevToolsPlugin {
    */
   private handleTimeTravelCommand(
     payload: { type: string; [key: string]: unknown },
-    store: EnhancedStore
+    store: Store
   ): void {
     if (!this.timeTravel) {
       if (process.env.NODE_ENV !== 'production') {
@@ -707,7 +747,7 @@ export class DevToolsPlugin {
    */
   private handleImportState(
     payload: { type: string; [key: string]: unknown },
-    store: EnhancedStore
+    store: Store
   ): void {
     try {
       // Extract import data from payload
@@ -753,7 +793,7 @@ export class DevToolsPlugin {
    */
   private importStateIntoStore(
     state: Record<string, unknown>,
-    store: EnhancedStore
+    store: Store
   ): void {
     // Check if store has importState method (from SimpleTimeTravel)
     if (typeof (store as any).importState === 'function') {
@@ -761,21 +801,32 @@ export class DevToolsPlugin {
       return;
     }
 
-    // Fallback: manually set each atom value
-    for (const [atomIdStr, value] of Object.entries(state)) {
-      try {
-        // Convert string atom ID to symbol
-        const atomId = Symbol.for(atomIdStr);
-        const atom = atomRegistry.get(atomId) as BasicAtom;
+    // Fallback: use setState if available (sets atoms by name)
+    if (store.setState) {
+      store.setState(state);
+      return;
+    }
 
-        if (atom) {
-          store.set(atom, value);
+    // Last resort: manually set each atom value by name
+    for (const [atomName, value] of Object.entries(state)) {
+      try {
+        // Try to get atom by name from store
+        if (store.getByName) {
+          const atom = store.getByName(atomName);
+          if (atom) {
+            store.set(atom, value);
+          }
         } else if (process.env.NODE_ENV !== 'production') {
-          console.warn(`IMPORT_STATE: Atom ${atomIdStr} not found in registry`);
+          console.warn(
+            `IMPORT_STATE: Atom "${atomName}" not found — store lacks getByName()`
+          );
         }
       } catch (error) {
         if (process.env.NODE_ENV !== 'production') {
-          console.warn(`IMPORT_STATE: Failed to set atom ${atomIdStr}:`, error);
+          console.warn(
+            `IMPORT_STATE: Failed to set atom "${atomName}":`,
+            error
+          );
         }
       }
     }
@@ -785,7 +836,7 @@ export class DevToolsPlugin {
    * Enhance store with metadata support.
    * @param store The store to enhance
    */
-  private enhanceStoreWithMetadata(store: EnhancedStore): void {
+  private enhanceStoreWithMetadata(store: Store): void {
     if (!store.setWithMetadata) return;
 
     // Override set method to capture metadata
@@ -812,7 +863,7 @@ export class DevToolsPlugin {
 
       const metadata = builder.build() as ActionMetadata;
 
-      store.setWithMetadata?.(atom, update, metadata);
+      store.setWithMetadata?.(atom as Atom<unknown>, update, metadata);
 
       if (this.currentBatchId) {
         this.actionGrouper.add(metadata);
@@ -873,7 +924,7 @@ export class DevToolsPlugin {
    * Setup polling for state updates (fallback for basic stores).
    * @param store The store to poll
    */
-  private setupPolling(store: EnhancedStore): void {
+  private setupPolling(store: Store): void {
     const interval = setInterval(() => {
       if (this.isTracking) {
         // Generate action name for polling updates
@@ -901,7 +952,7 @@ export class DevToolsPlugin {
    * @param store The store to get state from
    * @param action The action name
    */
-  private doSendStateUpdate(store: EnhancedStore, action: string): void {
+  private doSendStateUpdate(store: Store, action: string): void {
     if (!this.isTracking) return;
     try {
       const currentState = store.serializeState?.() || store.getState();
@@ -983,7 +1034,7 @@ export class DevToolsPlugin {
    * @param store The store to get state from
    * @param action The action name
    */
-  private sendStateUpdate(store: EnhancedStore, action: string): void {
+  private sendStateUpdate(store: Store, action: string): void {
     this.batchUpdater.schedule(store, action);
   }
 
@@ -995,7 +1046,7 @@ export class DevToolsPlugin {
    * @returns Serialized state with checksum
    */
   exportState(
-    store: EnhancedStore,
+    store: Store,
     metadata?: Record<string, unknown>
   ): Record<string, unknown> {
     try {
@@ -1048,7 +1099,7 @@ export class DevToolsPlugin {
    * Set up time travel integration
    * @param store The store to integrate with
    */
-  private setupTimeTravel(store: EnhancedStore): void {
+  private setupTimeTravel(store: Store): void {
     // Check if store has timeTravel property (SimpleTimeTravel instance)
     const storeWithTimeTravel = store as any;
 

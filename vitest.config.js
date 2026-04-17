@@ -41,7 +41,7 @@ export default defineConfig({
         // Файлы деклараций и конфигурации
         "**/*.d.ts",
         "**/legacy.ts",
-        "**/*.config.{js,ts,mjs,cjs}",
+        "**/*.config.{js,ts,mjs}",
         "**/*.config.*",
         // Скомпилированные файлы и зависимости
         "**/dist/**",

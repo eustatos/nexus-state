@@ -1,15 +1,14 @@
 {
   "name": "@nexus-state/devtools",
-  "version": "0.1.9",
-  "main": "./dist/cjs/index.js",
+  "version": "0.2.0",
+  "main": "./dist/esm/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": "./dist/esm/index.js"
     }
   },
   "files": [
@@ -19,9 +18,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.build.json",
     "build:esm": "tsc -p tsconfig.esm.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:types": "tsc -p tsconfig.build.json",
     "dev": "tsc -w",
     "test": "vitest run src/__tests__ src/action-naming/__tests__",

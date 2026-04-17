@@ -75,7 +75,7 @@ console.log(store.get(countAtom)); // 0
 
 ### How capture() Works
 
-When you call `capture()`, the `TimeTravelController` automatically initializes all atoms registered in the global `atomRegistry`:
+When you call `capture()`, the `TimeTravelController` initializes atoms accessed by the store:
 
 1. **Primitive atoms** use their `initialValue`
 2. **Computed atoms** are evaluated based on their dependencies
@@ -88,7 +88,11 @@ const atom2 = atom(42, 'atom2');
 const store = createStore();
 const controller = new TimeTravelController(store);
 
-// First capture - atoms are auto-initialized
+// Ensure atoms are initialized in this store before capturing
+store.get(atom1);
+store.get(atom2);
+
+// First capture - state is captured as-is
 controller.capture('init');
 
 const snapshot = controller.getSnapshots()[0];
@@ -96,7 +100,7 @@ console.log(snapshot.state);
 // { atom1: 'initial', atom2: 42 }
 ```
 
-**Note:** You don't need to explicitly call `store.get()` or `store.set()` before the first `capture()`. All atoms are automatically initialized with their default values.
+**Note:** Atoms are lazily initialized in each store. Call `store.get(atom)` before `capture()` to ensure the atom has a value in this store.
 
 ### Using SimpleTimeTravel
 
@@ -133,7 +137,7 @@ const controller = new TimeTravelController(store, {
 
 ### Atom Initialization
 
-The `TimeTravelController` automatically initializes all atoms registered in the global `atomRegistry` when you call `capture()`. This means:
+Atoms are lazily initialized in each store. When you call `capture()`, the controller captures the current state of all atoms that have been accessed:
 
 ```typescript
 const atom1 = atom('initial', 'atom1');
@@ -142,7 +146,10 @@ const atom2 = atom(42, 'atom2');
 const store = createStore();
 const controller = new TimeTravelController(store);
 
-// First capture - atoms are auto-initialized
+// Initialize atoms in this store before capturing
+store.get(atom1);
+store.get(atom2);
+
 controller.capture('init');
 
 const snapshot = controller.getSnapshots()[0];
@@ -151,11 +158,10 @@ console.log(snapshot.state);
 ```
 
 **How it works:**
-1. `capture()` iterates through all atoms in `atomRegistry`
-2. For each atom, it calls `store.get(atom)` to trigger initialization
-3. Primitive atoms return their `initialValue`
-4. Computed atoms are evaluated based on their dependencies
-5. The resulting store state is captured as a snapshot
+1. Atoms are initialized on first `store.get()` or `store.set()` access
+2. Primitive atoms return their `initialValue`
+3. Computed atoms are evaluated based on their dependencies
+4. The resulting store state is captured as a snapshot
 
 **Edge cases:**
 - If a computed atom's dependencies are not initialized, it may throw an error

@@ -256,8 +256,8 @@ console.log(store2.get(userAtom)); // { name: 'Bob' }
 | **@nexus-state/time-travel** | Undo/redo debugging          | `controller.undo()`               |
 | **@nexus-state/persist**     | LocalStorage persistence     | `persistAtom('key', value)`       |
 | **@nexus-state/form**        | Form management              | `createFormAtom(schema)`          |
-| **@nexus-state/middleware**  | Plugin system                | `store.applyPlugin(plugin)`       |
-| **@nexus-state/devtools**    | Redux DevTools               | `createEnhancedStore()`           |
+| **@nexus-state/middleware**  | Per-atom validation & transforms | `createMiddlewarePlugin(atom, config)` |
+| **@nexus-state/devtools**    | Redux DevTools integration   | `devTools()`                      |
 | **@nexus-state/immer**       | Immutable updates            | `produce(draft => ...)`           |
 | **@nexus-state/family**      | Atom families                | `atomFamily(param => atom())`     |
 | **@nexus-state/web-worker**  | Web Worker support           | `workerAtom({ fn })`              |
@@ -512,22 +512,27 @@ pnpm test -- src/reactive/__tests__/benchmarks.test.ts
 
 ### Store Methods
 
-| Method      | Signature                   | Description                 |
-| ----------- | --------------------------- | --------------------------- |
-| `get`       | `get(atom)`                 | Get atom value              |
-| `set`       | `set(atom, update)`         | Set atom value              |
-| `subscribe` | `subscribe(atom, callback)` | Subscribe to changes        |
-| `getState`  | `getState()`                | Get all state (for SSR)     |
-| `setState`  | `setState(state)`           | Set multiple atoms by name  |
-| `reset`     | `reset(atom)`               | Reset atom to default       |
-| `clear`     | `clear()`                   | Clear all atoms to defaults |
+| Method        | Signature                            | Description                      |
+| ------------- | ------------------------------------ | -------------------------------- |
+| `get`         | `get(atom)`                          | Get atom value                   |
+| `set`         | `set(atom, update)`                  | Set atom value                   |
+| `subscribe`   | `subscribe(atom, callback)`          | Subscribe to changes             |
+| `getState`    | `getState()`                         | Get all state (for SSR)          |
+| `setState`    | `setState(state)`                    | Set multiple atoms by name       |
+| `applyPlugin` | `applyPlugin(plugin)`                | Add a plugin (e.g. middleware)   |
+| `reset`       | `reset(atom)`                        | Reset atom to default            |
+| `clear`       | `clear()`                            | Clear all atoms to defaults      |
 
 ### Utilities
 
-| Utility               | Description                              |
-| --------------------- | ---------------------------------------- |
-| `atomRegistry`        | Global atom registry for DevTools        |
-| `createEnhancedStore` | Create store with DevTools, stack traces |
+| Utility        | Description                              |
+| -------------- | ---------------------------------------- |
+| `batch`        | Batch multiple state updates             |
+| `createEnhancedStore` | Create store with plugin support  |
+| `logger`       | Debug logging utilities                  |
+| `serializeState` | Serialize store state for SSR/hydration |
+
+> **Note:** Atoms are lazily registered in each store's `ScopedRegistry` on first access — no global registry exists.
 
 ---
 
@@ -657,7 +662,8 @@ store.setState({ user: { name: 'John' } });
 | ---------------------------------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------- |
 | [@nexus-state/time-travel](https://www.npmjs.com/package/@nexus-state/time-travel) | Time-travel debugging (dev) | [Install](https://www.npmjs.com/package/@nexus-state/time-travel) |
 | [@nexus-state/undo-redo](https://www.npmjs.com/package/@nexus-state/undo-redo)     | User-facing undo/redo       | [Install](https://www.npmjs.com/package/@nexus-state/undo-redo)   |
-| [@nexus-state/middleware](https://www.npmjs.com/package/@nexus-state/middleware)   | Middleware support          | [Install](https://www.npmjs.com/package/@nexus-state/middleware)  |
+| [@nexus-state/middleware](https://www.npmjs.com/package/@nexus-state/middleware)   | Per-atom validation & transforms | [Install](https://www.npmjs.com/package/@nexus-state/middleware) |
+| [@nexus-state/devtools](https://www.npmjs.com/package/@nexus-state/devtools)       | Redux DevTools integration  | [Install](https://www.npmjs.com/package/@nexus-state/devtools)    |
 
 **Full documentation:** [nexus-state.website.yandexcloud.net](https://nexus-state.website.yandexcloud.net/)
 

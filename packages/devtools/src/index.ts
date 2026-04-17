@@ -31,7 +31,6 @@ export type {
   DevToolsConfig,
   DevToolsConnection,
   DevToolsMessage,
-  EnhancedStore,
   JumpToActionCommand,
   JumpToStateCommand,
   Command,
@@ -50,6 +49,9 @@ export type {
   ActionGroupResult,
   BatchUpdateConfig,
 } from './types';
+
+// Backward-compatible re-export
+export type { Store as EnhancedStore } from '@nexus-state/core';
 export {
   createActionMetadata,
   createMinimalActionMetadata,

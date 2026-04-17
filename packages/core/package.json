@@ -1,7 +1,7 @@
 {
   "name": "@nexus-state/core",
-  "version": "0.1.19",
-  "main": "dist/cjs/index.js",
+  "version": "0.2.0",
+  "main": "dist/esm/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "sideEffects": false,
@@ -13,29 +13,24 @@
   "exports": {
     ".": {
       "types": "./dist/esm/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": "./dist/esm/index.js"
     },
     "./debug": {
       "types": "./dist/esm/debug.d.ts",
-      "import": "./dist/esm/debug.js",
-      "require": "./dist/cjs/debug.js"
+      "import": "./dist/esm/debug.js"
     },
     "./batching": {
       "types": "./dist/esm/batching.d.ts",
-      "import": "./dist/esm/batching.js",
-      "require": "./dist/cjs/batching.js"
+      "import": "./dist/esm/batching.js"
     },
     "./utils": {
       "types": "./dist/esm/utils/index.d.ts",
-      "import": "./dist/esm/utils/index.js",
-      "require": "./dist/cjs/utils/index.js"
+      "import": "./dist/esm/utils/index.js"
     }
   },
   "scripts": {
-    "build": "npm run build:esm && npm run build:cjs",
+    "build": "npm run build:esm",
     "build:esm": "tsc -p tsconfig.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
     "clean": "rm -rf dist && mkdir dist",
     "dev": "tsc -w",
     "test": "vitest run src",

@@ -25,7 +25,7 @@
 
 /**
  * Creates an atom with an initial value or a computed atom based on other atoms.
- * Atoms are automatically registered in the global registry for DevTools integration.
+ * Atoms are lazily registered in each store's ScopedRegistry on first access (get/set/subscribe).
  * You can provide an optional name for better debugging experience.
  * @param {any|Function} initialValue - The initial value or a function to compute the value
  * @param {string} [name] - Optional name for the atom for DevTools display

@@ -68,6 +68,11 @@ export class StoreImpl implements Store {
     this.storeRegistry = {
       store: this as unknown as Store,
       atoms: new Set<symbol>(),
+      getMetadata: (id: symbol) => this.registry.getMetadata(id),
+      getByName: (name: string) => {
+        const entry = this.registry.getByName(name);
+        return entry ? (entry.atom as Atom<unknown>) : undefined;
+      },
     };
 
     // Apply plugins

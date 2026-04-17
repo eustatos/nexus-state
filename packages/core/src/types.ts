@@ -400,6 +400,10 @@ export interface StoreRegistry {
   store: Store;
   /** The set of atom IDs owned by the store */
   atoms: Set<symbol>;
+  /** Get metadata for a registered atom by its ID */
+  getMetadata?: (id: symbol) => AtomMetadata | undefined;
+  /** Get atom by name from the registry */
+  getByName?: (name: string) => Atom<unknown> | undefined;
 }
 
 // === ENHANCED STORE TYPES ===

@@ -1,7 +1,7 @@
 // Tests for @nexus-state/web-worker
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { atom, createStore } from '@nexus-state/core';
-import { atomWithWorker, workerAtom, createWorkerStore } from '../index';
+import { atomWithWorker, workerAtom, createWorkerStore, ensureWorkerTracking } from '../index';
 
 // Mock Worker class
 class MockWorker implements Worker {
@@ -58,6 +58,7 @@ describe('workerAtom', () => {
 
   beforeEach(() => {
     store = createStore();
+    ensureWorkerTracking(store);
     worker = new MockWorker();
   });
 
@@ -229,6 +230,7 @@ describe('integration with core', () => {
 
   beforeEach(() => {
     store = createStore();
+    ensureWorkerTracking(store);
     worker = new MockWorker();
   });
 

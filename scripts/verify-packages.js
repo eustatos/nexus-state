@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PACKAGES_DIR = path.join(__dirname, '..');
-const EXPECTED_MAIN_PATTERNS = ['dist/index.js', './dist/cjs/index.js'];
+const EXPECTED_MAIN_PATTERNS = ['dist/index.js', './dist/esm/index.js'];
 
 console.log('==========================================');
 console.log('Verifying package.json configurations...');
@@ -39,7 +39,7 @@ function verifyPackage(pkgPath) {
     console.log(`✓ main field correct: ${main}`);
     pass++;
   } else {
-    console.log(`✗ main field incorrect: ${main || '(missing)'} (expected: dist/index.js or ./dist/cjs/index.js)`);
+    console.log(`✗ main field incorrect: ${main || '(missing)'} (expected: dist/index.js or ./dist/esm/index.js)`);
     fail++;
   }
 

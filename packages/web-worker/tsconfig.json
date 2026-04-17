@@ -4,8 +4,9 @@
     "outDir": "dist",
     "rootDir": ".",
     "lib": ["ES2020", "WebWorker"],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "types": ["vitest/config"]
   },
   "include": ["*.ts", "src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "*.test.ts", "src/**/*.test.ts"]
+  "exclude": ["node_modules", "dist", "*.test.ts", "src/**/*.test.ts", "*.config.ts"]
 }
