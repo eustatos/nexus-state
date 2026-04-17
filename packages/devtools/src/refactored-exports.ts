@@ -28,7 +28,6 @@ import type {
   DevToolsConfig,
   DevToolsConnection,
   DevToolsMessage,
-  EnhancedStore,
   BasicAtom,
   DevToolsMode,
   ActionMetadata,
@@ -41,12 +40,12 @@ import type {
   BatchUpdateConfig,
   ActionGroupOptions,
 } from "./types";
+import type { Store } from "@nexus-state/core";
 
 export type {
   DevToolsConfig,
   DevToolsConnection,
   DevToolsMessage,
-  EnhancedStore,
   BasicAtom,
   DevToolsMode,
   ActionMetadata,
@@ -59,3 +58,6 @@ export type {
   BatchUpdateConfig,
   ActionGroupOptions,
 };
+
+// Backward-compatible re-export
+export type { Store as EnhancedStore };

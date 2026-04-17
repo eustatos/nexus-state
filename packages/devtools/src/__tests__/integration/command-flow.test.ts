@@ -77,7 +77,13 @@ describe("DevTools Command Flow Integration Tests", () => {
       const messageCollector = createMessageCollector();
       mockConnection?.subscribe(messageCollector.listener);
 
-      const mockAtom = { id: { toString: () => "testAtom" } };
+      const mockAtom = {
+        id: Symbol("testAtom"),
+        type: "primitive",
+        name: "testAtom",
+        toString: () => "testAtom",
+        read: () => 0,
+      };
       store.set(mockAtom, 100);
 
       await messageCollector.waitForMessage("ACTION");
@@ -87,7 +93,12 @@ describe("DevTools Command Flow Integration Tests", () => {
       expect(messages[0].type).toBe("ACTION");
       expect((messages[0].payload as any)?.action?.type).toBe("testAtom SET");
       const payloadState = (messages[0].payload as any)?.state;
-      expect(payloadState?.state?.testAtom).toBe(100);
+      // Mock store uses atom.id.toString() as key → 'Symbol(testAtom)'
+      const stateKey = Object.keys(payloadState?.state || {}).find(
+        (k) => k.includes("testAtom")
+      );
+      expect(stateKey).toBeDefined();
+      expect(payloadState?.state?.[stateKey!]).toBe(100);
     });
   });
 

@@ -9,7 +9,7 @@ export default defineConfig({
     export: 'src/export/index.ts',
     utils: 'src/utils/index.ts',
   },
-  format: ['cjs', 'esm'],
+  format: ['esm'],
   dts: true,
   minify: true,
   treeshake: true,

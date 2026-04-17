@@ -1,5 +1,14 @@
 # demo-react
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @nexus-state/core@0.2.0
+  - @nexus-state/react@0.2.0
+  - @nexus-state/devtools@0.2.0
+
 ## 0.0.2
 
 ### Patch Changes

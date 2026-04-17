@@ -8,7 +8,6 @@ import type {
   ComputedAtom,
   WritableAtom,
 } from './types';
-import { atomRegistry } from './atom-registry';
 
 /**
  * Create a computed atom that derives its value from other atoms
@@ -133,14 +132,14 @@ export function atom<Value>(...args: any[]): Atom<Value> {
   };
 
   // Note: Registration is deferred until first store access.
-  // This allows proper SSR isolation - atoms are registered in the store's registry,
-  // not in a global singleton. See ensureAtomRegistered() in StoreImpl.
-  // 
-  // For DevTools/Time-travel support, atoms are registered in atomRegistry
-  // on first access, not on creation. This means:
-  // - Unaccessed atoms won't appear in DevTools until first store.get()/set()
+  // Each store has its own ScopedRegistry — no global registry exists.
+  // This ensures proper SSR isolation and per-store state management.
+  //
+  // For DevTools/Time-travel support, atoms are registered on first
+  // store.get()/set() access. This means:
+  // - Unaccessed atoms won't appear in DevTools until first interaction
   // - Time-travel capture() only includes accessed atoms
-  // - SSR isolation is preserved - no global state contamination
+  // - SSR isolation is preserved — no global state contamination
 
   return atomInstance;
 }

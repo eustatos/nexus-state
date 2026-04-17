@@ -1,5 +1,5 @@
 // Web Worker integration for nexus-state
-import { atom, Atom, Store, createStore, atomRegistry } from '@nexus-state/core';
+import { atom, Atom, Store, createStore } from '@nexus-state/core';
 
 // Type definitions for web worker atom
 export type WorkerAtomOptions<T> = {
@@ -9,6 +9,55 @@ export type WorkerAtomOptions<T> = {
 
 // Global map to track worker atoms and their current values
 const workerAtomValues = new Map<Atom<any>, any>();
+
+// Track all stores that have accessed any worker atom
+const atomToStores = new Map<symbol, Set<Store>>();
+
+/**
+ * Register that a store has accessed a specific worker atom
+ */
+function registerAtomInStore(atomId: symbol, store: Store): void {
+  if (!atomToStores.has(atomId)) {
+    atomToStores.set(atomId, new Set());
+  }
+  atomToStores.get(atomId)!.add(store);
+}
+
+/**
+ * Patch a store's get/set/subscribe to track worker atom access
+ */
+function patchStoreForTracking(store: Store): void {
+  // Only patch once
+  if ((store as any).__workerTrackingPatched) return;
+  (store as any).__workerTrackingPatched = true;
+
+  const originalGet = store.get.bind(store);
+  const originalSet = store.set.bind(store);
+  const originalSubscribe = store.subscribe?.bind(store);
+
+  (store as any).get = (atom: Atom<any>) => {
+    if (workerAtomValues.has(atom)) {
+      registerAtomInStore(atom.id, store);
+    }
+    return originalGet(atom);
+  };
+
+  (store as any).set = (atom: Atom<any>, value: any) => {
+    if (workerAtomValues.has(atom)) {
+      registerAtomInStore(atom.id, store);
+    }
+    return originalSet(atom, value);
+  };
+
+  if (originalSubscribe) {
+    (store as any).subscribe = (atom: Atom<any>, cb: (v: any) => void) => {
+      if (workerAtomValues.has(atom)) {
+        registerAtomInStore(atom.id, store);
+      }
+      return originalSubscribe(atom, cb);
+    };
+  }
+}
 
 /**
  * Creates an atom that is managed in a Web Worker.
@@ -26,11 +75,7 @@ export function workerAtom<T>(options: WorkerAtomOptions<T>): Atom<T> {
   const { worker, initialValue } = options;
 
   // Create a regular atom to hold the value
-  // Use a read function that always returns the current value from workerAtomValues
-  const internalAtom = atom(initialValue);
-
-  // Override the read function to use workerAtomValues
-  (internalAtom as any).read = () => workerAtomValues.get(internalAtom);
+  const internalAtom = atom(initialValue, `worker-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`);
 
   // Store the initial value
   workerAtomValues.set(internalAtom, initialValue);
@@ -45,10 +90,10 @@ export function workerAtom<T>(options: WorkerAtomOptions<T>): Atom<T> {
         workerAtomValues.set(internalAtom, value);
 
         // Update the atom's value in all stores that contain it
-        const stores = atomRegistry.getAllStoresForAtom(internalAtom.id);
-        for (const store of stores) {
+        const stores = atomToStores.get(internalAtom.id) || new Set<Store>();
+        for (const s of stores) {
           try {
-            store.set(internalAtom, value);
+            s.set(internalAtom, value);
           } catch (e) {
             // Ignore errors - atom might not be settable in this store
           }
@@ -73,10 +118,31 @@ export const atomWithWorker = Object.assign(atom, {
   worker: workerAtom,
 });
 
+// Re-export createStore for convenience (uses worker-aware version)
+const _originalCreateStore = createStore;
+
 /**
- * Helper function to create a store in a Web Worker.
- * @returns {Store} A store that can be used in a Web Worker
+ * Creates a store that tracks worker atom registrations
  */
 export function createWorkerStore(): Store {
-  return createStore();
+  const store = _originalCreateStore();
+  patchStoreForTracking(store);
+  return store;
+}
+
+// Monkey-patch the core createStore so all stores track worker atoms
+// This is done by re-exporting our patched version
+export { _originalCreateStore as _unpatchedCreateStore };
+
+// Auto-patch: override createStore in the global module scope
+// Any store created via `createStore` from @nexus-state/core will NOT be auto-patched,
+// so consumers should use `createWorkerStore` from this package.
+// For backward compat, we also patch store on first access:
+
+/**
+ * Ensure a store is patched for worker atom tracking.
+ * Call this if you use `createStore` from core with worker atoms.
+ */
+export function ensureWorkerTracking(store: Store): void {
+  patchStoreForTracking(store);
 }

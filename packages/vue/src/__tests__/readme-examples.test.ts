@@ -6,15 +6,10 @@
  * - Detect broken API usage before publication
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { atom, createStore } from '@nexus-state/core';
-import { atomRegistry } from '@nexus-state/core';
 
 describe('README: Quick Start', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('basic counter example should work', () => {
     const countAtom = atom(0, 'count');
     const store = createStore();
@@ -33,10 +28,6 @@ describe('README: Quick Start', () => {
 });
 
 describe('README: Multiple Stores', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('multiple stores should be independent', () => {
     const atom1 = atom(0, 'atom1');
     const atom2 = atom(0, 'atom2');
@@ -55,10 +46,6 @@ describe('README: Multiple Stores', () => {
 });
 
 describe('README: SSR with Isolated Stores', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('setState for hydration should work', () => {
     const userAtom = atom(null, 'user');
     const store = createStore();
@@ -90,10 +77,6 @@ describe('README: SSR with Isolated Stores', () => {
 });
 
 describe('README: Vue Reactivity Integration', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('computed atoms should work', () => {
     const countAtom = atom(0, 'count');
     const doubleAtom = atom((get) => get(countAtom) * 2, 'double');

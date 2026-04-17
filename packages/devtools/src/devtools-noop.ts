@@ -10,7 +10,6 @@ import type {
   DevToolsConfig,
   DevToolsConnection,
   DevToolsMessage,
-  EnhancedStore,
   BasicAtom,
   DevToolsMode,
   DevToolsFeatureDetectionResult,
@@ -25,6 +24,7 @@ import type {
   ActionToSnapshotMap,
   SnapshotToActionMap,
 } from "./types";
+import type { Store } from "@nexus-state/core";
 
 // ---------------------------------------------------------------------------
 // Feature detection (no-op / disabled in production)
@@ -89,13 +89,13 @@ export function createSnapshotMapper(
 // ---------------------------------------------------------------------------
 
 export class DevToolsPlugin {
-  apply(_store: EnhancedStore): void {
+  apply(_store: Store): void {
     // No-op: production builds do not connect to DevTools
   }
   startBatch(_groupId: string): void {}
   endBatch(_groupId: string): void {}
   exportState(
-    store: EnhancedStore,
+    store: Store,
     metadata?: Record<string, unknown>,
   ): Record<string, unknown> {
     const state = store.serializeState?.() ?? store.getState();
@@ -252,7 +252,6 @@ export type {
   DevToolsConfig,
   DevToolsConnection,
   DevToolsMessage,
-  EnhancedStore,
   JumpToActionCommand,
   JumpToStateCommand,
   Command,
@@ -271,3 +270,6 @@ export type {
   ActionGroupResult,
   BatchUpdateConfig,
 } from "./types";
+
+// Backward-compatible re-export
+export type { Store as EnhancedStore } from "@nexus-state/core";

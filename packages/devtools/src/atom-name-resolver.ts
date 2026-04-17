@@ -2,12 +2,12 @@
  * AtomNameResolver - Resolves atom names for DevTools display
  *
  * This service provides utilities for getting and formatting atom names
- * for display in DevTools. It integrates with the atom registry and
+ * for display in DevTools. It integrates with the store's ScopedRegistry and
  * provides configurable formatting options.
  */
 
 import type { BasicAtom } from './types';
-import { atomRegistry } from '@nexus-state/core';
+import type { Store } from '@nexus-state/core';
 
 /**
  * Atom name formatting options
@@ -25,13 +25,22 @@ export interface AtomNameFormatOptions {
   maxLength?: number;
   /** Ellipsis for truncated names (default: "...") */
   ellipsis?: string;
+  /** Store to resolve atom names from ScopedRegistry */
+  store?: Store;
 }
 
 /**
  * AtomNameResolver class for resolving and formatting atom names
  */
 export class AtomNameResolver {
-  private options: Required<AtomNameFormatOptions>;
+  private options: AtomNameFormatOptions & {
+    showAtomNames: boolean;
+    formatter: (atom: BasicAtom, defaultName: string) => string;
+    includeId: boolean;
+    includeType: boolean;
+    maxLength: number;
+    ellipsis: string;
+  };
 
   constructor(options: AtomNameFormatOptions = {}) {
     this.options = {
@@ -41,6 +50,7 @@ export class AtomNameResolver {
       includeType: options.includeType ?? false,
       maxLength: options.maxLength ?? 50,
       ellipsis: options.ellipsis ?? '...',
+      store: options.store,
     };
   }
 
@@ -94,34 +104,43 @@ export class AtomNameResolver {
    * @returns Default name
    */
   private getDefaultName(atom: BasicAtom): string {
-    // Try to get name from registry
-    const registryName = atomRegistry.getName(atom as { id: symbol });
-    if (registryName) {
-      return registryName;
+    // Try to get name from store's registry
+    if (this.options.store && this.options.store.getRegistry) {
+      const registry = this.options.store.getRegistry();
+      if (registry && registry.getMetadata && typeof atom.id === 'symbol') {
+        const metadata = registry.getMetadata(atom.id);
+        if (metadata && metadata.name) {
+          return metadata.name;
+        }
+      }
     }
 
-    // Try to get name from atom's toString method
-    const toStringName = atom.toString();
-    if (toStringName && toStringName !== '[object Object]') {
-      return toStringName;
+    // Try to get name from store.getAtomMetadata (direct Store method)
+    if (this.options.store && (this.options.store as any).getAtomMetadata && typeof atom.id === 'symbol') {
+      const metadata = (this.options.store as any).getAtomMetadata(atom.id);
+      if (metadata && metadata.name) {
+        return metadata.name;
+      }
     }
 
-    // Try to get name from atom's displayName property
-    if (
-      (atom as any).displayName &&
-      typeof (atom as any).displayName === 'string'
-    ) {
-      return (atom as any).displayName;
-    }
-
-    // Try to get name from atom's name property
+    // Fallback: use atom.name property
     if ((atom as any).name && typeof (atom as any).name === 'string') {
       return (atom as any).name;
     }
 
-    // Fallback to atom ID
-    if (atom.id?.toString()) {
-      return atom.id.toString();
+    // Fallback: use atom.id.toString()
+    if (atom.id && typeof atom.id.toString === 'function') {
+      const idStr = atom.id.toString();
+      if (idStr.startsWith('Symbol(') && idStr.endsWith(')')) {
+        return idStr.substring(7, idStr.length - 1);
+      }
+      return idStr;
+    }
+
+    // Fallback to atom's toString method
+    const toStringName = atom.toString();
+    if (toStringName && toStringName !== '[object Object]') {
+      return toStringName;
     }
 
     return 'unknown-atom';
@@ -189,13 +208,23 @@ export class AtomNameResolver {
       result.type = this.getAtomType(atom);
     }
 
-    try {
-      const registryName = atomRegistry.getName(atom as { id: symbol });
-      if (registryName) {
-        result.registryName = registryName;
+    // Try to get registry name from store's registry
+    if (this.options.store && this.options.store.getRegistry && typeof atom.id === 'symbol') {
+      const registry = this.options.store.getRegistry();
+      if (registry && registry.getMetadata) {
+        const metadata = registry.getMetadata(atom.id);
+        if (metadata && metadata.name) {
+          result.registryName = metadata.name;
+        }
       }
-    } catch (error) {
-      // Ignore errors when getting registry name
+    }
+
+    // Fallback: try store.getAtomMetadata directly
+    if (!result.registryName && this.options.store && (this.options.store as any).getAtomMetadata && typeof atom.id === 'symbol') {
+      const metadata = (this.options.store as any).getAtomMetadata(atom.id);
+      if (metadata && metadata.name) {
+        result.registryName = metadata.name;
+      }
     }
 
     return result;
@@ -240,10 +269,18 @@ export class AtomNameResolver {
   }
 
   /**
+   * Set the store for resolving atom names from its ScopedRegistry
+   * @param store The store to resolve names from
+   */
+  setStore(store: Store | undefined): void {
+    this.options.store = store;
+  }
+
+  /**
    * Get current options
    * @returns Current options
    */
-  getOptions(): Required<AtomNameFormatOptions> {
+  getOptions(): typeof this.options {
     return { ...this.options };
   }
 }

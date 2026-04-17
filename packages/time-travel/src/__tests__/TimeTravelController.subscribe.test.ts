@@ -1,13 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { TimeTravelController } from '../TimeTravelController';
-import { atom, createStore, atomRegistry } from '../index';
+import { atom, createStore } from '../index';
 
 describe('TimeTravelController: subscribe', () => {
-  beforeEach(() => {
-    // Очищаем registry перед каждым тестом для изоляции
-    atomRegistry.clear();
-  });
-
   it('should subscribe to undo events', () => {
     const store = createStore();
     const testAtom = atom(0, 'test');
@@ -366,10 +361,6 @@ describe('TimeTravelController: restoreSnapshot', () => {
 });
 
 describe('TimeTravelController: importState', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('should import state without errors', () => {
     const store = createStore();
     const controller = new TimeTravelController(store);
@@ -407,10 +398,6 @@ describe('TimeTravelController: importState', () => {
 });
 
 describe('TimeTravelController: restoreSnapshot integration', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('should restore primitive atom value after jumpTo', () => {
     const store = createStore();
     const testAtom = atom('initial', 'testAtom');
@@ -605,10 +592,6 @@ describe('TimeTravelController: restoreSnapshot integration', () => {
 });
 
 describe('TimeTravelController: auto-initialization', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('should auto-initialize atoms on first capture', () => {
     const store = createStore();
     const testAtom = atom('initial', 'testAtom');

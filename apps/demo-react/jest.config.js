@@ -8,10 +8,10 @@ module.exports = {
   ],
   moduleNameMapper: {
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
-    "^@nexus-state/core$": "<rootDir>/../../packages/core/dist/cjs/index.js",
-    "^@nexus-state/react$": "<rootDir>/../../packages/react/dist/cjs/index.js",
+    "^@nexus-state/core$": "<rootDir>/../../packages/core/dist/esm/index.js",
+    "^@nexus-state/react$": "<rootDir>/../../packages/react/dist/esm/index.js",
     "^@nexus-state/devtools$":
-      "<rootDir>/../../packages/devtools/dist/cjs/src/index.js",
+      "<rootDir>/../../packages/devtools/dist/esm/index.js",
   },
   transform: {
     "^.+\\.(js|jsx)$": "babel-jest",

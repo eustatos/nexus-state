@@ -1,41 +1,35 @@
 {
   "name": "@nexus-state/form-builder-core",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Core logic for Nexus State Form Builder (framework-agnostic)",
   "type": "module",
-  "main": "dist/index.cjs",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     },
     "./schema": {
       "types": "./dist/schema.d.ts",
-      "import": "./dist/schema.js",
-      "require": "./dist/schema.cjs"
+      "import": "./dist/schema.js"
     },
     "./registry": {
       "types": "./dist/registry.d.ts",
-      "import": "./dist/registry.js",
-      "require": "./dist/registry.cjs"
+      "import": "./dist/registry.js"
     },
     "./state": {
       "types": "./dist/state.d.ts",
-      "import": "./dist/state.js",
-      "require": "./dist/state.cjs"
+      "import": "./dist/state.js"
     },
     "./export": {
       "types": "./dist/export.d.ts",
-      "import": "./dist/export.js",
-      "require": "./dist/export.cjs"
+      "import": "./dist/export.js"
     },
     "./utils": {
       "types": "./dist/utils.d.ts",
-      "import": "./dist/utils.js",
-      "require": "./dist/utils.cjs"
+      "import": "./dist/utils.js"
     }
   },
   "sideEffects": false,

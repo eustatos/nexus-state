@@ -6,15 +6,10 @@
  * - Detect broken API usage before publication
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { atom, createStore } from '@nexus-state/core';
-import { atomRegistry } from '@nexus-state/core';
 
 describe('README: Quick Start', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('basic counter example should work', () => {
     const countAtom = atom(0, 'count');
     const store = createStore();
@@ -33,10 +28,6 @@ describe('README: Quick Start', () => {
 });
 
 describe('README: Split Hooks Pattern', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('useSetAtom pattern should work', () => {
     const nameAtom = atom('', 'name');
     const emailAtom = atom('', 'email');
@@ -64,10 +55,6 @@ describe('README: Split Hooks Pattern', () => {
 });
 
 describe('README: useAtomCallback Pattern', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('complex operations with multiple atoms should work', () => {
     const balanceAtom = atom(100, 'balance');
     const logAtom = atom<string[]>('log');
@@ -99,10 +86,6 @@ describe('README: useAtomCallback Pattern', () => {
 });
 
 describe('README: StoreProvider Pattern', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('store can be passed explicitly or via context', () => {
     const countAtom = atom(0, 'count');
     const store = createStore();

@@ -15,13 +15,12 @@
 
 import type {
   DevToolsConfig,
-  EnhancedStore,
   BasicAtom,
   DevToolsMode,
   ActionMetadata,
 } from "./types";
 import type { SimpleTimeTravel } from "@nexus-state/time-travel";
-import { atomRegistry } from "@nexus-state/core";
+import type { Store, Atom } from "@nexus-state/core";
 
 // Import decomposed services
 import { DevToolsConnector, createDevToolsConnector } from "./devtools-connector";
@@ -59,7 +58,7 @@ export class DevToolsPluginRefactored {
   private config: Required<DevToolsConfig>;
 
   // State
-  private currentStore: EnhancedStore | null = null;
+  private currentStore: Store | null = null;
   private currentBatchId: string | null = null;
   private lastState: unknown = null;
   private lastLazyState: Record<string, unknown> | null = null;
@@ -104,7 +103,7 @@ export class DevToolsPluginRefactored {
       maxUpdatesPerSecond: batchOpts.maxUpdatesPerSecond ?? 0,
       onFlush: (store, action) => {
         const targetStore = (store ??
-          this.currentStore) as EnhancedStore | null;
+          this.currentStore) as Store | null;
         if (targetStore) {
           this.doSendStateUpdate(targetStore, action);
         }
@@ -234,8 +233,11 @@ export class DevToolsPluginRefactored {
   /**
    * Apply the plugin to a store
    */
-  apply(store: EnhancedStore): void {
+  apply(store: Store): void {
     this.currentStore = store;
+
+    // Update atom name resolver with store reference
+    this.atomNameResolver.setStore(store);
 
     // Runtime production guard
     if (process.env.NODE_ENV === "production") {
@@ -281,7 +283,7 @@ export class DevToolsPluginRefactored {
   /**
    * Send initial state to DevTools
    */
-  private sendInitialState(store: EnhancedStore): void {
+  private sendInitialState(store: Store): void {
     try {
       const state = store.serializeState?.() || store.getState();
       const sanitized = this.config.stateSanitizer(state) as Record<
@@ -327,7 +329,7 @@ export class DevToolsPluginRefactored {
   /**
    * Enhance store with metadata support
    */
-  private enhanceStoreWithMetadata(store: EnhancedStore): void {
+  private enhanceStoreWithMetadata(store: Store): void {
     if (!store.setWithMetadata) return;
 
     // Override set method to capture metadata
@@ -362,7 +364,7 @@ export class DevToolsPluginRefactored {
 
       const metadata = builder.build() as ActionMetadata;
 
-      store.setWithMetadata?.(atom, update, metadata);
+      store.setWithMetadata?.(atom as Atom<unknown>, update, metadata);
 
       if (this.currentBatchId) {
         this.actionGrouper.add(metadata);
@@ -375,7 +377,7 @@ export class DevToolsPluginRefactored {
   /**
    * Setup polling for state updates (fallback for basic stores)
    */
-  private setupPolling(store: EnhancedStore): void {
+  private setupPolling(store: Store): void {
     this.pollingService.start(this.config.latency, () => {
       if (this.isTracking) {
         const actionName = this.actionNamingSystem.getName({
@@ -391,7 +393,7 @@ export class DevToolsPluginRefactored {
   /**
    * Send state update to DevTools
    */
-  private doSendStateUpdate(store: EnhancedStore, action: string): void {
+  private doSendStateUpdate(store: Store, action: string): void {
     if (!this.isTracking || !this.connector.isConnectedToDevTools()) return;
 
     try {
@@ -449,7 +451,7 @@ export class DevToolsPluginRefactored {
   /**
    * Schedule a state update to be sent to DevTools
    */
-  private sendStateUpdate(store: EnhancedStore, action: string): void {
+  private sendStateUpdate(store: Store, action: string): void {
     this.batchUpdater.schedule(store, action);
   }
 
@@ -478,7 +480,7 @@ export class DevToolsPluginRefactored {
    * Export current state in DevTools-compatible format
    */
   exportState(
-    store: EnhancedStore,
+    store: Store,
     metadata?: Record<string, unknown>,
   ): Record<string, unknown> {
     try {
@@ -579,7 +581,7 @@ export class DevToolsPluginRefactored {
    * Set up time travel integration
    * @param store The store to integrate with
    */
-  private setupTimeTravel(store: EnhancedStore): void {
+  private setupTimeTravel(store: Store): void {
     const storeWithTimeTravel = store as any;
     
     // First check if setTimeTravel was called explicitly

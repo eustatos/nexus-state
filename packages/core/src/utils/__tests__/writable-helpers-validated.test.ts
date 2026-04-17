@@ -144,9 +144,9 @@ describe("createValidatedAtom - number validation", () => {
     });
     const store = createStore();
     store.set(rangeAtom, 150);
-    expect(store.get(rangeAtom)).toBe(50);
+    expect(store.get(rangeAtom)).toBe(50); // invalid, keeps initial
     store.set(rangeAtom, 75);
-    // The validated atom keeps the previous valid value
-    expect(store.get(rangeAtom)).toBe(50);
+    // 75 is valid (0-100), should be accepted
+    expect(store.get(rangeAtom)).toBe(75);
   });
 });

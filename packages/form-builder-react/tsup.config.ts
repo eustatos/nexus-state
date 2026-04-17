@@ -9,7 +9,7 @@ export default defineConfig({
     state: 'src/state/index.ts',
     export: 'src/export/index.ts',
   },
-  format: ['cjs', 'esm'],
+  format: ['esm'],
   dts: true,
   minify: true,
   treeshake: true,

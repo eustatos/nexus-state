@@ -10,9 +10,8 @@ import {
   SerializedObject,
   SerializedProperty,
   DEFAULT_SERIALIZATION_OPTIONS,
-  StrategyRegistry,
-  createDefaultRegistry,
-} from "./index";
+} from "./types";
+import { StrategyRegistry, createDefaultRegistry } from "./strategy-registry";
 
 // Import strategies synchronously
 import { PrimitivesStrategy } from "./strategies/primitives-strategy";

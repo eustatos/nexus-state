@@ -2,17 +2,13 @@
  * Tests for store creation functions
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { createStore, createEnhancedStore } from './store';
 import { atom } from './atom';
-import { atomRegistry } from './atom-registry';
 import type { Plugin } from './types';
 import type { AtomContext } from './reactive';
 
 describe('createStore', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
 
   describe('Basic creation', () => {
     it('should create a store without parameters', () => {
@@ -281,10 +277,6 @@ describe('createStore', () => {
 });
 
 describe('createEnhancedStore', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('should create enhanced store without parameters', () => {
     const store = createEnhancedStore();
 
@@ -318,10 +310,6 @@ describe('createEnhancedStore', () => {
 });
 
 describe('Store setState method', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('should set multiple atoms by name', () => {
     const store = createStore();
     const userAtom = atom({ name: 'Anonymous' }, 'user');
@@ -394,10 +382,6 @@ describe('Store setState method', () => {
 });
 
 describe('Store reset method', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('should reset atom to default value', () => {
     const store = createStore();
     const countAtom = atom(42, 'count');
@@ -413,10 +397,6 @@ describe('Store reset method', () => {
 });
 
 describe('Store clear method', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('should clear all atoms to default values', () => {
     const store = createStore();
     const countAtom = atom(0, 'count');
@@ -435,10 +415,6 @@ describe('Store clear method', () => {
 });
 
 describe('SR-009: Store set method with AtomContext', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   describe('basic context passing', () => {
     it('should accept context parameter in set()', () => {
       const store = createStore();

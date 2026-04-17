@@ -1,6 +1,18 @@
 // Types for nexus-state core
 
-import type { AtomContext } from './reactive';
+import type { AtomContext } from './reactive/types';
+
+/**
+ * Metadata about a registered atom
+ */
+export interface AtomMetadata {
+  /** Display name for DevTools and debugging */
+  name: string;
+  /** Timestamp when the atom was first registered */
+  createdAt: number;
+  /** Atom type for runtime type checking */
+  type: 'primitive' | 'computed' | 'writable';
+}
 
 /**
  * Function to get the current value of an atom
@@ -223,6 +235,29 @@ export interface Store {
    * @returns The store registry
    */
   getRegistry?: () => StoreRegistry;
+
+  /**
+   * Set atom value by name (for SSR hydration and time-travel)
+   * @param name Atom name
+   * @param value New value
+   * @param context Optional operation context
+   * @returns true if atom was found and set
+   */
+  setByName?: (name: string, value: unknown, context?: unknown) => boolean;
+
+  /**
+   * Get atom by name from the store's registry
+   * @param name Atom name
+   * @returns The atom if found, undefined otherwise
+   */
+  getByName?: (name: string) => Atom<unknown> | undefined;
+
+  /**
+   * Get metadata for a registered atom by its ID
+   * @param id Atom symbol ID
+   * @returns Metadata object or undefined if not found
+   */
+  getAtomMetadata?: (id: symbol) => AtomMetadata | undefined;
 }
 
 // === NEW HIERARCHICAL ATOM TYPES (CORE-002) ===
@@ -365,6 +400,10 @@ export interface StoreRegistry {
   store: Store;
   /** The set of atom IDs owned by the store */
   atoms: Set<symbol>;
+  /** Get metadata for a registered atom by its ID */
+  getMetadata?: (id: symbol) => AtomMetadata | undefined;
+  /** Get atom by name from the registry */
+  getByName?: (name: string) => Atom<unknown> | undefined;
 }
 
 // === ENHANCED STORE TYPES ===
@@ -390,3 +429,5 @@ export type StoreEnhancementOptions = {
   /** Registry mode for the store */
   registryMode?: RegistryMode;
 };
+
+// === BACKWARD COMPATIBILITY ===

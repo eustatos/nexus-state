@@ -190,31 +190,10 @@ export interface BasicAtom {
 }
 
 /**
- * Extended store interface with enhanced DevTools support
+ * Re-export of Store from @nexus-state/core as EnhancedStore for backward compatibility.
+ * @deprecated Use `Store` from `@nexus-state/core` directly.
  */
-export interface EnhancedStore {
-  /** Get the current value of an atom */
-  get: <Value>(atom: BasicAtom) => Value;
-
-  /** Set the value of an atom */
-  set: <Value>(
-    atom: BasicAtom,
-    update: Value | ((prev: Value) => Value)
-  ) => void;
-
-  /** Get the state of all atoms in the store */
-  getState: () => Record<string, unknown>;
-
-  /** Set the value of an atom with metadata for DevTools */
-  setWithMetadata?: <Value>(
-    atom: BasicAtom,
-    update: Value | ((prev: Value) => Value),
-    metadata?: Record<string, unknown>
-  ) => void;
-
-  /** Serialize the state of all atoms in the store */
-  serializeState?: () => Record<string, unknown>;
-}
+export type { Store as EnhancedStore } from '@nexus-state/core';
 
 /**
  * DevTools mode for current environment

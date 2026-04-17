@@ -270,13 +270,15 @@ describe('Writable Atoms', () => {
     it('should log writes', () => {
       const store = createStore();
       const log: string[] = [];
-      let currentValue = 0;
+
+      // Internal state atom holds the actual value
+      const stateAtom = atom(0, 'logged-state');
 
       const loggedAtom = atom(
-        () => currentValue,
+        (get) => get(stateAtom),
         (get, set, value: number) => {
           log.push(`Setting value: ${value}`);
-          currentValue = value;
+          set(stateAtom, value);
         }
       );
 

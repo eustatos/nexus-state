@@ -25,7 +25,7 @@
 
 /**
  * Creates an atom with an initial value or a computed atom based on other atoms.
- * Atoms are automatically registered in the global registry for DevTools integration.
+ * Atoms are lazily registered in each store's ScopedRegistry on first access (get/set/subscribe).
  * You can provide an optional name for better debugging experience.
  * @param {any|Function} initialValue - The initial value or a function to compute the value
  * @param {string} [name] - Optional name for the atom for DevTools display
@@ -46,22 +46,6 @@
 export { atom } from './atom';
 
 /**
- * Global registry for atoms to support DevTools integration.
- * All atoms created with the atom() function are automatically registered.
- * @example
- * // Get an atom by its ID
- * const atom = atomRegistry.get(atomId);
- *
- * // Get all registered atoms
- * const allAtoms = atomRegistry.getAll();
- *
- * // Get the name of an atom
- * const name = atomRegistry.getName(atom);
- */
-export { atomRegistry, createIsolatedRegistry } from './atom-registry';
-export type { AtomRegistry } from './atom-registry';
-
-/**
  * Creates a store to hold atoms.
  * @param {Array<Function>} [plugins] - Array of plugins to apply to the store
  * @returns {Store} The created store
@@ -72,21 +56,8 @@ export type { AtomRegistry } from './atom-registry';
  * // Create a store with plugins
  * const store = createStore([plugin1, plugin2]);
  */
-export { createStore } from './store';
-
-/**
- * Creates an enhanced store with DevTools integration capabilities.
- * @param {Array<Plugin>} [plugins] - Array of plugins to apply to the store
- * @param {StoreEnhancementOptions} [options] - Options for store enhancement
- * @returns {EnhancedStore} The created enhanced store
- * @example
- * // Create an enhanced store
- * const store = createEnhancedStore();
- *
- * // Create an enhanced store with plugins and options
- * const store = createEnhancedStore([plugin1, plugin2], { enableDevTools: true });
- */
-export { createEnhancedStore } from './enhanced-store';
+export { createStore, createEnhancedStore } from './store';
+export type { StoreEnhancementOptions } from './store';
 
 // Export utility functions
 export {
@@ -119,7 +90,7 @@ export type {
 } from './types';
 // Export type guards
 export { isPrimitiveAtom, isComputedAtom, isWritableAtom } from './types';
-export type { EnhancedStore, StoreEnhancementOptions } from './enhanced-store';
+export type { EnhancedStore } from './enhanced-store';
 export type {
   ActionTrackingOptions,
   ActionMetadata as TrackedActionMetadata,

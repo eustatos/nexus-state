@@ -6,17 +6,12 @@
  * - Detect broken API usage before publication
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { atom, createStore } from '@nexus-state/core';
-import { atomRegistry } from '@nexus-state/core';
 import { asyncAtom } from '@nexus-state/async';
 
 describe('README: Quick Start', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
-  it('asyncAtom pattern should work', async () => {
+  it('async atom pattern should work', async () => {
     const store = createStore();
 
     // Create async atom (as shown in README)
@@ -50,10 +45,6 @@ describe('README: Quick Start', () => {
 });
 
 describe('README: State Shape', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('AsyncState shape should work', async () => {
     const store = createStore();
 
@@ -84,10 +75,6 @@ describe('README: State Shape', () => {
 });
 
 describe('README: Integration with Core', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('computed atom from async data should work', async () => {
     const store = createStore();
 
@@ -140,10 +127,6 @@ describe('README: Integration with Core', () => {
 });
 
 describe('README: Error Handling', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('error handling pattern should work', async () => {
     const store = createStore();
 
@@ -196,10 +179,6 @@ describe('README: Error Handling', () => {
 });
 
 describe('README: Async vs Query Decision', () => {
-  beforeEach(() => {
-    atomRegistry.clear();
-  });
-
   it('simple fetch (async) should work without caching', async () => {
     const store = createStore();
 

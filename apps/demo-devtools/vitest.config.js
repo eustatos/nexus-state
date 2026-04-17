@@ -8,11 +8,11 @@ export default defineConfig({
     alias: {
       "@nexus-state/core": path.resolve(
         __dirname,
-        "../../packages/core/dist/cjs/index.js"
+        "../../packages/core/dist/esm/index.js"
       ),
       "@nexus-state/react": path.resolve(
         __dirname,
-        "../../packages/react/dist/cjs/index.js"
+        "../../packages/react/dist/esm/index.js"
       ),
       "@nexus-state/devtools": path.resolve(
         __dirname,

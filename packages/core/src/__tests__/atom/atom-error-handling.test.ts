@@ -107,15 +107,15 @@ describe('Atom Error Handling', () => {
 
     it('should handle writable atom with validation error', () => {
       const store = createStore();
-      let currentValue = 0;
+      const stateAtom = atom(0, 'validation-state');
 
       const validatedAtom = atom(
-        () => currentValue,
+        (get) => get(stateAtom),
         (get, set, value: number) => {
           if (value < 0) {
             throw new Error('Value must be non-negative');
           }
-          currentValue = value;
+          set(stateAtom, value);
         }
       );
 
@@ -261,17 +261,16 @@ describe('Atom Error Handling', () => {
 
     it('should recover from write error on subsequent writes (using external state)', () => {
       const store = createStore();
+      const stateAtom = atom(0, 'conditional-state');
       let shouldThrow = true;
-      let internalValue = 0;
 
       const conditionalWriteAtom = atom(
-        () => internalValue,
+        (get) => get(stateAtom),
         (get, set, value: number) => {
           if (shouldThrow) {
             throw new Error('Temporary write error');
           }
-          // Use external state instead of set(self, value)
-          internalValue = value;
+          set(stateAtom, value);
         }
       );
 

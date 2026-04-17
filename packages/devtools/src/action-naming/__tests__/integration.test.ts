@@ -1,14 +1,15 @@
 import { DevToolsPlugin } from "../../devtools-plugin";
-import type { EnhancedStore, BasicAtom } from "../../types";
-import { atomRegistry } from "@nexus-state/core";
+import type { BasicAtom, Atom } from "../../types";
+import { createStore, type Store } from "@nexus-state/core";
 import { vi } from "vitest";
 
 describe("DevToolsPlugin Action Naming Integration", () => {
-  let mockStore: EnhancedStore;
+  let mockStore: Store;
+  let realStore: ReturnType<typeof createStore>;
 
   beforeEach(() => {
-    // Reset atom registry
-    atomRegistry.clear();
+    // Create a real store for each test
+    realStore = createStore();
 
     // Mock store implementation
     mockStore = {
@@ -17,8 +18,37 @@ describe("DevToolsPlugin Action Naming Integration", () => {
       getState: vi.fn().mockReturnValue({}),
       setWithMetadata: vi.fn(),
       serializeState: vi.fn().mockReturnValue({}),
-    } as any;
+    } as unknown as Store;
   });
+
+  /**
+   * Helper: register an atom in the real store and patch mockStore
+   * to delegate registry lookups to the real store.
+   */
+  function registerAtomInStore<T>(
+    a: BasicAtom,
+    _name: string,
+    value: T
+  ): BasicAtom {
+    // Ensure the atom is registered in the real store
+    realStore.set(a as Atom<T>, value);
+
+    // Patch mockStore to delegate registry to realStore
+    (mockStore as any).getRegistry = () => realStore.getRegistry?.();
+    (mockStore as any).getAtomMetadata = (id: symbol) =>
+      realStore.getAtomMetadata?.(id);
+
+    return a;
+  }
+
+  function makeAtom(name: string, idStr?: string): BasicAtom {
+    return {
+      id: Symbol(idStr ?? name),
+      type: "primitive" as const,
+      name,
+      read: () => null as unknown as never,
+    } as unknown as BasicAtom;
+  }
 
   describe("Configuration", () => {
     it("should use auto naming strategy by default", () => {
@@ -37,17 +67,12 @@ describe("DevToolsPlugin Action Naming Integration", () => {
         addEventListener: vi.fn(),
       };
 
-      const mockAtom = {
-        id: Symbol("test-atom"),
-        toString: () => "TestAtom",
-      } as BasicAtom;
-
-      atomRegistry.register(mockAtom, "user");
+      const mockAtom = registerAtomInStore(makeAtom("user"), "user", null);
 
       plugin.apply(mockStore);
 
       if (mockStore.set) {
-        mockStore.set(mockAtom, "test-value");
+        mockStore.set(mockAtom as any, "test-value");
       }
 
       // Auto strategy should generate "user SET"
@@ -80,17 +105,12 @@ describe("DevToolsPlugin Action Naming Integration", () => {
         addEventListener: vi.fn(),
       };
 
-      const mockAtom = {
-        id: Symbol("test-atom"),
-        toString: () => "TestAtom",
-      } as BasicAtom;
-
-      atomRegistry.register(mockAtom, "user");
+      const mockAtom = registerAtomInStore(makeAtom("user"), "user", null);
 
       plugin.apply(mockStore);
 
       if (mockStore.set) {
-        mockStore.set(mockAtom, "test-value");
+        mockStore.set(mockAtom as any, "test-value");
       }
 
       // Simple strategy should generate just "SET"
@@ -124,17 +144,12 @@ describe("DevToolsPlugin Action Naming Integration", () => {
         addEventListener: vi.fn(),
       };
 
-      const mockAtom = {
-        id: Symbol("test-atom"),
-        toString: () => "TestAtom",
-      } as BasicAtom;
-
-      atomRegistry.register(mockAtom, "user");
+      const mockAtom = registerAtomInStore(makeAtom("user"), "user", null);
 
       plugin.apply(mockStore);
 
       if (mockStore.set) {
-        mockStore.set(mockAtom, "test-value");
+        mockStore.set(mockAtom as any, "test-value");
       }
 
       // Pattern strategy with timestamp - ожидаем формат с timestamp
@@ -142,7 +157,7 @@ describe("DevToolsPlugin Action Naming Integration", () => {
         mockAtom,
         "test-value",
         expect.objectContaining({
-          type: expect.stringMatching(/^\[\d+\] user SET$/), // Ожидаем [timestamp] user SET, а не user.SET
+          type: expect.stringMatching(/^\[\d+\] user SET$/),
         }),
       );
 
@@ -170,17 +185,12 @@ describe("DevToolsPlugin Action Naming Integration", () => {
         addEventListener: vi.fn(),
       };
 
-      const mockAtom = {
-        id: Symbol("test-atom"),
-        toString: () => "TestAtom",
-      } as BasicAtom;
-
-      atomRegistry.register(mockAtom, "user");
+      const mockAtom = registerAtomInStore(makeAtom("user"), "user", null);
 
       plugin.apply(mockStore);
 
       if (mockStore.set) {
-        mockStore.set(mockAtom, "test-value");
+        mockStore.set(mockAtom as any, "test-value");
       }
 
       // Custom function should generate our custom name
@@ -220,17 +230,12 @@ describe("DevToolsPlugin Action Naming Integration", () => {
         addEventListener: vi.fn(),
       };
 
-      const mockAtom = {
-        id: Symbol("test-atom"),
-        toString: () => "TestAtom",
-      } as BasicAtom;
-
-      atomRegistry.register(mockAtom, "user");
+      const mockAtom = registerAtomInStore(makeAtom("user"), "user", null);
 
       plugin.apply(mockStore);
 
       if (mockStore.set) {
-        mockStore.set(mockAtom, "test-value");
+        mockStore.set(mockAtom as any, "test-value");
       }
 
       // Direct strategy should generate our custom name
@@ -266,22 +271,14 @@ describe("DevToolsPlugin Action Naming Integration", () => {
         addEventListener: vi.fn(),
       };
 
-      // Create a mock atom
-      const mockAtom = {
-        id: Symbol("test-atom"),
-        toString: () => "TestAtom",
-      } as BasicAtom;
-
-      // Register atom
-      atomRegistry.register(mockAtom, "user");
+      const mockAtom = registerAtomInStore(makeAtom("user"), "user", null);
 
       // Apply plugin
       plugin.apply(mockStore);
 
       // Simulate store.set being called
-      // The plugin overrides store.set in enhanceStoreWithMetadata
       if (mockStore.set) {
-        mockStore.set(mockAtom, "new-value");
+        mockStore.set(mockAtom as any, "new-value");
       }
 
       // Check that setWithMetadata was called with correct action name
@@ -289,7 +286,7 @@ describe("DevToolsPlugin Action Naming Integration", () => {
         mockAtom,
         "new-value",
         expect.objectContaining({
-          type: "SET", // Simple strategy should give just 'SET'
+          type: "SET",
           atomName: "user",
           source: "DevToolsPlugin",
         }),
@@ -315,24 +312,19 @@ describe("DevToolsPlugin Action Naming Integration", () => {
         addEventListener: vi.fn(),
       };
 
-      const mockAtom = {
-        id: Symbol("test-atom"),
-        toString: () => "TestAtom",
-      } as BasicAtom;
-
-      atomRegistry.register(mockAtom, "counter");
+      const mockAtom = registerAtomInStore(makeAtom("counter"), "counter", 0);
 
       plugin.apply(mockStore);
 
       if (mockStore.set) {
-        mockStore.set(mockAtom, 42);
+        mockStore.set(mockAtom as any, 42);
       }
 
       expect(mockStore.setWithMetadata).toHaveBeenCalledWith(
         mockAtom,
         42,
         expect.objectContaining({
-          type: "counter SET", // Auto strategy combines atom name and operation
+          type: "counter SET",
         }),
       );
 
@@ -361,7 +353,7 @@ describe("DevToolsPlugin Action Naming Integration", () => {
       const pollingStore = {
         ...mockStore,
         setWithMetadata: undefined,
-      };
+      } as unknown as Store;
 
       // Mock setTimeout for testing
       vi.useFakeTimers();

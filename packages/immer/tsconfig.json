@@ -2,8 +2,12 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "."
+    "rootDir": ".",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["*.ts"],
-  "exclude": ["node_modules", "dist", "*.test.ts"]
+  "exclude": ["node_modules", "dist", "*.test.ts", "*.config.ts"]
 }

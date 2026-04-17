@@ -4,6 +4,10 @@
 *.spec.ts
 *.tsbuildinfo
 
+# Test directories in dist
+dist/**/__tests__
+dist/**/__test__
+
 # Source files
 src/
 

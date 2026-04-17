@@ -1,16 +1,15 @@
 {
   "name": "@nexus-state/form-schema-zod",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Zod schema validator plugin for Nexus State forms",
   "type": "module",
-  "main": "dist/index.cjs",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     }
   },
   "sideEffects": false,

@@ -8,7 +8,6 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createStore } from '@nexus-state/core';
-import { atomRegistry } from '@nexus-state/core';
 import { useQuery, clearQueryCache } from '../../src/query';
 import { mutation } from '../../src/mutation';
 import { prefetchQuery } from '../prefetch';
@@ -16,7 +15,6 @@ import { getSuspenseCache, setSuspenseCache, SuspenseQueryCache } from '../../sr
 
 describe('README: Quick Start (SSR Prefetch)', () => {
   beforeEach(() => {
-    atomRegistry.clear();
     clearQueryCache();
     setSuspenseCache(new SuspenseQueryCache());
   });
@@ -35,7 +33,6 @@ describe('README: Quick Start (SSR Prefetch)', () => {
 
 describe('README: useQuery Pattern', () => {
   beforeEach(() => {
-    atomRegistry.clear();
     clearQueryCache();
     setSuspenseCache(new SuspenseQueryCache());
   });
@@ -63,7 +60,6 @@ describe('README: useQuery Pattern', () => {
 
 describe('README: useMutation with Optimistic Updates', () => {
   beforeEach(() => {
-    atomRegistry.clear();
     clearQueryCache();
     setSuspenseCache(new SuspenseQueryCache());
   });
@@ -115,7 +111,6 @@ describe('README: useMutation with Optimistic Updates', () => {
 
 describe('README: Cache Management', () => {
   beforeEach(() => {
-    atomRegistry.clear();
     clearQueryCache();
     setSuspenseCache(new SuspenseQueryCache());
   });
@@ -151,7 +146,6 @@ describe('README: Cache Management', () => {
 
 describe('README: Async vs Query Decision', () => {
   beforeEach(() => {
-    atomRegistry.clear();
     clearQueryCache();
     setSuspenseCache(new SuspenseQueryCache());
   });

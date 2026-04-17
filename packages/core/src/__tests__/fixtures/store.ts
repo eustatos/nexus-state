@@ -11,7 +11,7 @@
  * ```
  */
 
-import { atom, createStore, atomRegistry } from '../../index';
+import { atom, createStore } from '../../index';
 import type { Atom, Store, Getter } from '../../types';
 
 /**
@@ -301,17 +301,11 @@ export function createTestStore(
  * Create a store snapshot (all current values)
  */
 export function createSnapshot(store: Store): Record<string, any> {
-  const allAtoms = atomRegistry.getAll();
   const snapshot: Record<string, any> = {};
+  const state = store.getState();
 
-  for (const [id, atom] of allAtoms.entries()) {
-    const a = atom as any;
-    try {
-      const name = a.name || `atom-${id.toString()}`;
-      snapshot[name] = store.get(a as Atom<any>);
-    } catch {
-      // Skip atoms that throw
-    }
+  for (const [name, value] of Object.entries(state)) {
+    snapshot[name] = value;
   }
 
   return snapshot;
