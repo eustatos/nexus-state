@@ -1,5 +1,13 @@
 # @nexus-state/middleware
 
+## 1.0.4
+
+### Patch Changes
+
+- fix: Replace workspace:\* with real versions for npm publish
+- Updated dependencies
+  - @nexus-state/core@0.2.1
+
 ## 1.0.3
 
 ### Patch Changes

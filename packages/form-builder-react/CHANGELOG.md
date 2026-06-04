@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.1
+
+### Patch Changes
+
+- fix: Replace workspace:\* with real versions for npm publish
+- Updated dependencies
+  - @nexus-state/core@0.2.1
+  - @nexus-state/form@0.2.1
+  - @nexus-state/form-builder-core@0.2.1
+  - @nexus-state/form-schema-dsl@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes

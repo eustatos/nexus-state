@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+### Patch Changes
+
+- fix: Replace workspace:\* with real versions for npm publish
+
 ## 0.2.0
 
 ### Minor Changes

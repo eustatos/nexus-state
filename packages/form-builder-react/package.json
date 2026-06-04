@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/form-builder-react",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "React UI components for Nexus State Form Builder",
   "type": "module",
   "main": "dist/index.js",

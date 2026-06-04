@@ -1,5 +1,13 @@
 # @nexus-state/persist
 
+## 0.1.7
+
+### Patch Changes
+
+- fix: Replace workspace:\* with real versions for npm publish
+- Updated dependencies
+  - @nexus-state/core@0.2.1
+
 ## 0.1.6
 
 ### Patch Changes

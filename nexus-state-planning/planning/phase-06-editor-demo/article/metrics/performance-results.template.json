@@ -1,0 +1,55 @@
+{
+  "$schema": "./performance-results.schema.json",
+  "date": "2026-03-08T00:00:00.000Z",
+  "environment": {
+    "browser": "Chrome 122",
+    "browserVersion": "122.0.xxxx.x",
+    "os": "macOS Sonoma",
+    "cpu": "Apple M1",
+    "memory": "16GB"
+  },
+  "metrics": {
+    "snapshotCapture": {
+      "values": [],
+      "average": 0,
+      "min": 0,
+      "max": 0,
+      "unit": "ms"
+    },
+    "snapshotRestore": {
+      "values": [],
+      "average": 0,
+      "min": 0,
+      "max": 0,
+      "unit": "ms"
+    },
+    "memoryUsage": {
+      "usedJSHeapSize": 0,
+      "totalJSHeapSize": 0,
+      "unit": "MB"
+    },
+    "snapshotCount": 0,
+    "averageSnapshotSize": {
+      "value": 0,
+      "unit": "KB"
+    }
+  },
+  "targets": {
+    "snapshotCapture": {
+      "value": 50,
+      "unit": "ms",
+      "status": "pending"
+    },
+    "snapshotRestore": {
+      "value": 100,
+      "unit": "ms",
+      "status": "pending"
+    },
+    "memoryUsage": {
+      "value": 50,
+      "unit": "MB",
+      "status": "pending"
+    }
+  },
+  "notes": ""
+}

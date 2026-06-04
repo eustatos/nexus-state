@@ -1,5 +1,11 @@
 # @nexus-state/cli
 
+## 0.1.5
+
+### Patch Changes
+
+- fix: Replace workspace:\* with real versions for npm publish
+
 ## 0.1.3
 
 ### Patch Changes

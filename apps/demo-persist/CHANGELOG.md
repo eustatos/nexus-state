@@ -1,5 +1,14 @@
 # demo-persist
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @nexus-state/core@0.2.1
+  - @nexus-state/persist@0.1.7
+  - @nexus-state/react@0.2.1
+
 ## 0.0.2
 
 ### Patch Changes
