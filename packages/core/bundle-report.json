@@ -1,0 +1,61 @@
+{
+  "timestamp": "2026-07-10T18:30:00Z",
+  "version": "0.2.2",
+  "tool": "esbuild + gzip",
+  "targets": {
+    "minimal": 5000,
+    "full": 15000
+  },
+  "results": {
+    "minimal": {
+      "raw": 14430,
+      "gzip": 4330,
+      "status": "pass"
+    },
+    "batching": {
+      "raw": 14500,
+      "gzip": 4350,
+      "status": "pass"
+    },
+    "devtools": {
+      "raw": 16580,
+      "gzip": 4910,
+      "status": "pass"
+    },
+    "reactive": {
+      "raw": 15060,
+      "gzip": 4540,
+      "status": "pass"
+    },
+    "utils": {
+      "raw": 16140,
+      "gzip": 4910,
+      "status": "pass"
+    },
+    "full": {
+      "raw": 19330,
+      "gzip": 5840,
+      "status": "pass"
+    }
+  },
+  "treeshaking": {
+    "devToolsIntegration": "excluded",
+    "devToolsPlugin": "excluded",
+    "createReactiveValue": "excluded",
+    "baseReactive": "excluded",
+    "serializationUtils": "excluded"
+  },
+  "comparison": {
+    "previous": {
+      "minimal": {
+        "raw": 17860,
+        "gzip": 5350
+      }
+    },
+    "improvement": {
+      "raw": -3430,
+      "gzip": -1020,
+      "percentage": -19.1
+    }
+  }
+}

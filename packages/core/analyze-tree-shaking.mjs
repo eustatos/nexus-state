@@ -40,7 +40,7 @@ const scenarios = [
   },
   {
     name: 'with action-tracker',
-    entry: `export { atom, createStore, globalActionTracker } from '@nexus-state/core';`
+    entry: `export { atom, createStore, ActionTracker } from '@nexus-state/core';`
   },
   {
     name: 'full import',
