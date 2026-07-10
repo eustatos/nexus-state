@@ -233,11 +233,6 @@ export class ActionTracker {
 }
 
 /**
- * Global action tracker instance
- */
-export const globalActionTracker = new ActionTracker();
-
-/**
  * Helper function to create action metadata with stack trace
  * @param type - Action type
  * @param source - Action source

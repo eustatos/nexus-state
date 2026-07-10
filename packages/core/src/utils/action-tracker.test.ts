@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { 
-  ActionTracker, 
-  globalActionTracker, 
+import {
+  ActionTracker,
   createActionWithStackTrace,
   ActionMetadata,
   ActionTrackingOptions
@@ -287,28 +286,6 @@ describe("ActionTracker", () => {
       
       expect(() => tracker.trackAction(metadata)).not.toThrow();
     });
-  });
-});
-
-describe("globalActionTracker", () => {
-  it("should be a singleton instance", () => {
-    const tracker1 = globalActionTracker;
-    const tracker2 = new ActionTracker();
-
-    expect(tracker1).not.toBe(tracker2);
-    expect(tracker1).toBeInstanceOf(ActionTracker);
-  });
-
-  it("should track actions globally", () => {
-    const metadata: ActionMetadata = {
-      id: "global-test",
-      type: "SET",
-      timestamp: Date.now()
-    };
-
-    globalActionTracker.trackAction(metadata);
-
-    expect(globalActionTracker.getActionCount()).toBe(1);
   });
 });
 

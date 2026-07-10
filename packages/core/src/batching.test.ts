@@ -1,15 +1,17 @@
 /**
- * Tests for batching functionality (batcher and batch function)
+ * Tests for batching functionality (Batcher class and batch function)
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { batcher, batch, isBatching } from './batching';
+import { Batcher, batch, isBatching } from './batching';
 import { createStore } from './store';
 import { atom } from './atom';
 
 describe('Batcher', () => {
+  let batcher: Batcher;
+
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   describe('startBatch() / endBatch()', () => {
@@ -154,7 +156,7 @@ describe('Batcher', () => {
 
       batcher.flush();
 
-      expect(batcher['isFlushing']).toBe(false);
+      expect((batcher as any)['isFlushing']).toBe(false);
     });
 
     it('should flush new callbacks added during flush', () => {
@@ -289,20 +291,16 @@ describe('Batcher', () => {
       batcher.flush();
 
       // isFlushing should already be false after flush
-      expect(batcher['isFlushing']).toBe(false);
+      expect((batcher as any)['isFlushing']).toBe(false);
 
       batcher.reset();
 
-      expect(batcher['isFlushing']).toBe(false);
+      expect((batcher as any)['isFlushing']).toBe(false);
     });
   });
 });
 
 describe('batch()', () => {
-  beforeEach(() => {
-    batcher.reset();
-  });
-
   it('should execute function and return result', () => {
     const result = batch(() => 42);
     expect(result).toBe(42);
@@ -341,7 +339,7 @@ describe('batch()', () => {
   });
 
   it('should batch multiple state updates', () => {
-    const store = createStore();
+    const store = createStore({ batching: true });
     const atom1 = atom(0);
     const atom2 = atom(0);
     const atom3 = atom(0);
@@ -379,10 +377,6 @@ describe('batch()', () => {
 });
 
 describe('isBatching()', () => {
-  beforeEach(() => {
-    batcher.reset();
-  });
-
   it('should return false when not in batch', () => {
     expect(isBatching()).toBe(false);
   });
