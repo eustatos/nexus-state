@@ -2,13 +2,15 @@
  * StoreImpl - Store implementation (Facade pattern)
  *
  * This class is a facade that coordinates all store components:
- * - ScopedRegistry: Unified per-store atom registry (atoms + state + metadata)
- * - DependencyTracker: Dependency management
- * - NotificationManager: Subscription management
- * - PluginSystem: Plugin management
- * - ComputedEvaluator: Atom evaluation
- * - DevToolsIntegration: DevTools support
- * - BatchProcessor: Batch processing
+ * - ScopedRegistry: Unified per-store atom registry (atoms + state + metadata) — always created
+ * - DependencyTracker: Dependency management — always created
+ * - NotificationManager: Subscription management — always created
+ * - ComputedEvaluator: Atom evaluation — always created
+ * - PluginSystem: Plugin management — only created when plugins are used
+ * - BatchProcessor: Batch processing — only created when explicitly enabled
+ *
+ * DevTools is no longer built-in. Use the `devtools()` plugin from
+ * `@nexus-state/core/devtools` instead.
  */
 
 import type {
@@ -25,44 +27,49 @@ import type { AtomContext } from '../reactive';
 import { isWritableAtom } from '../types';
 import { storeLogger as logger } from '../debug';
 
-import { AtomStateManager } from './AtomStateManager';
+import { Batcher } from '../batching';
 import { DependencyTracker } from './DependencyTracker';
 import { NotificationManager } from './NotificationManager';
 import { PluginSystem } from './PluginSystem';
 import { ComputedEvaluator } from './ComputedEvaluator';
-import { DevToolsIntegration } from './DevToolsIntegration';
 import { BatchProcessor } from './BatchProcessor';
 import { ScopedRegistry } from './ScopedRegistry';
-import type { AtomEntry, AtomState } from './types';
+import type { AtomEntry, AtomState, StoreOptions } from './types';
 
 /**
  * StoreImpl provides the store implementation
  */
 export class StoreImpl implements Store {
+  // Required — always created
   private registry: ScopedRegistry;
-  private stateManager: AtomStateManager;
+  private evaluator: ComputedEvaluator;
   private dependencyTracker: DependencyTracker;
   private notificationManager: NotificationManager;
-  private pluginSystem: PluginSystem;
-  private evaluator: ComputedEvaluator;
-  private devTools: DevToolsIntegration;
-  private batchProcessor: BatchProcessor;
+
+  // Optional — null until needed
+  private _pluginSystem: PluginSystem | null = null;
+  private _batchProcessor: BatchProcessor | null = null;
+
   private storeRegistry: StoreRegistry;
+  private _currentAtom: Atom<any> | null = null;
 
-  constructor(plugins: Plugin[] = []) {
-    // Initialize unified registry
+  constructor(options?: StoreOptions | Plugin[]) {
+    // Normalize legacy Plugin[] to StoreOptions
+    let storeOptions: StoreOptions = {};
+    if (Array.isArray(options)) {
+      storeOptions = { plugins: options };
+    } else if (options) {
+      storeOptions = options;
+    }
+
+    // Required subsystems — always created
     this.registry = new ScopedRegistry(this as unknown as Store);
-
-    // Initialize state manager (pure state storage, no registration)
-    this.stateManager = new AtomStateManager();
-
-    // Initialize other components
-    this.dependencyTracker = new DependencyTracker();
-    this.notificationManager = new NotificationManager();
-    this.pluginSystem = new PluginSystem();
     this.evaluator = new ComputedEvaluator();
-    this.devTools = new DevToolsIntegration();
-    this.batchProcessor = new BatchProcessor();
+    this.dependencyTracker = new DependencyTracker();
+
+    // Create shared Batcher if batching is enabled
+    const sharedBatcher = storeOptions.batching ? new Batcher() : null;
+    this.notificationManager = new NotificationManager(sharedBatcher);
 
     // Create StoreRegistry adapter for backward compatibility
     this.storeRegistry = {
@@ -75,12 +82,33 @@ export class StoreImpl implements Store {
       },
     };
 
-    // Apply plugins
-    plugins.forEach((plugin) => {
-      this.pluginSystem.applyPlugin(plugin, this as unknown as Store);
-    });
+    // PluginSystem — only if plugins provided
+    if (storeOptions.plugins?.length) {
+      this._pluginSystem = new PluginSystem();
+      storeOptions.plugins.forEach((plugin) => {
+        this._pluginSystem!.applyPlugin(plugin, this as unknown as Store);
+      });
+    }
 
-    logger.log('[StoreImpl] Created with', plugins.length, 'plugins');
+    // BatchProcessor — only if explicitly enabled
+    if (storeOptions.batching) {
+      this._batchProcessor = new BatchProcessor(sharedBatcher);
+    }
+
+    if (storeOptions.devtools) {
+      logger.log(
+        '[StoreImpl] options.devtools is deprecated. Use devtools() plugin instead:',
+        'import { devtools } from "@nexus-state/core/devtools"; createStore({ plugins: [devtools()] })'
+      );
+    }
+
+    const pluginCount = storeOptions.plugins?.length ?? 0;
+    logger.log(
+      '[StoreImpl] Created with',
+      pluginCount,
+      'plugins,',
+      storeOptions.batching ? 'batching' : 'no batching'
+    );
   }
 
   /**
@@ -111,8 +139,8 @@ export class StoreImpl implements Store {
    */
   private createGetter(): Getter {
     return <Value>(atom: Atom<Value>): Value => {
-      const previousAtom = this.stateManager.getCurrentAtom();
-      this.stateManager.setCurrentAtom(atom);
+      const previousAtom = this._currentAtom;
+      this._currentAtom = atom;
 
       try {
         const entry = this.getOrCreateEntry(atom, this.createGetter());
@@ -123,10 +151,12 @@ export class StoreImpl implements Store {
         }
 
         // Apply onGet hooks
-        const value = this.pluginSystem.executeOnGetHooks(atom, entry.state.value);
-        return value;
+        if (!this._pluginSystem) {
+          return entry.state.value;
+        }
+        return this._pluginSystem.executeOnGetHooks(atom, entry.state.value);
       } finally {
-        this.stateManager.setCurrentAtom(previousAtom);
+        this._currentAtom = previousAtom;
       }
     };
   }
@@ -141,8 +171,8 @@ export class StoreImpl implements Store {
       context?: AtomContext
     ): void => {
       // Track current atom for dependency tracking during registration
-      const prevAtom = this.stateManager.getCurrentAtom();
-      this.stateManager.setCurrentAtom(atom);
+      const prevAtom = this._currentAtom;
+      this._currentAtom = atom;
 
       try {
         const entry = this.getOrCreateEntry(atom, get);
@@ -175,18 +205,13 @@ export class StoreImpl implements Store {
           : update;
 
       // Apply onSet hooks with context (even in silent mode)
-      const processedValue = this.pluginSystem.executeOnSetHooks(
-        atom,
-        newValue,
-        context
-      );
+      const processedValue = this._pluginSystem
+        ? this._pluginSystem.executeOnSetHooks(atom, newValue, context)
+        : newValue;
 
       // Update value
       const previousValue = entry.state.value;
       entry.state.value = processedValue;
-
-      // Also update state manager for compatibility
-      this.stateManager.setValue(atom, processedValue);
 
       logger.log(
         '[StoreImpl] Updated atom:',
@@ -223,24 +248,11 @@ export class StoreImpl implements Store {
       );
 
       // Execute afterSet hooks with context (only in normal mode)
-      if (!context?.silent) {
-        this.pluginSystem.executeAfterSetHooks(atom, processedValue, context);
-      }
-
-      // Track for DevTools (only in normal mode)
-      if (!context?.silent) {
-        if (context?.source) {
-          this.devTools.trackStateChange(atom, {
-            value: processedValue,
-            source: context.source,
-            timestamp: Date.now(),
-          });
-        } else {
-          this.devTools.trackStateChange(atom, processedValue);
-        }
+      if (!context?.silent && this._pluginSystem) {
+        this._pluginSystem.executeAfterSetHooks(atom, processedValue, context);
       }
       } finally {
-        this.stateManager.setCurrentAtom(prevAtom);
+        this._currentAtom = prevAtom;
       }
     };
   }
@@ -304,14 +316,14 @@ export class StoreImpl implements Store {
       atom.name || 'unnamed'
     );
 
-    const prevAtom = this.stateManager.getCurrentAtom();
-    this.stateManager.setCurrentAtom(atom);
+    const prevAtom = this._currentAtom;
+    this._currentAtom = atom;
 
     try {
       const entry = this.getOrCreateEntry(atom, this.createGetter());
       return this.notificationManager.subscribe(atom, entry.state, subscriber);
     } finally {
-      this.stateManager.setCurrentAtom(prevAtom);
+      this._currentAtom = prevAtom;
     }
   }
 
@@ -323,66 +335,58 @@ export class StoreImpl implements Store {
   }
 
   /**
-   * Apply plugin
+   * Apply plugin — creates PluginSystem on demand if not yet initialized
    */
   applyPlugin(plugin: Plugin): void {
-    this.pluginSystem.applyPlugin(plugin, this as unknown as Store);
+    if (!this._pluginSystem) {
+      this._pluginSystem = new PluginSystem();
+    }
+    this._pluginSystem.applyPlugin(plugin, this as unknown as Store);
   }
 
   /**
-   * Set value with metadata
+   * Set value with metadata — delegates to set() (DevTools tracking moved to plugin)
    */
   setWithMetadata<Value>(
     atom: Atom<Value>,
     update: Value | ((prev: Value) => Value),
-    metadata?: ActionMetadata
+    _metadata?: ActionMetadata
   ): void {
-    this.devTools.setWithMetadata(
-      atom,
-      update,
-      metadata,
-      this.createSetter(this.createGetter())
-    );
+    this.set(atom, update);
   }
 
   /**
-   * Serialize state
+   * Serialize state — uses registry directly (DevTools no longer built-in)
    */
   serializeState(): Record<string, unknown> {
-    return this.devTools.serializeState(this as unknown as Store);
+    return this.registry.getStateAsRecord();
   }
 
   /**
-   * Get intercepted getter
+   * Get intercepted getter — returns plain get() (DevTools no longer built-in)
    */
   getIntercepted<Value>(atom: Atom<Value>): Value {
-    return this.devTools.createInterceptedGetter(this.createGetter())(atom);
+    return this.get(atom);
   }
 
   /**
-   * Get intercepted setter
+   * Get intercepted setter — returns plain set() (DevTools no longer built-in)
    */
   setIntercepted<Value>(
     atom: Atom<Value>,
     update: Value | ((prev: Value) => Value)
   ): void {
-    this.devTools.createInterceptedSetter(
-      this.createSetter(this.createGetter())
-    )(atom, update);
+    this.set(atom, update);
   }
 
   /**
    * Get applied plugins
    */
   getPlugins(): Plugin[] {
-    return this.pluginSystem.getPlugins();
-  }
-
-  /**
-   * Get state manager
-   */
-  getStateManager(): AtomStateManager {
-    return this.stateManager;
+    if (!this._pluginSystem) {
+      return [];
+    }
+    return this._pluginSystem.getPlugins();
   }
 
   /**
@@ -400,10 +404,13 @@ export class StoreImpl implements Store {
   }
 
   /**
-   * Get plugin system
+   * Get plugin system — creates on demand if not yet initialized
    */
   getPluginSystem(): PluginSystem {
-    return this.pluginSystem;
+    if (!this._pluginSystem) {
+      this._pluginSystem = new PluginSystem();
+    }
+    return this._pluginSystem;
   }
 
   /**
@@ -414,17 +421,27 @@ export class StoreImpl implements Store {
   }
 
   /**
-   * Get DevTools integration
+   * @deprecated DevTools is no longer built-in. Use the `devtools()` plugin from
+   * `@nexus-state/core/devtools` instead.
+   *
+   * Get DevTools integration — always returns null.
    */
-  getDevTools(): DevToolsIntegration {
-    return this.devTools;
+  getDevTools(): null {
+    logger.log(
+      '[StoreImpl] getDevTools() is deprecated. Use devtools() plugin instead:',
+      'import { devtools } from "@nexus-state/core/devtools"; store.applyPlugin(devtools())'
+    );
+    return null;
   }
 
   /**
-   * Get batch processor
+   * Get batch processor — creates on demand if not yet initialized
    */
   getBatchProcessor(): BatchProcessor {
-    return this.batchProcessor;
+    if (!this._batchProcessor) {
+      this._batchProcessor = new BatchProcessor();
+    }
+    return this._batchProcessor;
   }
 
   /**
