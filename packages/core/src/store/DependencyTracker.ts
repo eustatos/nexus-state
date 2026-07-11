@@ -7,7 +7,7 @@
 import type { Atom, ComputedAtom, WritableAtom } from '../types';
 import { isComputedAtom, isWritableAtom } from '../types';
 import { storeLogger as logger } from '../debug';
-import type { AtomState } from './AtomStateManager';
+import type { AtomState } from './types';
 
 export type AtomStateGetter = <Value>(atom: Atom<Value>) => AtomState<Value> | undefined;
 export type ValueGetter = <Value>(atom: Atom<Value>) => Value | undefined;

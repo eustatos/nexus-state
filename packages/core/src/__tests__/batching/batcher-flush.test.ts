@@ -4,11 +4,12 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { batcher } from '../../batching';
+import { Batcher } from '../../batching';
 
 describe('batcher.flush', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should not flush when no callbacks queued', () => {
@@ -62,8 +63,9 @@ describe('batcher.flush', () => {
 });
 
 describe('flush execution order', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should execute callbacks in FIFO order', () => {
@@ -96,8 +98,9 @@ describe('flush execution order', () => {
 });
 
 describe('flush with new callbacks during flush', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should flush callbacks added during flush', () => {

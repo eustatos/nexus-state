@@ -48,6 +48,75 @@ describe('createStore', () => {
     });
   });
 
+  describe('StoreOptions API', () => {
+    it('should create store with new StoreOptions API', () => {
+      const plugin = vi.fn();
+      const store = createStore({ plugins: [plugin] });
+
+      expect(plugin).toHaveBeenCalledTimes(1);
+      expect(store).toBeDefined();
+    });
+
+    it('should create store with plugins array (legacy)', () => {
+      const plugin = vi.fn();
+      const store = createStore([plugin]);
+
+      expect(plugin).toHaveBeenCalledTimes(1);
+    });
+
+    it('should create store with devtools enabled', () => {
+      const store = createStore({ devtools: true });
+      expect(store).toBeDefined();
+
+      const countAtom = atom(0);
+      store.set(countAtom, 5);
+      expect(store.get(countAtom)).toBe(5);
+    });
+
+    it('should create store with devtools and config', () => {
+      const store = createStore({
+        devtools: true,
+        devtoolsConfig: { enableStackTrace: true, debounceDelay: 200 },
+      });
+
+      expect(store).toBeDefined();
+    });
+
+    it('should create store with batching enabled', () => {
+      const store = createStore({ batching: true });
+      expect(store).toBeDefined();
+    });
+
+    it('should create store with all options combined', () => {
+      const plugin = vi.fn();
+      const store = createStore({
+        plugins: [plugin],
+        devtools: true,
+        devtoolsConfig: { enableStackTrace: true },
+        batching: true,
+      });
+
+      expect(plugin).toHaveBeenCalledTimes(1);
+      expect(store).toBeDefined();
+    });
+
+    it('should create minimal store with no options', () => {
+      const store = createStore();
+
+      const countAtom = atom(0);
+      store.set(countAtom, 5);
+      expect(store.get(countAtom)).toBe(5);
+    });
+
+    it('should create store with empty options object', () => {
+      const store = createStore({});
+
+      const countAtom = atom(0);
+      store.set(countAtom, 10);
+      expect(store.get(countAtom)).toBe(10);
+    });
+  });
+
   describe('Store functionality', () => {
     it('should get and set primitive atom values', () => {
       const store = createStore();
@@ -306,6 +375,45 @@ describe('createEnhancedStore', () => {
 
     expect(basicStore.get(countAtom)).toBe(5);
     expect(enhancedStore.get(countAtom)).toBe(10);
+  });
+
+  it('should enable devtools by default', () => {
+    const store = createEnhancedStore();
+
+    const testAtom = atom(0, 'test');
+    store.set(testAtom, 5, { source: 'test' });
+
+    // DevTools is no longer built-in, getDevTools() returns null
+    const devTools = (store as any).getDevTools();
+    expect(devTools).toBeNull();
+  });
+
+  it('should accept plugins array', () => {
+    const plugin = vi.fn();
+    const store = createEnhancedStore([plugin]);
+
+    expect(plugin).toHaveBeenCalledTimes(1);
+  });
+
+  it('should accept StoreOptions', () => {
+    const plugin = vi.fn();
+    const store = createEnhancedStore({
+      plugins: [plugin],
+      devtools: true,
+    });
+
+    expect(plugin).toHaveBeenCalledTimes(1);
+  });
+
+  it('should allow disabling devtools', () => {
+    const store = createEnhancedStore({ devtools: false });
+
+    const testAtom = atom(0, 'test');
+    store.set(testAtom, 5, { source: 'test' });
+
+    // DevTools is no longer built-in
+    const devTools = (store as any).getDevTools();
+    expect(devTools).toBeNull();
   });
 });
 

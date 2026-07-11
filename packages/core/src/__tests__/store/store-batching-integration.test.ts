@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createStore, atom, batch, isBatching } from '../../index';
-import { batcher } from '../../batching';
+import { createStore, atom } from '../../index';
+import { batch, isBatching } from '../../batching';
 import type { Getter } from '../../types';
 
 describe('store with batch', () => {
@@ -13,7 +13,6 @@ describe('store with batch', () => {
 
   beforeEach(() => {
     store = createStore();
-    batcher.reset();
   });
 
   describe('Batch Multiple Sets', () => {
@@ -173,7 +172,7 @@ describe('store with batch', () => {
       }).toThrow('Test error');
 
       // Batch should be ended
-      expect(batcher.getDepth()).toBe(0);
+      expect(isBatching()).toBe(false);
     });
 
     it('should flush callbacks even after error in batch', () => {
@@ -233,7 +232,6 @@ describe('isBatching with store', () => {
 
   beforeEach(() => {
     store = createStore();
-    batcher.reset();
   });
 
   it('should return false outside batch', () => {

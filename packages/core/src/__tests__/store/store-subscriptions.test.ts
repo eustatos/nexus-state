@@ -4,7 +4,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createStore, atom, batch } from '../../index';
+import { createStore, atom } from '../../index';
+import { batch } from '../../batching';
 import type { Getter } from '../../types';
 
 describe('store.subscribe', () => {

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { atom, createStore, batch } from './src/index';
+import { atom, createStore } from './src/index';
+import { batch } from './src/batching';
 
 describe('Set Performance Analysis', () => {
   function measureTime(fn: () => void, iterations: number = 1): { total: number; perOp: number } {

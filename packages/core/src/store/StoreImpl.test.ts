@@ -3,13 +3,15 @@
  * Tests for the main store implementation (Facade pattern)
  *
  * StoreImpl coordinates all store components:
- * - AtomStateManager: State storage
+ * - ScopedRegistry: Unified per-store atom registry (atoms + state + metadata)
  * - DependencyTracker: Dependency management
  * - NotificationManager: Subscription management
  * - PluginSystem: Plugin management
  * - ComputedEvaluator: Atom evaluation
- * - DevToolsIntegration: DevTools support
  * - BatchProcessor: Batch processing
+ *
+ * DevTools is no longer built-in. Use the `devtools()` plugin from
+ * `@nexus-state/core/devtools` instead.
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -68,6 +70,201 @@ describe('StoreImpl', () => {
       new StoreImpl([plugin1, plugin2, plugin3]);
 
       expect(executionOrder).toEqual(['plugin1', 'plugin2', 'plugin3']);
+    });
+
+    it('should accept StoreOptions object', () => {
+      const plugin = vi.fn();
+      const store = new StoreImpl({ plugins: [plugin] });
+
+      expect(plugin).toHaveBeenCalledTimes(1);
+      expect(store).toBeDefined();
+    });
+
+    it('should create store with only devtools enabled (deprecated)', () => {
+      const store = new StoreImpl({ devtools: true });
+      expect(store).toBeDefined();
+
+      // DevTools is no longer built-in, getDevTools() returns null
+      const devTools = store.getDevTools();
+      expect(devTools).toBeNull();
+    });
+
+    it('should create store with devtools config (deprecated, ignored)', () => {
+      const store = new StoreImpl({
+        devtools: true,
+        devtoolsConfig: { enableStackTrace: true, debounceDelay: 200 },
+      });
+
+      // DevTools is no longer built-in, config is ignored
+      const devTools = store.getDevTools();
+      expect(devTools).toBeNull();
+    });
+
+    it('should create minimal store without optional subsystems', () => {
+      const store = new StoreImpl();
+
+      // Store should work normally
+      const testAtom = atom(0);
+      store.set(testAtom, 5);
+      expect(store.get(testAtom)).toBe(5);
+    });
+
+    it('should create minimal store with explicit empty options', () => {
+      const store = new StoreImpl({});
+
+      const testAtom = atom(0);
+      store.set(testAtom, 10);
+      expect(store.get(testAtom)).toBe(10);
+    });
+
+    it('should create store with batching enabled', () => {
+      const store = new StoreImpl({ batching: true });
+      expect(store).toBeDefined();
+
+      const batchProcessor = store.getBatchProcessor();
+      expect(batchProcessor).toBeDefined();
+    });
+
+    it('should create store with all options', () => {
+      const plugin = vi.fn();
+      const store = new StoreImpl({
+        plugins: [plugin],
+        devtools: true,
+        devtoolsConfig: { enableStackTrace: true },
+        batching: true,
+      });
+
+      expect(plugin).toHaveBeenCalledTimes(1);
+      // DevTools is no longer built-in
+      expect(store.getDevTools()).toBeNull();
+      expect(store.getBatchProcessor()).toBeDefined();
+    });
+
+    it('should backward compat: legacy Plugin[] array still works', () => {
+      const plugin1 = vi.fn();
+      const plugin2 = vi.fn();
+      const store = new StoreImpl([plugin1, plugin2]);
+
+      expect(plugin1).toHaveBeenCalledTimes(1);
+      expect(plugin2).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Lazy Initialization', () => {
+    it('should not create PluginSystem when no plugins provided', () => {
+      const store = new StoreImpl();
+      const testAtom = atom(0);
+
+      // Operations should work without PluginSystem
+      store.set(testAtom, 5);
+      expect(store.get(testAtom)).toBe(5);
+    });
+
+    it('should not create DevTools when not enabled (deprecated)', () => {
+      const store = new StoreImpl();
+      const testAtom = atom(0, 'test');
+
+      // setWithMetadata should fall back to set()
+      store.setWithMetadata(testAtom, 5, { type: 'SET', timestamp: Date.now() });
+      expect(store.get(testAtom)).toBe(5);
+    });
+
+    it('should not create BatchProcessor when not enabled', () => {
+      const store = new StoreImpl();
+      const testAtom = atom(0);
+
+      // Store should work normally without BatchProcessor
+      store.set(testAtom, 5);
+      expect(store.get(testAtom)).toBe(5);
+    });
+
+    it('getPluginSystem() should create PluginSystem on demand', () => {
+      const store = new StoreImpl();
+      const ps = store.getPluginSystem();
+
+      expect(ps).toBeDefined();
+      expect(ps.getPlugins()).toEqual([]);
+    });
+
+    it('getDevTools() should return null (deprecated)', () => {
+      const store = new StoreImpl();
+      const dt = store.getDevTools();
+
+      expect(dt).toBeNull();
+    });
+
+    it('getBatchProcessor() should create BatchProcessor on demand', () => {
+      const store = new StoreImpl();
+      const bp = store.getBatchProcessor();
+
+      expect(bp).toBeDefined();
+    });
+
+    it('applyPlugin() should create PluginSystem on demand', () => {
+      const store = new StoreImpl();
+      const plugin = vi.fn();
+
+      store.applyPlugin(plugin);
+
+      expect(plugin).toHaveBeenCalledTimes(1);
+    });
+
+    it('getPlugins() should return empty array when no plugins', () => {
+      const store = new StoreImpl();
+      expect(store.getPlugins()).toEqual([]);
+    });
+
+    it('serializeState() should fall back to registry when no DevTools', () => {
+      const store = new StoreImpl();
+      const testAtom = atom(42, 'test');
+
+      store.get(testAtom);
+      const state = store.serializeState();
+
+      expect(state).toBeDefined();
+      expect(typeof state).toBe('object');
+    });
+
+    it('getIntercepted() should fall back to get() when no DevTools', () => {
+      const store = new StoreImpl();
+      const testAtom = atom(42);
+
+      store.get(testAtom);
+      const value = store.getIntercepted(testAtom);
+
+      expect(value).toBe(42);
+    });
+
+    it('setIntercepted() should fall back to set() when no DevTools', () => {
+      const store = new StoreImpl();
+      const testAtom = atom(0);
+
+      store.setIntercepted(testAtom, 5);
+
+      expect(store.get(testAtom)).toBe(5);
+    });
+
+    it('should execute plugin hooks when plugins are provided', () => {
+      const onSetSpy = vi.fn((atom, value) => value * 2);
+      const plugin: Plugin = () => ({ onSet: onSetSpy });
+
+      const store = new StoreImpl({ plugins: [plugin] });
+      const testAtom = atom(5);
+
+      store.set(testAtom, 10);
+
+      expect(onSetSpy).toHaveBeenCalled();
+      expect(store.get(testAtom)).toBe(20);
+    });
+
+    it('should not track state changes via built-in devtools (deprecated)', () => {
+      const store = new StoreImpl({ devtools: true });
+      const testAtom = atom(0, 'test');
+
+      store.set(testAtom, 5, { source: 'test' });
+
+      // DevTools is no longer built-in, getDevTools() returns null
+      expect(store.getDevTools()).toBeNull();
     });
   });
 

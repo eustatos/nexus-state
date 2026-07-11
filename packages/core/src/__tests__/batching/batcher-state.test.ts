@@ -4,11 +4,12 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { batcher } from '../../batching';
+import { Batcher } from '../../batching';
 
 describe('batcher.startBatch / endBatch', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should increase batch depth on startBatch', () => {
@@ -53,8 +54,9 @@ describe('batcher.startBatch / endBatch', () => {
 });
 
 describe('batcher.schedule', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should execute callback immediately when not batching', () => {
@@ -98,8 +100,9 @@ describe('batcher.schedule', () => {
 });
 
 describe('batcher.getPendingCount', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should return 0 when no pending callbacks', () => {

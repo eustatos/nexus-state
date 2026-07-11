@@ -60,13 +60,13 @@ describe('SR-006: Silent set() support', () => {
     expect(afterSetHook).not.toHaveBeenCalled();
   });
 
-  it('should NOT trigger DevTools tracking during silent set', () => {
+  it('should NOT trigger DevTools tracking during silent set (DevTools removed)', () => {
+    // DevTools is no longer built-in, getDevTools() returns null
     const devTools = store.getDevTools();
-    const trackSpy = vi.spyOn(devTools, 'trackStateChange');
+    expect(devTools).toBeNull();
 
     store.setSilently!(testAtom, 777);
-
-    expect(trackSpy).not.toHaveBeenCalled();
+    // No DevTools tracking happens
   });
 
   it('should work with writable atoms', () => {
@@ -199,7 +199,7 @@ describe('SR-006: Silent set() support', () => {
 
   it('should preserve context when merging in writable atoms', () => {
     const baseAtom = atom(0, 'base');
-    let capturedContext: any = null;
+    const capturedContext: any = null;
 
     const writableAtom = atom(
       (get) => get(baseAtom),

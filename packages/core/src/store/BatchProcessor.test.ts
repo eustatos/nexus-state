@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { BatchProcessor } from './BatchProcessor';
-import { batcher } from '../batching';
 
 describe('BatchProcessor', () => {
   let processor: BatchProcessor;
@@ -12,8 +11,8 @@ describe('BatchProcessor', () => {
 
   afterEach(() => {
     // Clean up any pending batches
-    if (batcher.getIsBatching()) {
-      batcher.flush();
+    if (processor.isBatching()) {
+      processor.flush();
     }
   });
 
@@ -183,7 +182,7 @@ describe('BatchProcessor', () => {
     it('should return stats after batch operations', () => {
       processor.batch(() => {});
       processor.schedule(() => {});
-      batcher.flush();
+      processor.flush();
       
       const stats = processor.getStats();
       expect(stats.totalBatches).toBeGreaterThanOrEqual(1);
@@ -204,7 +203,7 @@ describe('BatchProcessor', () => {
     it('should reset all statistics', () => {
       processor.batch(() => {});
       processor.schedule(() => {});
-      batcher.flush();
+      processor.flush();
       
       processor.resetStats();
       

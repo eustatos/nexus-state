@@ -2,9 +2,10 @@
  * BatchProcessor - Manages batched operations
  *
  * Provides batch processing for notifications and updates.
+ * Uses its own Batcher instance — no global singleton dependency.
  */
 
-import { batcher } from '../batching';
+import { Batcher } from '../batching';
 import { storeLogger as logger } from '../debug';
 
 export type BatchTask = () => void;
@@ -22,15 +23,20 @@ export interface BatchStats {
  * BatchProcessor provides batch operation management
  */
 export class BatchProcessor {
+  private batcher: Batcher;
   private batchCount: number = 0;
   private taskCount: number = 0;
+
+  constructor(batcherInstance?: Batcher | null) {
+    this.batcher = batcherInstance ?? new Batcher();
+  }
 
   /**
    * Schedule a task for batched execution
    * @param task Task to schedule
    */
   schedule(task: BatchTask): void {
-    batcher.schedule(() => {
+    this.batcher.schedule(() => {
       this.taskCount++;
       task();
     });
@@ -41,7 +47,7 @@ export class BatchProcessor {
    */
   flush(): void {
     logger.log('[BatchProcessor] Flushing batches');
-    batcher.flush();
+    this.batcher.flush();
     this.batchCount++;
   }
 
@@ -51,13 +57,13 @@ export class BatchProcessor {
    */
   batch<T>(fn: () => T): T {
     logger.log('[BatchProcessor] Starting batch');
-    
+
     try {
-      batcher.startBatch();
+      this.batcher.startBatch();
       const result = fn();
       return result;
     } finally {
-      batcher.endBatch();
+      this.batcher.endBatch();
       this.batchCount++;
       logger.log('[BatchProcessor] Ended batch');
     }
@@ -68,7 +74,7 @@ export class BatchProcessor {
    * @returns True if batching
    */
   isBatching(): boolean {
-    return batcher.getIsBatching();
+    return this.batcher.getIsBatching();
   }
 
   /**

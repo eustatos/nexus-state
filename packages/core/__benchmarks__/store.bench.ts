@@ -5,7 +5,8 @@
  */
 
 import { describe, bench, expect } from 'vitest';
-import { atom, createStore, batch } from '../src/index';
+import { atom, createStore } from '../src/index';
+import { batch } from '../src/batching';
 
 describe('Store Performance', () => {
   bench('create 1000 primitive atoms', () => {

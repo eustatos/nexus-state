@@ -146,10 +146,10 @@ describe('DevToolsPlugin', () => {
   });
 
   describe('Tree-shaking compatibility', () => {
-    it('should be importable from debug entry point', async () => {
-      const debugModule = await import('../../debug');
-      expect(typeof debugModule.devtools).toBe('function');
-      expect(typeof debugModule.DevToolsPlugin).toBe('function');
+    it('should be importable from devtools entry point', async () => {
+      const devtoolsModule = await import('../../devtools');
+      expect(typeof devtoolsModule.devtools).toBe('function');
+      expect(typeof devtoolsModule.DevToolsPlugin).toBe('function');
     });
 
     it('devtools() should work with createStore', () => {

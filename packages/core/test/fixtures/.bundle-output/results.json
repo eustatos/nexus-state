@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Minimal core",
+    "description": "import { atom, createStore } from main entry",
+    "fixture": "bundle-minimal.ts",
+    "rawSize": 18304,
+    "gzipSize": 5490,
+    "rawKB": "17.88",
+    "gzipKB": "5.36",
+    "rawBytes": 18304,
+    "gzipBytes": 5490
+  },
+  {
+    "name": "+ batching",
+    "description": "+ import { batch } from @nexus-state/core/batching",
+    "fixture": "bundle-batching.ts",
+    "rawSize": 18382,
+    "gzipSize": 5513,
+    "rawKB": "17.95",
+    "gzipKB": "5.38",
+    "rawBytes": 18382,
+    "gzipBytes": 5513
+  },
+  {
+    "name": "+ devtools",
+    "description": "+ import { devtools } from @nexus-state/core/devtools",
+    "fixture": "bundle-devtools.ts",
+    "rawSize": 20504,
+    "gzipSize": 6042,
+    "rawKB": "20.02",
+    "gzipKB": "5.90",
+    "rawBytes": 20504,
+    "gzipBytes": 6042
+  },
+  {
+    "name": "+ reactive",
+    "description": "+ import { createReactiveValue } from @nexus-state/core/reactive",
+    "fixture": "bundle-reactive.ts",
+    "rawSize": 18976,
+    "gzipSize": 5711,
+    "rawKB": "18.53",
+    "gzipKB": "5.58",
+    "rawBytes": 18976,
+    "gzipBytes": 5711
+  },
+  {
+    "name": "+ utils",
+    "description": "+ import { serializeState } from @nexus-state/core/utils",
+    "fixture": "bundle-utils.ts",
+    "rawSize": 18324,
+    "gzipSize": 5497,
+    "rawKB": "17.89",
+    "gzipKB": "5.37",
+    "rawBytes": 18324,
+    "gzipBytes": 5497
+  },
+  {
+    "name": "Full backward-compat",
+    "description": "All exports from main + all subpaths",
+    "fixture": "bundle-full.ts",
+    "rawSize": 21702,
+    "gzipSize": 6400,
+    "rawKB": "21.19",
+    "gzipKB": "6.25",
+    "rawBytes": 21702,
+    "gzipBytes": 6400
+  }
+]
