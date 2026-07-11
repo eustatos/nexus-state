@@ -1,3 +1,17 @@
+> **⚠️ DEPRECATED**: This package is deprecated and will be removed in v1.1.0.
+> 
+> **Migration**: Use `@nexus-state/extras/family` instead.
+> 
+> ```typescript
+> // Old (deprecated)
+> import { ... } from '@nexus-state/family';
+> 
+> // New (recommended)
+> import { ... } from '@nexus-state/extras/family';
+> ```
+> 
+> See [Migration Guide](../../MIGRATION.md#package-consolidation-v110) for details.
+
 # @nexus-state/family
 
 > Utilities for working with state "families" in Nexus State — dynamic atom collections

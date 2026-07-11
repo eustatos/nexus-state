@@ -1,23 +1,16 @@
 {
   "name": "@nexus-state/middleware",
-  "version": "1.0.4",
-  "description": "Middleware plugin for Nexus State with plugin hooks support",
+  "version": "0.2.1",
+  "description": "DEPRECATED: Use @nexus-state/extras/middleware instead",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "README.md",
-    "CHANGELOG.md",
-    "MIGRATION.md",
-    "LICENSE"
-  ],
+  "files": ["dist", "README.md", "CHANGELOG.md", "LICENSE"],
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
@@ -26,7 +19,7 @@
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {
-    "@nexus-state/core": "workspace:*"
+    "@nexus-state/extras": "workspace:*"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^3.0.7",
@@ -34,23 +27,5 @@
     "vitest": "^3.0.7",
     "eslint": "^8.40.0"
   },
-  "keywords": [
-    "nexus-state",
-    "middleware",
-    "plugin",
-    "hooks",
-    "state-management",
-    "reactive"
-  ],
-  "author": "Nexus State Team",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/eustatos/nexus-state.git",
-    "directory": "packages/middleware"
-  },
-  "homepage": "https://nexus-state.website.yandexcloud.net/",
-  "bugs": {
-    "url": "https://github.com/eustatos/nexus-state/issues"
-  }
+  "deprecated": "This package is deprecated. Use @nexus-state/extras/middleware instead. Will be removed in v1.1.0."
 }

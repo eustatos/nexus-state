@@ -1,3 +1,17 @@
+> **⚠️ DEPRECATED**: This package is deprecated and will be removed in v1.1.0.
+> 
+> **Migration**: Use `@nexus-state/extras/immer` instead.
+> 
+> ```typescript
+> // Old (deprecated)
+> import { ... } from '@nexus-state/immer';
+> 
+> // New (recommended)
+> import { ... } from '@nexus-state/extras/immer';
+> ```
+> 
+> See [Migration Guide](../../MIGRATION.md#package-consolidation-v110) for details.
+
 # @nexus-state/immer
 
 > Immer integration with Nexus State — immutable updates with mutable syntax

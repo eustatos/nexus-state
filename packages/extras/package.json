@@ -1,0 +1,84 @@
+{
+  "name": "@nexus-state/extras",
+  "version": "0.2.1",
+  "description": "Collection of optional plugins and utilities for @nexus-state/core",
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./async": {
+      "types": "./dist/async.d.ts",
+      "import": "./dist/async.js"
+    },
+    "./family": {
+      "types": "./dist/family.d.ts",
+      "import": "./dist/family.js"
+    },
+    "./immer": {
+      "types": "./dist/immer.d.ts",
+      "import": "./dist/immer.js"
+    },
+    "./persist": {
+      "types": "./dist/persist.d.ts",
+      "import": "./dist/persist.js"
+    },
+    "./middleware": {
+      "types": "./dist/middleware.d.ts",
+      "import": "./dist/middleware.js"
+    },
+    "./web-worker": {
+      "types": "./dist/web-worker.d.ts",
+      "import": "./dist/web-worker.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "vitest run src",
+    "test:coverage": "vitest run src --coverage",
+    "lint": "eslint . --ext .ts"
+  },
+  "dependencies": {
+    "@nexus-state/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "immer": "^10.0.0"
+  },
+  "peerDependenciesMeta": {
+    "immer": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.0.7",
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.7",
+    "eslint": "^8.40.0",
+    "immer": "^10.0.0"
+  },
+  "keywords": [
+    "nexus-state",
+    "state-management",
+    "extras",
+    "plugins",
+    "utilities"
+  ],
+  "author": "Nexus State Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eustatos/nexus-state.git",
+    "directory": "packages/extras"
+  }
+}

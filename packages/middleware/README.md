@@ -1,3 +1,17 @@
+> **⚠️ DEPRECATED**: This package is deprecated and will be removed in v1.1.0.
+> 
+> **Migration**: Use `@nexus-state/extras/middleware` instead.
+> 
+> ```typescript
+> // Old (deprecated)
+> import { ... } from '@nexus-state/middleware';
+> 
+> // New (recommended)
+> import { ... } from '@nexus-state/extras/middleware';
+> ```
+> 
+> See [Migration Guide](../../MIGRATION.md#package-consolidation-v110) for details.
+
 # @nexus-state/middleware
 
 > Middleware plugin for Nexus State with plugin hooks support

@@ -1,3 +1,17 @@
+> **⚠️ DEPRECATED**: This package is deprecated and will be removed in v1.1.0.
+> 
+> **Migration**: Use `@nexus-state/extras/persist` instead.
+> 
+> ```typescript
+> // Old (deprecated)
+> import { ... } from '@nexus-state/persist';
+> 
+> // New (recommended)
+> import { ... } from '@nexus-state/extras/persist';
+> ```
+> 
+> See [Migration Guide](../../MIGRATION.md#package-consolidation-v110) for details.
+
 # @nexus-state/persist
 
 > Persistence for Nexus State — LocalStorage, sessionStorage, and custom storage adapters
