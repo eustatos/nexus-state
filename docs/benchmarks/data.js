@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1783793960373,
+  "lastUpdate": 1783794108883,
   "repoUrl": "https://github.com/eustatos/nexus-state",
   "entries": {
     "Benchmark": [
@@ -3819,6 +3819,233 @@ window.BENCHMARK_DATA = {
             "range": "0.64",
             "unit": "ops/sec",
             "extra": "Samples: 687\nMean: 0.728527ms\nP99: 1.019677ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "astashkinav@gmail.com",
+            "name": "eustatos",
+            "username": "eustatos"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9dc8b299f1628ced85481f2a8173cd08c9812fa1",
+          "message": "Feat/phase 14 cleanup and consolidation (#79)\n\n* chore(planning): remove old planning, create Phase 14 structure\n\n- Remove nexus-state-planning/ (old planning documents)\n- Remove planning/phase-12-scoped-registry/ (completed in v0.2.0)\n- Create planning/phase-14-cleanup-and-consolidation/ with task files\n- Add decisions/time-travel.md (REJECT decision)\n- Add INDEX.md, PHASE.md, VERSIONING.md\n\nPhase 14 focuses on:\n- Removing DevToolsIntegration from StoreImpl\n- Removing global singletons (batcher, globalActionTracker)\n- Consolidating micro-packages into @nexus-state/extras\n- Making form package framework-agnostic\n- Achieving < 5 KB minimal bundle\n\n* refactor(core): remove DevToolsIntegration from StoreImpl (14.1)\n\n- Remove static import of DevToolsIntegration from StoreImpl\n- Simplify setWithMetadata, serializeState, getIntercepted, setIntercepted\n- getDevTools() returns null with deprecation warning\n- Mark options.devtools as @deprecated in StoreOptions\n- Mark DevToolsIntegration.ts as @deprecated\n- Minimal bundle reduced from 5.35 KB to 4.33 KB gzipped\n\nMigration: Use devtools() plugin from @nexus-state/core/devtools instead\nof options.devtools or store.getDevTools()\n\n* refactor(core): remove global singletons (14.3)\n\n- Remove 'batcher' export from batching.ts (SSR-unsafe)\n- Remove 'globalActionTracker' export from action-tracker.ts (SSR-unsafe)\n- Keep standaloneBatcher internal for batch() function\n- Update tests to not rely on removed exports\n- Update CHANGELOG.md with breaking changes\n\nBreaking: Use batch() instead of batcher.batch()\nBreaking: Use per-instance ActionTracker instead of globalActionTracker\n\n* feat(core): measure and optimize bundle size (14.4)\n\n- Add BUNDLE-REPORT.md with detailed metrics\n- Add bundle-report.json for CI integration\n- Add measurement scripts (measure-bundles.mjs, full-measure.mjs, etc.)\n- Add bundle-tests/ with tree-shaking verification\n- Add .github/workflows/bundle-size.yml for CI checks\n- Verify minimal bundle < 5 KB gzipped (achieved 4.33 KB)\n\nMetrics:\n- Minimal (atom + createStore): 4.33 KB gzipped\n- With batching: 4.73 KB gzipped\n- With devtools plugin: 6.96 KB gzipped\n- Full bundle: 15.12 KB gzipped\n\n* feat: consolidate micro-packages into @nexus-state/extras (14.5)\n\n- Create @nexus-state/extras package with 6 subpath exports:\n  - ./async (asyncAtom, atomWithAsync)\n  - ./family (atomFamily, atomWithFamily)\n  - ./immer (immerAtom, setImmer)\n  - ./persist (persist, localStorageStorage, sessionStorageStorage)\n  - ./middleware (middleware, createMiddlewarePlugin)\n  - ./web-worker (workerAtom)\n- Configure package.json with subpath exports and sideEffects: false\n- Deprecate old packages (async, family, immer, persist, middleware, web-worker)\n- Old packages re-export from @nexus-state/extras with deprecation warnings\n- Update README.md with usage examples\n- Update MIGRATION.md with migration guide\n\nBenefits:\n- Reduces package count from 23 to 18\n- Single package.json, README, tests, build config\n- Maintains tree-shaking via subpath exports\n- Easier maintenance and discoverability\n\nDeprecated packages will be removed in v1.1.0\n\n* refactor(form): make framework-agnostic (14.6)\n\n- Remove @nexus-state/react from dependencies\n- Make react and @nexus-state/react optional peer dependencies\n- Replace React.ChangeEvent with framework-agnostic GenericChangeEvent\n- Main entry (index.ts) does not export React hooks\n- React hooks remain in ./react subpath (already in v0.2.1)\n- Add GenericChangeEvent and GenericFormEvent interfaces\n- Update README.md with framework-agnostic examples\n- Update MIGRATION.md with form migration guide\n\nBreaking (partial):\n- @nexus-state/react not auto-installed (must install explicitly)\n- Field.checkboxProps.onChange accepts GenericChangeEvent (compatible)\n\nBenefits:\n- Vue/Svelte users no longer forced to install React\n- Core API works without any framework\n- Framework-agnostic event types\n\n* docs: update all documentation for Phase 14 (14.8)\n\n- Create root CHANGELOG.md with full project history\n- Update README.md ecosystem section:\n  - Organized into Core, Framework Adapters, Utilities, Deprecated\n  - Added @nexus-state/extras as consolidated package\n  - Marked deprecated packages with replacements\n- All task files reflect actual completion status\n- INDEX.md success criteria updated\n\nPhase 14 completion:\n- 14.1 DevTools plugin ✅\n- 14.2 Time-travel REJECT ✅\n- 14.3 Remove singletons ✅\n- 14.4 Bundle size < 5 KB ✅ (4.33 KB)\n- 14.5 Consolidate packages ✅ (8/10 criteria)\n- 14.6 Form framework-agnostic ✅\n- 14.7 Deduplicate form-builder ❌ (not started)\n- 14.8 Update documentation ✅\n\n* refactor(core): remove dead code, update tests, add subpath exports\n\n- Remove enhanced-store.ts (dead code)\n- Remove SignalBasedReactive.ts (dead code)\n- Remove reactive/config.ts (dead code)\n- Remove AtomStateManager.ts (replaced by ScopedRegistry)\n- Add subpath exports: ./devtools, ./reactive\n- Update ScopedRegistry, DependencyTracker, NotificationManager\n- Update BatchProcessor, PluginSystem\n- Update all tests to work with new architecture\n- Add PluginSystem.test.ts\n- Update benchmarks and performance tests\n\n* fix: resolve CI build errors for deprecated packages\n\n- Remove moduleResolution override from web-worker/tsconfig.json\n  (was \"node\", inherited \"bundler\" from base now supports subpath exports)\n- Delete middleware/src/legacy.ts (dead code duplicating extras)\n\nFixes CI error: Cannot find module @nexus-state/extras/web-worker\nunder node moduleResolution\n\n* fix: use relative paths in bundle measurement scripts\n\n- Replace hardcoded absolute paths with import.meta.url resolution\n  in all 5 measurement scripts (measure-bundles, verify-treeshake,\n  list-modules, trace-imports, full-measure)\n- Add .bundler-out/ and .bundle-output/ to .gitignore\n- Remove generated bundle artifacts from git tracking\n\nFixes CI EACCES error when mkdir fails on hardcoded local path",
+          "timestamp": "2026-07-11T22:20:15+04:00",
+          "tree_id": "da9f81ec91ef194734d399230d4b9eb5a005d602",
+          "url": "https://github.com/eustatos/nexus-state/commit/9dc8b299f1628ced85481f2a8173cd08c9812fa1"
+        },
+        "date": 1783794107931,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "packages/core/__benchmarks__/registry-overhead.bench.ts > atomRegistry Overhead Analysis - current: set() with atomRegistry lookup",
+            "value": 1569.9390424068588,
+            "range": "0.73",
+            "unit": "ops/sec",
+            "extra": "Samples: 785\nMean: 0.636967ms\nP99: 1.056440ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/registry-overhead.bench.ts > atomRegistry Overhead Analysis - proposed: state-in-atom direct access",
+            "value": 357467.0970380909,
+            "range": "0.21",
+            "unit": "ops/sec",
+            "extra": "Samples: 178734\nMean: 0.002797ms\nP99: 0.004549ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/registry-overhead.bench.ts > atomRegistry.getStoresMap() overhead - direct Map access",
+            "value": 171239.8267052758,
+            "range": "0.27",
+            "unit": "ops/sec",
+            "extra": "Samples: 85620\nMean: 0.005840ms\nP99: 0.007764ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/registry-overhead.bench.ts > Memory comparison - current: atomRegistry + store state",
+            "value": 14478.459636679912,
+            "range": "0.68",
+            "unit": "ops/sec",
+            "extra": "Samples: 7240\nMean: 0.069068ms\nP99: 0.118882ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/registry-overhead.bench.ts > Memory comparison - proposed: state-in-atom only",
+            "value": 110298.7690657275,
+            "range": "1.66",
+            "unit": "ops/sec",
+            "extra": "Samples: 55150\nMean: 0.009066ms\nP99: 0.032130ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Batching Performance - batch with computed atoms",
+            "value": 141266.72577409222,
+            "range": "0.46",
+            "unit": "ops/sec",
+            "extra": "Samples: 70634\nMean: 0.007079ms\nP99: 0.013535ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Batching Performance - batch: 100 sets, single notification",
+            "value": 1595.2717680095025,
+            "range": "0.98",
+            "unit": "ops/sec",
+            "extra": "Samples: 798\nMean: 0.626852ms\nP99: 1.014482ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Batching Performance - nested batch calls",
+            "value": 13714.578374235682,
+            "range": "0.76",
+            "unit": "ops/sec",
+            "extra": "Samples: 6858\nMean: 0.072915ms\nP99: 0.141685ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Batching Performance - no batch: 100 sets, multiple notifications",
+            "value": 1601.7974591185393,
+            "range": "0.71",
+            "unit": "ops/sec",
+            "extra": "Samples: 801\nMean: 0.624299ms\nP99: 0.885561ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Edge Cases - atom with function update",
+            "value": 1525.6186990673398,
+            "range": "0.77",
+            "unit": "ops/sec",
+            "extra": "Samples: 763\nMean: 0.655472ms\nP99: 0.897293ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Edge Cases - concurrent subscriptions to same atom",
+            "value": 18971.99055194806,
+            "range": "0.46",
+            "unit": "ops/sec",
+            "extra": "Samples: 9486\nMean: 0.052709ms\nP99: 0.102852ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Edge Cases - rapid set/get cycles",
+            "value": 1500.1314362830174,
+            "range": "0.46",
+            "unit": "ops/sec",
+            "extra": "Samples: 751\nMean: 0.666608ms\nP99: 0.806014ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Memory Performance - create and cleanup 1000 atoms",
+            "value": 1368.8297627968282,
+            "range": "1.29",
+            "unit": "ops/sec",
+            "extra": "Samples: 685\nMean: 0.730551ms\nP99: 1.280788ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Memory Performance - dynamic atoms with subscriptions",
+            "value": 5766.996115917685,
+            "range": "1.11",
+            "unit": "ops/sec",
+            "extra": "Samples: 2884\nMean: 0.173400ms\nP99: 0.363699ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Memory Performance - subscribe and unsubscribe 1000 times",
+            "value": 2338.9510319189067,
+            "range": "0.43",
+            "unit": "ops/sec",
+            "extra": "Samples: 1170\nMean: 0.427542ms\nP99: 0.599650ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - 100 subscribers, 100 updates",
+            "value": 4643.147453123714,
+            "range": "0.35",
+            "unit": "ops/sec",
+            "extra": "Samples: 2322\nMean: 0.215371ms\nP99: 0.326208ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - 1000 subscribers, single update",
+            "value": 3475.2992823564273,
+            "range": "1.08",
+            "unit": "ops/sec",
+            "extra": "Samples: 1738\nMean: 0.287745ms\nP99: 0.488711ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - complex dependency graph",
+            "value": 109.08917260765512,
+            "range": "2.06",
+            "unit": "ops/sec",
+            "extra": "Samples: 55\nMean: 9.166813ms\nP99: 13.407024ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - computed atom with 1 dependency",
+            "value": 676.5803584969741,
+            "range": "0.39",
+            "unit": "ops/sec",
+            "extra": "Samples: 339\nMean: 1.478021ms\nP99: 1.662029ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - computed atom with 10 dependencies",
+            "value": 17.672758705174612,
+            "range": "0.98",
+            "unit": "ops/sec",
+            "extra": "Samples: 10\nMean: 56.584261ms\nP99: 57.674180ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - computed atom with 5 dependencies",
+            "value": 59.94263166459474,
+            "range": "0.74",
+            "unit": "ops/sec",
+            "extra": "Samples: 30\nMean: 16.682618ms\nP99: 18.030873ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - create 1000 primitive atoms",
+            "value": 13224.564685096546,
+            "range": "2.12",
+            "unit": "ops/sec",
+            "extra": "Samples: 6613\nMean: 0.075617ms\nP99: 0.225120ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - diamond dependency pattern",
+            "value": 272.66477260580126,
+            "range": "1.58",
+            "unit": "ops/sec",
+            "extra": "Samples: 137\nMean: 3.667507ms\nP99: 5.209462ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - get primitive atom - 10000 iterations",
+            "value": 3602.353976397549,
+            "range": "0.95",
+            "unit": "ops/sec",
+            "extra": "Samples: 1802\nMean: 0.277596ms\nP99: 0.502406ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - nested computed atoms (chain of 10)",
+            "value": 105.03120393836787,
+            "range": "0.44",
+            "unit": "ops/sec",
+            "extra": "Samples: 53\nMean: 9.520980ms\nP99: 9.933779ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - nested computed atoms (chain of 5)",
+            "value": 218.55886133471893,
+            "range": "0.33",
+            "unit": "ops/sec",
+            "extra": "Samples: 110\nMean: 4.575426ms\nP99: 4.855703ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - set primitive atom - 10000 iterations",
+            "value": 161.5286902952272,
+            "range": "0.29",
+            "unit": "ops/sec",
+            "extra": "Samples: 81\nMean: 6.190851ms\nP99: 6.448250ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Store Performance - subscribe and update - 1000 iterations",
+            "value": 1517.4453130402094,
+            "range": "0.96",
+            "unit": "ops/sec",
+            "extra": "Samples: 759\nMean: 0.659002ms\nP99: 1.128705ms"
+          },
+          {
+            "name": "packages/core/__benchmarks__/store.bench.ts > Writable Atom Performance - writable atom with multiple operations",
+            "value": 1259.7904842445782,
+            "range": "2.23",
+            "unit": "ops/sec",
+            "extra": "Samples: 630\nMean: 0.793783ms\nP99: 2.047821ms"
           }
         ]
       }
