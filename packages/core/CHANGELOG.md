@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.2.2
+
+### Breaking Changes
+
+- **Removed `batcher` global singleton** from `@nexus-state/core/batching`
+  - Use `batch()` function instead: `import { batch } from '@nexus-state/core/batching'`
+  - Global `batcher` was SSR-unsafe and caused test pollution
+
+- **Removed `globalActionTracker` global singleton** from `@nexus-state/core/utils`
+  - Use per-instance `ActionTracker` instead: `import { ActionTracker } from '@nexus-state/core/utils'`
+  - Global `globalActionTracker` was SSR-unsafe
+
+- **Removed built-in `DevToolsIntegration`** from `StoreImpl`
+  - Use `devtools()` plugin from `@nexus-state/core/devtools` instead
+  - `options.devtools` is deprecated and has no effect
+  - `store.getDevTools()` returns `null`
+
+**Migration:** See [MIGRATION.md](../../MIGRATION.md) for detailed migration guide.
+
+### Improvements
+
+- **Minimal bundle reduced to 4.33 KB gzipped** (was 5.35 KB)
+  - Removed static import of `DevToolsIntegration` from `StoreImpl`
+  - DevTools code no longer included in minimal bundle
+  - Tree-shaking verified for all optional features
+
+- **Zero global singletons** in core path
+  - All global state removed for SSR safety
+  - Test isolation improved
+
 ## 0.2.1
 
 ### Patch Changes

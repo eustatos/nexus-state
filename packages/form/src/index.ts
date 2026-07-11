@@ -53,6 +53,8 @@ export type {
   ValidationMode,
   ReValidateMode,
   ValidationConfig,
+  GenericChangeEvent,
+  GenericFormEvent,
 } from './types';
 
 // Re-export SchemaValidator from schema module

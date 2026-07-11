@@ -4,11 +4,12 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { batch, batcher } from '../../batching';
+import { Batcher } from '../../batching';
 
 describe('batcher.reset', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should clear all pending callbacks', () => {
@@ -44,25 +45,32 @@ describe('batcher.reset', () => {
 });
 
 describe('error handling in batch', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should propagate error from batch callback', () => {
     const error = new Error('Test error');
 
     expect(() => {
-      batch(() => {
+      batcher.startBatch();
+      try {
         throw error;
-      });
+      } finally {
+        batcher.endBatch();
+      }
     }).toThrow(error);
   });
 
   it('should clean up batch state after error', () => {
     try {
-      batch(() => {
+      batcher.startBatch();
+      try {
         throw new Error('Test error');
-      });
+      } finally {
+        batcher.endBatch();
+      }
     } catch {
       // Expected
     }
@@ -82,16 +90,20 @@ describe('error handling in batch', () => {
 });
 
 describe('empty batch operations', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should handle batch with no operations', () => {
-    const result = batch(() => {
+    batcher.startBatch();
+    try {
       // no operations
-    });
+    } finally {
+      batcher.endBatch();
+    }
 
-    expect(result).toBeUndefined();
+    expect(batcher.getDepth()).toBe(0);
   });
 
   it('should handle flush with empty queue', () => {
@@ -102,17 +114,21 @@ describe('empty batch operations', () => {
   });
 
   it('should handle multiple consecutive empty batches', () => {
-    batch(() => {});
-    batch(() => {});
-    batch(() => {});
+    batcher.startBatch();
+    batcher.endBatch();
+    batcher.startBatch();
+    batcher.endBatch();
+    batcher.startBatch();
+    batcher.endBatch();
 
     expect(batcher.getDepth()).toBe(0);
   });
 });
 
 describe('callback that modifies batch state', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should handle callback that calls startBatch', () => {
@@ -152,8 +168,9 @@ describe('callback that modifies batch state', () => {
 });
 
 describe('concurrent batch scheduling', () => {
+  let batcher: Batcher;
   beforeEach(() => {
-    batcher.reset();
+    batcher = new Batcher();
   });
 
   it('should handle same callback scheduled multiple times', () => {

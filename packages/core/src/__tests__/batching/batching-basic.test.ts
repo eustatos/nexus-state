@@ -4,13 +4,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { batch, isBatching, batcher } from '../../batching';
+import { batch, isBatching } from '../../batching';
 
 describe('batch', () => {
-  beforeEach(() => {
-    batcher.reset();
-  });
-
   it('should execute function immediately when not batching', () => {
     let executed = false;
     const result = batch(() => {
@@ -53,15 +49,10 @@ describe('batch', () => {
     }).toThrow();
 
     expect(isBatching()).toBe(false);
-    expect(batcher.getDepth()).toBe(0);
   });
 });
 
 describe('isBatching', () => {
-  beforeEach(() => {
-    batcher.reset();
-  });
-
   it('should return false outside of batch', () => {
     expect(isBatching()).toBe(false);
   });

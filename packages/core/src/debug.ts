@@ -74,14 +74,73 @@ class DebugLogger {
   }
 }
 
-export const logger = new DebugLogger('[Nexus]');
-export const storeLogger = new DebugLogger('[Nexus:Store]');
-export const atomLogger = new DebugLogger('[Nexus:Atom]');
-export const reactLogger = new DebugLogger('[Nexus:React]');
+// Lazy logger instances — created on first access, not at import time
+let _logger: DebugLogger | null = null;
+let _storeLogger: DebugLogger | null = null;
+let _atomLogger: DebugLogger | null = null;
+let _reactLogger: DebugLogger | null = null;
+
+/**
+ * Get the main debug logger (created lazily on first call)
+ */
+export function getLogger(): DebugLogger {
+  if (!_logger) _logger = new DebugLogger('[Nexus]');
+  return _logger;
+}
+
+/**
+ * Get the store debug logger (created lazily on first call)
+ */
+export function getStoreLogger(): DebugLogger {
+  if (!_storeLogger) _storeLogger = new DebugLogger('[Nexus:Store]');
+  return _storeLogger;
+}
+
+/**
+ * Get the atom debug logger (created lazily on first call)
+ */
+export function getAtomLogger(): DebugLogger {
+  if (!_atomLogger) _atomLogger = new DebugLogger('[Nexus:Atom]');
+  return _atomLogger;
+}
+
+/**
+ * Get the react debug logger (created lazily on first call)
+ */
+export function getReactLogger(): DebugLogger {
+  if (!_reactLogger) _reactLogger = new DebugLogger('[Nexus:React]');
+  return _reactLogger;
+}
+
+// Backward-compatible named exports (lazy via Proxy)
+export const logger = new Proxy({} as DebugLogger, {
+  get(_target, prop) {
+    return Reflect.get(getLogger(), prop);
+  },
+}) as DebugLogger;
+
+export const storeLogger = new Proxy({} as DebugLogger, {
+  get(_target, prop) {
+    return Reflect.get(getStoreLogger(), prop);
+  },
+}) as DebugLogger;
+
+export const atomLogger = new Proxy({} as DebugLogger, {
+  get(_target, prop) {
+    return Reflect.get(getAtomLogger(), prop);
+  },
+}) as DebugLogger;
+
+export const reactLogger = new Proxy({} as DebugLogger, {
+  get(_target, prop) {
+    return Reflect.get(getReactLogger(), prop);
+  },
+}) as DebugLogger;
 
 // Export class for testing
 export { DebugLogger };
 
-// DevTools plugin (tree-shakeable — only in bundle when imported from here)
-export { devtools, DevToolsPlugin } from './plugins/devtools';
-export type { DevToolsOptions } from './plugins/devtools';
+// DevTools plugin is exported via @nexus-state/core/devtools subpath.
+// Do NOT re-export here — it pulls DevToolsPlugin into the debug module,
+// which is imported by StoreImpl and forces the entire DevTools chain into
+// even the minimal bundle.

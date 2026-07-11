@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DependencyTracker } from './DependencyTracker';
 import { createMockAtom } from '../test-utils/index';
-import type { AtomState } from './AtomStateManager';
+import type { AtomState } from './types';
 
 describe('DependencyTracker', () => {
   let tracker: DependencyTracker;

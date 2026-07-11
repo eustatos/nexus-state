@@ -17,9 +17,7 @@ import type {
 /**
  * Unified registry for a single store.
  *
- * Replaces the previous triple-registry architecture where atom data was
- * split across AtomStateManager (values), StoreImpl.registry (IDs),
- * and AtomRegistry (references + metadata).
+ * Single source of truth for atom registration, state, and metadata.
  *
  * @example
  * ```typescript

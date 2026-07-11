@@ -1,6 +1,24 @@
 import { Atom, Store } from '@nexus-state/core';
 import type { SchemaPlugin, SchemaValidator } from './schema';
-import type { ChangeEvent } from 'react';
+
+/**
+ * Generic change event interface (framework-agnostic)
+ * Compatible with React.ChangeEvent, Vue events, etc.
+ */
+export interface GenericChangeEvent<T = Element> {
+  target: T;
+  currentTarget: T;
+  preventDefault(): void;
+  stopPropagation(): void;
+}
+
+/**
+ * Generic form event interface (framework-agnostic)
+ */
+export interface GenericFormEvent {
+  preventDefault(): void;
+  stopPropagation(): void;
+}
 
 /**
  * Validation trigger mode
@@ -315,7 +333,7 @@ export interface Field<TValue = any> {
   checkboxProps: {
     name: string;
     checked: boolean;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    onChange: (e: GenericChangeEvent<HTMLInputElement>) => void;
   };
 
   // Helper for radio group binding
@@ -323,14 +341,14 @@ export interface Field<TValue = any> {
     name: string;
     value: TValue;
     checked: boolean;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    onChange: (e: GenericChangeEvent<HTMLInputElement>) => void;
   };
 
   // Helper for select binding
   selectProps: {
     name: string;
     value: TValue;
-    onChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+    onChange: (e: GenericChangeEvent<HTMLSelectElement>) => void;
   };
 }
 

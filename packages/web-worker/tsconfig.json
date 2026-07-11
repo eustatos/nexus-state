@@ -4,7 +4,6 @@
     "outDir": "dist",
     "rootDir": ".",
     "lib": ["ES2020", "WebWorker"],
-    "moduleResolution": "node",
     "types": ["vitest/config"]
   },
   "include": ["*.ts", "src/**/*.ts"],

@@ -1,5 +1,4 @@
 import { atom, Atom, Store } from '@nexus-state/core';
-import type { ChangeEvent } from 'react';
 import {
   FormOptions,
   FormValues,
@@ -9,6 +8,7 @@ import {
   FieldState,
   ValidationMode,
   ReValidateMode,
+  GenericChangeEvent,
 } from './types';
 import { createFormCore, FormCore } from './core';
 import { createValidation, ValidationOptions } from './validation';
@@ -163,10 +163,10 @@ export function createForm<TValues extends FormValues>(
       inputProps: {
         name: name as string,
         value: fieldState.value,
-        onChange: (valueOrEvent: TValues[K] | ChangeEvent<HTMLInputElement>) => {
+        onChange: (valueOrEvent: TValues[K] | GenericChangeEvent<HTMLInputElement>) => {
           // Handle both direct value and event
           const value = typeof valueOrEvent === 'object' && 'target' in valueOrEvent
-            ? (valueOrEvent as ChangeEvent<HTMLInputElement>).target.value
+            ? (valueOrEvent as GenericChangeEvent<HTMLInputElement>).target.value
             : valueOrEvent;
           setFieldValue(store, meta as any, value as TValues[K]);
         },
@@ -188,7 +188,7 @@ export function createForm<TValues extends FormValues>(
       checkboxProps: {
         name: name as string,
         checked: !!fieldState.value,
-        onChange: (e: ChangeEvent<HTMLInputElement>) => {
+        onChange: (e: GenericChangeEvent<HTMLInputElement>) => {
           setFieldValue(store, meta as any, e.target.checked as TValues[K]);
         },
       },
@@ -198,7 +198,7 @@ export function createForm<TValues extends FormValues>(
         name: name as string,
         value: fieldState.value,
         checked: true, // Radio button is always checked when its value matches the field value
-        onChange: (e: ChangeEvent<HTMLInputElement>) => {
+        onChange: (e: GenericChangeEvent<HTMLInputElement>) => {
           setFieldValue(store, meta as any, e.target.value as TValues[K]);
         },
       },
@@ -207,7 +207,7 @@ export function createForm<TValues extends FormValues>(
       selectProps: {
         name: name as string,
         value: fieldState.value,
-        onChange: (e: ChangeEvent<HTMLSelectElement> | { target: { value: any } }) => {
+        onChange: (e: GenericChangeEvent<HTMLSelectElement> | { target: { value: any } }) => {
           const value = e?.target?.value ?? e;
           setFieldValue(store, meta as any, value as TValues[K]);
         },

@@ -43,8 +43,11 @@ export class PluginSystem {
    * @param value Value to set
    * @param context Optional operation metadata
    * @returns Processed value
+   * @complexity O(1) when no hooks registered, O(n) otherwise
    */
   executeOnSetHooks<T>(atom: Atom<any>, value: T, context?: AtomContext): T {
+    if (this.hooks.length === 0) return value;
+
     let processedValue = value;
 
     for (const hooks of this.hooks) {
@@ -64,8 +67,11 @@ export class PluginSystem {
    * @param atom Atom that was set
    * @param value Final value
    * @param context Optional operation metadata
+   * @complexity O(1) when no hooks registered, O(n) otherwise
    */
   executeAfterSetHooks<T>(atom: Atom<any>, value: T, context?: AtomContext): void {
+    if (this.hooks.length === 0) return;
+
     for (const hooks of this.hooks) {
       if (hooks.afterSet) {
         hooks.afterSet(atom, value, context);
@@ -78,8 +84,11 @@ export class PluginSystem {
    * @param atom Atom being read
    * @param value Current value
    * @returns Processed value
+   * @complexity O(1) when no hooks registered, O(n) otherwise
    */
   executeOnGetHooks<T>(atom: Atom<any>, value: T): T {
+    if (this.hooks.length === 0) return value;
+
     let processedValue = value;
 
     for (const hooks of this.hooks) {

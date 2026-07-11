@@ -2,12 +2,13 @@
  * NotificationManager - Manages atom subscriptions and notifications
  *
  * Handles subscriber management and batched notifications.
+ * Receives an optional Batcher instance; without it, notifications are synchronous.
  */
 
 import type { Atom } from '../types';
-import { batcher } from '../batching';
+import type { Batcher } from '../batching';
 import { storeLogger as logger } from '../debug';
-import type { AtomState } from './AtomStateManager';
+import type { AtomState } from './types';
 
 export type Subscriber<Value> = (value: Value) => void;
 export type Unsubscribe = () => void;
@@ -25,8 +26,13 @@ export interface NotificationStats {
  * NotificationManager provides subscription management
  */
 export class NotificationManager {
+  private batcher: Batcher | null;
   private notificationCount: number = 0;
   private errorCount: number = 0;
+
+  constructor(batcher?: Batcher | null) {
+    this.batcher = batcher ?? null;
+  }
 
   /**
    * Subscribe to atom changes
@@ -81,29 +87,28 @@ export class NotificationManager {
    * @param atom Changed atom
    * @param atomState Atom state
    * @param value New value
-   * @param useBatching Whether to use batching
    */
   notify<Value>(
     atom: Atom<Value>,
     atomState: AtomState<Value>,
-    value: Value,
-    useBatching: boolean = true
+    value: Value
   ): void {
-    const wasBatching = batcher.getIsBatching();
-
-    if (useBatching) {
-      // Schedule notification for batching
-      batcher.schedule(() => {
-        this.notifySubscribers(atom, atomState, value);
-      });
-
-      // Flush immediately if not already batching
-      if (!wasBatching) {
-        batcher.flush();
-      }
-    } else {
-      // Notify immediately
+    if (!this.batcher) {
+      // No batcher — notify synchronously
       this.notifySubscribers(atom, atomState, value);
+      return;
+    }
+
+    const wasBatching = this.batcher.getIsBatching();
+
+    // Schedule notification for batching
+    this.batcher.schedule(() => {
+      this.notifySubscribers(atom, atomState, value);
+    });
+
+    // Flush immediately if not already batching
+    if (!wasBatching) {
+      this.batcher.flush();
     }
   }
 

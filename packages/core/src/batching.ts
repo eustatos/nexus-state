@@ -6,7 +6,10 @@
 type BatchCallback = () => void;
 
 /**
- * Batcher class that collects and flushes batched callbacks
+ * Batcher class that collects and flushes batched callbacks.
+ *
+ * Create per-instance Batcher for each store or use the standalone
+ * `batch()` / `isBatching()` functions for quick batching without a store.
  */
 export class Batcher {
   private batch: Set<BatchCallback> = new Set();
@@ -101,7 +104,9 @@ export class Batcher {
   }
 }
 
-export const batcher = new Batcher();
+// Module-level batcher for the standalone batch() and isBatching() functions.
+// Stores created with `batching: true` create their own Batcher instance.
+const standaloneBatcher = new Batcher();
 
 /**
  * Execute multiple state updates in a single batch
@@ -117,11 +122,11 @@ export const batcher = new Batcher();
  * ```
  */
 export function batch<T>(fn: () => T): T {
-  batcher.startBatch();
+  standaloneBatcher.startBatch();
   try {
     return fn();
   } finally {
-    batcher.endBatch();
+    standaloneBatcher.endBatch();
   }
 }
 
@@ -129,5 +134,5 @@ export function batch<T>(fn: () => T): T {
  * Check if currently in a batch
  */
 export function isBatching(): boolean {
-  return batcher.getIsBatching();
+  return standaloneBatcher.getIsBatching();
 }

@@ -1,3 +1,17 @@
+> **⚠️ DEPRECATED**: This package is deprecated and will be removed in v1.1.0.
+> 
+> **Migration**: Use `@nexus-state/extras/async` instead.
+> 
+> ```typescript
+> // Old (deprecated)
+> import { ... } from '@nexus-state/async';
+> 
+> // New (recommended)
+> import { ... } from '@nexus-state/extras/async';
+> ```
+> 
+> See [Migration Guide](../../MIGRATION.md#package-consolidation-v110) for details.
+
 # @nexus-state/async
 
 > Simple async state management with loading/error/data states

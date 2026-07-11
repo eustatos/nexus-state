@@ -1,0 +1,64 @@
+name: Bundle Size Check
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  bundle-size:
+    runs-on: ubuntu-latest
+    name: Check Bundle Size
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: Build core package
+        run: pnpm --filter @nexus-state/core build
+        
+      - name: Measure bundle size
+        run: pnpm --filter @nexus-state/core bundle:measure
+        
+      - name: Check minimal bundle size
+        run: |
+          cd packages/core
+          SIZE=$(node -e "const report = require('./bundle-report.json'); console.log(report.results.minimal.gzip);")
+          TARGET=5000
+          
+          echo "Minimal bundle size: ${SIZE} bytes (target: ${TARGET} bytes)"
+          
+          if [ "$SIZE" -gt "$TARGET" ]; then
+            echo "❌ FAIL: Minimal bundle size exceeds target by $((SIZE - TARGET)) bytes"
+            exit 1
+          else
+            echo "✅ PASS: Minimal bundle size is within target (saved: $((TARGET - SIZE)) bytes)"
+          fi
+          
+      - name: Verify tree-shaking
+        run: pnpm --filter @nexus-state/core bundle:verify
+        
+      - name: Upload bundle report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-report
+          path: packages/core/bundle-report.json

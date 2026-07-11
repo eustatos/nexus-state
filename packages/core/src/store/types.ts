@@ -2,18 +2,15 @@
  * Types for ScopedRegistry — unified per-store atom registry
  *
  * Combines atom references, state, and metadata into a single entry.
- * Replaces the previous triple-registry architecture:
- *   - AtomStateManager.states (values)
- *   - StoreImpl.registry.atoms (IDs)
- *   - AtomRegistry (references + metadata)
+ * Single source of truth for all atom data within a store.
  *
  * @packageDocumentation
  */
 
-import type { AnyAtom, Atom, Store, AtomMetadata } from '../types';
+import type { AnyAtom, Atom, Store, AtomMetadata, Plugin } from '../types';
 
 /**
- * Internal state for an atom (alias for AtomStateManager.AtomState)
+ * Internal state for an atom
  */
 export interface AtomState<Value = unknown> {
   /** The current value of the atom */
@@ -104,4 +101,41 @@ export interface ScopedRegistryInterface {
    * Get number of registered atoms
    */
   size(): number;
+}
+
+/**
+ * Options for configuring store behavior.
+ * Optional subsystems (plugins, batching) are only created when needed.
+ *
+ * @example
+ * ```typescript
+ * // No optional subsystems — minimal store
+ * const store = createStore();
+ *
+ * // With plugins (legacy array API still works via createStore)
+ * const store = createStore({ plugins: [plugin1, plugin2] });
+ *
+ * // With batching
+ * const store = createStore({ batching: true });
+ * ```
+ */
+export interface StoreOptions {
+  /** Array of plugins to apply to the store */
+  plugins?: Plugin[];
+  /**
+   * @deprecated Use the `devtools()` plugin from `@nexus-state/core/devtools` instead.
+   * Enable DevTools integration (no longer built-in, this option is ignored).
+   */
+  devtools?: boolean;
+  /**
+   * @deprecated Use the `devtools()` plugin options instead.
+   * DevTools configuration (ignored — use devtools() plugin).
+   */
+  devtoolsConfig?: Partial<{
+    enabled: boolean;
+    enableStackTrace: boolean;
+    debounceDelay: number;
+  }>;
+  /** Enable batch processing */
+  batching?: boolean;
 }

@@ -1,6 +1,9 @@
 /**
  * DevToolsIntegration - Provides DevTools integration
  *
+ * @deprecated Use the `devtools()` plugin from `@nexus-state/core/devtools` instead.
+ * This class is no longer used internally by StoreImpl and will be removed in v1.0.0.
+ *
  * Handles DevTools tracking and state serialization.
  */
 

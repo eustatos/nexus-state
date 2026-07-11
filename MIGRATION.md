@@ -2,8 +2,299 @@
 
 ## Available Guides
 
+- [Form Framework-Agnostic (v0.3.0)](#migration-guide-form-framework-agnostic)
+- [Package Consolidation (v1.1.0)](#migration-guide-package-consolidation)
+- [Global Singletons Removal (v1.0.0)](#migration-guide-global-singletons-removal)
+- [DevTools Plugin Migration (v1.0.0)](#migration-guide-devtools-plugin)
 - [Time-Travel Refactoring (v0.2.0)](#migration-guide-time-travel-refactoring)
 - [Schema Validation API (v1.0)](#migration-guide-schema-validation-api)
+
+---
+
+# Migration Guide: Package Consolidation
+
+## Overview
+
+In v1.1.0, several small utility packages were consolidated into `@nexus-state/extras` to reduce package management overhead and improve discoverability.
+
+**What Changed:**
+- ❌ Deprecated: `@nexus-state/async` → use `@nexus-state/extras/async`
+- ❌ Deprecated: `@nexus-state/family` → use `@nexus-state/extras/family`
+- ❌ Deprecated: `@nexus-state/immer` → use `@nexus-state/extras/immer`
+- ❌ Deprecated: `@nexus-state/persist` → use `@nexus-state/extras/persist`
+- ❌ Deprecated: `@nexus-state/middleware` → use `@nexus-state/extras/middleware`
+- ❌ Deprecated: `@nexus-state/web-worker` → use `@nexus-state/extras/web-worker`
+
+**Why:** These packages were 20-180 lines each, creating unnecessary package management overhead. Consolidation reduces the number of packages from 23 to 18 while maintaining tree-shaking via subpath exports.
+
+## Quick Migration
+
+### Installation
+
+```bash
+# Install the consolidated package
+npm install @nexus-state/extras
+# or
+pnpm add @nexus-state/extras
+
+# Remove deprecated packages (optional, they still work with warnings)
+npm uninstall @nexus-state/async @nexus-state/family @nexus-state/immer \
+              @nexus-state/persist @nexus-state/middleware @nexus-state/web-worker
+```
+
+### Import Changes
+
+```typescript
+// Before (deprecated)
+import { asyncAtom } from '@nexus-state/async';
+import { atomFamily } from '@nexus-state/family';
+import { immerAtom } from '@nexus-state/immer';
+import { persist } from '@nexus-state/persist';
+import { middleware } from '@nexus-state/middleware';
+import { workerAtom } from '@nexus-state/web-worker';
+
+// After (recommended)
+import { asyncAtom } from '@nexus-state/extras/async';
+import { atomFamily } from '@nexus-state/extras/family';
+import { immerAtom } from '@nexus-state/extras/immer';
+import { persist } from '@nexus-state/extras/persist';
+import { middleware } from '@nexus-state/extras/middleware';
+import { workerAtom } from '@nexus-state/extras/web-worker';
+```
+
+## Migration Table
+
+| Old Package | New Import | Breaking Change |
+|-------------|------------|-----------------|
+| `@nexus-state/async` | `@nexus-state/extras/async` | No |
+| `@nexus-state/family` | `@nexus-state/extras/family` | No |
+| `@nexus-state/immer` | `@nexus-state/extras/immer` | No |
+| `@nexus-state/persist` | `@nexus-state/extras/persist` | No |
+| `@nexus-state/middleware` | `@nexus-state/extras/middleware` | No |
+| `@nexus-state/web-worker` | `@nexus-state/extras/web-worker` | No |
+
+## Backward Compatibility
+
+The deprecated packages continue to work with deprecation warnings. They re-export from `@nexus-state/extras`:
+
+```typescript
+// This still works, but shows a deprecation warning
+import { asyncAtom } from '@nexus-state/async';
+
+// Under the hood, this is:
+// export * from '@nexus-state/extras/async';
+```
+
+**Timeline:**
+- **v0.3.0** (current): Deprecated packages available with warnings
+- **v1.1.0**: Deprecated packages will be removed
+
+## Tree-Shaking
+
+The consolidated package maintains optimal tree-shaking. Only the modules you import are included in your bundle:
+
+```typescript
+// Only async module is included (~80 lines)
+import { asyncAtom } from '@nexus-state/extras/async';
+
+// Only persist module is included (~70 lines)
+import { persist } from '@nexus-state/extras/persist';
+```
+
+## Benefits
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Number of packages | 23 | 18 |
+| Package management overhead | High | Low |
+| Tree-shaking | ✅ | ✅ |
+| Bundle size | Same | Same |
+| Discoverability | Low (many small packages) | High (one package with subpaths) |
+
+---
+
+# Migration Guide: Global Singletons Removal
+
+## Overview
+
+In v1.0.0, global singletons `batcher` and `globalActionTracker` were removed. Use per-instance alternatives instead.
+
+**What Changed:**
+- ❌ Removed: `batcher` global singleton from `@nexus-state/core/batching`
+- ❌ Removed: `globalActionTracker` global singleton from `@nexus-state/core/utils`
+- ✅ Use: `batch()` function from `@nexus-state/core/batching`
+- ✅ Use: Per-instance `ActionTracker` from `@nexus-state/core/utils`
+
+## Quick Migration
+
+### Before (Deprecated)
+
+```typescript
+import { batcher } from '@nexus-state/core/batching';
+import { globalActionTracker } from '@nexus-state/core/utils';
+
+batcher.batch(() => {
+  store.set(atom1, 1);
+  store.set(atom2, 2);
+});
+
+globalActionTracker.trackAction({ type: 'SET', timestamp: Date.now() });
+```
+
+### After (Recommended)
+
+```typescript
+import { batch } from '@nexus-state/core/batching';
+import { ActionTracker } from '@nexus-state/core/utils';
+
+batch(() => {
+  store.set(atom1, 1);
+  store.set(atom2, 2);
+});
+
+const tracker = new ActionTracker();
+tracker.trackAction({ type: 'SET', timestamp: Date.now() });
+```
+
+## Full Migration Guide
+
+### 1. `batcher` → `batch()` function
+
+```diff
+- import { batcher } from '@nexus-state/core/batching';
++ import { batch } from '@nexus-state/core/batching';
+
+- batcher.batch(() => {
++ batch(() => {
+    store.set(atom1, 1);
+    store.set(atom2, 2);
+  });
+```
+
+**Why:** Global `batcher` was SSR-unsafe and caused test pollution. Use `batch()` function instead.
+
+### 2. `globalActionTracker` → per-instance `ActionTracker`
+
+```diff
+- import { globalActionTracker } from '@nexus-state/core/utils';
++ import { ActionTracker } from '@nexus-state/core/utils';
+
+- globalActionTracker.trackAction({ type: 'SET', timestamp: Date.now() });
++ const tracker = new ActionTracker();
++ tracker.trackAction({ type: 'SET', timestamp: Date.now() });
+```
+
+**Why:** Global `globalActionTracker` was SSR-unsafe. Use per-instance `ActionTracker` instead.
+
+## Backward Compatibility
+
+No backward compatibility. These exports were removed (not deprecated). Update your code before upgrading to v1.0.0.
+
+## Benefits
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Global singletons | 2 | 0 |
+| SSR-safe | No | Yes |
+| Test pollution | Yes | No |
+
+---
+
+# Migration Guide: DevTools Plugin
+
+## Overview
+
+In v1.0.0, built-in `DevToolsIntegration` was removed from `StoreImpl`. DevTools is now an **optional plugin** that must be explicitly imported and applied.
+
+**What Changed:**
+- ❌ Removed: Built-in `DevToolsIntegration` from `StoreImpl`
+- ❌ Deprecated: `options.devtools` and `options.devtoolsConfig`
+- ❌ Deprecated: `store.getDevTools()` (returns `null`)
+- ✅ New: `devtools()` plugin from `@nexus-state/core/devtools`
+
+## Quick Migration
+
+### Before (Deprecated)
+
+```typescript
+import { createStore } from '@nexus-state/core';
+
+const store = createStore({ devtools: true });
+// or
+const store = createStore({
+  devtools: true,
+  devtoolsConfig: { enableStackTrace: true }
+});
+```
+
+### After (Recommended)
+
+```typescript
+import { createStore } from '@nexus-state/core';
+import { devtools } from '@nexus-state/core/devtools';
+
+const store = createStore({ plugins: [devtools()] });
+// or with options
+const store = createStore({
+  plugins: [devtools({ name: 'MyApp', maxHistory: 100 })]
+});
+```
+
+## Full Migration Guide
+
+### 1. `options.devtools` → `devtools()` plugin
+
+```diff
+  import { createStore } from '@nexus-state/core';
++ import { devtools } from '@nexus-state/core/devtools';
+
+- const store = createStore({ devtools: true });
++ const store = createStore({ plugins: [devtools()] });
+```
+
+### 2. `options.devtoolsConfig` → `devtools(options)`
+
+```diff
+  import { createStore } from '@nexus-state/core';
++ import { devtools } from '@nexus-state/core/devtools';
+
+  const store = createStore({
+-   devtools: true,
+-   devtoolsConfig: { enableStackTrace: true, debounceDelay: 200 }
++   plugins: [devtools({ name: 'MyApp' })]
+  });
+```
+
+### 3. `store.getDevTools()` → removed
+
+```diff
+- const devTools = store.getDevTools();
+- devTools.trackStateChange(atom, value);
++ // Use devtools() plugin instead — tracking is automatic
+```
+
+### 4. `createEnhancedStore()` → `createStore()` with plugin
+
+```diff
+  import { createStore } from '@nexus-state/core';
++ import { devtools } from '@nexus-state/core/devtools';
+
+- const store = createEnhancedStore();
++ const store = createStore({ plugins: [devtools()] });
+```
+
+## Backward Compatibility
+
+`options.devtools` is still accepted but shows a deprecation warning. It has **no effect** — DevTools code is no longer in the core path. Use the `devtools()` plugin for actual DevTools functionality.
+
+## Benefits
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Minimal bundle (atom + store) | 5.35 KB | < 5 KB |
+| DevTools in minimal bundle | Yes (0.35 KB) | No |
+| Tree-shakeable DevTools | No | Yes |
+| SSR-safe | Partially | Fully |
 
 ---
 
@@ -679,4 +970,163 @@ npm install @nexus-state/form-schema-dsl
 | **Tree-shaking** | ⚠️ Partial | ✅ Full |
 | **SSR-safe** | ⚠️ No | ✅ Yes |
 | **Type inference** | ⚠️ Manual | ✅ Automatic |
+
+---
+
+# Migration Guide: Form Framework-Agnostic
+
+## Overview
+
+In v0.3.0, `@nexus-state/form` was made framework-agnostic by removing the hard dependency on React and `@nexus-state/react`.
+
+**What Changed:**
+- ❌ `@nexus-state/react` removed from `dependencies`
+- ✅ `react` is now an **optional** peer dependency
+- ✅ Core API (`createForm`) works without React
+- ✅ React hooks moved to `@nexus-state/form/react` subpath (already in v0.2.x)
+- ✅ `ChangeEvent` replaced with framework-agnostic `GenericChangeEvent`
+
+**Why:** Vue/Svelte users were forced to install React just to use the form core. Now the form package is truly framework-agnostic.
+
+## Quick Migration
+
+### Installation (React Users)
+
+```bash
+# Install React peer dependencies explicitly
+npm install @nexus-state/form @nexus-state/core @nexus-state/react react
+```
+
+### Installation (Non-React Users)
+
+```bash
+# Only core dependencies needed
+npm install @nexus-state/form @nexus-state/core
+```
+
+### Import Changes (Already Applied in v0.2.x)
+
+```typescript
+// Before (v0.2.0, deprecated)
+import { useForm } from '@nexus-state/form';
+
+// After (v0.2.1+, required)
+import { useForm } from '@nexus-state/form/react';
+```
+
+**Note:** React hooks were already moved to the `./react` subpath in v0.2.1. This migration guide covers the v0.3.0 change that removes the hard React dependency.
+
+## What's New
+
+### Framework-Agnostic Core
+
+```typescript
+import { createStore } from '@nexus-state/core';
+import { createForm } from '@nexus-state/form';
+
+const store = createStore();
+
+const form = createForm(store, {
+  initialValues: { name: '', email: '' },
+  validate: (values) => ({
+    name: values.name ? undefined : 'Required',
+  }),
+});
+
+// Use with any framework
+store.sub(form.valuesAtom, (values) => {
+  console.log('Form values:', values);
+});
+
+form.setFieldValue('name', 'Alice');
+```
+
+### Generic Event Types
+
+The `Field` interface now uses `GenericChangeEvent` instead of React's `ChangeEvent`:
+
+```typescript
+// Before (v0.2.x)
+import type { ChangeEvent } from 'react';
+
+interface Field {
+  checkboxProps: {
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  };
+}
+
+// After (v0.3.0)
+import type { GenericChangeEvent } from '@nexus-state/form';
+
+interface Field {
+  checkboxProps: {
+    onChange: (e: GenericChangeEvent<HTMLInputElement>) => void;
+  };
+}
+```
+
+`GenericChangeEvent` is compatible with React's `ChangeEvent`, Vue events, and other frameworks.
+
+## Breaking Changes
+
+### 1. `@nexus-state/react` Not Auto-Installed
+
+**Before:** Installing `@nexus-state/form` automatically installed `@nexus-state/react`.
+
+**After:** You must install `@nexus-state/react` explicitly if using React hooks.
+
+```bash
+npm install @nexus-state/react react
+```
+
+### 2. Event Type Change
+
+**Before:** `Field.checkboxProps.onChange` accepted React's `ChangeEvent`.
+
+**After:** `Field.checkboxProps.onChange` accepts `GenericChangeEvent`.
+
+**Impact:** Minimal — `GenericChangeEvent` is structurally compatible with React's `ChangeEvent`. Existing code should work without changes.
+
+## Non-Breaking Changes
+
+- Core API (`createForm`, validators, field arrays) unchanged
+- React hooks (`useForm`, `useField`, `useFieldArray`) unchanged
+- Subpath exports (`./react`, `./schema`, `./core`, etc.) unchanged
+- Validation API unchanged
+
+## Benefits
+
+| Feature | Before (v0.2.x) | After (v0.3.0) |
+|---------|----------------|----------------|
+| **React required** | ✅ Yes | ❌ No (optional) |
+| **Vue/Svelte support** | ❌ No | ✅ Yes |
+| **Bundle size (core only)** | Includes React types | Framework-agnostic |
+| **Tree-shaking** | ⚠️ Partial | ✅ Full |
+| **React hooks** | ✅ Yes | ✅ Yes (subpath) |
+
+## Troubleshooting
+
+### "Cannot find module '@nexus-state/react'"
+
+If you're using React hooks from `@nexus-state/form/react`, install the peer dependency:
+
+```bash
+npm install @nexus-state/react react
+```
+
+### "Type 'ChangeEvent' is not assignable to 'GenericChangeEvent'"
+
+This should not happen — the types are structurally compatible. If it does, update your imports:
+
+```typescript
+// Remove React import
+// import type { ChangeEvent } from 'react';
+
+// Use generic type
+import type { GenericChangeEvent } from '@nexus-state/form';
+```
+
+## Questions?
+
+See [packages/form/README.md](./packages/form/README.md) for full documentation.
 
