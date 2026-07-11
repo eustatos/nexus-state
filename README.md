@@ -439,6 +439,8 @@ console.log(store.get(countAtom)); // 3
 
 Nexus State includes powerful Time Travel functionality that allows you to track state changes and move between different states for debugging and historical state restoration.
 
+> **Note:** Time-travel is provided as a separate package (`@nexus-state/time-travel`) and is not included in core. This keeps the core bundle minimal (< 5 KB gzipped).
+
 ### Basic Usage with TimeTravelController
 
 ```javascript
@@ -649,22 +651,44 @@ MobX:          ██████████████ 14KB
 
 ## 📦 Packages
 
+### Core
+
 | Package | Description |
 |---------|-------------|
-| [@nexus-state/core](packages/core) | Core library |
-| [@nexus-state/react](packages/react) | React integration |
-| [@nexus-state/vue](packages/vue) | Vue integration |
-| [@nexus-state/svelte](packages/svelte) | Svelte integration |
-| [@nexus-state/persist](packages/persist) | Persistence plugin |
-| [@nexus-state/devtools](packages/devtools) | DevTools plugin |
-| [@nexus-state/middleware](packages/middleware) | Middleware plugin |
-| [@nexus-state/immer](packages/immer) | Immer integration |
-| [@nexus-state/web-worker](packages/web-worker) | Web Worker integration |
-| [@nexus-state/async](packages/async) | Async state management |
-| [@nexus-state/family](packages/family) | Atom family utilities |
-| [@nexus-state/cli](packages/cli) | CLI tools |
+| [@nexus-state/core](packages/core) | Core library — atoms, stores, plugins (< 5 KB gzipped) |
+
+### Framework Adapters
+
+| Package | Description |
+|---------|-------------|
+| [@nexus-state/react](packages/react) | React hooks (`useAtom`, `useStore`) |
+| [@nexus-state/vue](packages/vue) | Vue composables |
+| [@nexus-state/svelte](packages/svelte) | Svelte stores |
+
+### Utilities & Plugins
+
+| Package | Description |
+|---------|-------------|
+| [@nexus-state/extras](packages/extras) | **Consolidated package** — async, family, immer, persist, middleware, web-worker (subpath exports) |
+| [@nexus-state/form](packages/form) | Framework-agnostic form management (React hooks in `./react` subpath) |
 | [@nexus-state/query](packages/query) | Data fetching & caching |
-| [@nexus-state/form](packages/form) | Form management |
+| [@nexus-state/devtools](packages/devtools) | DevTools UI |
+| [@nexus-state/time-travel](packages/time-travel) | Time-travel debugging |
+| [@nexus-state/undo-redo](packages/undo-redo) | Undo/redo functionality |
+| [@nexus-state/cli](packages/cli) | CLI tools |
+
+### Deprecated (use `@nexus-state/extras` instead)
+
+| Package | Replacement | Status |
+|---------|-------------|--------|
+| [@nexus-state/async](packages/async) | `@nexus-state/extras/async` | ⚠️ Deprecated |
+| [@nexus-state/family](packages/family) | `@nexus-state/extras/family` | ⚠️ Deprecated |
+| [@nexus-state/immer](packages/immer) | `@nexus-state/extras/immer` | ⚠️ Deprecated |
+| [@nexus-state/persist](packages/persist) | `@nexus-state/extras/persist` | ⚠️ Deprecated |
+| [@nexus-state/middleware](packages/middleware) | `@nexus-state/extras/middleware` | ⚠️ Deprecated |
+| [@nexus-state/web-worker](packages/web-worker) | `@nexus-state/extras/web-worker` | ⚠️ Deprecated |
+
+**Note:** Deprecated packages re-export from `@nexus-state/extras` for backward compatibility. They will be removed in v1.1.0.
 
 ---
 
