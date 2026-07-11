@@ -2,11 +2,12 @@ import { build } from 'esbuild';
 import { gzip } from 'zlib';
 import { promisify } from 'util';
 import { writeFileSync, mkdirSync, rmSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 const gzipAsync = promisify(gzip);
 
-const CORE_PKG = '/Users/aleksanderastashkin/develop/nexus-state/packages/core';
+const CORE_PKG = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = join(CORE_PKG, 'test', 'fixtures');
 const OUT_DIR = join(CORE_PKG, 'test', 'fixtures', '.bundler-out');
 

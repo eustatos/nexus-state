@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CORE_PKG = '/Users/aleksanderastashkin/develop/nexus-state/packages/core';
+const CORE_PKG = __dirname;
 
 const aliasMap = {
   '@nexus-state/core': path.join(CORE_PKG, 'dist', 'esm', 'index.js'),

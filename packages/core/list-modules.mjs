@@ -1,7 +1,8 @@
 import { build } from 'esbuild';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-const CORE_PKG = '/Users/aleksanderastashkin/develop/nexus-state/packages/core';
+const CORE_PKG = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = join(CORE_PKG, 'test', 'fixtures');
 
 const aliasMap = {
