@@ -1,12 +1,15 @@
 # @nexus-state/form
 
 > **Forms for complex applications** — with DevTools, atomic architecture, and full type safety
+> 
+> **Framework-agnostic core** with optional React hooks. Vue/Svelte support coming soon.
 
 [![npm version](https://img.shields.io/npm/v/@nexus-state/form.svg)](https://www.npmjs.com/package/@nexus-state/form)
 
 > [![Coverage for form package](https://coveralls.io/repos/github/eustatos/nexus-state/badge.svg?branch=main&job_name=form)](https://coveralls.io/github/eustatos/nexus-state?branch=main)
 > [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 > [![React](https://img.shields.io/badge/React-17+-61dafb.svg)](https://react.dev/)
+> [![Framework Agnostic](https://img.shields.io/badge/Framework-Agnostic-green.svg)](#basic-example-framework-agnostic-core)
 
 ---
 
@@ -34,8 +37,67 @@
 
 ### Installation
 
+**Framework-agnostic core:**
 ```bash
-npm install @nexus-state/form @nexus-state/core @nexus-state/react
+npm install @nexus-state/form @nexus-state/core
+```
+
+**With React hooks:**
+```bash
+npm install @nexus-state/form @nexus-state/core @nexus-state/react react
+```
+
+**With Vue (future):**
+```bash
+# Coming soon
+npm install @nexus-state/form @nexus-state/core @nexus-state/vue vue
+```
+
+### Basic Example (Framework-Agnostic Core)
+
+```typescript
+import { createStore } from '@nexus-state/core';
+import { createForm, required, email, minLength } from '@nexus-state/form';
+
+const store = createStore();
+
+interface RegisterForm {
+  username: string;
+  email: string;
+  password: string;
+}
+
+const form = createForm<RegisterForm>(store, {
+  initialValues: {
+    username: '',
+    email: '',
+    password: '',
+  },
+  validate: (values) => {
+    const errors: Partial<Record<keyof RegisterForm, string>> = {};
+    if (!values.username) errors.username = 'Required';
+    else if (values.username.length < 3) errors.username = 'Min 3 characters';
+    if (!values.email) errors.email = 'Required';
+    else if (!values.email.includes('@')) errors.email = 'Invalid email';
+    if (!values.password) errors.password = 'Required';
+    else if (values.password.length < 8) errors.password = 'Min 8 characters';
+    return errors;
+  },
+});
+
+// Subscribe to form state
+store.sub(form.valuesAtom, (values) => {
+  console.log('Form values:', values);
+});
+
+// Update field
+form.setFieldValue('username', 'alice');
+
+// Validate
+const { valid, errors } = await form.validate();
+
+// Get values
+const values = form.values;
 ```
 
 ### Basic Example (React)

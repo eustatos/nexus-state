@@ -60,19 +60,25 @@
     "validation",
     "nexus-state",
     "typescript",
-    "react"
+    "react",
+    "vue",
+    "svelte",
+    "framework-agnostic"
   ],
   "dependencies": {
-    "@nexus-state/core": "workspace:*",
-    "@nexus-state/react": "workspace:*"
+    "@nexus-state/core": "workspace:*"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "@nexus-state/react": "workspace:*",
     "zod": "^3.0.0",
     "yup": "^1.0.0"
   },
   "peerDependenciesMeta": {
     "react": {
+      "optional": true
+    },
+    "@nexus-state/react": {
       "optional": true
     },
     "zod": {
@@ -83,6 +89,7 @@
     }
   },
   "devDependencies": {
+    "@nexus-state/react": "workspace:*",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",

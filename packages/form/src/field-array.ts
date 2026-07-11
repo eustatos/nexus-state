@@ -1,11 +1,11 @@
 import { atom, Store } from '@nexus-state/core';
-import type { ChangeEvent } from 'react';
 import type {
   FieldArray,
   FieldArrayMeta,
   Field,
   FieldState,
-  FieldMeta
+  FieldMeta,
+  GenericChangeEvent,
 } from './types';
 import {
   createField,
@@ -137,7 +137,7 @@ export function getFieldArray<TItem>(
       checkboxProps: {
         name: `${meta.name}[${index}]`,
         checked: !!fieldState.value,
-        onChange: (e: ChangeEvent<HTMLInputElement>) => {
+        onChange: (e: GenericChangeEvent<HTMLInputElement>) => {
           setFieldValue(store, fieldMeta, e.target.checked as TItem);
         }
       },
@@ -147,7 +147,7 @@ export function getFieldArray<TItem>(
         name: `${meta.name}[${index}]`,
         value: fieldState.value,
         checked: true,
-        onChange: (e: ChangeEvent<HTMLInputElement>) => {
+        onChange: (e: GenericChangeEvent<HTMLInputElement>) => {
           setFieldValue(store, fieldMeta, e.target.value as unknown as TItem);
         }
       },
@@ -156,7 +156,7 @@ export function getFieldArray<TItem>(
       selectProps: {
         name: `${meta.name}[${index}]`,
         value: fieldState.value,
-        onChange: (e: ChangeEvent<HTMLSelectElement> | { target: { value: any } }) => {
+        onChange: (e: GenericChangeEvent<HTMLSelectElement> | { target: { value: any } }) => {
           const value = e?.target?.value ?? e;
           setFieldValue(store, fieldMeta, value as TItem);
         }
