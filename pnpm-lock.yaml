@@ -81,34 +81,6 @@ importers:
         specifier: ^3.0.7
         version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
 
-  apps/demo-async:
-    dependencies:
-      '@nexus-state/async':
-        specifier: ^0.1.3
-        version: 0.1.4
-      '@nexus-state/react':
-        specifier: workspace:*
-        version: link:../../packages/react
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.0.0
-        version: 18.3.28
-      '@types/react-dom':
-        specifier: ^18.0.0
-        version: 18.3.7(@types/react@18.3.28)
-      '@vitejs/plugin-react':
-        specifier: ^4.0.0
-        version: 4.7.0(vite@5.4.21(@types/node@20.19.37))
-      vite:
-        specifier: ^5.4.21
-        version: 5.4.21(@types/node@20.19.37)
-
   apps/demo-devtools:
     dependencies:
       '@nexus-state/core':
@@ -240,49 +212,6 @@ importers:
         specifier: ^3.0.7
         version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
 
-  apps/demo-family:
-    dependencies:
-      '@nexus-state/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@nexus-state/family':
-        specifier: workspace:*
-        version: link:../../packages/family
-      '@nexus-state/react':
-        specifier: workspace:*
-        version: link:../../packages/react
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@testing-library/jest-dom':
-        specifier: ^6.1.3
-        version: 6.9.1
-      '@testing-library/react':
-        specifier: ^14.0.0
-        version: 14.3.1(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@types/react':
-        specifier: ^18.0.0
-        version: 18.3.28
-      '@types/react-dom':
-        specifier: ^18.0.0
-        version: 18.3.7(@types/react@18.3.28)
-      '@vitejs/plugin-react':
-        specifier: ^4.0.0
-        version: 4.7.0(vite@5.4.21(@types/node@20.19.37))
-      jsdom:
-        specifier: ^26.1.0
-        version: 26.1.0
-      vite:
-        specifier: ^5.4.21
-        version: 5.4.21(@types/node@20.19.37)
-      vitest:
-        specifier: ^3.0.7
-        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
-
   apps/demo-forms-granularity:
     dependencies:
       '@nexus-state/core':
@@ -291,99 +220,6 @@ importers:
       '@nexus-state/devtools':
         specifier: workspace:*
         version: link:../../packages/devtools
-      '@nexus-state/react':
-        specifier: workspace:*
-        version: link:../../packages/react
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.0.0
-        version: 18.3.28
-      '@types/react-dom':
-        specifier: ^18.0.0
-        version: 18.3.7(@types/react@18.3.28)
-      '@vitejs/plugin-react':
-        specifier: ^4.0.0
-        version: 4.7.0(vite@5.4.21(@types/node@20.19.37))
-      vite:
-        specifier: ^5.4.21
-        version: 5.4.21(@types/node@20.19.37)
-
-  apps/demo-immer:
-    dependencies:
-      '@nexus-state/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@nexus-state/immer':
-        specifier: workspace:*
-        version: link:../../packages/immer
-      '@nexus-state/react':
-        specifier: workspace:*
-        version: link:../../packages/react
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.0.0
-        version: 18.3.28
-      '@types/react-dom':
-        specifier: ^18.0.0
-        version: 18.3.7(@types/react@18.3.28)
-      '@vitejs/plugin-react':
-        specifier: ^4.0.0
-        version: 4.7.0(vite@5.4.21(@types/node@20.19.37))
-      vite:
-        specifier: ^5.4.21
-        version: 5.4.21(@types/node@20.19.37)
-
-  apps/demo-middleware:
-    dependencies:
-      '@nexus-state/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@nexus-state/middleware':
-        specifier: workspace:*
-        version: link:../../packages/middleware
-      '@nexus-state/react':
-        specifier: workspace:*
-        version: link:../../packages/react
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.0.0
-        version: 18.3.28
-      '@types/react-dom':
-        specifier: ^18.0.0
-        version: 18.3.7(@types/react@18.3.28)
-      '@vitejs/plugin-react':
-        specifier: ^4.0.0
-        version: 4.7.0(vite@5.4.21(@types/node@20.19.37))
-      vite:
-        specifier: ^5.4.21
-        version: 5.4.21(@types/node@20.19.37)
-
-  apps/demo-persist:
-    dependencies:
-      '@nexus-state/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@nexus-state/persist':
-        specifier: workspace:*
-        version: link:../../packages/persist
       '@nexus-state/react':
         specifier: workspace:*
         version: link:../../packages/react
@@ -518,25 +354,6 @@ importers:
         specifier: ^5.4.21
         version: 5.4.21(@types/node@20.19.37)
 
-  packages/async:
-    dependencies:
-      '@nexus-state/extras':
-        specifier: workspace:*
-        version: link:../extras
-    devDependencies:
-      '@vitest/coverage-v8':
-        specifier: ^3.0.7
-        version: 3.2.4(vitest@3.2.4(@types/node@20.19.37)(jsdom@26.1.0))
-      eslint:
-        specifier: ^8.40.0
-        version: 8.57.1
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^3.0.7
-        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
-
   packages/cli:
     dependencies:
       commander:
@@ -632,25 +449,6 @@ importers:
       immer:
         specifier: ^10.0.0
         version: 10.2.0
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^3.0.7
-        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
-
-  packages/family:
-    dependencies:
-      '@nexus-state/extras':
-        specifier: workspace:*
-        version: link:../extras
-    devDependencies:
-      '@vitest/coverage-v8':
-        specifier: ^3.0.7
-        version: 3.2.4(vitest@3.2.4(@types/node@20.19.37)(jsdom@26.1.0))
-      eslint:
-        specifier: ^8.40.0
-        version: 8.57.1
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
@@ -1028,72 +826,15 @@ importers:
         specifier: ^5.4.21
         version: 5.4.21(@types/node@20.19.37)
 
-  packages/immer:
-    dependencies:
-      '@nexus-state/extras':
-        specifier: workspace:*
-        version: link:../extras
-    devDependencies:
-      '@vitest/coverage-v8':
-        specifier: ^3.0.7
-        version: 3.2.4(vitest@3.2.4(@types/node@20.19.37)(jsdom@26.1.0))
-      eslint:
-        specifier: ^8.40.0
-        version: 8.57.1
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^3.0.7
-        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
-
-  packages/middleware:
-    dependencies:
-      '@nexus-state/extras':
-        specifier: workspace:*
-        version: link:../extras
-    devDependencies:
-      '@vitest/coverage-v8':
-        specifier: ^3.0.7
-        version: 3.2.4(vitest@3.2.4(@types/node@20.19.37)(jsdom@26.1.0))
-      eslint:
-        specifier: ^8.40.0
-        version: 8.57.1
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^3.0.7
-        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
-
-  packages/persist:
-    dependencies:
-      '@nexus-state/extras':
-        specifier: workspace:*
-        version: link:../extras
-    devDependencies:
-      '@vitest/coverage-v8':
-        specifier: ^3.0.7
-        version: 3.2.4(vitest@3.2.4(@types/node@20.19.37)(jsdom@26.1.0))
-      eslint:
-        specifier: ^8.40.0
-        version: 8.57.1
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^3.0.7
-        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
-
   packages/query:
     dependencies:
       '@nexus-state/core':
         specifier: workspace:*
         version: link:../core
+    devDependencies:
       '@nexus-state/react':
         specifier: workspace:*
         version: link:../react
-    devDependencies:
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.3.1(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1306,25 +1047,6 @@ importers:
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^3.0.7
-        version: 3.2.4(@types/node@20.19.37)(jsdom@26.1.0)
-
-  packages/web-worker:
-    dependencies:
-      '@nexus-state/extras':
-        specifier: workspace:*
-        version: link:../extras
-    devDependencies:
-      '@vitest/coverage-v8':
-        specifier: ^3.0.7
-        version: 3.2.4(vitest@3.2.4(@types/node@20.19.37)(jsdom@26.1.0))
-      eslint:
-        specifier: ^8.40.0
-        version: 8.57.1
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
@@ -2657,9 +2379,6 @@ packages:
 
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
-
-  '@nexus-state/async@0.1.4':
-    resolution: {integrity: sha512-pfAybRfossv3OO9V/C9ltexZ5kz1KlG7Z7s1PED47GVaS5NjOnKPmKF91K+sIDKci/7Pk3pHaNFqmEs/AzU22w==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -8207,10 +7926,6 @@ snapshots:
       '@emnapi/runtime': 1.8.1
       '@tybys/wasm-util': 0.10.1
     optional: true
-
-  '@nexus-state/async@0.1.4':
-    dependencies:
-      '@nexus-state/core': link:packages/core
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
