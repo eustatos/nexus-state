@@ -7,5 +7,10 @@ packages:
   - "!packages/persist"
   - "!packages/middleware"
   - "!packages/web-worker"
+  - "!apps/demo-family"
+  - "!apps/demo-async"
+  - "!apps/demo-immer"
+  - "!apps/demo-middleware"
+  - "!apps/demo-persist"
 
 engine-strict: true
