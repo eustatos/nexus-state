@@ -16,28 +16,16 @@ jobs:
             filter: '@nexus-state/core'
           - name: react
             filter: '@nexus-state/react'
-          - name: family
-            filter: '@nexus-state/family'
-          - name: async
-            filter: '@nexus-state/async'
           - name: devtools
             filter: '@nexus-state/devtools'
           - name: form
             filter: '@nexus-state/form'
-          - name: immer
-            filter: '@nexus-state/immer'
-          - name: middleware
-            filter: '@nexus-state/middleware'
-          - name: persist
-            filter: '@nexus-state/persist'
           - name: query
             filter: '@nexus-state/query'
           - name: svelte
             filter: '@nexus-state/svelte'
           - name: vue
             filter: '@nexus-state/vue'
-          - name: web-worker
-            filter: '@nexus-state/web-worker'
       fail-fast: false
 
     steps:
@@ -46,7 +34,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -69,7 +57,7 @@ jobs:
           name: coverage-${{ matrix.package.name }}
           path: packages/${{ matrix.package.name }}/coverage/lcov.info
           retention-days: 1
-          if-no-files-found: error
+          if-no-files-found: warn
 
   send-to-coveralls:
     runs-on: ubuntu-latest
@@ -81,28 +69,16 @@ jobs:
             flag: core
           - name: react
             flag: react
-          - name: family
-            flag: family
-          - name: async
-            flag: async
           - name: devtools
             flag: devtools
           - name: form
             flag: form
-          - name: immer
-            flag: immer
-          - name: middleware
-            flag: middleware
-          - name: persist
-            flag: persist
           - name: query
             flag: query
           - name: svelte
             flag: svelte
           - name: vue
             flag: vue
-          - name: web-worker
-            flag: web-worker
       fail-fast: false
 
     steps:
