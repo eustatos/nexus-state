@@ -1,10 +1,27 @@
 {
   "name": "@nexus-state/react",
   "version": "0.2.1",
+  "description": "React bindings for @nexus-state/core — hooks and context for atom-based state management",
   "main": "dist/esm/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "sideEffects": false,
+  "homepage": "https://nexus-state.website.yandexcloud.net/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eustatos/nexus-state.git",
+    "directory": "packages/react"
+  },
+  "keywords": [
+    "state-management",
+    "react",
+    "hooks",
+    "atoms",
+    "nexus-state",
+    "typescript"
+  ],
+  "author": "Nexus State Contributors",
+  "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/esm/index.d.ts",

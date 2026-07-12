@@ -53,6 +53,7 @@
     }
   },
   "sideEffects": false,
+  "homepage": "https://nexus-state.website.yandexcloud.net/",
   "files": [
     "dist",
     "README.md"

@@ -1,5 +1,16 @@
 packages:
   - "packages/**"
   - "apps/**"
+  - "!packages/async"
+  - "!packages/family"
+  - "!packages/immer"
+  - "!packages/persist"
+  - "!packages/middleware"
+  - "!packages/web-worker"
+  - "!apps/demo-family"
+  - "!apps/demo-async"
+  - "!apps/demo-immer"
+  - "!apps/demo-middleware"
+  - "!apps/demo-persist"
 
 engine-strict: true

@@ -9,13 +9,13 @@
   "homepage": "https://nexus-state.website.yandexcloud.net/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/eustatos/nexus-state.git"
+    "url": "https://github.com/eustatos/nexus-state.git",
+    "directory": "packages/time-travel"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js"
     }
   },
   "scripts": {
