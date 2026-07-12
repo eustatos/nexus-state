@@ -1,10 +1,27 @@
 {
   "name": "@nexus-state/devtools",
   "version": "0.2.1",
+  "description": "Developer tools plugin for @nexus-state/core — action inspector, time-travel, and state diffing",
   "main": "./dist/esm/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "sideEffects": false,
+  "homepage": "https://nexus-state.website.yandexcloud.net/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eustatos/nexus-state.git",
+    "directory": "packages/devtools"
+  },
+  "keywords": [
+    "state-management",
+    "devtools",
+    "debugging",
+    "time-travel",
+    "nexus-state",
+    "plugin"
+  ],
+  "author": "Nexus State Contributors",
+  "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",

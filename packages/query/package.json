@@ -4,16 +4,15 @@
   "description": "Powerful data fetching and caching for Nexus State",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js"
     },
     "./react": {
       "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.js",
-      "require": "./dist/react/index.js"
+      "import": "./dist/react/index.js"
     }
   },
   "files": [
@@ -40,12 +39,23 @@
     "react"
   ],
   "dependencies": {
-    "@nexus-state/core": "workspace:*",
-    "@nexus-state/react": "workspace:*"
+    "@nexus-state/core": "workspace:*"
   },
   "peerDependencies": {
+    "@nexus-state/react": ">=0.2.0",
     "react": ">=17.0.0 <20.0.0",
     "react-dom": ">=17.0.0 <20.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@nexus-state/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -57,6 +67,7 @@
     "typescript": "^5.9.3",
     "vitest": "^3.0.7",
     "eslint": "^8.57.1",
+    "@nexus-state/react": "workspace:*",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "jsdom": "^26.1.0"

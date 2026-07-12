@@ -1,13 +1,30 @@
 {
   "name": "@nexus-state/svelte",
   "version": "0.1.8",
+  "description": "Svelte bindings for @nexus-state/core — store adapter for atom-based state management",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "homepage": "https://nexus-state.website.yandexcloud.net/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eustatos/nexus-state.git",
+    "directory": "packages/svelte"
+  },
+  "keywords": [
+    "state-management",
+    "svelte",
+    "store",
+    "atoms",
+    "nexus-state",
+    "typescript"
+  ],
+  "author": "Nexus State Contributors",
+  "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js"
     }
   },
   "files": [

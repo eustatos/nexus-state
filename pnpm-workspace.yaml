@@ -1,5 +1,11 @@
 packages:
   - "packages/**"
   - "apps/**"
+  - "!packages/async"
+  - "!packages/family"
+  - "!packages/immer"
+  - "!packages/persist"
+  - "!packages/middleware"
+  - "!packages/web-worker"
 
 engine-strict: true
