@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/devtools",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Developer tools plugin for @nexus-state/core — action inspector, time-travel, and state diffing",
   "main": "./dist/esm/index.js",
   "module": "./dist/esm/index.js",

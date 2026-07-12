@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/svelte",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Svelte bindings for @nexus-state/core — store adapter for atom-based state management",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/vue",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Vue 3 bindings for @nexus-state/core — composable for atom-based state management",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

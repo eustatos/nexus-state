@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/react",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "React bindings for @nexus-state/core — hooks and context for atom-based state management",
   "main": "dist/esm/index.js",
   "module": "dist/esm/index.js",

@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/query",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Powerful data fetching and caching for Nexus State",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -42,7 +42,7 @@
     "@nexus-state/core": "workspace:*"
   },
   "peerDependencies": {
-    "@nexus-state/react": ">=0.2.0",
+    "@nexus-state/react": ">=0.2.2",
     "react": ">=17.0.0 <20.0.0",
     "react-dom": ">=17.0.0 <20.0.0"
   },

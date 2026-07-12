@@ -1,6 +1,6 @@
 {
   "name": "@nexus-state/extras",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Collection of optional plugins and utilities for @nexus-state/core",
   "type": "module",
   "sideEffects": false,
